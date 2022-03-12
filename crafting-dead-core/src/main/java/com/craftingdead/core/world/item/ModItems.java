@@ -209,6 +209,7 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(85)
               .setArmorPenetration(0.4F)
+              .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   public static final RegistryObject<MagazineItem> STANAG_DRUM_MAGAZINE =
@@ -216,6 +217,7 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(45)
               .setArmorPenetration(0.4F)
+              .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   public static final RegistryObject<MagazineItem> STANAG_30_ROUND_MAGAZINE =
@@ -223,6 +225,7 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(30)
               .setArmorPenetration(0.4F)
+              .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   public static final RegistryObject<MagazineItem> STANAG_20_ROUND_MAGAZINE =
@@ -230,6 +233,7 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(20)
               .setArmorPenetration(0.4F)
+              .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   public static final RegistryObject<MagazineItem> MPT55_MAGAZINE =
@@ -237,12 +241,14 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(30)
               .setArmorPenetration(0.4F)
+              .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   public static final RegistryObject<MagazineItem> AK47_30_ROUND_MAGAZINE =
       ITEMS.register("ak47_30_round_magazine",
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(30)
+              .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   public static final RegistryObject<MagazineItem> FNFAL_MAGAZINE =
@@ -250,6 +256,7 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(20)
               .setArmorPenetration(0.55F)
+              .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   public static final RegistryObject<MagazineItem> ACR_MAGAZINE =
@@ -257,6 +264,7 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(20)
               .setArmorPenetration(0.5F)
+              .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   public static final RegistryObject<MagazineItem> G36C_MAGAZINE =
@@ -264,6 +272,7 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(30)
               .setArmorPenetration(0.45F)
+              .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   public static final RegistryObject<MagazineItem> HK417_MAGAZINE =
@@ -271,6 +280,7 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(30)
               .setArmorPenetration(0.47F)
+              .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   public static final RegistryObject<MagazineItem> M1911_MAGAZINE =
@@ -278,6 +288,7 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(7)
               .setArmorPenetration(0.08F)
+              .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   public static final RegistryObject<MagazineItem> G18_MAGAZINE =
@@ -285,6 +296,7 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(20)
               .setArmorPenetration(0.08F)
+              .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   public static final RegistryObject<MagazineItem> M9_MAGAZINE =
@@ -292,6 +304,7 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(15)
               .setArmorPenetration(0.08F)
+              .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   public static final RegistryObject<MagazineItem> DESERT_EAGLE_MAGAZINE =
@@ -299,6 +312,7 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(13)
               .setArmorPenetration(0.35F)
+              .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   public static final RegistryObject<MagazineItem> P250_MAGAZINE =
@@ -306,6 +320,7 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(12)
               .setArmorPenetration(0.08F)
+              .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   public static final RegistryObject<MagazineItem> MAGNUM_MAGAZINE =
@@ -313,6 +328,7 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(6)
               .setArmorPenetration(0.65F)
+              .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   public static final RegistryObject<MagazineItem> FN57_MAGAZINE =
@@ -320,6 +336,7 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(20)
               .setArmorPenetration(0.09F)
+              .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   public static final RegistryObject<MagazineItem> P90_MAGAZINE =
@@ -327,6 +344,7 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(50)
               .setArmorPenetration(0.15F)
+              .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   public static final RegistryObject<MagazineItem> VECTOR_MAGAZINE =
@@ -334,6 +352,7 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(30)
               .setArmorPenetration(0.15F)
+              .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   public static final RegistryObject<MagazineItem> MP5A5_35_ROUND_MAGAZINE =
@@ -341,6 +360,7 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(35)
               .setArmorPenetration(0.15F)
+              .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   public static final RegistryObject<MagazineItem> MP5A5_21_ROUND_MAGAZINE =
@@ -348,6 +368,7 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(21)
               .setArmorPenetration(0.15F)
+              .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   public static final RegistryObject<MagazineItem> MAC10_EXTENDED_MAGAZINE =
@@ -355,6 +376,7 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(45)
               .setArmorPenetration(0.15F)
+              .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   public static final RegistryObject<MagazineItem> MAC10_MAGAZINE =
@@ -362,12 +384,14 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(30)
               .setArmorPenetration(0.15F)
+              .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   public static final RegistryObject<MagazineItem> SPORTER22_MAGAZINE =
       ITEMS.register("sporter22_magazine",
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(30)
+              .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   public static final RegistryObject<MagazineItem> M107_MAGAZINE =
@@ -375,6 +399,7 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(10)
               .setArmorPenetration(0.65F)
+              .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   public static final RegistryObject<MagazineItem> AS50_MAGAZINE =
@@ -382,6 +407,7 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(10)
               .setArmorPenetration(0.65F)
+              .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   public static final RegistryObject<MagazineItem> M1GARAND_MAGAZINE =
@@ -389,6 +415,7 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(8)
               .setArmorPenetration(0.95F)
+              .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   public static final RegistryObject<MagazineItem> AWP_MAGAZINE =
@@ -396,6 +423,7 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(10)
               .setArmorPenetration(0.95F)
+              .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   public static final RegistryObject<MagazineItem> TRENCH_GUN_SHELLS =
@@ -403,6 +431,7 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(6)
               .setArmorPenetration(0.35F)
+              .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   public static final RegistryObject<MagazineItem> MOSSBERG_SHELLS =
@@ -410,6 +439,7 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(8)
               .setArmorPenetration(0.3F)
+              .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   public static final RegistryObject<MagazineItem> DMR_MAGAZINE =
@@ -417,12 +447,14 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(5)
               .setArmorPenetration(0.65F)
+              .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   public static final RegistryObject<MagazineItem> TASER_CARTRIDGE =
       ITEMS.register("taser_cartridge",
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(3)
+              .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   public static final RegistryObject<MagazineItem> M240B_MAGAZINE =
@@ -430,6 +462,7 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(150)
               .setArmorPenetration(0.5F)
+              .stacksTo(1)
               .tab(COMBAT_TAB)));
 
 
@@ -438,6 +471,7 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(100)
               .setArmorPenetration(0.5F)
+              .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   public static final RegistryObject<MagazineItem> RPK_MAGAZINE =
@@ -445,6 +479,7 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(60)
               .setArmorPenetration(0.5F)
+              .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   public static final RegistryObject<MagazineItem> MINIGUN_MAGAZINE =
@@ -452,6 +487,7 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(350)
               .setArmorPenetration(0.3F)
+              .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   public static final RegistryObject<MagazineItem> MK48MOD_MAGAZINE =
@@ -459,6 +495,7 @@ public class ModItems {
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(150)
               .setArmorPenetration(0.52F)
+              .stacksTo(1)
               .tab(COMBAT_TAB)));
 
   // ================================================================================

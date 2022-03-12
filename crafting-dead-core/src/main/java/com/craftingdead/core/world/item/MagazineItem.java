@@ -150,7 +150,6 @@ public class MagazineItem extends Item {
 
     public Properties setSize(int size) {
       this.size = size;
-      this.durability(size);
       return this;
     }
   }
