@@ -256,7 +256,7 @@ public class CraftingDeadImmerse {
 
   @SubscribeEvent
   public void handleLevelTick(TickEvent.WorldTickEvent event) {
-    LevelExtension.getOrThrow(event.world).tick();
+    LevelExtension.getOrThrow(event.world).tick(event::haveTime);
   }
 
   @SubscribeEvent

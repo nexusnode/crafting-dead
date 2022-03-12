@@ -44,8 +44,8 @@ public class PersistedLandManager extends BaseLandManager {
   }
 
   @Override
-  public void serverTick(BooleanSupplier haveTime) {
-    super.serverTick(haveTime);
+  public void tick(BooleanSupplier haveTime) {
+    super.tick(haveTime);
     while (!this.dirtyChunks.isEmpty() && haveTime.getAsBoolean()) {
       this.saveChunk(this.dirtyChunks.first());
     }

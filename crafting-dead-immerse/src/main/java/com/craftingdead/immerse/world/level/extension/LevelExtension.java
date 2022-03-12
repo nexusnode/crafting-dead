@@ -15,6 +15,7 @@
 package com.craftingdead.immerse.world.level.extension;
 
 import java.io.IOException;
+import java.util.function.BooleanSupplier;
 import javax.annotation.Nullable;
 import com.craftingdead.core.capability.CapabilityUtil;
 import com.craftingdead.immerse.CraftingDeadImmerse;
@@ -27,7 +28,7 @@ import net.minecraftforge.common.capabilities.CapabilityToken;
 import net.minecraftforge.common.util.INBTSerializable;
 
 public sealed interface LevelExtension
-    extends AutoCloseable, INBTSerializable<CompoundTag> permits LevelExtensionImpl {
+    extends AutoCloseable, INBTSerializable<CompoundTag>permits LevelExtensionImpl {
 
   Capability<LevelExtension> CAPABILITY = CapabilityManager.get(new CapabilityToken<>() {});
 
@@ -49,7 +50,12 @@ public sealed interface LevelExtension
     return CapabilityUtil.get(CAPABILITY, level, LevelExtension.class);
   }
 
-  void tick();
+  /**
+   * Tick level logic, only called on the server.
+   * 
+   * @param haveTime - whether the server has enough time to perform any additional tasks
+   */
+  void tick(BooleanSupplier haveTime);
 
   LandManager getLandManager();
 

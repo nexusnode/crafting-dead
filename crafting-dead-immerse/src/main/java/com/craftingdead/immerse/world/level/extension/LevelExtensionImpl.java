@@ -15,17 +15,16 @@
 package com.craftingdead.immerse.world.level.extension;
 
 import java.io.IOException;
+import java.util.function.BooleanSupplier;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 
 final class LevelExtensionImpl implements LevelExtension {
 
-  private final Level level;
   private final LandManager landManager;
 
   LevelExtensionImpl(Level level) {
-    this.level = level;
     if (level instanceof ServerLevel) {
       var server = level.getServer();
       var storageSource = server.storageSource;
@@ -38,11 +37,8 @@ final class LevelExtensionImpl implements LevelExtension {
   }
 
   @Override
-  public void tick() {
-    if (!this.level.isClientSide()) {
-      var server = this.level.getServer();
-      this.landManager.serverTick(server::haveTime);
-    }
+  public void tick(BooleanSupplier haveTime) {
+    this.landManager.tick(haveTime);
   }
 
   @Override

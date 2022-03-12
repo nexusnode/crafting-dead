@@ -75,7 +75,7 @@ public class BaseLandManager implements LandManager {
   }
 
   @Override
-  public void serverTick(BooleanSupplier haveTime) {
+  public void tick(BooleanSupplier haveTime) {
     this.executor.tick();
     for (var chunkPos : this.dirtyChunks) {
       var chunk = this.level.getChunk(chunkPos.x, chunkPos.z);

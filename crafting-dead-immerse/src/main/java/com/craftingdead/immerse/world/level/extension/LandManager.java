@@ -27,7 +27,7 @@ import net.minecraft.world.level.ChunkPos;
 
 public interface LandManager extends AutoCloseable {
 
-  void serverTick(BooleanSupplier haveTime);
+  void tick(BooleanSupplier haveTime);
 
   /**
    * Registers a new {@link LandOwner}.
