@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "craftingdeadimmerse:item/watermelon"
+    "layer0": "craftingdeadimmerse:item/open_canned_pickles"
   }
 }

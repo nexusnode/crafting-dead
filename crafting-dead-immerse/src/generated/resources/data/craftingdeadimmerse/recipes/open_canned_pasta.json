@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "craftingdeadimmerse:canned_pasta"
+    },
+    [
+      {
+        "item": "craftingdeadimmerse:can_opener"
+      },
+      {
+        "item": "craftingdeadimmerse:screwdriver"
+      },
+      {
+        "item": "craftingdeadimmerse:multi_tool"
+      }
+    ]
+  ],
+  "result": {
+    "item": "craftingdeadimmerse:open_canned_pasta"
+  }
+}

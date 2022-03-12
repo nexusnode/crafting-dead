@@ -14,10 +14,15 @@
 
 package com.craftingdead.immerse.world.item;
 
+import com.craftingdead.core.world.item.ArbitraryTooltips;
+import com.craftingdead.core.world.item.MeleeWeaponItem;
+import com.craftingdead.core.world.item.ToolItem;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.world.action.ImmerseActionTypes;
 import com.craftingdead.immerse.world.food.ImmerseFoods;
 import com.craftingdead.immerse.world.level.block.ImmerseBlocks;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
@@ -162,42 +167,82 @@ public class ImmerseItems {
 
   public static final RegistryObject<Item> CANNED_CORN =
       items.register("canned_corn",
+          () -> new Item(new Item.Properties().tab(TAB)));
+
+  public static final RegistryObject<Item> OPEN_CANNED_CORN =
+      items.register("open_canned_corn",
           () -> new Item(new Item.Properties().tab(TAB).food(ImmerseFoods.CANNED_CORN)));
 
   public static final RegistryObject<Item> CANNED_BEANS =
       items.register("canned_beans",
+          () -> new Item(new Item.Properties().tab(TAB)));
+
+  public static final RegistryObject<Item> OPEN_CANNED_BEANS =
+      items.register("open_canned_beans",
           () -> new Item(new Item.Properties().tab(TAB).food(ImmerseFoods.CANNED_BEANS)));
 
   public static final RegistryObject<Item> CANNED_TUNA =
       items.register("canned_tuna",
+          () -> new Item(new Item.Properties().tab(TAB)));
+
+  public static final RegistryObject<Item> OPEN_CANNED_TUNA =
+      items.register("open_canned_tuna",
           () -> new Item(new Item.Properties().tab(TAB).food(ImmerseFoods.CANNED_TUNA)));
 
   public static final RegistryObject<Item> CANNED_PEACHES =
       items.register("canned_peaches",
+          () -> new Item(new Item.Properties().tab(TAB)));
+
+  public static final RegistryObject<Item> OPEN_CANNED_PEACHES =
+      items.register("open_canned_peaches",
           () -> new Item(new Item.Properties().tab(TAB).food(ImmerseFoods.CANNED_PEACHES)));
 
   public static final RegistryObject<Item> CANNED_PASTA =
       items.register("canned_pasta",
+          () -> new Item(new Item.Properties().tab(TAB)));
+
+  public static final RegistryObject<Item> OPEN_CANNED_PASTA =
+      items.register("open_canned_pasta",
           () -> new Item(new Item.Properties().tab(TAB).food(ImmerseFoods.CANNED_PASTA)));
 
   public static final RegistryObject<Item> CANNED_BACON =
       items.register("canned_bacon",
+          () -> new Item(new Item.Properties().tab(TAB)));
+
+  public static final RegistryObject<Item> OPEN_CANNED_BACON =
+      items.register("open_canned_bacon",
           () -> new Item(new Item.Properties().tab(TAB).food(ImmerseFoods.CANNED_BACON)));
 
   public static final RegistryObject<Item> CANNED_CUSTARD =
       items.register("canned_custard",
+          () -> new Item(new Item.Properties().tab(TAB)));
+
+  public static final RegistryObject<Item> OPEN_CANNED_CUSTARD =
+      items.register("open_canned_custard",
           () -> new Item(new Item.Properties().tab(TAB).food(ImmerseFoods.CANNED_CUSTARD)));
 
   public static final RegistryObject<Item> CANNED_PICKLES =
       items.register("canned_pickles",
+          () -> new Item(new Item.Properties().tab(TAB)));
+
+  public static final RegistryObject<Item> OPEN_CANNED_PICKLES =
+      items.register("open_canned_pickles",
           () -> new Item(new Item.Properties().tab(TAB).food(ImmerseFoods.CANNED_PICKLES)));
 
   public static final RegistryObject<Item> CANNED_DOG_FOOD =
       items.register("canned_dog_food",
+          () -> new Item(new Item.Properties().tab(TAB)));
+
+  public static final RegistryObject<Item> OPEN_CANNED_DOG_FOOD =
+      items.register("open_canned_dog_food",
           () -> new Item(new Item.Properties().tab(TAB).food(ImmerseFoods.CANNED_DOG_FOOD)));
 
   public static final RegistryObject<Item> CANNED_TOMATO_SOUP =
       items.register("canned_tomato_soup",
+          () -> new Item(new Item.Properties().tab(TAB)));
+
+  public static final RegistryObject<Item> OPEN_CANNED_TOMATO_SOUP =
+      items.register("open_canned_tomato_soup",
           () -> new Item(new Item.Properties().tab(TAB).food(ImmerseFoods.CANNED_TOMATO_SOUP)));
 
   public static final RegistryObject<Item> MRE =
@@ -224,10 +269,6 @@ public class ImmerseItems {
       items.register("rice_bag",
           () -> new Item(new Item.Properties().tab(TAB).food(ImmerseFoods.RICE_BAG)));
 
-  public static final RegistryObject<Item> APPLE =
-      items.register("apple",
-          () -> new Item(new Item.Properties().tab(TAB).food(ImmerseFoods.APPLE)));
-
   public static final RegistryObject<Item> ROTTEN_APPLE =
       items.register("rotten_apple",
           () -> new Item(new Item.Properties().tab(TAB).food(ImmerseFoods.ROTTEN_APPLE)));
@@ -236,13 +277,9 @@ public class ImmerseItems {
       items.register("noodles",
           () -> new Item(new Item.Properties().tab(TAB).food(ImmerseFoods.NOODLES)));
 
-  public static final RegistryObject<Item> WATERMELON =
-      items.register("watermelon",
-          () -> new Item(new Item.Properties().tab(TAB).food(ImmerseFoods.WATERMELON)));
-
-  public static final RegistryObject<Item> ROTTEN_WATERMELON =
-      items.register("rotten_watermelon",
-          () -> new Item(new Item.Properties().tab(TAB).food(ImmerseFoods.ROTTEN_WATERMELON)));
+  public static final RegistryObject<Item> ROTTEN_MELON_SLICE =
+      items.register("rotten_melon_slice",
+          () -> new Item(new Item.Properties().tab(TAB).food(ImmerseFoods.ROTTEN_MELON_SLICE)));
 
   public static final RegistryObject<Item> BLUEBERRY =
       items.register("blueberry",
@@ -291,4 +328,61 @@ public class ImmerseItems {
   public static final RegistryObject<Item> FLAKE_CEREAL =
       items.register("flake_cereal",
           () -> new Item(new Item.Properties().tab(TAB).food(ImmerseFoods.FLAKE_CEREAL)));
+
+  // ================================================================================
+  // Tools
+  // ================================================================================
+
+  public static final RegistryObject<Item> CAN_OPENER =
+      items.register("can_opener", () -> new ToolItem(
+          new Item.Properties().durability(8).tab(TAB)) {
+
+        @Override
+        public boolean hasContainerItem(ItemStack stack) {
+          return true;
+        }
+
+        @Override
+        public ItemStack getContainerItem(ItemStack itemStack) {
+          return itemStack.copy();
+        }
+      });
+
+  public static final RegistryObject<Item> SCREWDRIVER =
+      items.register("screwdriver", () -> new ToolItem(
+          new Item.Properties().durability(4).tab(TAB)) {
+
+        @Override
+        public boolean hasContainerItem(ItemStack stack) {
+          return true;
+        }
+
+        @Override
+        public ItemStack getContainerItem(ItemStack itemStack) {
+          return itemStack.copy();
+        }
+      });
+
+  public static final RegistryObject<Item> MULTI_TOOL =
+      items.register("multi_tool", () -> new MeleeWeaponItem(8, -2.4F,
+          new Item.Properties().durability(20).tab(TAB)) {
+
+        @Override
+        public boolean hasContainerItem(ItemStack stack) {
+          return true;
+        }
+
+        @Override
+        public ItemStack getContainerItem(ItemStack itemStack) {
+          return itemStack.copy();
+        }
+      });
+
+  static {
+    var canOpenerTooltip = new TranslatableComponent("item_lore.can_opener")
+        .withStyle(ChatFormatting.GRAY);
+    ArbitraryTooltips.registerTooltip(CAN_OPENER, canOpenerTooltip);
+    ArbitraryTooltips.registerTooltip(SCREWDRIVER, canOpenerTooltip);
+    ArbitraryTooltips.registerTooltip(MULTI_TOOL, canOpenerTooltip);
+  }
 }

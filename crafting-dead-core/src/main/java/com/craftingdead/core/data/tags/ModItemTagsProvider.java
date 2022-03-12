@@ -12,7 +12,7 @@
  * https://craftingdead.net/terms.php
  */
 
-package com.craftingdead.core.data;
+package com.craftingdead.core.data.tags;
 
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.tags.ModItemTags;

@@ -23,6 +23,7 @@ import com.craftingdead.core.capability.CapabilityUtil;
 import com.craftingdead.immerse.client.ClientDist;
 import com.craftingdead.immerse.command.Commands;
 import com.craftingdead.immerse.data.models.ImmerseModelProvider;
+import com.craftingdead.immerse.data.recipes.ImmerseRecipeProvider;
 import com.craftingdead.immerse.game.Game;
 import com.craftingdead.immerse.game.GameTypes;
 import com.craftingdead.immerse.game.module.ModuleTypes;
@@ -183,6 +184,7 @@ public class CraftingDeadImmerse {
 
   private void handleGatherData(GatherDataEvent event) {
     var generator = event.getGenerator();
+    generator.addProvider(new ImmerseRecipeProvider(generator));
     generator.addProvider(new ImmerseModelProvider(generator));
   }
 

@@ -29,26 +29,34 @@ public class ImmerseItemModelGenerators {
     this.generateFlatItem(ImmerseItems.CANDY_BAR.get(), ModelTemplates.FLAT_ITEM);
     this.generateFlatItem(ImmerseItems.CEREAL.get(), ModelTemplates.FLAT_ITEM);
     this.generateFlatItem(ImmerseItems.CANNED_CORN.get(), ModelTemplates.FLAT_ITEM);
+    this.generateFlatItem(ImmerseItems.OPEN_CANNED_CORN.get(), ModelTemplates.FLAT_ITEM);
     this.generateFlatItem(ImmerseItems.CANNED_BEANS.get(), ModelTemplates.FLAT_ITEM);
+    this.generateFlatItem(ImmerseItems.OPEN_CANNED_BEANS.get(), ModelTemplates.FLAT_ITEM);
     this.generateFlatItem(ImmerseItems.CANNED_TUNA.get(), ModelTemplates.FLAT_ITEM);
+    this.generateFlatItem(ImmerseItems.OPEN_CANNED_TUNA.get(), ModelTemplates.FLAT_ITEM);
     this.generateFlatItem(ImmerseItems.CANNED_PEACHES.get(), ModelTemplates.FLAT_ITEM);
+    this.generateFlatItem(ImmerseItems.OPEN_CANNED_PEACHES.get(), ModelTemplates.FLAT_ITEM);
     this.generateFlatItem(ImmerseItems.CANNED_PASTA.get(), ModelTemplates.FLAT_ITEM);
+    this.generateFlatItem(ImmerseItems.OPEN_CANNED_PASTA.get(), ModelTemplates.FLAT_ITEM);
     this.generateFlatItem(ImmerseItems.CANNED_BACON.get(), ModelTemplates.FLAT_ITEM);
+    this.generateFlatItem(ImmerseItems.OPEN_CANNED_BACON.get(), ModelTemplates.FLAT_ITEM);
     this.generateFlatItem(ImmerseItems.CANNED_CUSTARD.get(), ModelTemplates.FLAT_ITEM);
+    this.generateFlatItem(ImmerseItems.OPEN_CANNED_CUSTARD.get(), ModelTemplates.FLAT_ITEM);
     this.generateFlatItem(ImmerseItems.CANNED_PICKLES.get(), ModelTemplates.FLAT_ITEM);
+    this.generateFlatItem(ImmerseItems.OPEN_CANNED_PICKLES.get(), ModelTemplates.FLAT_ITEM);
     this.generateFlatItem(ImmerseItems.CANNED_DOG_FOOD.get(), ModelTemplates.FLAT_ITEM);
+    this.generateFlatItem(ImmerseItems.OPEN_CANNED_DOG_FOOD.get(), ModelTemplates.FLAT_ITEM);
     this.generateFlatItem(ImmerseItems.CANNED_TOMATO_SOUP.get(), ModelTemplates.FLAT_ITEM);
+    this.generateFlatItem(ImmerseItems.OPEN_CANNED_TOMATO_SOUP.get(), ModelTemplates.FLAT_ITEM);
     this.generateFlatItem(ImmerseItems.MRE.get(), ModelTemplates.FLAT_ITEM);
     this.generateFlatItem(ImmerseItems.ORANGE.get(), ModelTemplates.FLAT_ITEM);
     this.generateFlatItem(ImmerseItems.ROTTEN_ORANGE.get(), ModelTemplates.FLAT_ITEM);
     this.generateFlatItem(ImmerseItems.PEAR.get(), ModelTemplates.FLAT_ITEM);
     this.generateFlatItem(ImmerseItems.ROTTEN_PEAR.get(), ModelTemplates.FLAT_ITEM);
     this.generateFlatItem(ImmerseItems.RICE_BAG.get(), ModelTemplates.FLAT_ITEM);
-    this.generateFlatItem(ImmerseItems.APPLE.get(), ModelTemplates.FLAT_ITEM);
     this.generateFlatItem(ImmerseItems.ROTTEN_APPLE.get(), ModelTemplates.FLAT_ITEM);
     this.generateFlatItem(ImmerseItems.NOODLES.get(), ModelTemplates.FLAT_ITEM);
-    this.generateFlatItem(ImmerseItems.WATERMELON.get(), ModelTemplates.FLAT_ITEM);
-    this.generateFlatItem(ImmerseItems.ROTTEN_WATERMELON.get(), ModelTemplates.FLAT_ITEM);
+    this.generateFlatItem(ImmerseItems.ROTTEN_MELON_SLICE.get(), ModelTemplates.FLAT_ITEM);
     this.generateFlatItem(ImmerseItems.BLUEBERRY.get(), ModelTemplates.FLAT_ITEM);
     this.generateFlatItem(ImmerseItems.ROTTEN_BLUEBERRY.get(), ModelTemplates.FLAT_ITEM);
     this.generateFlatItem(ImmerseItems.RASPBERRY.get(), ModelTemplates.FLAT_ITEM);
@@ -61,5 +69,8 @@ public class ImmerseItemModelGenerators {
     this.generateFlatItem(ImmerseItems.NUTTY_CEREAL.get(), ModelTemplates.FLAT_ITEM);
     this.generateFlatItem(ImmerseItems.EMERALD_CEREAL.get(), ModelTemplates.FLAT_ITEM);
     this.generateFlatItem(ImmerseItems.FLAKE_CEREAL.get(), ModelTemplates.FLAT_ITEM);
+    this.generateFlatItem(ImmerseItems.CAN_OPENER.get(), ModelTemplates.FLAT_ITEM);
+    this.generateFlatItem(ImmerseItems.SCREWDRIVER.get(), ModelTemplates.FLAT_ITEM);
+    this.generateFlatItem(ImmerseItems.MULTI_TOOL.get(), ModelTemplates.FLAT_ITEM);
   }
 }

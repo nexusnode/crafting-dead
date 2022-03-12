@@ -38,6 +38,10 @@ public class ArbitraryTooltips {
   private static final Multimap<IRegistryDelegate<Item>, TooltipFunction> functions =
       ArrayListMultimap.create();
 
+  public static void registerTooltip(Supplier<Item> item, Component tooltip) {
+    registerTooltip(item, (stack, level, flag) -> tooltip);
+  }
+
   public static void registerTooltip(Supplier<Item> item, TooltipFunction function) {
     toRegister.put(item, function);
   }

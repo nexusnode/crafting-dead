@@ -12,7 +12,7 @@
  * https://craftingdead.net/terms.php
  */
 
-package com.craftingdead.core.data;
+package com.craftingdead.core.data.recipes;
 
 import java.util.function.Consumer;
 import javax.annotation.Nullable;

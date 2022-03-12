@@ -38,6 +38,8 @@ import com.craftingdead.core.world.item.gun.aimable.AimableGunItem;
 import com.craftingdead.core.world.item.gun.attachment.Attachments;
 import com.craftingdead.core.world.item.gun.minigun.MinigunItem;
 import com.craftingdead.core.world.item.gun.skin.Skins;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.AxeItem;
@@ -2414,4 +2416,13 @@ public class ModItems {
   public static final RegistryObject<Item> GREY_GUN_BAG = ITEMS
       .register("grey_gun_bag", () -> new StorageItem(StorageItem.GUN_BAG,
           new Item.Properties().stacksTo(1).tab(COSMETICS_TAB)));
+
+  static {
+    ArbitraryTooltips.registerTooltip(SCUBA_MASK,
+        new TranslatableComponent("item_lore.clothing_item.water_breathing")
+            .withStyle(ChatFormatting.GRAY));
+    ArbitraryTooltips.registerTooltip(SCUBA_CLOTHING,
+        new TranslatableComponent("item_lore.clothing_item.water_speed")
+            .withStyle(ChatFormatting.GRAY));
+  }
 }

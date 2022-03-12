@@ -58,7 +58,6 @@ import com.craftingdead.core.world.inventory.ModEquipmentSlot;
 import com.craftingdead.core.world.inventory.ModMenuTypes;
 import com.craftingdead.core.world.item.ArbitraryTooltips;
 import com.craftingdead.core.world.item.ArbitraryTooltips.TooltipFunction;
-import com.craftingdead.core.world.item.ModItems;
 import com.craftingdead.core.world.item.RegisterGunColor;
 import com.craftingdead.core.world.item.clothing.Clothing;
 import com.craftingdead.core.world.item.gun.Gun;
@@ -69,7 +68,6 @@ import com.craftingdead.core.world.item.scope.Scope;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Vector3f;
-import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
@@ -92,7 +90,6 @@ import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.client.tutorial.Tutorial;
 import net.minecraft.client.tutorial.TutorialSteps;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.Mth;
@@ -125,7 +122,6 @@ import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModLoadingContext;
-import net.minecraftforge.fml.StartupMessageManager;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.config.ModConfigEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
@@ -314,18 +310,6 @@ public class ClientDist implements ModDist {
                 .getStackInSlot(ModEquipmentSlot.HAT.getIndex()) == itemStack)
             .map(__ -> 1.0F)
             .orElse(0.0F));
-
-    StartupMessageManager.addModMessage("Registering tooltips");
-
-    ArbitraryTooltips.registerTooltip(ModItems.SCUBA_MASK,
-        (stack, level, tooltipFlags) -> new TranslatableComponent(
-            "item_lore.clothing_item.water_breathing")
-                .withStyle(ChatFormatting.GRAY));
-
-    ArbitraryTooltips.registerTooltip(ModItems.SCUBA_CLOTHING,
-        (stack, level, tooltipFlags) -> new TranslatableComponent(
-            "item_lore.clothing_item.water_speed")
-                .withStyle(ChatFormatting.GRAY));
 
     MenuScreens.register(ModMenuTypes.EQUIPMENT.get(), EquipmentScreen::new);
     MenuScreens.register(ModMenuTypes.VEST.get(), GenericContainerScreen::new);

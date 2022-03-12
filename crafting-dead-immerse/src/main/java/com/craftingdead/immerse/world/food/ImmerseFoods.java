@@ -70,11 +70,6 @@ public class ImmerseFoods {
       .build();
   public static final FoodProperties RICE_BAG =
       new FoodProperties.Builder().nutrition(8).saturationMod(0.6F).build();
-  public static final FoodProperties APPLE = new FoodProperties.Builder()
-      .nutrition(5)
-      .saturationMod(0.6F)
-      // .effect(() -> new MobEffectInstance(ModEffects.HYDRATE.get(), 1, 2), 1.0F)
-      .build();
   public static final FoodProperties ROTTEN_APPLE = new FoodProperties.Builder()
       .nutrition(1)
       .saturationMod(0.6F)
@@ -86,12 +81,7 @@ public class ImmerseFoods {
       .saturationMod(0.6F)
       // .effect(() -> new MobEffectInstance(ModEffects.HYDRATE.get(), 1, 3), 1.0F)
       .build();
-  public static final FoodProperties WATERMELON = new FoodProperties.Builder()
-      .nutrition(6)
-      .saturationMod(0.6F)
-      // .effect(() -> new MobEffectInstance(ModEffects.HYDRATE.get(), 1, 5), 1.0F)
-      .build();
-  public static final FoodProperties ROTTEN_WATERMELON = new FoodProperties.Builder()
+  public static final FoodProperties ROTTEN_MELON_SLICE = new FoodProperties.Builder()
       .nutrition(3)
       .saturationMod(0.6F)
       // .effect(() -> new MobEffectInstance(ModEffects.HYDRATE.get(), 1, 1), 1.0F)
