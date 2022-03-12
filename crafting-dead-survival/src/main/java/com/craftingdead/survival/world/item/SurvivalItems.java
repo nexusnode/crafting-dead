@@ -41,7 +41,7 @@ public class SurvivalItems {
 
     @Override
     public ItemStack makeIcon() {
-      return new ItemStack(RBI_SYRINGE::get);
+      return new ItemStack(RBI_SYRINGE.get());
     }
   };
 

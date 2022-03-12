@@ -22,6 +22,7 @@ import javax.annotation.Nullable;
 import com.craftingdead.core.capability.CapabilityUtil;
 import com.craftingdead.immerse.client.ClientDist;
 import com.craftingdead.immerse.command.Commands;
+import com.craftingdead.immerse.data.models.ImmerseModelProvider;
 import com.craftingdead.immerse.game.Game;
 import com.craftingdead.immerse.game.GameTypes;
 import com.craftingdead.immerse.game.module.ModuleTypes;
@@ -64,6 +65,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLPaths;
 import net.minecraftforge.fml.loading.JarVersionLookupHandler;
+import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.server.permission.events.PermissionGatherEvent;
 
@@ -128,6 +130,7 @@ public class CraftingDeadImmerse {
     this.modDist = DistExecutor.unsafeRunForDist(() -> ClientDist::new, () -> ServerDist::new);
 
     final var modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
+    modEventBus.addListener(this::handleGatherData);
     modEventBus.addListener(this::handleCommonSetup);
 
     ImmerseSoundEvents.soundEvents.register(modEventBus);
@@ -177,6 +180,11 @@ public class CraftingDeadImmerse {
   // ================================================================================
   // Mod Events
   // ================================================================================
+
+  private void handleGatherData(GatherDataEvent event) {
+    var generator = event.getGenerator();
+    generator.addProvider(new ImmerseModelProvider(generator));
+  }
 
   private void handleCommonSetup(FMLCommonSetupEvent event) {
     if (commonConfig.sentryEnabled.get()) {

@@ -57,6 +57,28 @@ minecraft {
                 }
             }
         }
+        
+        data {
+            taskName 'runImmerseData'
+      
+            workingDirectory project.file('run/data')
+
+            property 'forge.logging.markers', 'SCAN,REGISTRIES'
+            property 'forge.logging.console.level', 'debug'
+
+            args '--mod', 'craftingdeadimmerse', '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
+
+            environment 'target', 'fmluserdevdata'
+
+            mods {
+                craftingdeadimmerse {
+                    source sourceSets.main
+                }
+                craftingdead {
+                    source project(':crafting-dead-core').sourceSets.main
+                }
+            }
+        }
     }
 }
 

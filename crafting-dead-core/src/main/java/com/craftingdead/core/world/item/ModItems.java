@@ -61,7 +61,7 @@ public class ModItems {
 
         @Override
         public ItemStack makeIcon() {
-          return new ItemStack(ModItems.BUILDER_CLOTHING::get);
+          return new ItemStack(BUILDER_CLOTHING.get());
         }
       };
 
@@ -69,7 +69,7 @@ public class ModItems {
 
     @Override
     public ItemStack makeIcon() {
-      return new ItemStack(ModItems.AK47::get);
+      return new ItemStack(AK47.get());
     }
   };
 
@@ -77,7 +77,7 @@ public class ModItems {
 
     @Override
     public ItemStack makeIcon() {
-      return new ItemStack(ModItems.FIRST_AID_KIT::get);
+      return new ItemStack(FIRST_AID_KIT.get());
     }
   };
 
