@@ -323,6 +323,8 @@ public class ClientDist implements ModDist {
     ClientRegistry.registerKeyBinding(REMOVE_MAGAZINE);
     ClientRegistry.registerKeyBinding(OPEN_EQUIPMENT_MENU);
     ClientRegistry.registerKeyBinding(TOGGLE_COMBAT_MODE);
+
+    ArbitraryTooltips.registerAll();
   }
 
   private void handleEntityRenderers(EntityRenderersEvent.RegisterRenderers event) {

@@ -19,12 +19,11 @@ import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
-import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.registries.IRegistryDelegate;
 
 /**
@@ -50,7 +49,7 @@ public class ArbitraryTooltips {
     functions.put(item.delegate, function);
   }
 
-  public static void registerAll(RegistryEvent.Register<Item> event) {
+  public static void registerAll() {
     toRegister.asMap()
         .forEach((supplier, lines) -> functions.putAll(supplier.get().delegate, lines));
     toRegister.clear();

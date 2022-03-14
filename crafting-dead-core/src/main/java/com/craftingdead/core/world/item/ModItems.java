@@ -2456,10 +2456,10 @@ public class ModItems {
 
   static {
     ArbitraryTooltips.registerTooltip(SCUBA_MASK,
-        new TranslatableComponent("item_lore.clothing_item.water_breathing")
+        new TranslatableComponent("clothing_item.water_breathing")
             .withStyle(ChatFormatting.GRAY));
     ArbitraryTooltips.registerTooltip(SCUBA_CLOTHING,
-        new TranslatableComponent("item_lore.clothing_item.water_speed")
+        new TranslatableComponent("clothing_item.water_speed")
             .withStyle(ChatFormatting.GRAY));
   }
 }

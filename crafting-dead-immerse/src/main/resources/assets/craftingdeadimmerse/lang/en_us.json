@@ -123,7 +123,7 @@
     "item.craftingdeadimmerse.screwdriver": "Screwdriver",
     "item.craftingdeadimmerse.multi_tool": "Multi Tool",
 
-    "item_lore.can_opener": "Opens canned goods",
+    "can_opener.information": "Opens canned goods",
 
     "toasts.info": "Rocket",
     "toasts.error": "Rocket Error",

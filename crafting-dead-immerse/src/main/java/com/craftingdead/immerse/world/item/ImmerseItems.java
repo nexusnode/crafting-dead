@@ -379,7 +379,7 @@ public class ImmerseItems {
       });
 
   static {
-    var canOpenerTooltip = new TranslatableComponent("item_lore.can_opener")
+    var canOpenerTooltip = new TranslatableComponent("can_opener.information")
         .withStyle(ChatFormatting.GRAY);
     ArbitraryTooltips.registerTooltip(CAN_OPENER, canOpenerTooltip);
     ArbitraryTooltips.registerTooltip(SCREWDRIVER, canOpenerTooltip);

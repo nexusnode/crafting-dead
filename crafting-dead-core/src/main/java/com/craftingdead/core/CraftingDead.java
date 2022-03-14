@@ -34,7 +34,6 @@ import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.core.world.inventory.ModMenuTypes;
 import com.craftingdead.core.world.inventory.storage.Storage;
-import com.craftingdead.core.world.item.ArbitraryTooltips;
 import com.craftingdead.core.world.item.ModItems;
 import com.craftingdead.core.world.item.clothing.Clothing;
 import com.craftingdead.core.world.item.combatslot.CombatSlot;
@@ -57,7 +56,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -149,8 +147,6 @@ public class CraftingDead {
     ActionTypes.ACTION_TYPES.register(modEventBus);
     AmmoProviderTypes.AMMO_PROVIDER_TYPES.register(modEventBus);
     Attachments.ATTACHMENTS.register(modEventBus);
-
-    modEventBus.addGenericListener(Item.class, ArbitraryTooltips::registerAll);
 
     MinecraftForge.EVENT_BUS.register(this);
   }
