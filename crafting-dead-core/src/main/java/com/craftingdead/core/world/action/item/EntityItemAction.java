@@ -80,31 +80,29 @@ public final class EntityItemAction<T extends LivingExtension<?, ?>> extends Ite
 
   @Override
   public void stop(StopReason reason) {
-    super.stop(reason);
+    if (reason.isCompleted()) {
+      if (this.type.getCustomAction() != null
+          && performer.getEntity().getRandom().nextFloat() < this.type.getCustomAction().chance()) {
+        this.type.getCustomAction().consumer().accept(this.performer, this.selectedTarget);
+      }
 
-    if (!reason.isCompleted()) {
-      return;
-    }
+      this.selectedTarget.getEntity().curePotionEffects(this.getItemStack());
 
-    if (this.type.getCustomAction() != null
-        && performer.getEntity().getRandom().nextFloat() < this.type.getCustomAction().chance()) {
-      this.type.getCustomAction().consumer().accept(this.performer, this.selectedTarget);
-    }
-
-    this.selectedTarget.getEntity().curePotionEffects(this.performer.getMainHandItem());
-
-    for (var action : this.type.getEffects()) {
-      if (performer.getEntity().getRandom().nextFloat() < action.chance()) {
-        var effectInstance = action.effect().get();
-        if (effectInstance.getEffect().isInstantenous()) {
-          effectInstance.getEffect().applyInstantenousEffect(this.selectedTarget.getEntity(),
-              this.selectedTarget.getEntity(),
-              this.selectedTarget.getEntity(), effectInstance.getAmplifier(), 1.0D);
-        } else {
-          this.selectedTarget.getEntity().addEffect(new MobEffectInstance(effectInstance));
+      for (var action : this.type.getEffects()) {
+        if (performer.getEntity().getRandom().nextFloat() < action.chance()) {
+          var effectInstance = action.effect().get();
+          if (effectInstance.getEffect().isInstantenous()) {
+            effectInstance.getEffect().applyInstantenousEffect(this.selectedTarget.getEntity(),
+                this.selectedTarget.getEntity(),
+                this.selectedTarget.getEntity(), effectInstance.getAmplifier(), 1.0D);
+          } else {
+            this.selectedTarget.getEntity().addEffect(new MobEffectInstance(effectInstance));
+          }
         }
       }
     }
+
+    super.stop(reason);
   }
 
   @Override
