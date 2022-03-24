@@ -47,10 +47,10 @@ public class AdvancedZombieModel<T extends AdvancedZombie> extends ZombieModel<T
   public void setupAnim(T entity, float limbSwing, float limbSwingAmount, float ageInTicks,
       float netHeadYaw, float headPitch) {
     super.setupAnim(entity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
-    this.leftSleeve.copyFrom(this.leftLeg);
-    this.rightSleeve.copyFrom(this.rightLeg);
-    this.leftPants.copyFrom(this.leftArm);
-    this.rightPants.copyFrom(this.rightArm);
+    this.leftSleeve.copyFrom(this.leftArm);
+    this.rightSleeve.copyFrom(this.rightArm);
+    this.leftPants.copyFrom(this.leftLeg);
+    this.rightPants.copyFrom(this.rightLeg);
     this.jacket.copyFrom(this.body);
   }
 
