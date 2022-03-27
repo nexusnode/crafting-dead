@@ -110,7 +110,15 @@ public class ModItemTagsProvider extends ItemTagsProvider {
         ModItems.KNIGHT_HAT.get(), ModItems.MILITARY_HAZMAT_HAT.get(), ModItems.NINJA_HAT.get(),
         ModItems.NV_GOGGLES_HAT.get(), ModItems.ORANGE_HARD_HAT.get(), ModItems.RIOT_HAT.get(),
         ModItems.SANTA_HAT.get(), ModItems.TOP_HAT.get(), ModItems.TRAPPER_HAT.get(),
-        ModItems.USHANKA_HAT.get(), ModItems.YELLOW_HARD_HAT.get());
+        ModItems.USHANKA_HAT.get(), ModItems.YELLOW_HARD_HAT.get(), ModItems.ARMY_HELMET.get(),
+        ModItems.CREEPER_MASK.get(), ModItems.COW_MASK.get(), ModItems.COOKIE_MASK.get(),
+        ModItems.COMBAT_BDU_HELMET.get(), ModItems.CAMO_HELMET.get(), ModItems.DOCTOR_MASK.get(),
+        ModItems.DEADPOOL_MASK.get(), ModItems.GAS_MASK.get(), ModItems.GREEN_ARMY_HELMET.get(),
+        ModItems.GREEN_BALLISTIC_HELMET.get(), ModItems.GREY_ARMY_HELMET.get(), ModItems.HACKER_MASK.get(),
+        ModItems.JUGGERNAUT_HELMET.get(), ModItems.PAYDAY_MASK.get(), ModItems.PILOT_HELMET.get(),
+        ModItems.PAYDAY2_MASK.get(), ModItems.PUMPKIN_MASK.get(), ModItems.RADAR_CAP.get(),
+        ModItems.SCUBA_MASK.get(), ModItems.SHEEP_MASK.get(), ModItems.SKI_MASK.get(),
+        ModItems.ZOMBIE_MASK.get(), ModItems.WINTER_MILITARY_HELMET.get(), ModItems.SPETSNAZ_HELMET.get());
   }
 
   @Override
