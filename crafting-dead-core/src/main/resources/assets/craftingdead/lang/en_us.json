@@ -76,9 +76,8 @@
   "entity.craftingdead.decoy_grenade": "Decoy Grenade",
   "entity.craftingdead.fire_grenade": "Fire Grenade",
   "entity.craftingdead.flash_grenade": "Flash Grenade",
-  "entity.craftingdead.flag_grenade": "Frag Grenade",
-  "entity.craftingdead.smoke_grenade": "Smoke Grenade",
   "entity.craftingdead.frag_grenade": "Frag Grenade",
+  "entity.craftingdead.smoke_grenade": "Smoke Grenade",
 
   "message.switch_fire_mode": "Switched to %s",
   "message.low_health": "%1$s's health is too low",
