@@ -116,10 +116,10 @@ public class RefillableAmmoProvider implements AmmoProvider {
       out.writeBoolean(true);
       out.writeItem(this.magazineStack);
       out.writeBoolean(this.infiniteAmmo);
-      this.getMagazine().resolve().ifPresent(magazine -> magazine.encode(out, true));
     } else {
       out.writeBoolean(false);
     }
+    this.getExpectedMagazine().encode(out, writeAll);
 
     out.writeVarInt(this.reserveSize);
     this.reserveSizeChanged = false;
@@ -130,8 +130,9 @@ public class RefillableAmmoProvider implements AmmoProvider {
     if (in.readBoolean()) {
       this.magazineStack = in.readItem();
       this.infiniteAmmo = in.readBoolean();
-      this.getMagazine().resolve().ifPresent(magazine -> magazine.decode(in));
     }
+
+    this.getExpectedMagazine().decode(in);
     this.reserveSize = in.readVarInt();
   }
 
