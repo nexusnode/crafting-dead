@@ -17,6 +17,7 @@ package com.craftingdead.core.world.entity.extension;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.event.LivingExtensionEvent;
 import com.craftingdead.core.network.NetworkChannel;
+import com.craftingdead.core.network.message.play.ActionCompletionSync;
 import com.craftingdead.core.network.message.play.CancelActionMessage;
 import com.craftingdead.core.network.message.play.CrouchMessage;
 import com.craftingdead.core.network.message.play.PerformActionMessage;
@@ -41,6 +42,7 @@ import java.util.Optional;
 import javax.annotation.Nullable;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -255,6 +257,13 @@ class BaseLivingExtension<E extends LivingEntity, H extends LivingHandler>
       // Action may have cancelled itself
       if (this.action != null) {
         this.stopAction(Action.StopReason.COMPLETED);
+        if (!this.entity.getLevel().isClientSide()) {
+          // Sometimes the client may want to cancel an action when it's already completed on the server and it does not know yet
+          // throwing it into a weird desync with an action that never goes away
+          var target = PacketDistributor.PLAYER.with(() -> (ServerPlayer) this.getEntity());
+          NetworkChannel.PLAY.getSimpleChannel().send(target,
+              new ActionCompletionSync());
+        }
       }
     }
 
