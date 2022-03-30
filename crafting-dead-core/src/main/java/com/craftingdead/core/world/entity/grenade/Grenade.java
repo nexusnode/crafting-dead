@@ -254,4 +254,8 @@ public abstract class Grenade extends BounceableProjectileEntity {
   public DamageSource createDamageSource() {
     return ModDamageSource.grenade(this, this.getSource().orElse(null));
   }
+
+  public boolean isPushedByFluid() {
+    return false;
+  }
 }
