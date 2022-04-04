@@ -15,7 +15,6 @@
 package com.craftingdead.core.network;
 
 import com.craftingdead.core.CraftingDead;
-import com.craftingdead.core.network.message.play.ActionCompletionSync;
 import com.craftingdead.core.network.message.play.AddKillFeedEntryMessage;
 import com.craftingdead.core.network.message.play.CancelActionMessage;
 import com.craftingdead.core.network.message.play.CrouchMessage;
@@ -144,13 +143,6 @@ public enum NetworkChannel {
           .encoder(EnableCombatModeMessage::encode)
           .decoder(EnableCombatModeMessage::decode)
           .consumer(EnableCombatModeMessage::handle)
-          .add();
-
-      simpleChannel
-          .messageBuilder(ActionCompletionSync.class, 0x0F, NetworkDirection.PLAY_TO_CLIENT)
-          .encoder(ActionCompletionSync::encode)
-          .decoder(ActionCompletionSync::decode)
-          .consumer(ActionCompletionSync::handle)
           .add();
     }
   };
