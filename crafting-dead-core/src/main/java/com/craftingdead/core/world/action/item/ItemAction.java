@@ -25,6 +25,7 @@ import net.minecraft.world.item.ItemStack;
 public abstract class ItemAction implements Action {
 
   private final InteractionHand hand;
+  private ItemStack originalStack;
 
   public ItemAction(InteractionHand hand) {
     this.hand = hand;
@@ -49,8 +50,11 @@ public abstract class ItemAction implements Action {
   @Override
   public boolean start(boolean simulate) {
     if (this.checkHeldItem()) {
-      if (!this.getPerformer().getLevel().isClientSide() && !simulate) {
-        this.getPerformer().getEntity().startUsingItem(this.hand);
+      if (!simulate) {
+        this.originalStack = getItemStack();
+        if (!this.getPerformer().getLevel().isClientSide()) {
+          this.getPerformer().getEntity().startUsingItem(this.hand);
+        }
       }
       return true;
     }
@@ -101,8 +105,8 @@ public abstract class ItemAction implements Action {
 
   @Override
   public boolean tick() {
-    if (!this.getPerformer().getLevel().isClientSide()
-        && !this.getPerformer().getEntity().isUsingItem()) {
+    if (!this.getPerformer().getEntity().isUsingItem() || !compareStacks(this.originalStack,
+        this.getItemStack(), false)) {
       this.getPerformer().cancelAction(true);
       return false;
     }
@@ -125,4 +129,22 @@ public abstract class ItemAction implements Action {
 
   @Override
   public abstract ItemActionType<?> getType();
+
+  //TODO: Should this method be moved somewhere else? - juan
+  public static boolean compareStacks(ItemStack first, ItemStack second, boolean compareNbt) {
+    if (first == null || second == null) {
+      return false;
+    }
+
+    boolean areEqual = first.getItem().equals(second.getItem());
+    if (compareNbt && areEqual) {
+      if (first.hasTag() && second.hasTag()) {
+        //noinspection ConstantConditions
+        areEqual = first.getTag().equals(second.getTag());
+      } else {
+        areEqual = (!first.hasTag() && !second.hasTag());
+      }
+    }
+    return areEqual;
+  }
 }
