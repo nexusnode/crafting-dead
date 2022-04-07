@@ -20,7 +20,9 @@ import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.eventbus.api.Event;
+import org.apache.commons.lang3.mutable.MutableInt;
 
 public interface PlayerHandler extends LivingHandler {
 
@@ -59,4 +61,17 @@ public interface PlayerHandler extends LivingHandler {
    * @param wasDeath if they died or not
    */
   default void copyFrom(PlayerExtension<ServerPlayer> that, boolean wasDeath) {}
+
+
+  /**
+   * When this player breaks a block.
+   *
+   * @param pos - the position of the broken block
+   * @param block - the block being broken
+   * @param xp - the xp amount the player should receive by breaking the block
+   * @return if the event should be cancelled
+   */
+  default boolean handleBlockBreak(BlockPos pos, BlockState block, MutableInt xp) {
+    return false;
+  }
 }

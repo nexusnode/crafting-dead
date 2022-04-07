@@ -36,6 +36,7 @@ import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import javax.annotation.Nullable;
@@ -50,8 +51,10 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.network.PacketDistributor;
@@ -392,9 +395,7 @@ class BaseLivingExtension<E extends LivingEntity, H extends LivingHandler>
   @Override
   public boolean handleDeathLoot(DamageSource cause, Collection<ItemEntity> drops) {
     if (this.handlers.values().stream()
-        .filter(e -> e.handleDeathLoot(cause, drops))
-        .findAny()
-        .isPresent()) {
+        .anyMatch(e -> e.handleDeathLoot(cause, drops))) {
       return true;
     }
 
@@ -410,6 +411,16 @@ class BaseLivingExtension<E extends LivingEntity, H extends LivingHandler>
       }
     }
     return false;
+  }
+
+  @Override
+  public boolean handleBlockPlace(BlockSnapshot replacedBlock, BlockState placedBlock, BlockState placedAgainst) {
+    return this.handlers.values().stream().anyMatch(e -> e.handleBlockPlace(replacedBlock, placedBlock, placedAgainst));
+  }
+
+  @Override
+  public boolean handleMultiBlockPlace(List<BlockSnapshot> replacedBlocks, BlockState placedBlock, BlockState placedAgainst) {
+    return this.handlers.values().stream().anyMatch(e -> e.handleMultiBlockPlace(replacedBlocks, placedBlock, placedAgainst));
   }
 
   protected boolean keepInventory() {

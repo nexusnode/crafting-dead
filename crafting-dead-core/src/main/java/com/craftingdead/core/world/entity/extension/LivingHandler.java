@@ -16,11 +16,14 @@ package com.craftingdead.core.world.entity.extension;
 
 import java.util.Collection;
 import com.craftingdead.core.network.Synched;
+import java.util.List;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.common.util.INBTSerializable;
 
 public interface LivingHandler extends INBTSerializable<CompoundTag>, Synched {
@@ -94,6 +97,30 @@ public interface LivingHandler extends INBTSerializable<CompoundTag>, Synched {
    * @return true if movement is blocked
    */
   default boolean isMovementBlocked() {
+    return false;
+  }
+
+  /**
+   * When this entity places a block.
+   *
+   * @param replacedBlock - the snapshot of the replaced block
+   * @param placedBlock - the block that was placed
+   * @param placedAgainst - the block which was placed against
+   * @return if the event should be cancelled
+   */
+  default boolean handleBlockPlace(BlockSnapshot replacedBlock, BlockState placedBlock, BlockState placedAgainst) {
+    return false;
+  }
+
+  /**
+   * When this entity places a block which triggered the creation of multiple blocks.
+   *
+   * @param replacedBlocks - the snapshot of the replaced blocks
+   * @param placedBlock - the block that was placed
+   * @param placedAgainst - the block which was placed against
+   * @return if the event should be cancelled
+   */
+  default boolean handleMultiBlockPlace(List<BlockSnapshot> replacedBlocks, BlockState placedBlock, BlockState placedAgainst) {
     return false;
   }
 
