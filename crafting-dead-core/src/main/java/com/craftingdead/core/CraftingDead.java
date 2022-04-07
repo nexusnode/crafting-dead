@@ -14,6 +14,8 @@
 
 package com.craftingdead.core;
 
+import net.minecraftforge.event.world.BlockEvent;
+import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import com.craftingdead.core.capability.CapabilityUtil;
@@ -305,6 +307,33 @@ public class CraftingDead {
         .getCapability(LivingExtension.CAPABILITY)
         .ifPresent(living -> event.setAmount(
             living.handleDamaged(event.getSource(), event.getAmount())));
+  }
+
+  @SubscribeEvent(priority = EventPriority.LOWEST)
+  public void handleEntityBlockPlace(BlockEvent.EntityPlaceEvent event) {
+    if (event.getEntity() != null) {
+      event.getEntity()
+          .getCapability(LivingExtension.CAPABILITY)
+          .ifPresent(living -> event.setCanceled(
+              living.handleBlockPlace(event.getBlockSnapshot(), event.getPlacedBlock(), event.getPlacedAgainst())));
+    }
+  }
+
+  @SubscribeEvent(priority = EventPriority.LOWEST)
+  public void handleEntityBlockMultiPlace(BlockEvent.EntityMultiPlaceEvent event) {
+    if (event.getEntity() != null) {
+      event.getEntity()
+          .getCapability(LivingExtension.CAPABILITY)
+          .ifPresent(living -> event.setCanceled(
+              living.handleMultiBlockPlace(event.getReplacedBlockSnapshots(), event.getPlacedBlock(), event.getPlacedAgainst())));
+    }
+  }
+
+  @SubscribeEvent(priority = EventPriority.LOWEST)
+  public void handleEntityBlockBreakEvent(BlockEvent.BreakEvent event) {
+    var xp = new MutableInt(event.getExpToDrop());
+    event.setCanceled(PlayerExtension.getOrThrow(event.getPlayer()).handleBlockBreak(event.getPos(), event.getState(), xp));
+    event.setExpToDrop(xp.getValue());
   }
 
   @SubscribeEvent

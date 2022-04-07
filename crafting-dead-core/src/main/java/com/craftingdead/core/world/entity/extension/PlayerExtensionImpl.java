@@ -45,9 +45,11 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.GameRules;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.network.PacketDistributor;
+import org.apache.commons.lang3.mutable.MutableInt;
 
 final class PlayerExtensionImpl<E extends Player>
     extends BaseLivingExtension<E, PlayerHandler> implements PlayerExtension<E> {
@@ -187,6 +189,10 @@ final class PlayerExtensionImpl<E extends Player>
     }
 
     return false;
+  }
+
+  public boolean handleBlockBreak(BlockPos pos, BlockState block, MutableInt xp) {
+    return this.handlers.values().stream().anyMatch(e -> e.handleBlockBreak(pos, block, xp));
   }
 
   private void handcuffInteract(float chance) {
