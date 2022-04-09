@@ -14,17 +14,22 @@
 
 package com.craftingdead.immerse.world.level.block;
 
+import com.craftingdead.immerse.Permissions;
 import javax.annotation.Nullable;
 import com.craftingdead.immerse.world.level.block.entity.BaseCenterBlockEntity;
 import com.craftingdead.immerse.world.level.block.entity.ImmerseBlockEntityTypes;
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraftforge.server.permission.PermissionAPI;
 
 public class BaseCenterBlock extends Block implements EntityBlock {
 
@@ -57,5 +62,17 @@ public class BaseCenterBlock extends Block implements EntityBlock {
           .ifPresent(BaseCenterBlockEntity::removed);
     }
     super.onRemove(blockState, level, blockPos, newState, moved);
+  }
+
+  @Override
+  public boolean onDestroyedByPlayer(BlockState state, Level level, BlockPos pos, Player player,
+      boolean willHarvest, FluidState fluid) {
+    if (!level.isClientSide()) {
+      if (PermissionAPI.getPermission((ServerPlayer) player, Permissions.BASE_DESTROY)) {
+        level.getBlockEntity(pos, ImmerseBlockEntityTypes.BASE_CENTER.get())
+            .ifPresent(BaseCenterBlockEntity::destroyPlayerBlocks);
+      }
+    }
+    return super.onDestroyedByPlayer(state, level, pos, player, willHarvest, fluid);
   }
 }

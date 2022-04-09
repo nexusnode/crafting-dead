@@ -22,4 +22,8 @@ public class Permissions {
   public static final PermissionNode<Boolean> GAME_OP =
       new PermissionNode<Boolean>(CraftingDeadImmerse.ID, "game.op", PermissionTypes.BOOLEAN,
           (player, playerUUID, context) -> false);
+
+  public static final PermissionNode<Boolean> BASE_DESTROY =
+      new PermissionNode<Boolean>(CraftingDeadImmerse.ID, "base.destroy", PermissionTypes.BOOLEAN,
+          (player, playerUUID, context) -> false);
 }

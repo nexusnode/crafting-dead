@@ -14,7 +14,10 @@
 
 package com.craftingdead.immerse.world.action;
 
+import com.craftingdead.immerse.world.level.block.entity.ImmerseBlockEntityTypes;
+import com.craftingdead.immerse.world.level.extension.LegacyBase;
 import java.util.Optional;
+import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
 import com.craftingdead.core.world.action.Action;
 import com.craftingdead.core.world.action.item.ItemActionType;
@@ -45,15 +48,30 @@ public abstract class BuildActionType extends ItemActionType<BuildAction> {
           .map(handler -> handler.getBase().isEmpty())
           .orElse(true);
 
+  public static final BiConsumer<LivingExtension<?, ?>, BlockPos> NOTIFY_BASE_CENTER =
+      (performer, blockPos) -> LevelExtension.getOrThrow(performer.getLevel()).getLandManager()
+          .getLandOwnerAt(blockPos)
+          .map(owner -> owner instanceof LegacyBase base ? base.getBlockPos() : null)
+          .map(basePos -> performer.getLevel()
+              .getBlockEntity(basePos, ImmerseBlockEntityTypes.BASE_CENTER.get()))
+          .flatMap(base -> base)
+          .ifPresent(base -> base.playerPlacedBlock(performer, blockPos));
+
   private final BiPredicate<LivingExtension<?, ?>, BlockPos> predicate;
+  private final BiConsumer<LivingExtension<?, ?>, BlockPos> onBlockPlacement;
 
   protected BuildActionType(Builder<?> builder) {
     super(builder);
     this.predicate = builder.predicate;
+    this.onBlockPlacement = builder.onBlockPlacement;
   }
 
   public BiPredicate<LivingExtension<?, ?>, BlockPos> getPlacementPredicate() {
     return this.predicate;
+  }
+
+  public BiConsumer<LivingExtension<?, ?>, BlockPos> getBlockPlacementConsumer() {
+    return this.onBlockPlacement;
   }
 
   protected abstract BuildAction create(LivingExtension<?, ?> performer,
@@ -84,9 +102,11 @@ public abstract class BuildActionType extends ItemActionType<BuildAction> {
       extends ItemActionType.Builder<SELF> {
 
     private BiPredicate<LivingExtension<?, ?>, BlockPos> predicate = (performer, blockPos) -> true;
+    private BiConsumer<LivingExtension<?, ?>, BlockPos> onBlockPlacement = (performer, blockPos) -> {};
 
     public SELF withinBase() {
       this.predicate = this.predicate.and(WITHIN_BASE);
+      this.onBlockPlacement = onBlockPlacement.andThen(NOTIFY_BASE_CENTER);
       return this.self();
     }
 
