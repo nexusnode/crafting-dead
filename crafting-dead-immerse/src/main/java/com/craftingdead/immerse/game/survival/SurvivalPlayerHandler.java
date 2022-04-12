@@ -14,7 +14,6 @@
 
 package com.craftingdead.immerse.game.survival;
 
-import com.craftingdead.immerse.world.level.block.entity.ImmerseBlockEntityTypes;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -144,12 +143,8 @@ public class SurvivalPlayerHandler implements PlayerHandler {
   public boolean handleBlockBreak(BlockPos pos, BlockState block, MutableInt xp) {
     LevelExtension.getOrThrow(player.getLevel()).getLandManager()
         .getLandOwnerAt(pos)
-        .map(owner -> owner instanceof LegacyBase base ? base.getBlockPos() : null)
-        .map(basePos -> player.getLevel()
-            .getBlockEntity(basePos, ImmerseBlockEntityTypes.BASE_CENTER.get()))
-        .flatMap(base -> base)
         .ifPresent(base -> base.playerRemovedBlock(player, pos));
-    return PlayerHandler.super.handleBlockBreak(pos, block, xp);
+    return false;
   }
 
   @Override
@@ -157,12 +152,8 @@ public class SurvivalPlayerHandler implements PlayerHandler {
       BlockState placedAgainst) {
     LevelExtension.getOrThrow(player.getLevel()).getLandManager()
         .getLandOwnerAt(replacedBlock.getPos())
-        .map(owner -> owner instanceof LegacyBase base ? base.getBlockPos() : null)
-        .map(basePos -> player.getLevel()
-            .getBlockEntity(basePos, ImmerseBlockEntityTypes.BASE_CENTER.get()))
-        .flatMap(base -> base)
         .ifPresent(base -> base.playerPlacedBlock(player, replacedBlock.getPos()));
-    return PlayerHandler.super.handleBlockPlace(replacedBlock, placedBlock, placedAgainst);
+    return false;
   }
 
   @Override
@@ -170,21 +161,18 @@ public class SurvivalPlayerHandler implements PlayerHandler {
       BlockState placedAgainst) {
     var pos = new ArrayList<BlockPos>(replacedBlocks.size());
     for (BlockSnapshot block : replacedBlocks) {
-      // Work around blocks updating their state when you place a block but not actually being replaced
+      // Work around neighbours updating their state when you place a block but not actually being replaced
       if (!block.getCurrentBlock().is(block.getReplacedBlock().getBlock())) {
         pos.add(block.getPos());
       }
     }
 
     // Use the first replaced block as point of reference
+    var refBlock = pos.get(0);
     LevelExtension.getOrThrow(player.getLevel()).getLandManager()
-        .getLandOwnerAt(replacedBlocks.get(0).getPos())
-        .map(owner -> owner instanceof LegacyBase base ? base.getBlockPos() : null)
-        .map(basePos -> player.getLevel()
-            .getBlockEntity(basePos, ImmerseBlockEntityTypes.BASE_CENTER.get()))
-        .flatMap(base -> base)
+        .getLandOwnerAt(refBlock)
         .ifPresent(base -> base.playerPlacedBlock(player, pos.toArray(new BlockPos[0])));
-    return PlayerHandler.super.handleMultiBlockPlace(replacedBlocks, placedBlock, placedAgainst);
+    return false;
   }
 
   @Override

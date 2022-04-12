@@ -14,8 +14,6 @@
 
 package com.craftingdead.immerse.world.action;
 
-import com.craftingdead.immerse.world.level.block.entity.ImmerseBlockEntityTypes;
-import com.craftingdead.immerse.world.level.extension.LegacyBase;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
@@ -51,11 +49,8 @@ public abstract class BuildActionType extends ItemActionType<BuildAction> {
   public static final BiConsumer<LivingExtension<?, ?>, BlockPos> NOTIFY_BASE =
       (performer, blockPos) -> LevelExtension.getOrThrow(performer.getLevel()).getLandManager()
           .getLandOwnerAt(blockPos)
-          .map(owner -> owner instanceof LegacyBase base ? base.getBlockPos() : null)
-          .map(basePos -> performer.getLevel()
-              .getBlockEntity(basePos, ImmerseBlockEntityTypes.BASE_CENTER.get()))
-          .flatMap(base -> base)
           .ifPresent(base -> base.playerPlacedBlock(performer, blockPos));
+
 
   private final BiPredicate<LivingExtension<?, ?>, BlockPos> predicate;
   private final BiConsumer<LivingExtension<?, ?>, BlockPos> placementHandler;
