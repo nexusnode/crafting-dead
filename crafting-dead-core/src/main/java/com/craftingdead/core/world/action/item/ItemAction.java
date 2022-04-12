@@ -106,7 +106,7 @@ public abstract class ItemAction implements Action {
   @Override
   public boolean tick() {
     if (!this.getPerformer().getEntity().isUsingItem()
-        || !this.originalStack.getItem().equals(this.getItemStack().getItem())) {
+        || this.originalStack != this.getItemStack()) {
       this.getPerformer().cancelAction(true);
       return false;
     }
