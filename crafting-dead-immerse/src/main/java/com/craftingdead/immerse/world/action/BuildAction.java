@@ -134,7 +134,7 @@ public abstract class BuildAction extends ItemAction {
     if (!reason.isCompleted()) {
       return;
     }
-    //TODO Maybe send block place events on the forge event bus? - juan
+
     this.placements.forEach(
         placement -> this.placeBlock(placement.blockPos(), placement.blockState()));
   }
