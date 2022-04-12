@@ -67,8 +67,8 @@ public class BaseCenterBlock extends Block implements EntityBlock {
   @Override
   public boolean onDestroyedByPlayer(BlockState state, Level level, BlockPos pos, Player player,
       boolean willHarvest, FluidState fluid) {
-    if (!level.isClientSide()) {
-      if (PermissionAPI.getPermission((ServerPlayer) player, Permissions.BASE_DESTROY)) {
+    if (player instanceof ServerPlayer serverPlayer) {
+      if (PermissionAPI.getPermission(serverPlayer, Permissions.BASE_DESTROY)) {
         level.getBlockEntity(pos, ImmerseBlockEntityTypes.BASE_CENTER.get())
             .ifPresent(BaseCenterBlockEntity::destroyPlayerBlocks);
       }
