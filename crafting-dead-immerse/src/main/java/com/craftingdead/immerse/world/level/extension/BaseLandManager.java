@@ -15,9 +15,12 @@
 package com.craftingdead.immerse.world.level.extension;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Queue;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -28,6 +31,8 @@ import java.util.function.LongFunction;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import com.mojang.logging.LogUtils;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import org.slf4j.Logger;
 import com.craftingdead.immerse.network.NetworkChannel;
 import com.craftingdead.immerse.network.play.RegisterLandOwnerMessage;
@@ -57,6 +62,7 @@ import net.minecraftforge.network.PacketDistributor;
 public class BaseLandManager implements LandManager {
 
   private static final int SYNC_AREA_THRESHOLD = 1000;
+  public static final int BLOCK_DESTRUCTION_CHUNK_SIZE = 8192;
 
   private static final Logger logger = LogUtils.getLogger();
 
@@ -197,6 +203,11 @@ public class BaseLandManager implements LandManager {
       return Optional.empty();
     }, true).whenComplete(
         (result, exception) -> this.landClaims.remove(landClaim.ownerId(), landClaim));
+  }
+
+  @Override
+  public CompletionStage<Void> destroyBlocks(BlockPos... toDestroy) {
+    return this.destroyBlocks(new LinkedList<>(Arrays.asList(ensureImmutable(toDestroy))));
   }
 
   @Override
@@ -346,5 +357,34 @@ public class BaseLandManager implements LandManager {
       }
     }
     return CompletableFuture.completedStage(successResult);
+  }
+
+  private CompletionStage<Void> destroyBlocks(Queue<BlockPos> blocks) {
+    var block = blocks.poll();
+    for (int i = 0; block != null; i++) {
+
+      // The UPDATE_KNOWN_SHAPE prevent block neighbors from being updated
+      // we need it to avoid certain blocks from dropping
+      level.setBlock(block, Blocks.AIR.defaultBlockState(),
+          Block.UPDATE_SUPPRESS_DROPS
+              | Block.UPDATE_KNOWN_SHAPE
+              | Block.UPDATE_SUPPRESS_LIGHT
+              | Block.UPDATE_CLIENTS);
+
+      if (i > BLOCK_DESTRUCTION_CHUNK_SIZE) {
+        return executor.submit(() -> this.destroyBlocks(blocks)).thenCompose(Function.identity());
+      }
+
+      block = blocks.poll();
+    }
+
+    return CompletableFuture.completedStage(null);
+  }
+
+  private static BlockPos[] ensureImmutable(BlockPos[] original) {
+    for (int i = 0; i < original.length; i++) {
+      original[i] = original[i].immutable();
+    }
+    return original;
   }
 }

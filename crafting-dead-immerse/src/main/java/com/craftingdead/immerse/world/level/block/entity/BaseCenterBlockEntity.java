@@ -21,7 +21,6 @@ import com.craftingdead.immerse.world.level.extension.LandClaim;
 import com.craftingdead.immerse.world.level.extension.LegacyBase;
 import com.craftingdead.immerse.world.level.extension.LevelExtension;
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import javax.annotation.Nullable;
@@ -34,8 +33,6 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
@@ -122,23 +119,8 @@ public class BaseCenterBlockEntity extends BlockEntity {
   }
 
   public void destroyPlayerBlocks() {
-    var bedrock = Blocks.BEDROCK.defaultBlockState();
-    var air = Blocks.AIR.defaultBlockState();
-
-    // The UPDATE_KNOWN_SHAPE prevent block neighbors from being updated
-    // we need it to avoid certain blocks from dropping
-    for (BlockPos pos : playerBlocks) {
-      Objects.requireNonNull(level)
-          .setBlock(pos, bedrock,
-              Block.UPDATE_SUPPRESS_DROPS
-                  | Block.UPDATE_KNOWN_SHAPE
-                  | Block.UPDATE_SUPPRESS_LIGHT);
-    }
-
-    // Now run it again to apply a proper block update around the neighbors
-    for (BlockPos pos : playerBlocks) {
-      level.setBlock(pos, air, Block.UPDATE_CLIENTS);
-    }
+    LevelExtension.getOrThrow(this.level).getLandManager()
+        .destroyBlocks(this.playerBlocks.toArray(new BlockPos[0]));
   }
 
   @Override
