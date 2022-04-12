@@ -15,6 +15,7 @@
   "death.attack.bullet.item": "%s was shot by %s with %s",
   "death.attack.bullet.headshot": "%1$s was shot in the head by %s",
   "death.attack.bullet.headshot.item": "%1$s was shot in the head by %s with %s",
+  "death.attack.grenade": "%s was blasted by %s" ,
 
   "options.craftingdead.client.hit_marker_mode": "Hit Marker Mode",
   "options.craftingdead.client.kill_sound_enabled": "Kill Sound Enabled",
@@ -75,7 +76,7 @@
   "entity.craftingdead.decoy_grenade": "Decoy Grenade",
   "entity.craftingdead.fire_grenade": "Fire Grenade",
   "entity.craftingdead.flash_grenade": "Flash Grenade",
-  "entity.craftingdead.flag_grenade": "Frag Grenade",
+  "entity.craftingdead.frag_grenade": "Frag Grenade",
   "entity.craftingdead.smoke_grenade": "Smoke Grenade",
 
   "message.switch_fire_mode": "Switched to %s",
