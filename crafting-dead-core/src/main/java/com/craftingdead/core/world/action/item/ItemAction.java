@@ -105,8 +105,8 @@ public abstract class ItemAction implements Action {
 
   @Override
   public boolean tick() {
-    if (!this.getPerformer().getEntity().isUsingItem() || !compareStacks(this.originalStack,
-        this.getItemStack(), false)) {
+    if (!this.getPerformer().getEntity().isUsingItem()
+        || !this.originalStack.getItem().equals(this.getItemStack().getItem())) {
       this.getPerformer().cancelAction(true);
       return false;
     }
@@ -129,22 +129,4 @@ public abstract class ItemAction implements Action {
 
   @Override
   public abstract ItemActionType<?> getType();
-
-  //TODO: Should this method be moved somewhere else? - juan
-  public static boolean compareStacks(ItemStack first, ItemStack second, boolean compareNbt) {
-    if (first == null || second == null) {
-      return false;
-    }
-
-    boolean areEqual = first.getItem().equals(second.getItem());
-    if (compareNbt && areEqual) {
-      if (first.hasTag() && second.hasTag()) {
-        //noinspection ConstantConditions
-        areEqual = first.getTag().equals(second.getTag());
-      } else {
-        areEqual = (!first.hasTag() && !second.hasTag());
-      }
-    }
-    return areEqual;
-  }
 }
