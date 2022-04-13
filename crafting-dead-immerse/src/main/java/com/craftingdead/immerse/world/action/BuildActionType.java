@@ -65,7 +65,7 @@ public abstract class BuildActionType extends ItemActionType<BuildAction> {
     return this.predicate;
   }
 
-  public BiConsumer<LivingExtension<?, ?>, BlockPos> getBlockPlacementConsumer() {
+  public BiConsumer<LivingExtension<?, ?>, BlockPos> getBlockPlacementHandler() {
     return this.placementHandler;
   }
 

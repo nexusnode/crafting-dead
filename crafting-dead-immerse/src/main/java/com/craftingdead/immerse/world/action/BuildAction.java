@@ -107,7 +107,7 @@ public abstract class BuildAction extends ItemAction {
 
     blockState.getBlock().setPlacedBy(level, blockPos, blockState,
         this.getPerformer().getEntity(), this.getItemStack());
-    this.getType().getBlockPlacementConsumer().accept(this.performer, blockPos);
+    this.getType().getBlockPlacementHandler().accept(this.performer, blockPos);
     if (this.performer.getEntity() instanceof ServerPlayer player) {
       CriteriaTriggers.PLACED_BLOCK.trigger(player, blockPos, this.getItemStack());
     }
