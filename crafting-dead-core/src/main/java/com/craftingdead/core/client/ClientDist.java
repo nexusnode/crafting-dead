@@ -540,7 +540,10 @@ public class ClientDist implements ModDist {
       if (this.minecraft.options.keyAttack.matchesMouse(event.getButton())) {
         boolean triggerPressed = event.getAction() == GLFW.GLFW_PRESS;
         if (gun != null) {
-          event.setCanceled(true);
+          // Allow minecraft to register release, preventing from certain actions freezing when the player swap items
+          if (event.getAction() != GLFW.GLFW_RELEASE) {
+            event.setCanceled(true);
+          }
           gun.setTriggerPressed(player, triggerPressed, true);
         }
       } else if (this.minecraft.options.keyUse.matchesMouse(event.getButton())) {
