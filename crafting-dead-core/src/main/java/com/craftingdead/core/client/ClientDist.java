@@ -14,7 +14,9 @@
 
 package com.craftingdead.core.client;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import javax.annotation.Nullable;
 import org.lwjgl.glfw.GLFW;
@@ -129,6 +131,10 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.ForgeRegistries;
 
 public class ClientDist implements ModDist {
+
+  //TODO: Maybe make it a configuration option? - juan
+  private static final List<String> ENTITY_RENDER_BLACKLIST =
+      Arrays.asList("de.maxhenkel.corpse.entities.DummyPlayer", "de.maxhenkel.corpse.entities.DummySkeleton");
 
   public static final KeyMapping RELOAD =
       new KeyMapping("key.reload", GLFW.GLFW_KEY_R, "key.categories.gameplay");
@@ -571,7 +577,8 @@ public class ClientDist implements ModDist {
     final var heldStack = event.getEntity().getMainHandItem();
     // TODO Unpleasant way of setting pose for gun. Introduce nicer system (with better poses).
     if (event.getRenderer().getModel() instanceof HumanoidModel<?> model
-        && heldStack.getItem() instanceof GunItem) {
+        && heldStack.getItem() instanceof GunItem
+        && !ENTITY_RENDER_BLACKLIST.contains(event.getEntity().getClass().getName())) {
       switch (event.getEntity().getMainArm()) {
         case LEFT:
           model.leftArmPose = ArmPose.BOW_AND_ARROW;
