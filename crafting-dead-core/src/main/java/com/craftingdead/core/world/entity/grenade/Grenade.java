@@ -258,4 +258,9 @@ public abstract class Grenade extends BounceableProjectileEntity {
   public boolean isPushedByFluid() {
     return false;
   }
+
+  @Override
+  public boolean shouldRenderAtSqrDistance(double distance) {
+    return true;
+  }
 }
