@@ -98,5 +98,10 @@
                 ]
             }
         }
+    },
+    "combat_slot_transform": {
+        "scale": [0.5, 0.5, 0.5],
+        "rotation": [0, 0, 180],
+        "translation": [-0.3, 0, -0.1]
     }
 }

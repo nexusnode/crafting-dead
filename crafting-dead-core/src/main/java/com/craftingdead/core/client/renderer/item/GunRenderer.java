@@ -174,6 +174,13 @@ public class GunRenderer implements CustomItemRenderer {
               transformType, partialTicks, poseStack, bufferSource, packedLight,
               packedOverlay);
           break;
+        case HEAD:
+          this.properties.combatSlotTransform().push(poseStack);
+          this.renderGunWithAttachements(itemStack.hasFoil(), gun, 0.0F,
+              transformType, partialTicks, poseStack, bufferSource, packedLight,
+              packedOverlay);
+          poseStack.popPose();
+          break;
         case FIXED:
           poseStack.scale(1.5F, 1.5F, 1.5F);
           poseStack.translate(-0.25F, 0, 0);
