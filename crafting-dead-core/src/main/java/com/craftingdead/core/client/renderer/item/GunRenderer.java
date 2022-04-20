@@ -3,9 +3,7 @@
  * Copyright (C) 2022  NexusNode LTD
  *
  * This Non-Commercial Software License Agreement (the "Agreement") is made between you (the "Licensee") and NEXUSNODE (BRAD HUNTER). (the "Licensor").
- * By installing or otherwise using Crafting Dead (the "Software"), you agree to be bound by the terms and conditions of this Agreement as may be revised from time to time at Licensor's sole discretion.
  *
- * If you do not agree to the terms and conditions of this Agreement do not download, copy, reproduce or otherwise use any of the source code available online at any time.
  *
  * https://github.com/nexusnode/crafting-dead/blob/1.18.x/LICENSE.txt
  *
@@ -122,19 +120,13 @@ public class GunRenderer implements CustomItemRenderer {
   }
 
   @Override
-  public boolean handlePerspective(ItemStack item,
-      ItemTransforms.TransformType transformType) {
-    switch (transformType) {
-      case THIRD_PERSON_LEFT_HAND:
-      case THIRD_PERSON_RIGHT_HAND:
-      case FIRST_PERSON_LEFT_HAND:
-      case FIRST_PERSON_RIGHT_HAND:
-      case FIXED:
-      case HEAD:
-        return true;
-      default:
-        return false;
-    }
+  public boolean handlePerspective(ItemStack item, ItemTransforms.TransformType transformType) {
+    return switch (transformType) {
+      case THIRD_PERSON_LEFT_HAND, THIRD_PERSON_RIGHT_HAND,
+          FIRST_PERSON_LEFT_HAND, FIRST_PERSON_RIGHT_HAND,
+          FIXED, HEAD -> true;
+      default -> false;
+    };
   }
 
   @Override
