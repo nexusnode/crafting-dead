@@ -35,7 +35,7 @@ public record GunRendererProperties(
     Transformation muzzleFlashTransform,
     Transformation aimingTransform,
     Transformation sprintingTransform,
-    Transformation combatSlotTransform,
+    Transformation backTransform,
     Map<ResourceLocation, Transformation> attachementTransforms,
     Map<ResourceLocation, Transformation> magazineTransforms,
     Map<HandTransform, Pair<Transformation, Transformation>> handTransforms,
@@ -64,8 +64,8 @@ public record GunRendererProperties(
                   .optionalFieldOf("sprinting_transform", DEFAULT_SPRINTING_TRANSFORM)
                   .forGetter(t -> t.sprintingTransform),
               RenderUtil.TRANSFORMATION_MATRIX_CODEC
-                  .optionalFieldOf("combat_slot_transform", Transformation.identity())
-                  .forGetter(t -> t.combatSlotTransform),
+                  .optionalFieldOf("back_transform", Transformation.identity())
+                  .forGetter(t -> t.backTransform),
               Codec.unboundedMap(ResourceLocation.CODEC, RenderUtil.TRANSFORMATION_MATRIX_CODEC)
                   .optionalFieldOf("attachement_transforms", Collections.emptyMap())
                   .forGetter(t -> t.attachementTransforms),
