@@ -61,7 +61,7 @@ public class ClientConfig {
       this.crosshair = builder
           .translation("options.craftingdead.client.crosshair")
           .define("crosshair", CrosshairManager.DEFAULT_CROSSHAIR.toString(),
-              v -> v instanceof String && ResourceLocation.isValidResourceLocation((String) v));
+              o -> o instanceof String s && ResourceLocation.isValidResourceLocation(s));
     }
     builder.pop();
   }

@@ -18,10 +18,8 @@
 
 package com.craftingdead.core.client;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import javax.annotation.Nullable;
 import org.lwjgl.glfw.GLFW;
 import com.craftingdead.core.CraftingDead;
@@ -63,7 +61,6 @@ import com.craftingdead.core.world.entity.grenade.FlashGrenadeEntity;
 import com.craftingdead.core.world.inventory.ModEquipmentSlot;
 import com.craftingdead.core.world.inventory.ModMenuTypes;
 import com.craftingdead.core.world.item.ArbitraryTooltips;
-import com.craftingdead.core.world.item.ArbitraryTooltips.TooltipFunction;
 import com.craftingdead.core.world.item.RegisterGunColor;
 import com.craftingdead.core.world.item.clothing.Clothing;
 import com.craftingdead.core.world.item.gun.Gun;
@@ -82,10 +79,8 @@ import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.HumanoidModel.ArmPose;
 import net.minecraft.client.model.geom.ModelPart;
-import net.minecraft.client.particle.ParticleEngine;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.PostChain;
 import net.minecraft.client.renderer.RenderType;
@@ -95,7 +90,6 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.client.tutorial.Tutorial;
 import net.minecraft.client.tutorial.TutorialSteps;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.Mth;
@@ -103,7 +97,6 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.inventory.InventoryMenu;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.client.ClientRegistry;
 import net.minecraftforge.client.event.ColorHandlerEvent;
@@ -136,9 +129,10 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 public class ClientDist implements ModDist {
 
-  //TODO: Maybe make it a configuration option? - juan
-  private static final List<String> ENTITY_RENDER_BLACKLIST =
-      Arrays.asList("de.maxhenkel.corpse.entities.DummyPlayer", "de.maxhenkel.corpse.entities.DummySkeleton");
+  // TODO: Maybe make it a configuration option? - juan
+  private static final Set<String> gunPoseBlacklist =
+      Set.of("de.maxhenkel.corpse.entities.DummyPlayer",
+          "de.maxhenkel.corpse.entities.DummySkeleton");
 
   public static final KeyMapping RELOAD =
       new KeyMapping("key.reload", GLFW.GLFW_KEY_R, "key.categories.gameplay");
@@ -164,7 +158,7 @@ public class ClientDist implements ModDist {
   private static final ResourceLocation ADRENALINE_SHADER =
       new ResourceLocation(CraftingDead.ID, "shaders/post/adrenaline.json");
 
-  private static final Vector3f MUTABLE_CAMERA_ROTATIONS = new Vector3f();
+  private static final Vector3f mutableCameraRotations = new Vector3f();
   private static final MutableVector2f FOV = new MutableVector2f();
 
   private static final int DOUBLE_CLICK_DURATION = 500;
@@ -184,8 +178,6 @@ public class ClientDist implements ModDist {
   private TutorialSteps lastTutorialStep;
 
   private long adrenalineShaderStartTime = 0L;
-
-  private float lastTime = 0F;
 
   private boolean wasAdrenalineActive;
 
@@ -401,7 +393,7 @@ public class ClientDist implements ModDist {
   }
 
   private void handleParticleFactoryRegisterEvent(ParticleFactoryRegisterEvent event) {
-    ParticleEngine particleEngine = this.minecraft.particleEngine;
+    var particleEngine = this.minecraft.particleEngine;
     particleEngine.register(ModParticleTypes.GRENADE_SMOKE.get(),
         GrenadeSmokeParticle.Factory::new);
     particleEngine.register(ModParticleTypes.RGB_FLASH.get(), FlashParticle.Factory::new);
@@ -436,15 +428,13 @@ public class ClientDist implements ModDist {
 
   @SubscribeEvent
   public void handleTooltipEvent(ItemTooltipEvent event) {
-    Collection<TooltipFunction> functions =
-        ArbitraryTooltips.getFunctions(event.getItemStack().getItem());
+    var functions = ArbitraryTooltips.getFunctions(event.getItemStack().getItem());
     int lineIndex = 1;
 
-    // Applies the arbitrary tooltip
-    for (TooltipFunction function : functions) {
-      Level world = event.getEntity() != null ? event.getEntity().level : null;
-      Component tooltip =
-          function.createTooltip(event.getItemStack(), world, event.getFlags());
+    // Applies the arbitrary tooltips
+    for (var function : functions) {
+      var level = event.getEntity() != null ? event.getEntity().getLevel() : null;
+      var tooltip = function.createTooltip(event.getItemStack(), level, event.getFlags());
       if (tooltip != null) {
         event.getToolTip().add(lineIndex++, tooltip);
       }
@@ -455,7 +445,6 @@ public class ClientDist implements ModDist {
   public void handleClientTick(TickEvent.ClientTickEvent event) {
     switch (event.phase) {
       case START:
-        this.lastTime = (float) Math.ceil(this.lastTime);
         var player = this.getPlayerExtension().orElse(null);
         if (player != null) {
           var gun = player.getMainHandGun().orElse(null);
@@ -548,9 +537,10 @@ public class ClientDist implements ModDist {
         && this.minecraft.screen == null && !player.getEntity().isSpectator()) {
       var gun = player.getMainHandGun().orElse(null);
       if (this.minecraft.options.keyAttack.matchesMouse(event.getButton())) {
-        boolean triggerPressed = event.getAction() == GLFW.GLFW_PRESS;
+        var triggerPressed = event.getAction() == GLFW.GLFW_PRESS;
         if (gun != null) {
-          // Allow minecraft to register release, preventing from certain actions freezing when the player swap items
+          // Allow minecraft to register release, preventing from certain actions freezing when the
+          // player swap items
           if (triggerPressed) {
             event.setCanceled(true);
           }
@@ -582,16 +572,14 @@ public class ClientDist implements ModDist {
     // TODO Unpleasant way of setting pose for gun. Introduce nicer system (with better poses).
     if (event.getRenderer().getModel() instanceof HumanoidModel<?> model
         && heldStack.getItem() instanceof GunItem
-        && !ENTITY_RENDER_BLACKLIST.contains(event.getEntity().getClass().getName())) {
+        && !gunPoseBlacklist.contains(event.getEntity().getClass().getName())) {
       switch (event.getEntity().getMainArm()) {
-        case LEFT:
+        case LEFT -> {
           model.leftArmPose = ArmPose.BOW_AND_ARROW;
-          break;
-        case RIGHT:
+        }
+        case RIGHT -> {
           model.rightArmPose = ArmPose.BOW_AND_ARROW;
-          break;
-        default:
-          break;
+        }
       }
     }
   }
@@ -645,33 +633,32 @@ public class ClientDist implements ModDist {
     var heldStack = player.getMainHandItem();
     var gun = heldStack.getCapability(Gun.CAPABILITY).orElse(null);
     switch (event.getType()) {
-      case ALL:
+      case ALL -> {
         this.ingameGui.renderOverlay(player, heldStack, gun, event.getMatrixStack(),
             event.getWindow().getGuiScaledWidth(), event.getWindow().getGuiScaledHeight(),
             event.getPartialTicks());
-        break;
-      default:
-        break;
+      }
+      default -> {}
     }
   }
 
   @SubscribeEvent
   public void handleCameraSetup(EntityViewRenderEvent.CameraSetup event) {
     this.cameraManager.getCameraRotations((float) event.getPartialTicks(),
-        MUTABLE_CAMERA_ROTATIONS);
+        mutableCameraRotations);
     if (this.minecraft.cameraEntity instanceof LivingEntity livingEntity) {
       var itemStack = livingEntity.getMainHandItem();
       var itemRenderer = this.itemRenderDispatcher.getItemRenderer(itemStack.getItem());
       if (itemRenderer != null) {
         itemRenderer.rotateCamera(itemStack, livingEntity, (float) event.getPartialTicks(),
-            MUTABLE_CAMERA_ROTATIONS);
+            mutableCameraRotations);
       }
     }
 
-    this.lastPitch = Mth.lerp(0.1F, this.lastPitch, MUTABLE_CAMERA_ROTATIONS.x());
-    this.lastYaw = Mth.lerp(0.1F, this.lastYaw, MUTABLE_CAMERA_ROTATIONS.y());
-    this.lastRoll = Mth.lerp(0.1F, this.lastRoll, MUTABLE_CAMERA_ROTATIONS.z());
-    MUTABLE_CAMERA_ROTATIONS.set(0.0F, 0.0F, 0.0F);
+    this.lastPitch = Mth.lerp(0.1F, this.lastPitch, mutableCameraRotations.x());
+    this.lastYaw = Mth.lerp(0.1F, this.lastYaw, mutableCameraRotations.y());
+    this.lastRoll = Mth.lerp(0.1F, this.lastRoll, mutableCameraRotations.z());
+    mutableCameraRotations.set(0.0F, 0.0F, 0.0F);
     event.setPitch(event.getPitch() + this.lastPitch);
     event.setYaw(event.getYaw() + this.lastYaw);
     event.setRoll(event.getRoll() + this.lastRoll);
@@ -681,40 +668,35 @@ public class ClientDist implements ModDist {
   public void handeFOVModifier(FOVModifierEvent event) {
     var player = this.getCameraPlayer();
     if (player != null) {
-      final var scope =
-          player.getEntity().getMainHandItem().getCapability(Scope.CAPABILITY).orElse(null);
+      var scope = player.getEntity().getMainHandItem().getCapability(Scope.CAPABILITY).orElse(null);
       if (scope != null && scope.isScoping(player)) {
         event.setNewfov(1.0F / scope.getZoomMultiplier(player));
       }
     }
-    event.setNewfov(
-        event.getNewfov() + this.cameraManager.getFov(Minecraft.getInstance().getFrameTime()));
+    event.setNewfov(event.getNewfov() + this.cameraManager.getFov(this.minecraft.getFrameTime()));
   }
 
   @SubscribeEvent
   public void handleRenderTick(TickEvent.RenderTickEvent event) {
     switch (event.phase) {
-      case START:
+      case START -> {
         if (this.minecraft.player != null) {
           this.cameraManager.getLookRotationDelta(FOV);
           this.minecraft.player.turn(FOV.getY(), FOV.getX());
         }
-        break;
-      case END:
+      }
+      case END -> {
         if (this.minecraft.player != null) {
           this.updateAdrenalineShader(event.renderTickTime);
         }
-        break;
-      default:
-        break;
+      }
     }
   }
 
   private void updateAdrenalineShader(float partialTicks) {
-    final GameRenderer gameRenderer = this.minecraft.gameRenderer;
-    final boolean shaderLoaded = gameRenderer.currentEffect() != null
-        && gameRenderer.currentEffect().getName()
-            .equals(ADRENALINE_SHADER.toString());
+    final var gameRenderer = this.minecraft.gameRenderer;
+    final var shaderLoaded = gameRenderer.currentEffect() != null
+        && gameRenderer.currentEffect().getName().equals(ADRENALINE_SHADER.toString());
     if (this.minecraft.player.hasEffect(ModMobEffects.ADRENALINE.get())) {
       final long currentTime = Util.getMillis();
       if (this.adrenalineShaderStartTime == 0L) {
@@ -772,8 +754,7 @@ public class ClientDist implements ModDist {
     int duration = flashGrenadeEntity.calculateDuration(this.minecraft.player,
         RenderUtil.isInsideFrustum(flashGrenadeEntity, false));
     if (duration > 0) {
-      MobEffectInstance flashEffect =
-          new MobEffectInstance(ModMobEffects.FLASH_BLINDNESS.get(), duration);
+      var flashEffect = new MobEffectInstance(ModMobEffects.FLASH_BLINDNESS.get(), duration);
       ModMobEffects.applyOrOverrideIfLonger(this.minecraft.player, flashEffect);
     }
   }
