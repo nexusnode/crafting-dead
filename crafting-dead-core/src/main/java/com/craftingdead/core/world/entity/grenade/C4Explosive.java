@@ -46,7 +46,9 @@ public class C4Explosive extends Grenade implements ExplosionSource {
   @Override
   public boolean hurt(DamageSource source, float amount) {
     if (source.isExplosion() || source.isFire()) {
-      this.setSource(source.getEntity());
+      if (source.getEntity() != null) {
+        this.setSource(source.getEntity());
+      }
       this.setActivated(true);
     }
     return super.hurt(source, amount);

@@ -889,6 +889,7 @@ public class ModItems {
               .addFireMode(FireMode.AUTO)
               .setShootSound(ModSoundEvents.MINIGUN_SHOOT)
               .setReloadSound(ModSoundEvents.M240B_RELOAD)
+              .putAnimation(GunAnimationEvent.SHOOT, SubmachineShootAnimation::new)
               .putReloadAnimation(ReloadAnimation::new)
               .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
               .setDefaultMagazine(ModItems.MINIGUN_MAGAZINE)

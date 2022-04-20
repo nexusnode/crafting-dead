@@ -99,5 +99,10 @@
                 0
             ]
         }
+    },
+    "back_transform": {
+        "scale": [0.5, 0.5, 0.5],
+        "rotation": [0, 90, 180],
+        "translation": [-5, 0, -1.5]
     }
 }
