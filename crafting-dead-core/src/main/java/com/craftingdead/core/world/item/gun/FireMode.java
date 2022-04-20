@@ -19,15 +19,27 @@
 package com.craftingdead.core.world.item.gun;
 
 import com.craftingdead.core.CraftingDead;
+import com.mojang.serialization.Codec;
+import java.util.Arrays;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.function.IntSupplier;
+import java.util.stream.Collectors;
 import javax.annotation.Nullable;
+import net.minecraft.util.StringRepresentable;
+import org.jetbrains.annotations.NotNull;
 
-public enum FireMode {
+public enum FireMode implements StringRepresentable {
 
   AUTO("auto"),
   BURST("burst", CraftingDead.serverConfig.burstfireShotsPerBurst::get),
   SEMI("semi", () -> 1);
+
+  public static final Codec<FireMode> CODEC =
+      StringRepresentable.fromEnum(FireMode::values, FireMode::byName);
+  private static final Map<String, FireMode> BY_NAME = Arrays.stream(values())
+      .collect(Collectors.toMap(FireMode::getSerializedName, Function.identity()));
 
   private final String name;
   @Nullable
@@ -51,5 +63,14 @@ public enum FireMode {
    */
   public Optional<Integer> getMaxShots() {
     return maxShots == null ? Optional.empty() : Optional.of(maxShots.getAsInt());
+  }
+
+  @Override
+  public @NotNull String getSerializedName() {
+    return name;
+  }
+
+  public static FireMode byName(String name) {
+    return BY_NAME.get(name);
   }
 }
