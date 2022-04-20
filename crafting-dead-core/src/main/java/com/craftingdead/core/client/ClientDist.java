@@ -547,7 +547,7 @@ public class ClientDist implements ModDist {
         boolean triggerPressed = event.getAction() == GLFW.GLFW_PRESS;
         if (gun != null) {
           // Allow minecraft to register release, preventing from certain actions freezing when the player swap items
-          if (event.getAction() != GLFW.GLFW_RELEASE) {
+          if (triggerPressed) {
             event.setCanceled(true);
           }
           gun.setTriggerPressed(player, triggerPressed, true);
