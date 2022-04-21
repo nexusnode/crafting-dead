@@ -15,10 +15,10 @@ public record GunProperties(
           .group(
               Attributes.CODEC
                   .fieldOf("attributes")
-                  .forGetter(t -> t.attributes),
+                  .forGetter(GunProperties::attributes),
               Sounds.CODEC
                   .fieldOf("sounds")
-                  .forGetter(t -> t.sounds))
+                  .forGetter(GunProperties::sounds))
           .apply(instance, GunProperties::new));
 
   public record Attributes(
@@ -38,35 +38,34 @@ public record GunProperties(
         RecordCodecBuilder.create(instance -> instance
             .group(
                 Codec.INT.optionalFieldOf("fire_delay", 0)
-                    .forGetter(t -> t.fireDelay),
+                    .forGetter(Attributes::fireDelay),
                 Codec.DOUBLE.optionalFieldOf("damage", 1D)
-                    .forGetter(t -> t.damage),
+                    .forGetter(Attributes::damage),
                 Codec.INT.optionalFieldOf("reload_duration", 1)
-                    .forGetter(t -> t.reloadDuration),
+                    .forGetter(Attributes::reloadDuration),
                 Codec.DOUBLE.optionalFieldOf("accuracy", 1D)
-                    .forGetter(t -> t.accuracy),
+                    .forGetter(Attributes::accuracy),
                 Codec.DOUBLE.optionalFieldOf("recoil", 0D)
-                    .forGetter(t -> t.recoil),
+                    .forGetter(Attributes::recoil),
                 Codec.INT.optionalFieldOf("rounds_per_shot", 1)
-                    .forGetter(t -> t.roundsPerShot),
+                    .forGetter(Attributes::roundsPerShot),
                 Codec.DOUBLE.optionalFieldOf("range", 10D)
-                    .forGetter(t -> t.range),
+                    .forGetter(Attributes::range),
                 Codec.BOOL.optionalFieldOf("has_crosshair", true)
-                    .forGetter(t -> t.hasCrossHair),
+                    .forGetter(Attributes::hasCrossHair),
                 Codec.list(FireMode.CODEC)
                     .optionalFieldOf("fire_mode", Collections.singletonList(FireMode.SEMI))
-                    .forGetter(t -> t.fireModes),
+                    .forGetter(Attributes::fireModes),
                 Codec.list(ResourceLocation.CODEC)
                     .optionalFieldOf("accepted_magazines", Collections.emptyList())
-                    .forGetter(t -> t.acceptedMagazines),
+                    .forGetter(Attributes::acceptedMagazines),
                 ResourceLocation.CODEC.fieldOf("default_magazine")
-                    .forGetter(t -> t.defaultMagazine),
+                    .forGetter(Attributes::defaultMagazine),
                 Codec.list(ResourceLocation.CODEC)
                     .optionalFieldOf("accepted_attachments", Collections.emptyList())
-                    .forGetter(t -> t.acceptedAttachments)
+                    .forGetter(Attributes::acceptedAttachments)
                 )
             .apply(instance, Attributes::new));
-
   }
 
   public record Sounds(
@@ -79,16 +78,16 @@ public record GunProperties(
             .group(
                 ResourceLocation.CODEC
                     .optionalFieldOf("shoot_sound", null)
-                    .forGetter(t -> t.shootSound),
+                    .forGetter(Sounds::shootSound),
                 ResourceLocation.CODEC
                     .optionalFieldOf("distant_shoot_sound", null)
-                    .forGetter(t -> t.distantShootSound),
+                    .forGetter(Sounds::distantShootSound),
                 ResourceLocation.CODEC
                     .optionalFieldOf("silenced_shoot_sound", null)
-                    .forGetter(t -> t.silencedShootSound),
+                    .forGetter(Sounds::silencedShootSound),
                 ResourceLocation.CODEC
                     .optionalFieldOf("reload_sound", null)
-                    .forGetter(t -> t.reloadSound))
+                    .forGetter(Sounds::reloadSound))
             .apply(instance, Sounds::new));
 
   }
