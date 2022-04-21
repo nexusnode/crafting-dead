@@ -25,9 +25,9 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 
-public class SimpleGunType extends GunItem {
+public class SimpleGunItem extends GunItem {
 
-  protected SimpleGunType(Builder<?> builder) {
+  protected SimpleGunItem(Builder<?> builder) {
     super(builder);
   }
 
@@ -43,6 +43,6 @@ public class SimpleGunType extends GunItem {
   }
 
   public static Builder<?> builder() {
-    return new Builder<>(SimpleGunType::new);
+    return new Builder<>(SimpleGunItem::new);
   }
 }

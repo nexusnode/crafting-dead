@@ -19,11 +19,11 @@
 package com.craftingdead.core.world.item.gun.minigun;
 
 import java.util.function.Function;
-import com.craftingdead.core.world.item.gun.SimpleGunType;
+import com.craftingdead.core.world.item.gun.SimpleGunItem;
 import com.craftingdead.core.world.item.gun.TypedGun;
 import com.craftingdead.core.world.item.gun.TypedGunClient;
 
-public class MinigunItem extends SimpleGunType {
+public class MinigunItem extends SimpleGunItem {
 
   protected MinigunItem(Builder<?> builder) {
     super(builder);
