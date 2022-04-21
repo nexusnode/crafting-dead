@@ -18,6 +18,7 @@
 
 package com.craftingdead.core;
 
+import com.craftingdead.core.world.item.gun.Guns;
 import net.minecraftforge.event.world.BlockEvent;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.commons.lang3.tuple.Pair;
@@ -153,6 +154,7 @@ public class CraftingDead {
     ActionTypes.ACTION_TYPES.register(modEventBus);
     AmmoProviderTypes.AMMO_PROVIDER_TYPES.register(modEventBus);
     Attachments.ATTACHMENTS.register(modEventBus);
+    Guns.GUNS.register(modEventBus);
 
     MinecraftForge.EVENT_BUS.register(this);
   }

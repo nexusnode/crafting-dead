@@ -32,11 +32,11 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
-public class TypedGun<T extends GunItem> extends AbstractGun {
+public class TypedGun<T extends GunType> extends AbstractGun {
 
   private final T type;
 
-  public static <T extends GunItem> TypedGun<T> create(
+  public static <T extends GunType> TypedGun<T> create(
       Function<TypedGun<T>, ? extends TypedGunClient<? super TypedGun<T>>> clientFactory,
       ItemStack itemStack, T type) {
     TypedGun<T> gun = new TypedGun<>(clientFactory, itemStack, type);

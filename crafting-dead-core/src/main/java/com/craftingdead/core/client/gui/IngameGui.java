@@ -31,7 +31,7 @@ import com.craftingdead.core.world.effect.ModMobEffects;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.core.world.item.GrenadeItem;
 import com.craftingdead.core.world.item.gun.Gun;
-import com.craftingdead.core.world.item.gun.GunItem;
+import com.craftingdead.core.world.item.GunItem;
 import com.craftingdead.core.world.item.gun.ammoprovider.AmmoProvider;
 import com.craftingdead.core.world.item.gun.magazine.Magazine;
 import com.craftingdead.core.world.item.scope.Scope;

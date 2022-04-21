@@ -18,23 +18,23 @@
 
 package com.craftingdead.core.world.item.gun.minigun;
 
-import java.util.function.Function;
-import com.craftingdead.core.world.item.gun.SimpleGunItem;
+import com.craftingdead.core.world.item.gun.GunType;
 import com.craftingdead.core.world.item.gun.TypedGun;
 import com.craftingdead.core.world.item.gun.TypedGunClient;
+import java.util.function.Function;
 
-public class MinigunItem extends SimpleGunItem {
+public class MinigunType extends GunType {
 
-  protected MinigunItem(Builder<?> builder) {
+  protected MinigunType(Builder<?> builder) {
     super(builder);
   }
 
   @Override
-  protected <T extends TypedGun<?>> Function<T, TypedGunClient<? super T>> getClientFactory() {
+  public <T extends TypedGun<?>> Function<T, TypedGunClient<? super T>> getClientFactory() {
     return MinigunClient::new;
   }
 
   public static Builder<?> builder() {
-    return new Builder<>(MinigunItem::new);
+    return new Builder<>(MinigunType::new);
   }
 }
