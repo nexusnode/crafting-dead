@@ -21,6 +21,8 @@ package com.craftingdead.core.world.item.gun.aimable;
 import com.craftingdead.core.capability.CapabilityUtil;
 import com.craftingdead.core.world.item.combatslot.CombatSlotProvider;
 import com.craftingdead.core.world.item.gun.Gun;
+import com.craftingdead.core.world.item.gun.GunProperties;
+import com.craftingdead.core.world.item.gun.GunProperties.AimableGunAttributes;
 import com.craftingdead.core.world.item.gun.GunType;
 import com.craftingdead.core.world.item.scope.Scope;
 import net.minecraft.nbt.CompoundTag;
@@ -29,14 +31,10 @@ import net.minecraftforge.common.capabilities.ICapabilityProvider;
 
 public class AimableGunType extends GunType {
 
-  /**
-   * Whether the gun has bolt action
-   */
-  private final boolean boltAction;
-
   protected AimableGunType(Builder builder) {
     super(builder);
-    this.boltAction = builder.boltAction;
+    this.properties = new GunProperties(properties.attributes(), properties.sounds(),
+        new AimableGunAttributes(builder.boltAction));
   }
 
   @Override
@@ -47,7 +45,7 @@ public class AimableGunType extends GunType {
   }
 
   public boolean hasBoltAction() {
-    return this.boltAction;
+    return this.properties.aimableGunAttributes().boltAction();
   }
 
   public static Builder builder() {

@@ -25,6 +25,8 @@ import com.craftingdead.core.util.FunctionalUtil;
 import com.craftingdead.core.world.item.GunItem;
 import com.craftingdead.core.world.item.combatslot.CombatSlot;
 import com.craftingdead.core.world.item.combatslot.CombatSlotProvider;
+import com.craftingdead.core.world.item.gun.GunProperties.Attributes;
+import com.craftingdead.core.world.item.gun.GunProperties.Sounds;
 import com.craftingdead.core.world.item.gun.ammoprovider.AmmoProvider;
 import com.craftingdead.core.world.item.gun.ammoprovider.MagazineAmmoProvider;
 import com.craftingdead.core.world.item.gun.attachment.Attachment;
@@ -52,82 +54,7 @@ public class GunType extends ForgeRegistryEntry<GunType> implements ItemLike {
 
   private final Supplier<? extends GunItem> item;
 
-  /**
-   * Time between shots in milliseconds.
-   */
-  private final int fireDelayMs;
-
-  /**
-   * Damage inflicted by a single shot from this gun.
-   */
-  private final int damage;
-
-  /**
-   * The duration of time this gun takes to reload in ticks.
-   */
-  private final int reloadDurationTicks;
-
-  /**
-   * Accuracy as percentage.
-   */
-  private final float accuracyPct;
-
-  /**
-   * Recoil.
-   */
-  private final float recoil;
-
-  /**
-   * Amount of rounds to be fired in a single shot. e.g. for shotguns
-   */
-  private final int roundsPerShot;
-
-  /**
-   * Whether the crosshair should be rendered or not while holding this item.
-   */
-  private final boolean crosshair;
-
-  /**
-   * {@link FireMode}s the gun can cycle through.
-   */
-  private final Set<FireMode> fireModes;
-
-  /**
-   * Sound to play for each shot of the gun.
-   */
-  private final Supplier<SoundEvent> shootSound;
-
-  /**
-   * Sound to play for each shot of the gun when far away.
-   */
-  private final Supplier<SoundEvent> distantShootSound;
-
-  /**
-   * A 'silenced' version of the shoot sound.
-   */
-  private final Supplier<SoundEvent> silencedShootSound;
-
-  /**
-   * Sound to play whilst the gun is being reloaded.
-   */
-  private final Supplier<SoundEvent> reloadSound;
-
   private final Map<GunAnimationEvent, Function<GunType, Animation>> animations;
-
-  /**
-   * A set of magazines that are supported by this gun.
-   */
-  private final Set<Supplier<? extends Item>> acceptedMagazines;
-
-  /**
-   * The default magazine that is supplied with this gun when crafted.
-   */
-  private final Supplier<? extends Item> defaultMagazine;
-
-  /**
-   * A set of attachments that are supported by this gun.
-   */
-  private final Set<Supplier<? extends Attachment>> acceptedAttachments;
 
   /**
    * Type of right mouse action. E.g. hold for minigun barrel rotation, click for toggling aim.
@@ -149,42 +76,44 @@ public class GunType extends ForgeRegistryEntry<GunType> implements ItemLike {
    */
   private final long secondaryActionSoundRepeatDelayMs;
 
-  /**
-   * Range in blocks.
-   */
-  private final double range;
+  protected GunProperties properties;
 
   private final CombatSlot combatSlot;
 
-  //TODO: move to properties after the split is done
   protected GunType(Builder<?> builder) {
+    //TODO: Remove this ugly manual construction of the properties when the json implementation
+    // is done - juanmuscaria
+    this.properties = new GunProperties(new Attributes(
+        builder.fireDelayMs,
+        builder.damage,
+        builder.reloadDurationTicks,
+        builder.accuracy,
+        builder.recoil,
+        builder.roundsPerShot,
+        builder.range,
+        builder.crosshair,
+        builder.fireModes,
+        builder.acceptedMagazines,
+        builder.defaultMagazine,
+        builder.acceptedAttachments
+    ), new Sounds(
+        builder.shootSound,
+        builder.distantShootSound,
+        builder.silencedShootSound,
+        builder.reloadSound
+    ), null);
+
     this.item = builder.item;
-    this.fireDelayMs = builder.fireDelayMs;
-    this.damage = builder.damage;
-    this.reloadDurationTicks = builder.reloadDurationTicks;
-    this.accuracyPct = builder.accuracy;
-    this.recoil = builder.recoil;
-    this.roundsPerShot = builder.roundsPerShot;
-    this.crosshair = builder.crosshair;
-    this.fireModes = builder.fireModes;
-    this.shootSound = builder.shootSound;
-    this.distantShootSound = builder.distantShootSound;
-    this.silencedShootSound = builder.silencedShootSound;
-    this.reloadSound = builder.reloadSound;
     this.animations = builder.animations;
-    this.acceptedMagazines = builder.acceptedMagazines;
-    this.defaultMagazine = builder.defaultMagazine;
-    this.acceptedAttachments = builder.acceptedAttachments;
     this.secondaryActionTrigger = builder.rightMouseActionTriggerType;
     this.triggerPredicate = builder.triggerPredicate;
     this.secondaryActionSound = builder.secondaryActionSound;
     this.secondaryActionSoundRepeatDelayMs = builder.secondaryActionSoundRepeatDelayMs;
-    this.range = builder.range;
     this.combatSlot = builder.combatSlot;
   }
 
   public int getFireDelayMs() {
-    return this.fireDelayMs;
+    return this.properties.attributes().fireDelay();
   }
 
   public int getFireRateRPM() {
@@ -192,51 +121,51 @@ public class GunType extends ForgeRegistryEntry<GunType> implements ItemLike {
   }
 
   public float getDamage() {
-    return this.damage;
+    return this.properties.attributes().damage();
   }
 
   public int getReloadDurationTicks() {
-    return this.reloadDurationTicks;
+    return this.properties.attributes().reloadDuration();
   }
 
   public float getAccuracyPct() {
-    return this.accuracyPct;
+    return this.properties.attributes().accuracy();
   }
 
   public float getRecoil() {
-    return this.recoil;
+    return this.properties.attributes().recoil();
   }
 
   public double getRange() {
-    return this.range;
+    return this.properties.attributes().range();
   }
 
   public int getRoundsPerShot() {
-    return this.roundsPerShot;
+    return this.properties.attributes().roundsPerShot();
   }
 
   public boolean hasCrosshair() {
-    return this.crosshair;
+    return this.properties.attributes().hasCrossHair();
   }
 
   public Set<FireMode> getFireModes() {
-    return this.fireModes;
+    return this.properties.attributes().fireModes();
   }
 
   public SoundEvent getShootSound() {
-    return this.shootSound.get();
+    return this.properties.sounds().shootSound().get();
   }
 
   public Optional<SoundEvent> getDistantShootSound() {
-    return Optional.ofNullable(this.distantShootSound).map(Supplier::get);
+    return Optional.ofNullable(this.properties.sounds().distantShootSound()).map(Supplier::get);
   }
 
   public Optional<SoundEvent> getSilencedShootSound() {
-    return Optional.ofNullable(this.silencedShootSound).map(Supplier::get);
+    return Optional.ofNullable(this.properties.sounds().silencedShootSound()).map(Supplier::get);
   }
 
   public Optional<SoundEvent> getReloadSound() {
-    return Optional.ofNullable(this.reloadSound).map(Supplier::get);
+    return Optional.ofNullable(this.properties.sounds().reloadSound()).map(Supplier::get);
   }
 
   public Map<GunAnimationEvent, Function<GunType, Animation>> getAnimations() {
@@ -253,15 +182,17 @@ public class GunType extends ForgeRegistryEntry<GunType> implements ItemLike {
   }
 
   public Set<Item> getAcceptedMagazines() {
-    return this.acceptedMagazines.stream().map(Supplier::get).collect(Collectors.toSet());
+    return this.properties.attributes().acceptedMagazines()
+        .stream().map(Supplier::get).collect(Collectors.toSet());
   }
 
   public Item getDefaultMagazine() {
-    return this.defaultMagazine.get();
+    return this.properties.attributes().defaultMagazine().get();
   }
 
   public Set<Attachment> getAcceptedAttachments() {
-    return this.acceptedAttachments.stream().map(Supplier::get).collect(Collectors.toSet());
+    return this.properties.attributes().acceptedAttachments()
+        .stream().map(Supplier::get).collect(Collectors.toSet());
   }
 
   public Gun.SecondaryActionTrigger getSecondaryActionTrigger() {
@@ -338,11 +269,11 @@ public class GunType extends ForgeRegistryEntry<GunType> implements ItemLike {
     private final Map<GunAnimationEvent, Function<GunType, Animation>> animations =
         new EnumMap<>(GunAnimationEvent.class);
 
-    private final Set<Supplier<? extends Item>> acceptedMagazines = new HashSet<>();
+    private final Set<Supplier<Item>> acceptedMagazines = new HashSet<>();
 
-    private Supplier<? extends Item> defaultMagazine;
+    private Supplier<Item> defaultMagazine;
 
-    private final Set<Supplier<? extends Attachment>> acceptedAttachments = new HashSet<>();
+    private final Set<Supplier<Attachment>> acceptedAttachments = new HashSet<>();
 
     private Gun.SecondaryActionTrigger rightMouseActionTriggerType =
         Gun.SecondaryActionTrigger.TOGGLE;
@@ -363,7 +294,6 @@ public class GunType extends ForgeRegistryEntry<GunType> implements ItemLike {
       this.item = item  ;
       return this.self();
     }
-
 
     public SELF setFireDelayMs(int fireDelayMs) {
       this.fireDelayMs = fireDelayMs;
@@ -436,7 +366,7 @@ public class GunType extends ForgeRegistryEntry<GunType> implements ItemLike {
 
     public SELF putReloadAnimation(IntFunction<Animation> animation) {
       return this.putAnimation(GunAnimationEvent.RELOAD,
-          gunType -> animation.apply(gunType.reloadDurationTicks));
+          gunType -> animation.apply(gunType.properties.attributes().reloadDuration()));
     }
 
     public SELF putAnimation(GunAnimationEvent event,
@@ -446,7 +376,7 @@ public class GunType extends ForgeRegistryEntry<GunType> implements ItemLike {
     }
 
     public SELF addAcceptedMagazine(Supplier<? extends Item> acceptedMagazine) {
-      this.acceptedMagazines.add(acceptedMagazine);
+      this.acceptedMagazines.add(acceptedMagazine::get);
       return this.self();
     }
 
@@ -454,12 +384,12 @@ public class GunType extends ForgeRegistryEntry<GunType> implements ItemLike {
       if (this.defaultMagazine != null) {
         throw new IllegalArgumentException("Default magazine already set");
       }
-      this.defaultMagazine = defaultMagazine;
+      this.defaultMagazine = defaultMagazine::get;
       return this.addAcceptedMagazine(defaultMagazine);
     }
 
     public SELF addAcceptedAttachment(Supplier<? extends Attachment> acceptedAttachment) {
-      this.acceptedAttachments.add(acceptedAttachment);
+      this.acceptedAttachments.add(acceptedAttachment::get);
       return this.self();
     }
 
