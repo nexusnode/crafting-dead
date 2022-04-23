@@ -22,19 +22,37 @@ import com.craftingdead.core.capability.CapabilityUtil;
 import com.craftingdead.core.world.item.combatslot.CombatSlotProvider;
 import com.craftingdead.core.world.item.gun.Gun;
 import com.craftingdead.core.world.item.gun.GunProperties;
-import com.craftingdead.core.world.item.gun.GunProperties.AimableGunAttributes;
 import com.craftingdead.core.world.item.gun.GunType;
 import com.craftingdead.core.world.item.scope.Scope;
+import com.google.common.base.Suppliers;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 
 public class AimableGunType extends GunType {
 
+  public static final Codec<AimableGunProperties> CODEC =
+      RecordCodecBuilder.create(instance -> instance
+          .group(
+              GunProperties.Attributes.CODEC
+                  .fieldOf("attributes")
+                  .forGetter(GunProperties::attributes),
+              GunProperties.Sounds.CODEC
+                  .fieldOf("sounds")
+                  .forGetter(GunProperties::sounds),
+              AimableGunProperties.AimableGunAttributes.CODEC
+                  .optionalFieldOf("", new AimableGunProperties.AimableGunAttributes(false))
+                  .forGetter(AimableGunProperties::aimableGunAttributes))
+          .apply(instance, AimableGunProperties::new));
+
   protected AimableGunType(Builder builder) {
     super(builder);
-    this.properties = new GunProperties(properties.attributes(), properties.sounds(),
-        new AimableGunAttributes(builder.boltAction));
+
+    this.properties = Suppliers.ofInstance(
+        new AimableGunProperties(this.properties.get().attributes(), this.properties.get().sounds(),
+            new AimableGunProperties.AimableGunAttributes(builder.boltAction)));
   }
 
   @Override
@@ -44,8 +62,13 @@ public class AimableGunType extends GunType {
         Gun.CAPABILITY, CombatSlotProvider.CAPABILITY, Scope.CAPABILITY);
   }
 
+  @Override
+  public Codec<? extends GunProperties> getCodec() {
+    return CODEC;
+  }
+
   public boolean hasBoltAction() {
-    return this.properties.aimableGunAttributes().boltAction();
+    return this.<AimableGunProperties>properties().aimableGunAttributes().boltAction();
   }
 
   public static Builder builder() {

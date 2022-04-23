@@ -25,30 +25,50 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Supplier;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.registries.ForgeRegistries;
 
-public record GunProperties(
-    GunProperties.Attributes attributes,
-    GunProperties.Sounds sounds,
-    GunProperties.AimableGunAttributes aimableGunAttributes) {
+public class GunProperties {
 
-  public static final Codec<GunProperties> CODEC =
-      RecordCodecBuilder.create(instance -> instance
-          .group(
-              Attributes.CODEC
-                  .fieldOf("attributes")
-                  .forGetter(GunProperties::attributes),
-              Sounds.CODEC
-                  .fieldOf("sounds")
-                  .forGetter(GunProperties::sounds),
-              AimableGunAttributes.CODEC
-                  .optionalFieldOf("aimable_gun_attributes", null)
-                  .forGetter(GunProperties::aimableGunAttributes))
-          .apply(instance, GunProperties::new));
+  private final Attributes attributes;
+  private final Sounds sounds;
+
+  public GunProperties(
+      Attributes attributes,
+      Sounds sounds) {
+    this.attributes = attributes;
+    this.sounds = sounds;
+  }
+
+  public Attributes attributes() {
+    return attributes;
+  }
+
+  public Sounds sounds() {
+    return sounds;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (obj == this) {
+      return true;
+    }
+    if (obj == null || obj.getClass() != this.getClass()) {
+      return false;
+    }
+    var that = (GunProperties) obj;
+    return Objects.equals(this.attributes, that.attributes) &&
+        Objects.equals(this.sounds, that.sounds);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(attributes, sounds);
+  }
 
   /**
    * @param fireDelay           - Time between shots in milliseconds.
@@ -151,19 +171,5 @@ public record GunProperties(
                     .xmap(to -> (Supplier<SoundEvent>) () -> to, Supplier::get)
                     .forGetter(Sounds::reloadSound))
             .apply(instance, Sounds::new));
-  }
-
-  //TODO: I don't know an easier way to extend gun attributes for sub gun types,
-  // so I added them here - juanmuscaria
-  /**
-   * @param boltAction Whether the gun has bolt action
-   */
-  public record AimableGunAttributes(boolean boltAction) {
-    public static final Codec<AimableGunAttributes> CODEC =
-        RecordCodecBuilder.create(instance -> instance
-            .group(Codec.BOOL
-                .optionalFieldOf("bolt_action", false)
-                .forGetter(AimableGunAttributes::boltAction))
-            .apply(instance, AimableGunAttributes::new));
   }
 }

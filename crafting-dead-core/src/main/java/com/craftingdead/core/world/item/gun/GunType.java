@@ -25,11 +25,12 @@ import com.craftingdead.core.util.FunctionalUtil;
 import com.craftingdead.core.world.item.GunItem;
 import com.craftingdead.core.world.item.combatslot.CombatSlot;
 import com.craftingdead.core.world.item.combatslot.CombatSlotProvider;
-import com.craftingdead.core.world.item.gun.GunProperties.Attributes;
-import com.craftingdead.core.world.item.gun.GunProperties.Sounds;
 import com.craftingdead.core.world.item.gun.ammoprovider.AmmoProvider;
 import com.craftingdead.core.world.item.gun.ammoprovider.MagazineAmmoProvider;
 import com.craftingdead.core.world.item.gun.attachment.Attachment;
+import com.google.common.base.Suppliers;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.HashSet;
@@ -51,6 +52,17 @@ import net.minecraftforge.registries.ForgeRegistryEntry;
 import org.jetbrains.annotations.NotNull;
 
 public class GunType extends ForgeRegistryEntry<GunType> implements ItemLike {
+
+  public static final Codec<GunProperties> DEFAULT_CODEC =
+      RecordCodecBuilder.create(instance -> instance
+          .group(
+              GunProperties.Attributes.CODEC
+                  .fieldOf("attributes")
+                  .forGetter(GunProperties::attributes),
+              GunProperties.Sounds.CODEC
+                  .fieldOf("sounds")
+                  .forGetter(GunProperties::sounds))
+          .apply(instance, GunProperties::new));
 
   private final Supplier<? extends GunItem> item;
 
@@ -76,14 +88,14 @@ public class GunType extends ForgeRegistryEntry<GunType> implements ItemLike {
    */
   private final long secondaryActionSoundRepeatDelayMs;
 
-  protected GunProperties properties;
+  protected Supplier<? extends GunProperties> properties;
 
   private final CombatSlot combatSlot;
 
   protected GunType(Builder<?> builder) {
     //TODO: Remove this ugly manual construction of the properties when the json implementation
     // is done - juanmuscaria
-    this.properties = new GunProperties(new Attributes(
+    this.properties = Suppliers.ofInstance(new GunProperties(new GunProperties.Attributes(
         builder.fireDelayMs,
         builder.damage,
         builder.reloadDurationTicks,
@@ -96,12 +108,12 @@ public class GunType extends ForgeRegistryEntry<GunType> implements ItemLike {
         builder.acceptedMagazines,
         builder.defaultMagazine,
         builder.acceptedAttachments
-    ), new Sounds(
+    ), new GunProperties.Sounds(
         builder.shootSound,
         builder.distantShootSound,
         builder.silencedShootSound,
         builder.reloadSound
-    ), null);
+    )));
 
     this.item = builder.item;
     this.animations = builder.animations;
@@ -113,7 +125,7 @@ public class GunType extends ForgeRegistryEntry<GunType> implements ItemLike {
   }
 
   public int getFireDelayMs() {
-    return this.properties.attributes().fireDelay();
+    return this.properties().attributes().fireDelay();
   }
 
   public int getFireRateRPM() {
@@ -121,51 +133,51 @@ public class GunType extends ForgeRegistryEntry<GunType> implements ItemLike {
   }
 
   public float getDamage() {
-    return this.properties.attributes().damage();
+    return this.properties().attributes().damage();
   }
 
   public int getReloadDurationTicks() {
-    return this.properties.attributes().reloadDuration();
+    return this.properties().attributes().reloadDuration();
   }
 
   public float getAccuracyPct() {
-    return this.properties.attributes().accuracy();
+    return this.properties().attributes().accuracy();
   }
 
   public float getRecoil() {
-    return this.properties.attributes().recoil();
+    return this.properties().attributes().recoil();
   }
 
   public double getRange() {
-    return this.properties.attributes().range();
+    return this.properties().attributes().range();
   }
 
   public int getRoundsPerShot() {
-    return this.properties.attributes().roundsPerShot();
+    return this.properties().attributes().roundsPerShot();
   }
 
   public boolean hasCrosshair() {
-    return this.properties.attributes().hasCrossHair();
+    return this.properties().attributes().hasCrossHair();
   }
 
   public Set<FireMode> getFireModes() {
-    return this.properties.attributes().fireModes();
+    return this.properties().attributes().fireModes();
   }
 
   public SoundEvent getShootSound() {
-    return this.properties.sounds().shootSound().get();
+    return this.properties().sounds().shootSound().get();
   }
 
   public Optional<SoundEvent> getDistantShootSound() {
-    return Optional.ofNullable(this.properties.sounds().distantShootSound()).map(Supplier::get);
+    return Optional.ofNullable(this.properties().sounds().distantShootSound()).map(Supplier::get);
   }
 
   public Optional<SoundEvent> getSilencedShootSound() {
-    return Optional.ofNullable(this.properties.sounds().silencedShootSound()).map(Supplier::get);
+    return Optional.ofNullable(this.properties().sounds().silencedShootSound()).map(Supplier::get);
   }
 
   public Optional<SoundEvent> getReloadSound() {
-    return Optional.ofNullable(this.properties.sounds().reloadSound()).map(Supplier::get);
+    return Optional.ofNullable(this.properties().sounds().reloadSound()).map(Supplier::get);
   }
 
   public Map<GunAnimationEvent, Function<GunType, Animation>> getAnimations() {
@@ -182,16 +194,16 @@ public class GunType extends ForgeRegistryEntry<GunType> implements ItemLike {
   }
 
   public Set<Item> getAcceptedMagazines() {
-    return this.properties.attributes().acceptedMagazines()
+    return this.properties().attributes().acceptedMagazines()
         .stream().map(Supplier::get).collect(Collectors.toSet());
   }
 
   public Item getDefaultMagazine() {
-    return this.properties.attributes().defaultMagazine().get();
+    return this.properties().attributes().defaultMagazine().get();
   }
 
   public Set<Attachment> getAcceptedAttachments() {
-    return this.properties.attributes().acceptedAttachments()
+    return this.properties().attributes().acceptedAttachments()
         .stream().map(Supplier::get).collect(Collectors.toSet());
   }
 
@@ -228,6 +240,16 @@ public class GunType extends ForgeRegistryEntry<GunType> implements ItemLike {
   @Override
   public @NotNull Item asItem() {
     return this.item.get();
+  }
+
+  public Codec<? extends GunProperties> getCodec() {
+    return DEFAULT_CODEC;
+  }
+
+  // TODO: better way that avoids this unchecked cast? - juanmuscaria
+  @SuppressWarnings("unchecked")
+  public <T extends GunProperties> T properties() {
+    return (T) this.properties.get();
   }
 
   public static Builder<?> builder() {
@@ -366,7 +388,7 @@ public class GunType extends ForgeRegistryEntry<GunType> implements ItemLike {
 
     public SELF putReloadAnimation(IntFunction<Animation> animation) {
       return this.putAnimation(GunAnimationEvent.RELOAD,
-          gunType -> animation.apply(gunType.properties.attributes().reloadDuration()));
+          gunType -> animation.apply(gunType.properties().attributes().reloadDuration()));
     }
 
     public SELF putAnimation(GunAnimationEvent event,
