@@ -18,8 +18,6 @@
 
 package com.craftingdead.core;
 
-import com.craftingdead.core.world.item.gun.Guns;
-import net.minecraftforge.event.world.BlockEvent;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
@@ -48,6 +46,8 @@ import com.craftingdead.core.world.item.combatslot.CombatSlotProvider;
 import com.craftingdead.core.world.item.crafting.ModRecipeSerializers;
 import com.craftingdead.core.world.item.enchantment.ModEnchantments;
 import com.craftingdead.core.world.item.gun.Gun;
+import com.craftingdead.core.world.item.gun.GunTypeFactories;
+import com.craftingdead.core.world.item.gun.GunTypes;
 import com.craftingdead.core.world.item.gun.ammoprovider.AmmoProviderTypes;
 import com.craftingdead.core.world.item.gun.attachment.Attachments;
 import com.craftingdead.core.world.item.gun.magazine.Magazine;
@@ -83,6 +83,7 @@ import net.minecraftforge.event.entity.player.AttackEntityEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -154,7 +155,8 @@ public class CraftingDead {
     ActionTypes.ACTION_TYPES.register(modEventBus);
     AmmoProviderTypes.AMMO_PROVIDER_TYPES.register(modEventBus);
     Attachments.ATTACHMENTS.register(modEventBus);
-    Guns.GUNS.register(modEventBus);
+    GunTypes.gunTypes.register(modEventBus);
+    GunTypeFactories.gunTypeFactories.register(modEventBus);
 
     MinecraftForge.EVENT_BUS.register(this);
   }
@@ -321,7 +323,8 @@ public class CraftingDead {
       event.getEntity()
           .getCapability(LivingExtension.CAPABILITY)
           .ifPresent(living -> event.setCanceled(
-              living.handleBlockPlace(event.getBlockSnapshot(), event.getPlacedBlock(), event.getPlacedAgainst())));
+              living.handleBlockPlace(event.getBlockSnapshot(), event.getPlacedBlock(),
+                  event.getPlacedAgainst())));
     }
   }
 
@@ -331,14 +334,16 @@ public class CraftingDead {
       event.getEntity()
           .getCapability(LivingExtension.CAPABILITY)
           .ifPresent(living -> event.setCanceled(
-              living.handleMultiBlockPlace(event.getReplacedBlockSnapshots(), event.getPlacedBlock(), event.getPlacedAgainst())));
+              living.handleMultiBlockPlace(event.getReplacedBlockSnapshots(),
+                  event.getPlacedBlock(), event.getPlacedAgainst())));
     }
   }
 
   @SubscribeEvent(priority = EventPriority.LOWEST)
   public void handleEntityBlockBreakEvent(BlockEvent.BreakEvent event) {
     var xp = new MutableInt(event.getExpToDrop());
-    event.setCanceled(PlayerExtension.getOrThrow(event.getPlayer()).handleBlockBreak(event.getPos(), event.getState(), xp));
+    event.setCanceled(PlayerExtension.getOrThrow(event.getPlayer()).handleBlockBreak(event.getPos(),
+        event.getState(), xp));
     event.setExpToDrop(xp.getValue());
   }
 

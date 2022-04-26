@@ -18,19 +18,8 @@
 
 package com.craftingdead.core.world.item.gun;
 
-import com.craftingdead.core.CraftingDead;
-import com.craftingdead.core.capability.CapabilityUtil;
-import com.craftingdead.core.client.animation.Animation;
-import com.craftingdead.core.util.FunctionalUtil;
-import com.craftingdead.core.world.item.GunItem;
-import com.craftingdead.core.world.item.combatslot.CombatSlot;
-import com.craftingdead.core.world.item.combatslot.CombatSlotProvider;
-import com.craftingdead.core.world.item.gun.ammoprovider.AmmoProvider;
-import com.craftingdead.core.world.item.gun.ammoprovider.MagazineAmmoProvider;
-import com.craftingdead.core.world.item.gun.attachment.Attachment;
-import com.google.common.base.Suppliers;
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.HashSet;
@@ -42,27 +31,44 @@ import java.util.function.IntFunction;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import org.jetbrains.annotations.NotNull;
+import com.craftingdead.core.CraftingDead;
+import com.craftingdead.core.capability.CapabilityUtil;
+import com.craftingdead.core.client.animation.Animation;
+import com.craftingdead.core.util.FunctionalUtil;
+import com.craftingdead.core.world.item.GunItem;
+import com.craftingdead.core.world.item.combatslot.CombatSlot;
+import com.craftingdead.core.world.item.combatslot.CombatSlotProvider;
+import com.craftingdead.core.world.item.gun.ammoprovider.AmmoProvider;
+import com.craftingdead.core.world.item.gun.ammoprovider.MagazineAmmoProvider;
+import com.craftingdead.core.world.item.gun.attachment.Attachment;
+import com.craftingdead.core.world.item.gun.attachment.Attachments;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.ForgeRegistryEntry;
-import org.jetbrains.annotations.NotNull;
 
 public class GunType extends ForgeRegistryEntry<GunType> implements ItemLike {
 
-  public static final Codec<GunProperties> DEFAULT_CODEC =
+  public static final Codec<GunType> CODEC =
+      GunTypeFactory.CODEC.dispatch(GunType::getFactory, GunTypeFactory::getGunTypeCodec);
+
+  public static final Codec<GunType> DIRECT_CODEC =
       RecordCodecBuilder.create(instance -> instance
           .group(
-              GunProperties.Attributes.CODEC
-                  .fieldOf("attributes")
-                  .forGetter(GunProperties::attributes),
-              GunProperties.Sounds.CODEC
+              GeneralAttributes.CODEC
+                  .fieldOf("general_attributes")
+                  .forGetter(GunType::getAttributes),
+              Sounds.CODEC
                   .fieldOf("sounds")
-                  .forGetter(GunProperties::sounds))
-          .apply(instance, GunProperties::new));
+                  .forGetter(GunType::getSounds))
+          .apply(instance, GunType::new));
 
   private final Supplier<? extends GunItem> item;
 
@@ -88,14 +94,21 @@ public class GunType extends ForgeRegistryEntry<GunType> implements ItemLike {
    */
   private final long secondaryActionSoundRepeatDelayMs;
 
-  protected Supplier<? extends GunProperties> properties;
-
   private final CombatSlot combatSlot;
 
+  private final GeneralAttributes attributes;
+  private final Sounds sounds;
+
+  protected GunType(GeneralAttributes attributes, Sounds sounds) {
+    this.attributes = attributes;
+    this.sounds = sounds;
+
+    // TODO Implement full serialization support
+    throw new IllegalStateException("Not supported");
+  }
+
   protected GunType(Builder<?> builder) {
-    //TODO: Remove this ugly manual construction of the properties when the json implementation
-    // is done - juanmuscaria
-    this.properties = Suppliers.ofInstance(new GunProperties(new GunProperties.Attributes(
+    this.attributes = new GeneralAttributes(
         builder.fireDelayMs,
         builder.damage,
         builder.reloadDurationTicks,
@@ -107,13 +120,12 @@ public class GunType extends ForgeRegistryEntry<GunType> implements ItemLike {
         builder.fireModes,
         builder.acceptedMagazines,
         builder.defaultMagazine,
-        builder.acceptedAttachments
-    ), new GunProperties.Sounds(
+        builder.acceptedAttachments);
+    this.sounds = new Sounds(
         builder.shootSound,
         builder.distantShootSound,
         builder.silencedShootSound,
-        builder.reloadSound
-    )));
+        builder.reloadSound);
 
     this.item = builder.item;
     this.animations = builder.animations;
@@ -124,8 +136,16 @@ public class GunType extends ForgeRegistryEntry<GunType> implements ItemLike {
     this.combatSlot = builder.combatSlot;
   }
 
+  public GeneralAttributes getAttributes() {
+    return this.attributes;
+  }
+
+  public Sounds getSounds() {
+    return this.sounds;
+  }
+
   public int getFireDelayMs() {
-    return this.properties().attributes().fireDelay();
+    return this.attributes.fireDelay();
   }
 
   public int getFireRateRPM() {
@@ -133,51 +153,51 @@ public class GunType extends ForgeRegistryEntry<GunType> implements ItemLike {
   }
 
   public float getDamage() {
-    return this.properties().attributes().damage();
+    return this.attributes.damage();
   }
 
   public int getReloadDurationTicks() {
-    return this.properties().attributes().reloadDuration();
+    return this.attributes.reloadDuration();
   }
 
   public float getAccuracyPct() {
-    return this.properties().attributes().accuracy();
+    return this.attributes.accuracy();
   }
 
   public float getRecoil() {
-    return this.properties().attributes().recoil();
+    return this.attributes.recoil();
   }
 
   public double getRange() {
-    return this.properties().attributes().range();
+    return this.attributes.range();
   }
 
   public int getRoundsPerShot() {
-    return this.properties().attributes().roundsPerShot();
+    return this.attributes.roundsPerShot();
   }
 
   public boolean hasCrosshair() {
-    return this.properties().attributes().hasCrossHair();
+    return this.attributes.hasCrossHair();
   }
 
   public Set<FireMode> getFireModes() {
-    return this.properties().attributes().fireModes();
+    return this.attributes.fireModes();
   }
 
   public SoundEvent getShootSound() {
-    return this.properties().sounds().shootSound().get();
+    return this.sounds.shootSound().get();
   }
 
   public Optional<SoundEvent> getDistantShootSound() {
-    return Optional.ofNullable(this.properties().sounds().distantShootSound()).map(Supplier::get);
+    return Optional.ofNullable(this.sounds.distantShootSound()).map(Supplier::get);
   }
 
   public Optional<SoundEvent> getSilencedShootSound() {
-    return Optional.ofNullable(this.properties().sounds().silencedShootSound()).map(Supplier::get);
+    return Optional.ofNullable(this.sounds.silencedShootSound()).map(Supplier::get);
   }
 
   public Optional<SoundEvent> getReloadSound() {
-    return Optional.ofNullable(this.properties().sounds().reloadSound()).map(Supplier::get);
+    return Optional.ofNullable(this.sounds.reloadSound()).map(Supplier::get);
   }
 
   public Map<GunAnimationEvent, Function<GunType, Animation>> getAnimations() {
@@ -194,16 +214,16 @@ public class GunType extends ForgeRegistryEntry<GunType> implements ItemLike {
   }
 
   public Set<Item> getAcceptedMagazines() {
-    return this.properties().attributes().acceptedMagazines()
+    return this.attributes.acceptedMagazines()
         .stream().map(Supplier::get).collect(Collectors.toSet());
   }
 
   public Item getDefaultMagazine() {
-    return this.properties().attributes().defaultMagazine().get();
+    return this.attributes.defaultMagazine().get();
   }
 
   public Set<Attachment> getAcceptedAttachments() {
-    return this.properties().attributes().acceptedAttachments()
+    return this.attributes.acceptedAttachments()
         .stream().map(Supplier::get).collect(Collectors.toSet());
   }
 
@@ -242,14 +262,109 @@ public class GunType extends ForgeRegistryEntry<GunType> implements ItemLike {
     return this.item.get();
   }
 
-  public Codec<? extends GunProperties> getCodec() {
-    return DEFAULT_CODEC;
+  public GunTypeFactory getFactory() {
+    return GunTypeFactories.SIMPLE.get();
   }
 
-  // TODO: better way that avoids this unchecked cast? - juanmuscaria
-  @SuppressWarnings("unchecked")
-  public <T extends GunProperties> T properties() {
-    return (T) this.properties.get();
+  /**
+   * @param fireDelay - Time between shots in milliseconds.
+   * @param damage - Damage inflicted by a single shot from this gun.
+   * @param reloadDuration - The duration of time this gun takes to reload in ticks.
+   * @param accuracy - Accuracy as percentage.
+   * @param recoil - Recoil.
+   * @param roundsPerShot - Amount of rounds to be fired in a single shot. e.g. for shotguns
+   * @param range - Range in blocks.
+   * @param hasCrossHair - Whether the crosshair should be rendered or not while holding this item.
+   * @param fireModes - {@link FireMode}s the gun can cycle through.
+   * @param acceptedMagazines - A set of magazines that are supported by this gun.
+   * @param defaultMagazine - The default magazine that is supplied with this gun when crafted.
+   * @param acceptedAttachments - A set of attachments that are supported by this gun.
+   */
+  public record GeneralAttributes(
+      int fireDelay,
+      int damage,
+      int reloadDuration,
+      float accuracy,
+      float recoil,
+      int roundsPerShot,
+      double range,
+      boolean hasCrossHair,
+      Set<FireMode> fireModes,
+      Set<Supplier<Item>> acceptedMagazines,
+      Supplier<Item> defaultMagazine,
+      Set<Supplier<Attachment>> acceptedAttachments) {
+
+    public static final Codec<GeneralAttributes> CODEC =
+        RecordCodecBuilder.create(instance -> instance
+            .group(
+                Codec.INT.optionalFieldOf("fire_delay", 0)
+                    .forGetter(GeneralAttributes::fireDelay),
+                Codec.INT.optionalFieldOf("damage", 1)
+                    .forGetter(GeneralAttributes::damage),
+                Codec.INT.optionalFieldOf("reload_duration", 1)
+                    .forGetter(GeneralAttributes::reloadDuration),
+                Codec.FLOAT.optionalFieldOf("accuracy", 1F)
+                    .forGetter(GeneralAttributes::accuracy),
+                Codec.FLOAT.optionalFieldOf("recoil", 0F)
+                    .forGetter(GeneralAttributes::recoil),
+                Codec.INT.optionalFieldOf("rounds_per_shot", 1)
+                    .forGetter(GeneralAttributes::roundsPerShot),
+                Codec.DOUBLE.optionalFieldOf("range", 10D)
+                    .forGetter(GeneralAttributes::range),
+                Codec.BOOL.optionalFieldOf("has_crosshair", true)
+                    .forGetter(GeneralAttributes::hasCrossHair),
+                Codec.list(FireMode.CODEC)
+                    .optionalFieldOf("fire_mode", Collections.singletonList(FireMode.SEMI))
+                    .xmap(to -> (Set<FireMode>) new HashSet<>(to), ArrayList::new)
+                    .forGetter(GeneralAttributes::fireModes),
+                Codec.list(ForgeRegistries.ITEMS.getCodec()
+                    .xmap(to -> (Supplier<Item>) () -> to, Supplier::get))
+                    .optionalFieldOf("accepted_magazines", Collections.emptyList())
+                    .xmap(to -> (Set<Supplier<Item>>) new HashSet<>(to), ArrayList::new)
+                    .forGetter(GeneralAttributes::acceptedMagazines),
+                ForgeRegistries.ITEMS.getCodec().fieldOf("default_magazine")
+                    .xmap(to -> (Supplier<Item>) () -> to, Supplier::get)
+                    .forGetter(t -> t.defaultMagazine),
+                Codec.list(Attachments.REGISTRY.get()
+                    .getCodec().xmap(to -> (Supplier<Attachment>) () -> to, Supplier::get))
+                    .optionalFieldOf("accepted_attachments", Collections.emptyList())
+                    .xmap(to -> (Set<Supplier<Attachment>>) new HashSet<>(to), ArrayList::new)
+                    .forGetter(GeneralAttributes::acceptedAttachments))
+            .apply(instance, GeneralAttributes::new));
+  }
+
+  /**
+   * @param shootSound - Sound to play for each shot of the gun.
+   * @param distantShootSound - Sound to play for each shot of the gun when far away.
+   * @param silencedShootSound - A 'silenced' version of the shoot sound.
+   * @param reloadSound - Sound to play whilst the gun is being reloaded.
+   */
+  public record Sounds(
+      Supplier<SoundEvent> shootSound,
+      Supplier<SoundEvent> distantShootSound,
+      Supplier<SoundEvent> silencedShootSound,
+      Supplier<SoundEvent> reloadSound) {
+
+    public static final Codec<Sounds> CODEC =
+        RecordCodecBuilder.create(instance -> instance
+            .group(
+                ForgeRegistries.SOUND_EVENTS.getCodec()
+                    .fieldOf("shoot_sound")
+                    .xmap(to -> (Supplier<SoundEvent>) () -> to, Supplier::get)
+                    .forGetter(Sounds::shootSound),
+                ForgeRegistries.SOUND_EVENTS.getCodec()
+                    .optionalFieldOf("distant_shoot_sound", null)
+                    .xmap(to -> (Supplier<SoundEvent>) () -> to, Supplier::get)
+                    .forGetter(Sounds::distantShootSound),
+                ForgeRegistries.SOUND_EVENTS.getCodec()
+                    .optionalFieldOf("silenced_shoot_sound", null)
+                    .xmap(to -> (Supplier<SoundEvent>) () -> to, Supplier::get)
+                    .forGetter(Sounds::silencedShootSound),
+                ForgeRegistries.SOUND_EVENTS.getCodec()
+                    .optionalFieldOf("reload_sound", null)
+                    .xmap(to -> (Supplier<SoundEvent>) () -> to, Supplier::get)
+                    .forGetter(Sounds::reloadSound))
+            .apply(instance, Sounds::new));
   }
 
   public static Builder<?> builder() {
@@ -313,7 +428,7 @@ public class GunType extends ForgeRegistryEntry<GunType> implements ItemLike {
     }
 
     public SELF setItem(Supplier<? extends GunItem> item) {
-      this.item = item  ;
+      this.item = item;
       return this.self();
     }
 
@@ -388,7 +503,7 @@ public class GunType extends ForgeRegistryEntry<GunType> implements ItemLike {
 
     public SELF putReloadAnimation(IntFunction<Animation> animation) {
       return this.putAnimation(GunAnimationEvent.RELOAD,
-          gunType -> animation.apply(gunType.properties().attributes().reloadDuration()));
+          gunType -> animation.apply(gunType.attributes.reloadDuration()));
     }
 
     public SELF putAnimation(GunAnimationEvent event,

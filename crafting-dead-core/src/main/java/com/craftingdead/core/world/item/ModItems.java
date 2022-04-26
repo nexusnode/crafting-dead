@@ -27,7 +27,7 @@ import com.craftingdead.core.world.entity.grenade.FlashGrenadeEntity;
 import com.craftingdead.core.world.entity.grenade.FragGrenade;
 import com.craftingdead.core.world.entity.grenade.SmokeGrenadeEntity;
 import com.craftingdead.core.world.item.clothing.Clothing;
-import com.craftingdead.core.world.item.gun.Guns;
+import com.craftingdead.core.world.item.gun.GunTypes;
 import com.craftingdead.core.world.item.gun.attachment.Attachments;
 import com.craftingdead.core.world.item.gun.skin.Skins;
 import net.minecraft.ChatFormatting;
@@ -548,43 +548,43 @@ public class ModItems {
 
   public static final RegistryObject<GunItem> M4A1 =
       ITEMS.register("m4a1",
-          () -> new GunItem(Guns.M4A1));
+          () -> new GunItem(GunTypes.M4A1));
 
   public static final RegistryObject<GunItem> SCARL =
       ITEMS.register("scarl",
-          () -> new GunItem(Guns.SCARL));
+          () -> new GunItem(GunTypes.SCARL));
 
   public static final RegistryObject<GunItem> AK47 =
       ITEMS.register("ak47",
-          () -> new GunItem(Guns.AK47));
+          () -> new GunItem(GunTypes.AK47));
 
   public static final RegistryObject<GunItem> FNFAL =
       ITEMS.register("fnfal",
-          () -> new GunItem(Guns.FNFAL));
+          () -> new GunItem(GunTypes.FNFAL));
 
   public static final RegistryObject<GunItem> ACR =
       ITEMS.register("acr",
-          () -> new GunItem(Guns.ACR));
+          () -> new GunItem(GunTypes.ACR));
 
   public static final RegistryObject<GunItem> HK417 =
       ITEMS.register("hk417",
-          () -> new GunItem(Guns.HK417));
+          () -> new GunItem(GunTypes.HK417));
 
   public static final RegistryObject<GunItem> MPT55 =
       ITEMS.register("mpt55",
-          () -> new GunItem(Guns.MPT55));
+          () -> new GunItem(GunTypes.MPT55));
 
   public static final RegistryObject<GunItem> M1GARAND =
       ITEMS.register("m1garand",
-          () -> new GunItem(Guns.M1GARAND));
+          () -> new GunItem(GunTypes.M1GARAND));
 
   public static final RegistryObject<GunItem> SPORTER22 =
       ITEMS.register("sporter22",
-          () -> new GunItem(Guns.SPORTER22));
+          () -> new GunItem(GunTypes.SPORTER22));
 
   public static final RegistryObject<GunItem> G36C =
       ITEMS.register("g36c",
-          () -> new GunItem(Guns.G36C));
+          () -> new GunItem(GunTypes.G36C));
 
   // ================================================================================
   // Machine Guns
@@ -592,19 +592,19 @@ public class ModItems {
 
   public static final RegistryObject<GunItem> M240B =
       ITEMS.register("m240b",
-          () -> new GunItem(Guns.M240B));
+          () -> new GunItem(GunTypes.M240B));
 
   public static final RegistryObject<GunItem> RPK =
       ITEMS.register("rpk",
-          () -> new GunItem(Guns.RPK));
+          () -> new GunItem(GunTypes.RPK));
 
   public static final RegistryObject<GunItem> MINIGUN =
       ITEMS.register("minigun",
-          () -> new GunItem(Guns.MINIGUN));
+          () -> new GunItem(GunTypes.MINIGUN));
 
   public static final RegistryObject<GunItem> MK48MOD =
       ITEMS.register("mk48mod",
-          () -> new GunItem(Guns.MK48MOD));
+          () -> new GunItem(GunTypes.MK48MOD));
 
   // ================================================================================
   // Pistols
@@ -612,35 +612,35 @@ public class ModItems {
 
   public static final RegistryObject<GunItem> TASER =
       ITEMS.register("taser",
-          () -> new GunItem(Guns.TASER));
+          () -> new GunItem(GunTypes.TASER));
 
   public static final RegistryObject<GunItem> M1911 =
       ITEMS.register("m1911",
-          () -> new GunItem(Guns.M1911));
+          () -> new GunItem(GunTypes.M1911));
 
   public static final RegistryObject<GunItem> G18 =
       ITEMS.register("g18",
-          () -> new GunItem(Guns.G18));
+          () -> new GunItem(GunTypes.G18));
 
   public static final RegistryObject<GunItem> M9 =
       ITEMS.register("m9",
-          () -> new GunItem(Guns.M9));
+          () -> new GunItem(GunTypes.M9));
 
   public static final RegistryObject<GunItem> DESERT_EAGLE =
       ITEMS.register("desert_eagle",
-          () -> new GunItem(Guns.DESERT_EAGLE));
+          () -> new GunItem(GunTypes.DESERT_EAGLE));
 
   public static final RegistryObject<GunItem> P250 =
       ITEMS.register("p250",
-          () -> new GunItem(Guns.P250));
+          () -> new GunItem(GunTypes.P250));
 
   public static final RegistryObject<GunItem> MAGNUM =
       ITEMS.register("magnum",
-          () -> new GunItem(Guns.MAGNUM));
+          () -> new GunItem(GunTypes.MAGNUM));
 
   public static final RegistryObject<GunItem> FN57 =
       ITEMS.register("fn57",
-          () -> new GunItem(Guns.FNFAL));
+          () -> new GunItem(GunTypes.FNFAL));
 
   // ================================================================================
   // Submachine Guns
@@ -648,19 +648,19 @@ public class ModItems {
 
   public static final RegistryObject<GunItem> MAC10 =
       ITEMS.register("mac10",
-          () -> new GunItem(Guns.MAC10));
+          () -> new GunItem(GunTypes.MAC10));
 
   public static final RegistryObject<GunItem> P90 =
       ITEMS.register("p90",
-          () -> new GunItem(Guns.P90));
+          () -> new GunItem(GunTypes.P90));
 
   public static final RegistryObject<GunItem> VECTOR =
       ITEMS.register("vector",
-          () -> new GunItem(Guns.VECTOR));
+          () -> new GunItem(GunTypes.VECTOR));
 
   public static final RegistryObject<GunItem> MP5A5 =
       ITEMS.register("mp5a5",
-          () -> new GunItem(Guns.MP5A5));
+          () -> new GunItem(GunTypes.MP5A5));
 
   // ================================================================================
   // Sniper Rifles
@@ -668,19 +668,19 @@ public class ModItems {
 
   public static final RegistryObject<GunItem> M107 =
       ITEMS.register("m107",
-          () -> new GunItem(Guns.M107));
+          () -> new GunItem(GunTypes.M107));
 
   public static final RegistryObject<GunItem> AS50 =
       ITEMS.register("as50",
-          () -> new GunItem(Guns.AS50));
+          () -> new GunItem(GunTypes.AS50));
 
   public static final RegistryObject<GunItem> AWP =
       ITEMS.register("awp",
-          () -> new GunItem(Guns.AWP));
+          () -> new GunItem(GunTypes.AWP));
 
   public static final RegistryObject<GunItem> DMR =
       ITEMS.register("dmr",
-          () -> new GunItem(Guns.DMR));
+          () -> new GunItem(GunTypes.DMR));
 
   // ================================================================================
   // Shotguns
@@ -688,11 +688,11 @@ public class ModItems {
 
   public static final RegistryObject<GunItem> TRENCH_GUN =
       ITEMS.register("trench_gun",
-          () -> new GunItem(Guns.TRENCH_GUN));
+          () -> new GunItem(GunTypes.TRENCH_GUN));
 
   public static final RegistryObject<GunItem> MOSSBERG =
       ITEMS.register("mossberg",
-          () -> new GunItem(Guns.MOSSBERG));
+          () -> new GunItem(GunTypes.MOSSBERG));
 
   // ================================================================================
   // Grenades

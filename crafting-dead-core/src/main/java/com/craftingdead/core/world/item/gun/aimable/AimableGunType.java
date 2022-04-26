@@ -21,10 +21,10 @@ package com.craftingdead.core.world.item.gun.aimable;
 import com.craftingdead.core.capability.CapabilityUtil;
 import com.craftingdead.core.world.item.combatslot.CombatSlotProvider;
 import com.craftingdead.core.world.item.gun.Gun;
-import com.craftingdead.core.world.item.gun.GunProperties;
 import com.craftingdead.core.world.item.gun.GunType;
+import com.craftingdead.core.world.item.gun.GunTypeFactories;
+import com.craftingdead.core.world.item.gun.GunTypeFactory;
 import com.craftingdead.core.world.item.scope.Scope;
-import com.google.common.base.Suppliers;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.nbt.CompoundTag;
@@ -33,26 +33,34 @@ import net.minecraftforge.common.capabilities.ICapabilityProvider;
 
 public class AimableGunType extends GunType {
 
-  public static final Codec<AimableGunProperties> CODEC =
+  public static final Codec<AimableGunType> DIRECT_CODEC =
       RecordCodecBuilder.create(instance -> instance
           .group(
-              GunProperties.Attributes.CODEC
-                  .fieldOf("attributes")
-                  .forGetter(GunProperties::attributes),
-              GunProperties.Sounds.CODEC
+              GeneralAttributes.CODEC
+                  .fieldOf("general_attributes")
+                  .forGetter(AimableGunType::getAttributes),
+              Sounds.CODEC
                   .fieldOf("sounds")
-                  .forGetter(GunProperties::sounds),
-              AimableGunProperties.AimableGunAttributes.CODEC
-                  .optionalFieldOf("", new AimableGunProperties.AimableGunAttributes(false))
-                  .forGetter(AimableGunProperties::aimableGunAttributes))
-          .apply(instance, AimableGunProperties::new));
+                  .forGetter(AimableGunType::getSounds),
+              AimAttributes.CODEC
+                  .optionalFieldOf("aim_attributes", new AimAttributes(false))
+                  .forGetter(AimableGunType::getAimAttributes))
+          .apply(instance, AimableGunType::new));
+
+  private final AimAttributes aimAttributes;
+
+  private AimableGunType(GeneralAttributes attributes, Sounds sounds, AimAttributes aimAttributes) {
+    super(attributes, sounds);
+    this.aimAttributes = aimAttributes;
+  }
 
   protected AimableGunType(Builder builder) {
     super(builder);
+    this.aimAttributes = new AimAttributes(builder.boltAction);
+  }
 
-    this.properties = Suppliers.ofInstance(
-        new AimableGunProperties(this.properties.get().attributes(), this.properties.get().sounds(),
-            new AimableGunProperties.AimableGunAttributes(builder.boltAction)));
+  public AimAttributes getAimAttributes() {
+    return this.aimAttributes;
   }
 
   @Override
@@ -62,17 +70,17 @@ public class AimableGunType extends GunType {
         Gun.CAPABILITY, CombatSlotProvider.CAPABILITY, Scope.CAPABILITY);
   }
 
-  @Override
-  public Codec<? extends GunProperties> getCodec() {
-    return CODEC;
-  }
-
   public boolean hasBoltAction() {
-    return this.<AimableGunProperties>properties().aimableGunAttributes().boltAction();
+    return this.aimAttributes.boltAction();
   }
 
   public static Builder builder() {
     return new Builder();
+  }
+
+  @Override
+  public GunTypeFactory getFactory() {
+    return GunTypeFactories.AIMABLE.get();
   }
 
   public static class Builder extends GunType.Builder<Builder> {
