@@ -368,7 +368,7 @@ public class GunType extends ForgeRegistryEntry<GunType> implements ItemLike {
   }
 
   public static Builder<?> builder() {
-    return new Builder<>(GunType::new);
+    return new Builder<>(b -> new GunType(b));
   }
 
   public static class Builder<SELF extends Builder<SELF>> {
