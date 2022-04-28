@@ -21,11 +21,10 @@ package com.craftingdead.immerse.game;
 import java.util.function.Supplier;
 import com.craftingdead.immerse.game.network.NetworkProtocol;
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.DataResult;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.Util;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.util.ExtraCodecs;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.DistExecutor.SafeCallable;
@@ -34,12 +33,7 @@ import net.minecraftforge.registries.ForgeRegistryEntry;
 public class GameType extends ForgeRegistryEntry<GameType> {
 
   public static final Codec<GameType> CODEC =
-      ResourceLocation.CODEC.flatXmap(registryName -> {
-        var gameType = GameTypes.registry.get().getValue(registryName);
-        return gameType == null
-            ? DataResult.error("Unknown registry key: " + registryName.toString())
-            : DataResult.success(gameType);
-      }, gameType -> DataResult.success(gameType.getRegistryName()));
+      ExtraCodecs.lazyInitializedCodec(() -> GameTypes.registry.get().getCodec());
 
   private final Codec<? extends GameServer> gameServerCodec;
   private final Supplier<SafeCallable<GameClient>> gameClientFactory;

@@ -19,19 +19,13 @@
 package com.craftingdead.core.world.item.gun;
 
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.DataResult;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.ExtraCodecs;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 
 public class GunTypeFactory extends ForgeRegistryEntry<GunTypeFactory> {
 
   public static final Codec<GunTypeFactory> CODEC =
-      ResourceLocation.CODEC.flatXmap(registryName -> {
-        var gunType = GunTypeFactories.registry.get().getValue(registryName);
-        return gunType == null
-            ? DataResult.error("Unknown registry key: " + registryName.toString())
-            : DataResult.success(gunType);
-      }, gameType -> DataResult.success(gameType.getRegistryName()));
+      ExtraCodecs.lazyInitializedCodec(() -> GunTypeFactories.registry.get().getCodec());
 
   private final Codec<? extends GunType> gunTypeCodec;
 

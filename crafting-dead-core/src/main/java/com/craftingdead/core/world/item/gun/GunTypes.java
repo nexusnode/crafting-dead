@@ -47,7 +47,6 @@ public class GunTypes {
   public static final RegistryObject<GunType> M4A1 =
       gunTypes.register("m4a1",
           () -> AimableGunType.builder()
-              .setItem(ModItems.M4A1)
               .setFireDelayMs(100)
               .setDamage(7)
               .setReloadDurationTicks(20 * 4)
@@ -81,7 +80,6 @@ public class GunTypes {
   public static final RegistryObject<GunType> SCARL =
       gunTypes.register("scarl",
           () -> AimableGunType.builder()
-              .setItem(ModItems.SCARL)
               .setFireDelayMs(110)
               .setDamage(6)
               .setReloadDurationTicks(20 * 4)
@@ -114,7 +112,6 @@ public class GunTypes {
   public static final RegistryObject<GunType> AK47 =
       gunTypes.register("ak47",
           () -> AimableGunType.builder()
-              .setItem(ModItems.AK47)
               .setFireDelayMs(100)
               .setDamage(7)
               .setReloadDurationTicks(20 * 4)
@@ -144,7 +141,6 @@ public class GunTypes {
   public static final RegistryObject<GunType> FNFAL =
       gunTypes.register("fnfal",
           () -> AimableGunType.builder()
-              .setItem(ModItems.FNFAL)
               .setFireDelayMs(80)
               .setDamage(9)
               .setReloadDurationTicks(20 * 4)
@@ -172,7 +168,6 @@ public class GunTypes {
   public static final RegistryObject<GunType> ACR =
       gunTypes.register("acr",
           () -> AimableGunType.builder()
-              .setItem(ModItems.ACR)
               .setFireDelayMs(92)
               .setDamage(7)
               .setReloadDurationTicks(20 * 4)
@@ -199,7 +194,6 @@ public class GunTypes {
   public static final RegistryObject<GunType> HK417 =
       gunTypes.register("hk417",
           () -> AimableGunType.builder()
-              .setItem(ModItems.HK417)
               .setFireDelayMs(100)
               .setDamage(8)
               .setReloadDurationTicks((int) (20 * 2.1F))
@@ -227,7 +221,6 @@ public class GunTypes {
   public static final RegistryObject<GunType> MPT55 =
       gunTypes.register("mpt55",
           () -> AimableGunType.builder()
-              .setItem(ModItems.MPT55)
               .setFireDelayMs(70)
               .setDamage(6)
               .setReloadDurationTicks(20 * 2)
@@ -252,7 +245,6 @@ public class GunTypes {
   public static final RegistryObject<GunType> M1GARAND =
       gunTypes.register("m1garand",
           () -> AimableGunType.builder()
-              .setItem(ModItems.M1GARAND)
               .setFireDelayMs(170)
               .setDamage(10)
               .setReloadDurationTicks(20 * 2)
@@ -275,7 +267,6 @@ public class GunTypes {
   public static final RegistryObject<GunType> SPORTER22 =
       gunTypes.register("sporter22",
           () -> AimableGunType.builder()
-              .setItem(ModItems.SPORTER22)
               .setFireDelayMs(200)
               .setDamage(7)
               .setReloadDurationTicks((int) (20 * 1.5F))
@@ -303,7 +294,6 @@ public class GunTypes {
   public static final RegistryObject<GunType> G36C =
       gunTypes.register("g36c",
           () -> AimableGunType.builder()
-              .setItem(ModItems.G36C)
               .setFireDelayMs(92)
               .setDamage(8)
               .setReloadDurationTicks((int) (20 * 2.2F))
@@ -332,7 +322,6 @@ public class GunTypes {
   public static final RegistryObject<GunType> M240B =
       gunTypes.register("m240b",
           () -> AimableGunType.builder()
-              .setItem(ModItems.M240B)
               .setFireDelayMs(85)
               .setDamage(8)
               .setReloadDurationTicks(20 * 4)
@@ -358,7 +347,6 @@ public class GunTypes {
   public static final RegistryObject<GunType> RPK =
       gunTypes.register("rpk",
           () -> AimableGunType.builder()
-              .setItem(ModItems.RPK)
               .setFireDelayMs(92)
               .setDamage(6)
               .setReloadDurationTicks(20 * 3)
@@ -382,7 +370,6 @@ public class GunTypes {
   public static final RegistryObject<GunType> MINIGUN =
       gunTypes.register("minigun",
           () -> MinigunType.builder()
-              .setItem(ModItems.MINIGUN)
               .setFireDelayMs(75)
               .setDamage(4)
               .setReloadDurationTicks(20 * 5)
@@ -405,7 +392,6 @@ public class GunTypes {
   public static final RegistryObject<GunType> MK48MOD =
       gunTypes.register("mk48mod",
           () -> AimableGunType.builder()
-              .setItem(ModItems.MK48MOD)
               .setFireDelayMs(92)
               .setDamage(7)
               .setReloadDurationTicks(20 * 4)
@@ -434,7 +420,6 @@ public class GunTypes {
   public static final RegistryObject<GunType> TASER =
       gunTypes.register("taser",
           () -> AimableGunType.builder()
-              .setItem(ModItems.TASER)
               .setCombatSlot(CombatSlot.SECONDARY)
               .setFireDelayMs(2000)
               .setDamage(7)
@@ -453,7 +438,6 @@ public class GunTypes {
   public static final RegistryObject<GunType> M1911 =
       gunTypes.register("m1911",
           () -> AimableGunType.builder()
-              .setItem(ModItems.M1911)
               .setCombatSlot(CombatSlot.SECONDARY)
               .setFireDelayMs(160)
               .setDamage(7)
@@ -477,7 +461,6 @@ public class GunTypes {
   public static final RegistryObject<GunType> G18 =
       gunTypes.register("g18",
           () -> AimableGunType.builder()
-              .setItem(ModItems.G18)
               .setCombatSlot(CombatSlot.SECONDARY)
               .setFireDelayMs(160)
               .setDamage(7)
@@ -501,7 +484,6 @@ public class GunTypes {
   public static final RegistryObject<GunType> M9 =
       gunTypes.register("m9",
           () -> AimableGunType.builder()
-              .setItem(ModItems.M9)
               .setCombatSlot(CombatSlot.SECONDARY)
               .setFireDelayMs(160)
               .setDamage(7)
@@ -523,7 +505,6 @@ public class GunTypes {
   public static final RegistryObject<GunType> DESERT_EAGLE =
       gunTypes.register("desert_eagle",
           () -> AimableGunType.builder()
-              .setItem(ModItems.DESERT_EAGLE)
               .setCombatSlot(CombatSlot.SECONDARY)
               .setFireDelayMs(160)
               .setDamage(8)
@@ -544,7 +525,6 @@ public class GunTypes {
   public static final RegistryObject<GunType> P250 =
       gunTypes.register("p250",
           () -> AimableGunType.builder()
-              .setItem(ModItems.P250)
               .setCombatSlot(CombatSlot.SECONDARY)
               .setFireDelayMs(160)
               .setDamage(6)
@@ -568,7 +548,6 @@ public class GunTypes {
   public static final RegistryObject<GunType> MAGNUM =
       gunTypes.register("magnum",
           () -> AimableGunType.builder()
-              .setItem(ModItems.MAGNUM)
               .setCombatSlot(CombatSlot.SECONDARY)
               .setFireDelayMs(160)
               .setDamage(7)
@@ -588,7 +567,6 @@ public class GunTypes {
   public static final RegistryObject<GunType> FN57 =
       gunTypes.register("fn57",
           () -> AimableGunType.builder()
-              .setItem(ModItems.FN57)
               .setCombatSlot(CombatSlot.SECONDARY)
               .setFireDelayMs(160)
               .setDamage(8)
@@ -614,7 +592,6 @@ public class GunTypes {
   public static final RegistryObject<GunType> MAC10 =
       gunTypes.register("mac10",
           () -> AimableGunType.builder()
-              .setItem(ModItems.MAC10)
               .setFireDelayMs(80)
               .setDamage(6)
               .setReloadDurationTicks((int) (20 * 1.8F))
@@ -639,7 +616,6 @@ public class GunTypes {
   public static final RegistryObject<GunType> P90 =
       gunTypes.register("p90",
           () -> AimableGunType.builder()
-              .setItem(ModItems.P90)
               .setFireDelayMs(80)
               .setDamage(5)
               .setReloadDurationTicks((int) (20 * 2.2F))
@@ -663,7 +639,6 @@ public class GunTypes {
   public static final RegistryObject<GunType> VECTOR =
       gunTypes.register("vector",
           () -> AimableGunType.builder()
-              .setItem(ModItems.VECTOR)
               .setFireDelayMs(90)
               .setDamage(5)
               .setReloadDurationTicks((int) (20 * 1.9F))
@@ -687,7 +662,6 @@ public class GunTypes {
   public static final RegistryObject<GunType> MP5A5 =
       gunTypes.register("mp5a5",
           () -> AimableGunType.builder()
-              .setItem(ModItems.MP5A5)
               .setFireDelayMs(85)
               .setDamage(7)
               .setReloadDurationTicks((int) (20 * 2.2F))
@@ -716,7 +690,6 @@ public class GunTypes {
   public static final RegistryObject<GunType> M107 =
       gunTypes.register("m107",
           () -> AimableGunType.builder()
-              .setItem(ModItems.M107)
               .setFireDelayMs(750)
               .setDamage(20)
               .setReloadDurationTicks(20 * 3)
@@ -743,8 +716,6 @@ public class GunTypes {
   public static final RegistryObject<GunType> AS50 =
       gunTypes.register("as50",
           () -> AimableGunType.builder()
-              .setItem(ModItems.AS50)
-              .setFireDelayMs(170)
               .setDamage(14)
               .setReloadDurationTicks((int) (20 * 3.5F))
               .setAccuracy(0.9F)
@@ -769,7 +740,6 @@ public class GunTypes {
   public static final RegistryObject<GunType> AWP =
       gunTypes.register("awp",
           () -> AimableGunType.builder()
-              .setItem(ModItems.AWP)
               .setFireDelayMs(1200)
               .setDamage(20)
               .setReloadDurationTicks(20 * 3)
@@ -796,7 +766,6 @@ public class GunTypes {
   public static final RegistryObject<GunType> DMR =
       gunTypes.register("dmr",
           () -> AimableGunType.builder()
-              .setItem(ModItems.DMR)
               .setFireDelayMs(170)
               .setDamage(15)
               .setReloadDurationTicks(20 * 2)
@@ -826,7 +795,6 @@ public class GunTypes {
   public static final RegistryObject<GunType> TRENCH_GUN =
       gunTypes.register("trench_gun",
           () -> AimableGunType.builder()
-              .setItem(ModItems.TRENCH_GUN)
               .setFireDelayMs(1200)
               .setDamage(2)
               .setRoundsPerShot(8)
@@ -848,7 +816,6 @@ public class GunTypes {
   public static final RegistryObject<GunType> MOSSBERG =
       gunTypes.register("mossberg",
           () -> AimableGunType.builder()
-              .setItem(ModItems.MOSSBERG)
               .setRoundsPerShot(8)
               .setFireDelayMs(1200)
               .setDamage(3)

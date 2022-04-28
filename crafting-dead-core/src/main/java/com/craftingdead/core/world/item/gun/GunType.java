@@ -18,22 +18,6 @@
 
 package com.craftingdead.core.world.item.gun;
 
-import com.craftingdead.core.CraftingDead;
-import com.craftingdead.core.capability.CapabilityUtil;
-import com.craftingdead.core.client.animation.Animation;
-import com.craftingdead.core.client.animation.gun.GunAnimations;
-import com.craftingdead.core.util.FunctionRegistryEntry;
-import com.craftingdead.core.util.FunctionalUtil;
-import com.craftingdead.core.util.PredicateRegistryEntry;
-import com.craftingdead.core.world.item.GunItem;
-import com.craftingdead.core.world.item.combatslot.CombatSlot;
-import com.craftingdead.core.world.item.combatslot.CombatSlotProvider;
-import com.craftingdead.core.world.item.gun.ammoprovider.AmmoProvider;
-import com.craftingdead.core.world.item.gun.ammoprovider.MagazineAmmoProvider;
-import com.craftingdead.core.world.item.gun.attachment.Attachment;
-import com.craftingdead.core.world.item.gun.attachment.Attachments;
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumMap;
@@ -46,17 +30,30 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import com.craftingdead.core.CraftingDead;
+import com.craftingdead.core.capability.CapabilityUtil;
+import com.craftingdead.core.client.animation.Animation;
+import com.craftingdead.core.client.animation.gun.GunAnimations;
+import com.craftingdead.core.util.FunctionRegistryEntry;
+import com.craftingdead.core.util.FunctionalUtil;
+import com.craftingdead.core.util.PredicateRegistryEntry;
+import com.craftingdead.core.world.item.combatslot.CombatSlot;
+import com.craftingdead.core.world.item.combatslot.CombatSlotProvider;
+import com.craftingdead.core.world.item.gun.ammoprovider.AmmoProvider;
+import com.craftingdead.core.world.item.gun.ammoprovider.MagazineAmmoProvider;
+import com.craftingdead.core.world.item.gun.attachment.Attachment;
+import com.craftingdead.core.world.item.gun.attachment.Attachments;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.ItemLike;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.ForgeRegistryEntry;
-import org.jetbrains.annotations.NotNull;
 
-public class GunType extends ForgeRegistryEntry<GunType> implements ItemLike {
+public class GunType extends ForgeRegistryEntry<GunType> {
 
   public static final Codec<GunType> CODEC =
       GunTypeFactory.CODEC.dispatch(GunType::getFactory, GunTypeFactory::getGunTypeCodec);
@@ -72,17 +69,12 @@ public class GunType extends ForgeRegistryEntry<GunType> implements ItemLike {
                   .forGetter(GunType::getSounds))
           .apply(instance, GunType::new));
 
-  private final Supplier<? extends GunItem> item;
-
   private final GeneralAttributes attributes;
   private final Sounds sounds;
 
   protected GunType(GeneralAttributes attributes, Sounds sounds) {
     this.attributes = attributes;
     this.sounds = sounds;
-
-    // TODO Implement full serialization support
-    throw new IllegalStateException("Not supported");
   }
 
   protected GunType(Builder<?> builder) {
@@ -110,8 +102,6 @@ public class GunType extends ForgeRegistryEntry<GunType> implements ItemLike {
         builder.reloadSound,
         builder.secondaryActionSound,
         builder.secondaryActionSoundRepeatDelayMs);
-
-    this.item = builder.item;
   }
 
   public GeneralAttributes getAttributes() {
@@ -236,10 +226,7 @@ public class GunType extends ForgeRegistryEntry<GunType> implements ItemLike {
     return TypedGunClient::new;
   }
 
-  @Override
-  public @NotNull Item asItem() {
-    return this.item.get();
-  }
+
 
   public GunTypeFactory getFactory() {
     return GunTypeFactories.SIMPLE.get();
@@ -382,8 +369,6 @@ public class GunType extends ForgeRegistryEntry<GunType> implements ItemLike {
 
     private final Function<SELF, GunType> factory;
 
-    private Supplier<? extends GunItem> item;
-
     private int fireDelayMs;
 
     private int damage;
@@ -432,11 +417,6 @@ public class GunType extends ForgeRegistryEntry<GunType> implements ItemLike {
 
     public Builder(Function<SELF, GunType> factory) {
       this.factory = factory;
-    }
-
-    public SELF setItem(Supplier<? extends GunItem> item) {
-      this.item = item;
-      return this.self();
     }
 
     public SELF setFireDelayMs(int fireDelayMs) {
