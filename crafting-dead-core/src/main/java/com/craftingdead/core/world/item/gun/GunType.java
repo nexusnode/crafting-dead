@@ -18,24 +18,13 @@
 
 package com.craftingdead.core.world.item.gun;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.EnumMap;
-import java.util.EnumSet;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.function.IntFunction;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
-import org.jetbrains.annotations.NotNull;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.capability.CapabilityUtil;
 import com.craftingdead.core.client.animation.Animation;
+import com.craftingdead.core.client.animation.gun.GunAnimations;
+import com.craftingdead.core.util.FunctionRegistryEntry;
 import com.craftingdead.core.util.FunctionalUtil;
+import com.craftingdead.core.util.PredicateRegistryEntry;
 import com.craftingdead.core.world.item.GunItem;
 import com.craftingdead.core.world.item.combatslot.CombatSlot;
 import com.craftingdead.core.world.item.combatslot.CombatSlotProvider;
@@ -45,6 +34,18 @@ import com.craftingdead.core.world.item.gun.attachment.Attachment;
 import com.craftingdead.core.world.item.gun.attachment.Attachments;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.EnumMap;
+import java.util.EnumSet;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.item.Item;
@@ -53,6 +54,7 @@ import net.minecraft.world.level.ItemLike;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.ForgeRegistryEntry;
+import org.jetbrains.annotations.NotNull;
 
 public class GunType extends ForgeRegistryEntry<GunType> implements ItemLike {
 
@@ -71,30 +73,6 @@ public class GunType extends ForgeRegistryEntry<GunType> implements ItemLike {
           .apply(instance, GunType::new));
 
   private final Supplier<? extends GunItem> item;
-
-  private final Map<GunAnimationEvent, Function<GunType, Animation>> animations;
-
-  /**
-   * Type of right mouse action. E.g. hold for minigun barrel rotation, click for toggling aim.
-   */
-  private final Gun.SecondaryActionTrigger secondaryActionTrigger;
-
-  /**
-   * A {@link Predicate} used to determine if the gun can shoot or not.
-   */
-  private final Predicate<Gun> triggerPredicate;
-
-  /**
-   * Sound to be played when performing the right mouse action.
-   */
-  private final Supplier<SoundEvent> secondaryActionSound;
-
-  /**
-   * A delay in milliseconds between repeating the secondary action sound.
-   */
-  private final long secondaryActionSoundRepeatDelayMs;
-
-  private final CombatSlot combatSlot;
 
   private final GeneralAttributes attributes;
   private final Sounds sounds;
@@ -120,20 +98,20 @@ public class GunType extends ForgeRegistryEntry<GunType> implements ItemLike {
         builder.fireModes,
         builder.acceptedMagazines,
         builder.defaultMagazine,
-        builder.acceptedAttachments);
+        builder.acceptedAttachments,
+        builder.animations,
+        builder.rightMouseActionTriggerType,
+        builder.triggerPredicate,
+        builder.combatSlot);
     this.sounds = new Sounds(
         builder.shootSound,
         builder.distantShootSound,
         builder.silencedShootSound,
-        builder.reloadSound);
+        builder.reloadSound,
+        builder.secondaryActionSound,
+        builder.secondaryActionSoundRepeatDelayMs);
 
     this.item = builder.item;
-    this.animations = builder.animations;
-    this.secondaryActionTrigger = builder.rightMouseActionTriggerType;
-    this.triggerPredicate = builder.triggerPredicate;
-    this.secondaryActionSound = builder.secondaryActionSound;
-    this.secondaryActionSoundRepeatDelayMs = builder.secondaryActionSoundRepeatDelayMs;
-    this.combatSlot = builder.combatSlot;
   }
 
   public GeneralAttributes getAttributes() {
@@ -201,7 +179,8 @@ public class GunType extends ForgeRegistryEntry<GunType> implements ItemLike {
   }
 
   public Map<GunAnimationEvent, Function<GunType, Animation>> getAnimations() {
-    return this.animations;
+    return this.attributes.animations.entrySet().stream()
+        .collect(Collectors.toMap(Map.Entry::getKey, v -> v.getValue().get()));
   }
 
   public AmmoProvider createAmmoProvider() {
@@ -228,23 +207,23 @@ public class GunType extends ForgeRegistryEntry<GunType> implements ItemLike {
   }
 
   public Gun.SecondaryActionTrigger getSecondaryActionTrigger() {
-    return this.secondaryActionTrigger;
+    return this.attributes.secondaryActionTrigger;
   }
 
   public Predicate<Gun> getTriggerPredicate() {
-    return this.triggerPredicate;
+    return this.attributes.triggerPredicate.get();
   }
 
   public Optional<SoundEvent> getSecondaryActionSound() {
-    return FunctionalUtil.optional(this.secondaryActionSound);
+    return FunctionalUtil.optional(this.sounds.secondaryActionSound);
   }
 
   public long getSecondaryActionSoundRepeatDelayMs() {
-    return this.secondaryActionSoundRepeatDelayMs;
+    return this.sounds.secondaryActionSoundRepeatDelay;
   }
 
   public CombatSlot getCombatSlot() {
-    return this.combatSlot;
+    return this.attributes.combatSlot;
   }
 
   public ICapabilityProvider initCapabilities(ItemStack itemStack, CompoundTag nbt) {
@@ -279,6 +258,8 @@ public class GunType extends ForgeRegistryEntry<GunType> implements ItemLike {
    * @param acceptedMagazines - A set of magazines that are supported by this gun.
    * @param defaultMagazine - The default magazine that is supplied with this gun when crafted.
    * @param acceptedAttachments - A set of attachments that are supported by this gun.
+   * @param secondaryActionTrigger - Type of right mouse action. E.g. hold for minigun barrel rotation, click for toggling aim.
+   * @param triggerPredicate - A {@link Predicate} used to determine if the gun can shoot or not.
    */
   public record GeneralAttributes(
       int fireDelay,
@@ -292,44 +273,60 @@ public class GunType extends ForgeRegistryEntry<GunType> implements ItemLike {
       Set<FireMode> fireModes,
       Set<Supplier<Item>> acceptedMagazines,
       Supplier<Item> defaultMagazine,
-      Set<Supplier<Attachment>> acceptedAttachments) {
+      Set<Supplier<Attachment>> acceptedAttachments,
+      Map<GunAnimationEvent, Supplier<FunctionRegistryEntry<GunType, Animation>>> animations,
+      Gun.SecondaryActionTrigger secondaryActionTrigger,
+      Supplier<PredicateRegistryEntry<Gun>> triggerPredicate,
+      CombatSlot combatSlot) {
 
     public static final Codec<GeneralAttributes> CODEC =
         RecordCodecBuilder.create(instance -> instance
             .group(
                 Codec.INT.optionalFieldOf("fire_delay", 0)
                     .forGetter(GeneralAttributes::fireDelay),
-                Codec.INT.optionalFieldOf("damage", 1)
+                Codec.INT.optionalFieldOf("damage", 0)
                     .forGetter(GeneralAttributes::damage),
-                Codec.INT.optionalFieldOf("reload_duration", 1)
+                Codec.INT.optionalFieldOf("reload_duration", 0)
                     .forGetter(GeneralAttributes::reloadDuration),
-                Codec.FLOAT.optionalFieldOf("accuracy", 1F)
+                Codec.FLOAT.optionalFieldOf("accuracy", 0F)
                     .forGetter(GeneralAttributes::accuracy),
                 Codec.FLOAT.optionalFieldOf("recoil", 0F)
                     .forGetter(GeneralAttributes::recoil),
                 Codec.INT.optionalFieldOf("rounds_per_shot", 1)
                     .forGetter(GeneralAttributes::roundsPerShot),
-                Codec.DOUBLE.optionalFieldOf("range", 10D)
+                Codec.DOUBLE.optionalFieldOf("range", 0D)
                     .forGetter(GeneralAttributes::range),
                 Codec.BOOL.optionalFieldOf("has_crosshair", true)
                     .forGetter(GeneralAttributes::hasCrossHair),
                 Codec.list(FireMode.CODEC)
                     .optionalFieldOf("fire_mode", Collections.singletonList(FireMode.SEMI))
-                    .xmap(to -> (Set<FireMode>) new HashSet<>(to), ArrayList::new)
+                    .xmap(Set::copyOf, ArrayList::new)
                     .forGetter(GeneralAttributes::fireModes),
                 Codec.list(ForgeRegistries.ITEMS.getCodec()
                     .xmap(to -> (Supplier<Item>) () -> to, Supplier::get))
                     .optionalFieldOf("accepted_magazines", Collections.emptyList())
-                    .xmap(to -> (Set<Supplier<Item>>) new HashSet<>(to), ArrayList::new)
+                    .xmap(Set::copyOf, ArrayList::new)
                     .forGetter(GeneralAttributes::acceptedMagazines),
                 ForgeRegistries.ITEMS.getCodec().fieldOf("default_magazine")
-                    .xmap(to -> (Supplier<Item>) () -> to, Supplier::get)
+                    .xmap(FunctionalUtil::supplier, Supplier::get)
                     .forGetter(t -> t.defaultMagazine),
                 Codec.list(Attachments.REGISTRY.get()
-                    .getCodec().xmap(to -> (Supplier<Attachment>) () -> to, Supplier::get))
+                        .getCodec().xmap(FunctionalUtil::supplier, Supplier::get))
                     .optionalFieldOf("accepted_attachments", Collections.emptyList())
-                    .xmap(to -> (Set<Supplier<Attachment>>) new HashSet<>(to), ArrayList::new)
-                    .forGetter(GeneralAttributes::acceptedAttachments))
+                    .xmap(Set::copyOf, ArrayList::new)
+                    .forGetter(GeneralAttributes::acceptedAttachments),
+                Codec.unboundedMap(GunAnimationEvent.CODEC,
+                        GunAnimations.CODEC.xmap(FunctionalUtil::supplier, Supplier::get))
+                    .optionalFieldOf("animations", Collections.emptyMap())
+                    .forGetter(GeneralAttributes::animations),
+                Gun.SecondaryActionTrigger.CODEC.fieldOf("secondary_action_trigger")
+                    .forGetter(GeneralAttributes::secondaryActionTrigger),
+                GunTriggerPredicates.CODEC
+                    .xmap(FunctionalUtil::supplier, Supplier::get)
+                    .optionalFieldOf("trigger_predicate", GunTriggerPredicates.NONE)
+                    .forGetter(GeneralAttributes::triggerPredicate),
+                CombatSlot.CODEC.optionalFieldOf("combat_slot", CombatSlot.PRIMARY)
+                    .forGetter(GeneralAttributes::combatSlot))
             .apply(instance, GeneralAttributes::new));
   }
 
@@ -338,32 +335,42 @@ public class GunType extends ForgeRegistryEntry<GunType> implements ItemLike {
    * @param distantShootSound - Sound to play for each shot of the gun when far away.
    * @param silencedShootSound - A 'silenced' version of the shoot sound.
    * @param reloadSound - Sound to play whilst the gun is being reloaded.
+   * @param secondaryActionSound - Sound to be played when performing the right mouse action.
+   * @param secondaryActionSoundRepeatDelay - A delay in milliseconds between repeating the secondary action sound.
    */
   public record Sounds(
       Supplier<SoundEvent> shootSound,
       Supplier<SoundEvent> distantShootSound,
       Supplier<SoundEvent> silencedShootSound,
-      Supplier<SoundEvent> reloadSound) {
+      Supplier<SoundEvent> reloadSound,
+      Supplier<SoundEvent> secondaryActionSound,
+      long secondaryActionSoundRepeatDelay) {
 
     public static final Codec<Sounds> CODEC =
         RecordCodecBuilder.create(instance -> instance
             .group(
                 ForgeRegistries.SOUND_EVENTS.getCodec()
                     .fieldOf("shoot_sound")
-                    .xmap(to -> (Supplier<SoundEvent>) () -> to, Supplier::get)
+                    .xmap(FunctionalUtil::supplier, Supplier::get)
                     .forGetter(Sounds::shootSound),
                 ForgeRegistries.SOUND_EVENTS.getCodec()
                     .optionalFieldOf("distant_shoot_sound", null)
-                    .xmap(to -> (Supplier<SoundEvent>) () -> to, Supplier::get)
+                    .xmap(FunctionalUtil::supplier, Supplier::get)
                     .forGetter(Sounds::distantShootSound),
                 ForgeRegistries.SOUND_EVENTS.getCodec()
                     .optionalFieldOf("silenced_shoot_sound", null)
-                    .xmap(to -> (Supplier<SoundEvent>) () -> to, Supplier::get)
+                    .xmap(FunctionalUtil::supplier, Supplier::get)
                     .forGetter(Sounds::silencedShootSound),
                 ForgeRegistries.SOUND_EVENTS.getCodec()
                     .optionalFieldOf("reload_sound", null)
-                    .xmap(to -> (Supplier<SoundEvent>) () -> to, Supplier::get)
-                    .forGetter(Sounds::reloadSound))
+                    .xmap(FunctionalUtil::supplier, Supplier::get)
+                    .forGetter(Sounds::reloadSound),
+                ForgeRegistries.SOUND_EVENTS.getCodec()
+                    .optionalFieldOf("secondary_action_sound", null)
+                    .xmap(FunctionalUtil::supplier, Supplier::get)
+                    .forGetter(Sounds::secondaryActionSound),
+                Codec.LONG.optionalFieldOf("secondary_action_sound_repeat_delay", -1L)
+                    .forGetter(Sounds::secondaryActionSoundRepeatDelay))
             .apply(instance, Sounds::new));
   }
 
@@ -403,7 +410,7 @@ public class GunType extends ForgeRegistryEntry<GunType> implements ItemLike {
 
     private Supplier<SoundEvent> reloadSound = () -> null;
 
-    private final Map<GunAnimationEvent, Function<GunType, Animation>> animations =
+    private final Map<GunAnimationEvent, Supplier<FunctionRegistryEntry<GunType, Animation>>> animations =
         new EnumMap<>(GunAnimationEvent.class);
 
     private final Set<Supplier<Item>> acceptedMagazines = new HashSet<>();
@@ -415,7 +422,7 @@ public class GunType extends ForgeRegistryEntry<GunType> implements ItemLike {
     private Gun.SecondaryActionTrigger rightMouseActionTriggerType =
         Gun.SecondaryActionTrigger.TOGGLE;
 
-    private Predicate<Gun> triggerPredicate = gun -> true;
+    private Supplier<PredicateRegistryEntry<Gun>> triggerPredicate = GunTriggerPredicates.NONE;
 
     private Supplier<SoundEvent> secondaryActionSound = () -> null;
 
@@ -497,17 +504,8 @@ public class GunType extends ForgeRegistryEntry<GunType> implements ItemLike {
       return this.self();
     }
 
-    public SELF putAnimation(GunAnimationEvent event, Supplier<Animation> animation) {
-      return this.putAnimation(event, __ -> animation.get());
-    }
-
-    public SELF putReloadAnimation(IntFunction<Animation> animation) {
-      return this.putAnimation(GunAnimationEvent.RELOAD,
-          gunType -> animation.apply(gunType.attributes.reloadDuration()));
-    }
-
     public SELF putAnimation(GunAnimationEvent event,
-        Function<GunType, Animation> animation) {
+        Supplier<FunctionRegistryEntry<GunType, Animation>> animation) {
       this.animations.put(event, animation);
       return this.self();
     }
@@ -536,7 +534,7 @@ public class GunType extends ForgeRegistryEntry<GunType> implements ItemLike {
       return this.self();
     }
 
-    public SELF setTriggerPredicate(Predicate<Gun> triggerPredicate) {
+    public SELF setTriggerPredicate(Supplier<PredicateRegistryEntry<Gun>> triggerPredicate) {
       this.triggerPredicate = triggerPredicate;
       return this.self();
     }

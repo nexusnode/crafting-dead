@@ -640,7 +640,7 @@ public class ModItems {
 
   public static final RegistryObject<GunItem> FN57 =
       ITEMS.register("fn57",
-          () -> new GunItem(GunTypes.FNFAL));
+          () -> new GunItem(GunTypes.FN57));
 
   // ================================================================================
   // Submachine Guns

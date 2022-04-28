@@ -18,11 +18,9 @@
 
 package com.craftingdead.core;
 
-import org.apache.commons.lang3.mutable.MutableInt;
-import org.apache.commons.lang3.tuple.Pair;
-import org.slf4j.Logger;
 import com.craftingdead.core.capability.CapabilityUtil;
 import com.craftingdead.core.client.ClientDist;
+import com.craftingdead.core.client.animation.gun.GunAnimations;
 import com.craftingdead.core.data.recipes.ModRecipeProvider;
 import com.craftingdead.core.data.tags.ModItemTagsProvider;
 import com.craftingdead.core.event.CombatPickupEvent;
@@ -46,6 +44,7 @@ import com.craftingdead.core.world.item.combatslot.CombatSlotProvider;
 import com.craftingdead.core.world.item.crafting.ModRecipeSerializers;
 import com.craftingdead.core.world.item.enchantment.ModEnchantments;
 import com.craftingdead.core.world.item.gun.Gun;
+import com.craftingdead.core.world.item.gun.GunTriggerPredicates;
 import com.craftingdead.core.world.item.gun.GunTypeFactories;
 import com.craftingdead.core.world.item.gun.GunTypes;
 import com.craftingdead.core.world.item.gun.ammoprovider.AmmoProviderTypes;
@@ -96,6 +95,9 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.JarVersionLookupHandler;
 import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
 import net.minecraftforge.network.PacketDistributor;
+import org.apache.commons.lang3.mutable.MutableInt;
+import org.apache.commons.lang3.tuple.Pair;
+import org.slf4j.Logger;
 
 @Mod(CraftingDead.ID)
 public class CraftingDead {
@@ -157,6 +159,8 @@ public class CraftingDead {
     Attachments.ATTACHMENTS.register(modEventBus);
     GunTypes.gunTypes.register(modEventBus);
     GunTypeFactories.gunTypeFactories.register(modEventBus);
+    GunAnimations.gunAnimations.register(modEventBus);
+    GunTriggerPredicates.gunPredicates.register(modEventBus);
 
     MinecraftForge.EVENT_BUS.register(this);
   }
