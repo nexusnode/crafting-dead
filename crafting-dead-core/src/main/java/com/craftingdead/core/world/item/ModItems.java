@@ -1396,6 +1396,15 @@ public class ModItems {
           .stacksTo(1)
           .tab(COMBAT_TAB)));
 
+  public static final RegistryObject<GrenadeItem> STICKY_C4 = ITEMS.register("sticky_c4_explosive",
+      () -> new GrenadeItem((GrenadeItem.Properties) new GrenadeItem.Properties()
+          .setGrenadeEntitySupplier(C4Explosive::new)
+          .setEnabledSupplier(CraftingDead.serverConfig.explosivesC4Enabled::get)
+          .setSticky(true)
+          .setThrowSpeed(0.75F)
+          .stacksTo(1)
+          .tab(COMBAT_TAB)));
+
   public static final RegistryObject<Item> REMOTE_DETONATOR = ITEMS.register("remote_detonator",
       () -> new RemoteDetonatorItem(new Item.Properties()
           .stacksTo(1)

@@ -73,6 +73,7 @@
   "effect.craftingdead.parachute": "Parachute",
 
   "entity.craftingdead.c4_explosive": "C4 Explosive",
+  "entity.craftingdead.sticky_c4_explosive": "Sticky C4 Explosive",
   "entity.craftingdead.decoy_grenade": "Decoy Grenade",
   "entity.craftingdead.fire_grenade": "Fire Grenade",
   "entity.craftingdead.flash_grenade": "Flash Grenade",
@@ -288,6 +289,7 @@
   "item.craftingdead.army_clothing": "Army Clothing",
   "item.craftingdead.remote_detonator": "Remote Detonator",
   "item.craftingdead.c4_explosive": "C4 Explosive",
+  "item.craftingdead.sticky_c4_explosive": "Sticky C4 Explosive",
   "item.craftingdead.decoy_grenade": "Decoy Grenade",
   "item.craftingdead.fire_grenade": "Fire Grenade",
   "item.craftingdead.flash_grenade": "Flash Grenade",
