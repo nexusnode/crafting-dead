@@ -11,7 +11,9 @@
       "conditions": {
         "items": [
           {
-            "item": "craftingdead:combat_knife"
+            "items": [
+              "craftingdead:combat_knife"
+            ]
           }
         ]
       }
