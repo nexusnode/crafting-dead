@@ -16,22 +16,25 @@
  * https://craftingdead.net/terms.php
  */
 
-package com.craftingdead.core.util;
+package com.craftingdead.core.world.item.gun.minigun;
 
-import com.google.common.base.Suppliers;
-import java.util.Optional;
-import java.util.function.Supplier;
-import javax.annotation.Nullable;
-import org.jetbrains.annotations.NotNull;
+import com.craftingdead.core.world.item.gun.GunType;
+import com.craftingdead.core.world.item.gun.TypedGun;
+import com.craftingdead.core.world.item.gun.TypedGunClient;
+import java.util.function.Function;
 
-public class FunctionalUtil {
+public class MinigunType extends GunType {
 
-  public static <T> Optional<T> optional(@Nullable Supplier<T> supplier) {
-    return Optional.ofNullable(supplier).map(Supplier::get);
+  protected MinigunType(Builder<?> builder) {
+    super(builder);
   }
 
-  // Java is not that smart with implicit casting the google commons supplier to java util supplier
-  public static <T> Supplier<T> supplier(@NotNull T instance) {
-    return Suppliers.ofInstance(instance);
+  @Override
+  public <T extends TypedGun<?>> Function<T, TypedGunClient<? super T>> getClientFactory() {
+    return MinigunClient::new;
+  }
+
+  public static Builder<?> builder() {
+    return new Builder<>(MinigunType::new);
   }
 }

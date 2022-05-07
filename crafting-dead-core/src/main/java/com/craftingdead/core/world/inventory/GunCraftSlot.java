@@ -22,7 +22,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import com.craftingdead.core.world.item.gun.Gun;
-import com.craftingdead.core.world.item.gun.GunItem;
+import com.craftingdead.core.world.item.GunItem;
 import com.craftingdead.core.world.item.gun.attachment.Attachment;
 import com.craftingdead.core.world.item.gun.attachment.AttachmentLike;
 import com.craftingdead.core.world.item.gun.skin.Paint;

@@ -20,7 +20,7 @@ package com.craftingdead.core.client.renderer.item;
 
 import java.util.Optional;
 import com.craftingdead.core.CraftingDead;
-import com.craftingdead.core.world.item.gun.GunItem;
+import com.craftingdead.core.world.item.GunItem;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.mojang.serialization.Codec;

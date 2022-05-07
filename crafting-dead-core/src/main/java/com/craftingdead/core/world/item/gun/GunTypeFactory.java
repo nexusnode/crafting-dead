@@ -16,22 +16,24 @@
  * https://craftingdead.net/terms.php
  */
 
-package com.craftingdead.core.util;
+package com.craftingdead.core.world.item.gun;
 
-import com.google.common.base.Suppliers;
-import java.util.Optional;
-import java.util.function.Supplier;
-import javax.annotation.Nullable;
-import org.jetbrains.annotations.NotNull;
+import com.mojang.serialization.Codec;
+import net.minecraft.util.ExtraCodecs;
+import net.minecraftforge.registries.ForgeRegistryEntry;
 
-public class FunctionalUtil {
+public class GunTypeFactory extends ForgeRegistryEntry<GunTypeFactory> {
 
-  public static <T> Optional<T> optional(@Nullable Supplier<T> supplier) {
-    return Optional.ofNullable(supplier).map(Supplier::get);
+  public static final Codec<GunTypeFactory> CODEC =
+      ExtraCodecs.lazyInitializedCodec(() -> GunTypeFactories.registry.get().getCodec());
+
+  private final Codec<? extends GunType> gunTypeCodec;
+
+  public GunTypeFactory(Codec<? extends GunType> gunTypeCodec) {
+    this.gunTypeCodec = gunTypeCodec;
   }
 
-  // Java is not that smart with implicit casting the google commons supplier to java util supplier
-  public static <T> Supplier<T> supplier(@NotNull T instance) {
-    return Suppliers.ofInstance(instance);
+  public Codec<? extends GunType> getGunTypeCodec() {
+    return this.gunTypeCodec;
   }
 }

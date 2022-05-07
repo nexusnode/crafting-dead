@@ -16,25 +16,9 @@
  * https://craftingdead.net/terms.php
  */
 
-package com.craftingdead.core.world.item.gun.minigun;
+package com.craftingdead.core.world.item.gun;
 
-import java.util.function.Function;
-import com.craftingdead.core.world.item.gun.SimpleGunItem;
-import com.craftingdead.core.world.item.gun.TypedGun;
-import com.craftingdead.core.world.item.gun.TypedGunClient;
+public interface GunLike {
 
-public class MinigunItem extends SimpleGunItem {
-
-  protected MinigunItem(Builder<?> builder) {
-    super(builder);
-  }
-
-  @Override
-  protected <T extends TypedGun<?>> Function<T, TypedGunClient<? super T>> getClientFactory() {
-    return MinigunClient::new;
-  }
-
-  public static Builder<?> builder() {
-    return new Builder<>(MinigunItem::new);
-  }
+  GunType asGun();
 }
