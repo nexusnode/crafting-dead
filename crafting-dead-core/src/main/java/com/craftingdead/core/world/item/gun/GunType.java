@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.capability.CapabilityUtil;
 import com.craftingdead.core.client.animation.Animation;
-import com.craftingdead.core.client.animation.gun.GunAnimations;
+import com.craftingdead.core.client.animation.gun.GunAnimationTypes;
 import com.craftingdead.core.util.FunctionRegistryEntry;
 import com.craftingdead.core.util.FunctionalUtil;
 import com.craftingdead.core.util.PredicateRegistryEntry;
@@ -245,7 +245,8 @@ public class GunType extends ForgeRegistryEntry<GunType> {
    * @param acceptedMagazines - A set of magazines that are supported by this gun.
    * @param defaultMagazine - The default magazine that is supplied with this gun when crafted.
    * @param acceptedAttachments - A set of attachments that are supported by this gun.
-   * @param secondaryActionTrigger - Type of right mouse action. E.g. hold for minigun barrel rotation, click for toggling aim.
+   * @param secondaryActionTrigger - Type of right mouse action. E.g. hold for minigun barrel
+   *        rotation, click for toggling aim.
    * @param triggerPredicate - A {@link Predicate} used to determine if the gun can shoot or not.
    */
   public record GeneralAttributes(
@@ -297,13 +298,13 @@ public class GunType extends ForgeRegistryEntry<GunType> {
                 ForgeRegistries.ITEMS.getCodec().fieldOf("default_magazine")
                     .xmap(FunctionalUtil::supplier, Supplier::get)
                     .forGetter(t -> t.defaultMagazine),
-                Codec.list(Attachments.REGISTRY.get()
-                        .getCodec().xmap(FunctionalUtil::supplier, Supplier::get))
+                Codec.list(Attachments.registry.get()
+                    .getCodec().xmap(FunctionalUtil::supplier, Supplier::get))
                     .optionalFieldOf("accepted_attachments", Collections.emptyList())
                     .xmap(Set::copyOf, ArrayList::new)
                     .forGetter(GeneralAttributes::acceptedAttachments),
                 Codec.unboundedMap(GunAnimationEvent.CODEC,
-                        GunAnimations.CODEC.xmap(FunctionalUtil::supplier, Supplier::get))
+                    GunAnimationTypes.CODEC.xmap(FunctionalUtil::supplier, Supplier::get))
                     .optionalFieldOf("animations", Collections.emptyMap())
                     .forGetter(GeneralAttributes::animations),
                 Gun.SecondaryActionTrigger.CODEC.fieldOf("secondary_action_trigger")
@@ -323,7 +324,8 @@ public class GunType extends ForgeRegistryEntry<GunType> {
    * @param silencedShootSound - A 'silenced' version of the shoot sound.
    * @param reloadSound - Sound to play whilst the gun is being reloaded.
    * @param secondaryActionSound - Sound to be played when performing the right mouse action.
-   * @param secondaryActionSoundRepeatDelay - A delay in milliseconds between repeating the secondary action sound.
+   * @param secondaryActionSoundRepeatDelay - A delay in milliseconds between repeating the
+   *        secondary action sound.
    */
   public record Sounds(
       Supplier<SoundEvent> shootSound,

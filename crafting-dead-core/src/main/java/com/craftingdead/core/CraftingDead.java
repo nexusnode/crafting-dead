@@ -20,7 +20,7 @@ package com.craftingdead.core;
 
 import com.craftingdead.core.capability.CapabilityUtil;
 import com.craftingdead.core.client.ClientDist;
-import com.craftingdead.core.client.animation.gun.GunAnimations;
+import com.craftingdead.core.client.animation.gun.GunAnimationTypes;
 import com.craftingdead.core.data.recipes.ModRecipeProvider;
 import com.craftingdead.core.data.tags.ModItemTagsProvider;
 import com.craftingdead.core.event.CombatPickupEvent;
@@ -157,10 +157,10 @@ public class CraftingDead {
     ActionTypes.deferredRegister.register(modEventBus);
     AmmoProviderTypes.deferredRegister.register(modEventBus);
     Attachments.deferredRegister.register(modEventBus);
-    GunTypes.gunTypes.register(modEventBus);
-    GunTypeFactories.gunTypeFactories.register(modEventBus);
-    GunAnimations.gunAnimations.register(modEventBus);
-    GunTriggerPredicates.gunPredicates.register(modEventBus);
+    GunTypes.deferredRegister.register(modEventBus);
+    GunTypeFactories.deferredRegister.register(modEventBus);
+    GunAnimationTypes.deferredRegister.register(modEventBus);
+    GunTriggerPredicates.deferredRegister.register(modEventBus);
 
     MinecraftForge.EVENT_BUS.register(this);
   }

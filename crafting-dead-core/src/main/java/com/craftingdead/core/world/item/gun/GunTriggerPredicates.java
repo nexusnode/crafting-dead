@@ -18,11 +18,14 @@
 
 package com.craftingdead.core.world.item.gun;
 
+import java.util.function.Supplier;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.util.PredicateRegistryEntry;
 import com.mojang.serialization.Codec;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.ExtraCodecs;
-import net.minecraftforge.common.util.Lazy;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.RegistryBuilder;
@@ -30,19 +33,25 @@ import net.minecraftforge.registries.RegistryObject;
 
 public class GunTriggerPredicates {
 
-  public static final DeferredRegister<PredicateRegistryEntry<Gun>> gunPredicates =
-      DeferredRegister.create(PredicateRegistryEntry.asClass(), CraftingDead.ID);
+  public static final ResourceKey<Registry<PredicateRegistryEntry<Gun>>> REGISTRY_KEY =
+      ResourceKey.createRegistryKey(new ResourceLocation(CraftingDead.ID, "gun_trigger_predicate"));
 
-  public static final Lazy<IForgeRegistry<PredicateRegistryEntry<Gun>>> registry =
-      Lazy.of(gunPredicates.makeRegistry("trigger_predicates", RegistryBuilder::new));
+  public static final DeferredRegister<PredicateRegistryEntry<Gun>> deferredRegister =
+      DeferredRegister.create(REGISTRY_KEY, CraftingDead.ID);
+
+  @SuppressWarnings("unchecked")
+  public static final Supplier<IForgeRegistry<PredicateRegistryEntry<Gun>>> registry =
+      deferredRegister.makeRegistry(
+          (Class<PredicateRegistryEntry<Gun>>) (Class<?>) PredicateRegistryEntry.class,
+          RegistryBuilder::new);
 
   public static final Codec<PredicateRegistryEntry<Gun>> CODEC =
       ExtraCodecs.lazyInitializedCodec(() -> registry.get().getCodec());
 
   public static final RegistryObject<PredicateRegistryEntry<Gun>> PERFORMING_SECONDARY_ACTION =
-      gunPredicates.register("performing_secondary_actions",
+      deferredRegister.register("performing_secondary_actions",
           () -> PredicateRegistryEntry.of(Gun::isPerformingSecondaryAction));
 
   public static final RegistryObject<PredicateRegistryEntry<Gun>> NONE =
-      gunPredicates.register("none", () -> PredicateRegistryEntry.of(gun -> true));
+      deferredRegister.register("none", () -> PredicateRegistryEntry.of(gun -> true));
 }

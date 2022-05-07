@@ -18,9 +18,12 @@
 
 package com.craftingdead.core.world.item.gun;
 
+import java.util.function.Supplier;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.world.item.gun.aimable.AimableGunType;
-import net.minecraftforge.common.util.Lazy;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.RegistryBuilder;
@@ -28,15 +31,18 @@ import net.minecraftforge.registries.RegistryObject;
 
 public class GunTypeFactories {
 
-  public static final DeferredRegister<GunTypeFactory> gunTypeFactories =
-      DeferredRegister.create(GunTypeFactory.class, CraftingDead.ID);
+  public static final ResourceKey<Registry<GunTypeFactory>> REGISTRY_KEY =
+      ResourceKey.createRegistryKey(new ResourceLocation(CraftingDead.ID, "gun_type_factory"));
 
-  public static final Lazy<IForgeRegistry<GunTypeFactory>> registry =
-      Lazy.of(gunTypeFactories.makeRegistry("gun_type_factory", RegistryBuilder::new));
+  public static final DeferredRegister<GunTypeFactory> deferredRegister =
+      DeferredRegister.create(REGISTRY_KEY, CraftingDead.ID);
 
-  public static final RegistryObject<GunTypeFactory> SIMPLE = gunTypeFactories.register("simple",
+  public static final Supplier<IForgeRegistry<GunTypeFactory>> registry =
+      deferredRegister.makeRegistry(GunTypeFactory.class, RegistryBuilder::new);
+
+  public static final RegistryObject<GunTypeFactory> SIMPLE = deferredRegister.register("simple",
       () -> new GunTypeFactory(GunType.DIRECT_CODEC));
 
-  public static final RegistryObject<GunTypeFactory> AIMABLE = gunTypeFactories.register("aimable",
+  public static final RegistryObject<GunTypeFactory> AIMABLE = deferredRegister.register("aimable",
       () -> new GunTypeFactory(AimableGunType.DIRECT_CODEC));
 }

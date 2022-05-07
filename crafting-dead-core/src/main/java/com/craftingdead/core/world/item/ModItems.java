@@ -547,191 +547,164 @@ public class ModItems {
   // ================================================================================
 
   public static final RegistryObject<GunItem> M4A1 =
-      deferredRegister.register("m4a1",
-          () -> new GunItem(GunTypes.M4A1));
+      deferredRegister.register("m4a1", () -> new GunItem(GunTypes.M4A1));
 
   public static final RegistryObject<GunItem> SCARL =
-      deferredRegister.register("scarl",
-          () -> new GunItem(GunTypes.SCARL));
+      deferredRegister.register("scarl", () -> new GunItem(GunTypes.SCARL));
 
   public static final RegistryObject<GunItem> AK47 =
-      deferredRegister.register("ak47",
-          () -> new GunItem(GunTypes.AK47));
+      deferredRegister.register("ak47", () -> new GunItem(GunTypes.AK47));
 
   public static final RegistryObject<GunItem> FNFAL =
-      deferredRegister.register("fnfal",
-          () -> new GunItem(GunTypes.FNFAL));
+      deferredRegister.register("fnfal", () -> new GunItem(GunTypes.FNFAL));
 
   public static final RegistryObject<GunItem> ACR =
-      deferredRegister.register("acr",
-          () -> new GunItem(GunTypes.ACR));
+      deferredRegister.register("acr", () -> new GunItem(GunTypes.ACR));
 
   public static final RegistryObject<GunItem> HK417 =
-      deferredRegister.register("hk417",
-          () -> new GunItem(GunTypes.HK417));
+      deferredRegister.register("hk417", () -> new GunItem(GunTypes.HK417));
 
   public static final RegistryObject<GunItem> MPT55 =
-      deferredRegister.register("mpt55",
-          () -> new GunItem(GunTypes.MPT55));
+      deferredRegister.register("mpt55", () -> new GunItem(GunTypes.MPT55));
 
   public static final RegistryObject<GunItem> M1GARAND =
-      deferredRegister.register("m1garand",
-          () -> new GunItem(GunTypes.M1GARAND));
+      deferredRegister.register("m1garand", () -> new GunItem(GunTypes.M1GARAND));
 
   public static final RegistryObject<GunItem> SPORTER22 =
-      deferredRegister.register("sporter22",
-          () -> new GunItem(GunTypes.SPORTER22));
+      deferredRegister.register("sporter22", () -> new GunItem(GunTypes.SPORTER22));
 
   public static final RegistryObject<GunItem> G36C =
-      deferredRegister.register("g36c",
-          () -> new GunItem(GunTypes.G36C));
+      deferredRegister.register("g36c", () -> new GunItem(GunTypes.G36C));
 
   // ================================================================================
   // Machine Guns
   // ================================================================================
 
   public static final RegistryObject<GunItem> M240B =
-      deferredRegister.register("m240b",
-          () -> new GunItem(GunTypes.M240B));
+      deferredRegister.register("m240b", () -> new GunItem(GunTypes.M240B));
 
   public static final RegistryObject<GunItem> RPK =
-      deferredRegister.register("rpk",
-          () -> new GunItem(GunTypes.RPK));
+      deferredRegister.register("rpk", () -> new GunItem(GunTypes.RPK));
 
   public static final RegistryObject<GunItem> MINIGUN =
-      deferredRegister.register("minigun",
-          () -> new GunItem(GunTypes.MINIGUN));
+      deferredRegister.register("minigun", () -> new GunItem(GunTypes.MINIGUN));
 
   public static final RegistryObject<GunItem> MK48MOD =
-      deferredRegister.register("mk48mod",
-          () -> new GunItem(GunTypes.MK48MOD));
+      deferredRegister.register("mk48mod", () -> new GunItem(GunTypes.MK48MOD));
 
   // ================================================================================
   // Pistols
   // ================================================================================
 
   public static final RegistryObject<GunItem> TASER =
-      deferredRegister.register("taser",
-          () -> new GunItem(GunTypes.TASER));
+      deferredRegister.register("taser", () -> new GunItem(GunTypes.TASER));
 
   public static final RegistryObject<GunItem> M1911 =
-      deferredRegister.register("m1911",
-          () -> new GunItem(GunTypes.M1911));
+      deferredRegister.register("m1911", () -> new GunItem(GunTypes.M1911));
 
   public static final RegistryObject<GunItem> G18 =
-      deferredRegister.register("g18",
-          () -> new GunItem(GunTypes.G18));
+      deferredRegister.register("g18", () -> new GunItem(GunTypes.G18));
 
   public static final RegistryObject<GunItem> M9 =
-      deferredRegister.register("m9",
-          () -> new GunItem(GunTypes.M9));
+      deferredRegister.register("m9", () -> new GunItem(GunTypes.M9));
 
   public static final RegistryObject<GunItem> DESERT_EAGLE =
-      deferredRegister.register("desert_eagle",
-          () -> new GunItem(GunTypes.DESERT_EAGLE));
+      deferredRegister.register("desert_eagle", () -> new GunItem(GunTypes.DESERT_EAGLE));
 
   public static final RegistryObject<GunItem> P250 =
-      deferredRegister.register("p250",
-          () -> new GunItem(GunTypes.P250));
+      deferredRegister.register("p250", () -> new GunItem(GunTypes.P250));
 
   public static final RegistryObject<GunItem> MAGNUM =
-      deferredRegister.register("magnum",
-          () -> new GunItem(GunTypes.MAGNUM));
+      deferredRegister.register("magnum", () -> new GunItem(GunTypes.MAGNUM));
 
   public static final RegistryObject<GunItem> FN57 =
-      deferredRegister.register("fn57",
-          () -> new GunItem(GunTypes.FN57));
+      deferredRegister.register("fn57", () -> new GunItem(GunTypes.FN57));
 
   // ================================================================================
   // Submachine Guns
   // ================================================================================
 
   public static final RegistryObject<GunItem> MAC10 =
-      deferredRegister.register("mac10",
-          () -> new GunItem(GunTypes.MAC10));
+      deferredRegister.register("mac10", () -> new GunItem(GunTypes.MAC10));
 
   public static final RegistryObject<GunItem> P90 =
-      deferredRegister.register("p90",
-          () -> new GunItem(GunTypes.P90));
+      deferredRegister.register("p90", () -> new GunItem(GunTypes.P90));
 
   public static final RegistryObject<GunItem> VECTOR =
-      deferredRegister.register("vector",
-          () -> new GunItem(GunTypes.VECTOR));
+      deferredRegister.register("vector", () -> new GunItem(GunTypes.VECTOR));
 
   public static final RegistryObject<GunItem> MP5A5 =
-      deferredRegister.register("mp5a5",
-          () -> new GunItem(GunTypes.MP5A5));
+      deferredRegister.register("mp5a5", () -> new GunItem(GunTypes.MP5A5));
 
   // ================================================================================
   // Sniper Rifles
   // ================================================================================
 
   public static final RegistryObject<GunItem> M107 =
-      deferredRegister.register("m107",
-          () -> new GunItem(GunTypes.M107));
+      deferredRegister.register("m107", () -> new GunItem(GunTypes.M107));
 
   public static final RegistryObject<GunItem> AS50 =
-      deferredRegister.register("as50",
-          () -> new GunItem(GunTypes.AS50));
+      deferredRegister.register("as50", () -> new GunItem(GunTypes.AS50));
 
   public static final RegistryObject<GunItem> AWP =
-      deferredRegister.register("awp",
-          () -> new GunItem(GunTypes.AWP));
+      deferredRegister.register("awp", () -> new GunItem(GunTypes.AWP));
 
   public static final RegistryObject<GunItem> DMR =
-      deferredRegister.register("dmr",
-          () -> new GunItem(GunTypes.DMR));
+      deferredRegister.register("dmr", () -> new GunItem(GunTypes.DMR));
 
   // ================================================================================
   // Shotguns
   // ================================================================================
 
   public static final RegistryObject<GunItem> TRENCH_GUN =
-      deferredRegister.register("trench_gun",
-          () -> new GunItem(GunTypes.TRENCH_GUN));
+      deferredRegister.register("trench_gun", () -> new GunItem(GunTypes.TRENCH_GUN));
 
   public static final RegistryObject<GunItem> MOSSBERG =
-      deferredRegister.register("mossberg",
-          () -> new GunItem(GunTypes.MOSSBERG));
+      deferredRegister.register("mossberg", () -> new GunItem(GunTypes.MOSSBERG));
 
   // ================================================================================
   // Grenades
   // ================================================================================
 
-  public static final RegistryObject<GrenadeItem> FIRE_GRENADE = deferredRegister.register("fire_grenade",
-      () -> new GrenadeItem((GrenadeItem.Properties) new GrenadeItem.Properties()
-          .setGrenadeEntitySupplier(FireGrenadeEntity::new)
-          .setEnabledSupplier(CraftingDead.serverConfig.explosivesFireGrenadeEnabled::get)
-          .stacksTo(3)
-          .tab(COMBAT_TAB)));
+  public static final RegistryObject<GrenadeItem> FIRE_GRENADE =
+      deferredRegister.register("fire_grenade",
+          () -> new GrenadeItem((GrenadeItem.Properties) new GrenadeItem.Properties()
+              .setGrenadeEntitySupplier(FireGrenadeEntity::new)
+              .setEnabledSupplier(CraftingDead.serverConfig.explosivesFireGrenadeEnabled::get)
+              .stacksTo(3)
+              .tab(COMBAT_TAB)));
 
-  public static final RegistryObject<GrenadeItem> SMOKE_GRENADE = deferredRegister.register("smoke_grenade",
-      () -> new GrenadeItem((GrenadeItem.Properties) new GrenadeItem.Properties()
-          .setGrenadeEntitySupplier(SmokeGrenadeEntity::new)
-          .setEnabledSupplier(CraftingDead.serverConfig.explosivesSmokeGrenadeEnabled::get)
-          .stacksTo(3)
-          .tab(COMBAT_TAB)));
+  public static final RegistryObject<GrenadeItem> SMOKE_GRENADE =
+      deferredRegister.register("smoke_grenade",
+          () -> new GrenadeItem((GrenadeItem.Properties) new GrenadeItem.Properties()
+              .setGrenadeEntitySupplier(SmokeGrenadeEntity::new)
+              .setEnabledSupplier(CraftingDead.serverConfig.explosivesSmokeGrenadeEnabled::get)
+              .stacksTo(3)
+              .tab(COMBAT_TAB)));
 
-  public static final RegistryObject<GrenadeItem> FLASH_GRENADE = deferredRegister.register("flash_grenade",
-      () -> new GrenadeItem((GrenadeItem.Properties) new GrenadeItem.Properties()
-          .setGrenadeEntitySupplier(FlashGrenadeEntity::new)
-          .setEnabledSupplier(CraftingDead.serverConfig.explosivesFlashGrenadeEnabled::get)
-          .stacksTo(3)
-          .tab(COMBAT_TAB)));
+  public static final RegistryObject<GrenadeItem> FLASH_GRENADE =
+      deferredRegister.register("flash_grenade",
+          () -> new GrenadeItem((GrenadeItem.Properties) new GrenadeItem.Properties()
+              .setGrenadeEntitySupplier(FlashGrenadeEntity::new)
+              .setEnabledSupplier(CraftingDead.serverConfig.explosivesFlashGrenadeEnabled::get)
+              .stacksTo(3)
+              .tab(COMBAT_TAB)));
 
-  public static final RegistryObject<GrenadeItem> DECOY_GRENADE = deferredRegister.register("decoy_grenade",
-      () -> new GrenadeItem((GrenadeItem.Properties) new GrenadeItem.Properties()
-          .setGrenadeEntitySupplier(DecoyGrenadeEntity::new)
-          .setEnabledSupplier(CraftingDead.serverConfig.explosivesDecoyGrenadeEnabled::get)
-          .stacksTo(3)
-          .tab(COMBAT_TAB)));
+  public static final RegistryObject<GrenadeItem> DECOY_GRENADE =
+      deferredRegister.register("decoy_grenade",
+          () -> new GrenadeItem((GrenadeItem.Properties) new GrenadeItem.Properties()
+              .setGrenadeEntitySupplier(DecoyGrenadeEntity::new)
+              .setEnabledSupplier(CraftingDead.serverConfig.explosivesDecoyGrenadeEnabled::get)
+              .stacksTo(3)
+              .tab(COMBAT_TAB)));
 
-  public static final RegistryObject<GrenadeItem> FRAG_GRENADE = deferredRegister.register("frag_grenade",
-      () -> new GrenadeItem((GrenadeItem.Properties) new GrenadeItem.Properties()
-          .setGrenadeEntitySupplier(FragGrenade::new)
-          .setEnabledSupplier(CraftingDead.serverConfig.explosivesFragGrenadeEnabled::get)
-          .stacksTo(1)
-          .tab(COMBAT_TAB)));
+  public static final RegistryObject<GrenadeItem> FRAG_GRENADE =
+      deferredRegister.register("frag_grenade",
+          () -> new GrenadeItem((GrenadeItem.Properties) new GrenadeItem.Properties()
+              .setGrenadeEntitySupplier(FragGrenade::new)
+              .setEnabledSupplier(CraftingDead.serverConfig.explosivesFragGrenadeEnabled::get)
+              .stacksTo(1)
+              .tab(COMBAT_TAB)));
 
   public static final RegistryObject<GrenadeItem> C4 = deferredRegister.register("c4_explosive",
       () -> new GrenadeItem((GrenadeItem.Properties) new GrenadeItem.Properties()
@@ -741,10 +714,11 @@ public class ModItems {
           .stacksTo(1)
           .tab(COMBAT_TAB)));
 
-  public static final RegistryObject<Item> REMOTE_DETONATOR = deferredRegister.register("remote_detonator",
-      () -> new RemoteDetonatorItem(new Item.Properties()
-          .stacksTo(1)
-          .tab(COMBAT_TAB)));
+  public static final RegistryObject<Item> REMOTE_DETONATOR =
+      deferredRegister.register("remote_detonator",
+          () -> new RemoteDetonatorItem(new Item.Properties()
+              .stacksTo(1)
+              .tab(COMBAT_TAB)));
 
   // ================================================================================
   // Weapon
@@ -831,10 +805,11 @@ public class ModItems {
           .durability(70)
           .tab(COMBAT_TAB)));
 
-  public static final RegistryObject<Item> WEAPONIZED_SCYTHE = deferredRegister.register("weaponized_scythe",
-      () -> new MeleeWeaponItem(15, -2.4F, new Item.Properties()
-          .durability(40)
-          .tab(COMBAT_TAB)));
+  public static final RegistryObject<Item> WEAPONIZED_SCYTHE =
+      deferredRegister.register("weaponized_scythe",
+          () -> new MeleeWeaponItem(15, -2.4F, new Item.Properties()
+              .durability(40)
+              .tab(COMBAT_TAB)));
 
   public static final RegistryObject<Item> SCYTHE = deferredRegister.register("scythe",
       () -> new MeleeWeaponItem(20, -2.4F, new Item.Properties()
@@ -881,10 +856,11 @@ public class ModItems {
           .durability(80)
           .tab(COMBAT_TAB)));
 
-  public static final RegistryObject<Item> BROKEN_BOTTLE = deferredRegister.register("broken_bottle",
-      () -> new MeleeWeaponItem(15, -2.4F, new Item.Properties()
-          .durability(10)
-          .tab(COMBAT_TAB)));
+  public static final RegistryObject<Item> BROKEN_BOTTLE =
+      deferredRegister.register("broken_bottle",
+          () -> new MeleeWeaponItem(15, -2.4F, new Item.Properties()
+              .durability(10)
+              .tab(COMBAT_TAB)));
 
   // ================================================================================
   // Vests
@@ -948,16 +924,18 @@ public class ModItems {
               .stacksTo(1)
               .tab(COSMETICS_TAB)));
 
-  public static final RegistryObject<Item> FIREMAN_CHIEF_HAT = deferredRegister.register("chief_fireman_hat",
-      () -> new HatItem((HatItem.Properties) new HatItem.Properties()
-          .stacksTo(1)
-          .tab(COSMETICS_TAB)));
+  public static final RegistryObject<Item> FIREMAN_CHIEF_HAT =
+      deferredRegister.register("chief_fireman_hat",
+          () -> new HatItem((HatItem.Properties) new HatItem.Properties()
+              .stacksTo(1)
+              .tab(COSMETICS_TAB)));
 
-  public static final RegistryObject<Item> BLUE_HARD_HAT = deferredRegister.register("blue_hard_hat",
-      () -> new HatItem((HatItem.Properties) new HatItem.Properties()
-          .setHeadshotReductionPercentage(0.2F)
-          .stacksTo(1)
-          .tab(COSMETICS_TAB)));
+  public static final RegistryObject<Item> BLUE_HARD_HAT =
+      deferredRegister.register("blue_hard_hat",
+          () -> new HatItem((HatItem.Properties) new HatItem.Properties()
+              .setHeadshotReductionPercentage(0.2F)
+              .stacksTo(1)
+              .tab(COSMETICS_TAB)));
 
   public static final RegistryObject<Item> BUNNY_HAT = deferredRegister.register("bunny_hat",
       () -> new HatItem((HatItem.Properties) new HatItem.Properties()
@@ -976,11 +954,12 @@ public class ModItems {
           .stacksTo(1)
           .tab(COSMETICS_TAB)));
 
-  public static final RegistryObject<Item> COMBAT_BDU_HELMET = deferredRegister.register("combat_bdu_helmet",
-      () -> new HatItem((HatItem.Properties) new HatItem.Properties()
-          .setHeadshotReductionPercentage(0.2F)
-          .stacksTo(1)
-          .tab(COSMETICS_TAB)));
+  public static final RegistryObject<Item> COMBAT_BDU_HELMET =
+      deferredRegister.register("combat_bdu_helmet",
+          () -> new HatItem((HatItem.Properties) new HatItem.Properties()
+              .setHeadshotReductionPercentage(0.2F)
+              .stacksTo(1)
+              .tab(COSMETICS_TAB)));
 
   public static final RegistryObject<Item> COOKIE_MASK = deferredRegister.register("cookie_mask",
       () -> new HatItem((HatItem.Properties) new HatItem.Properties()
@@ -997,10 +976,11 @@ public class ModItems {
           .stacksTo(1)
           .tab(COSMETICS_TAB)));
 
-  public static final RegistryObject<Item> DEADPOOL_MASK = deferredRegister.register("deadpool_mask",
-      () -> new HatItem((HatItem.Properties) new HatItem.Properties()
-          .stacksTo(1)
-          .tab(COSMETICS_TAB)));
+  public static final RegistryObject<Item> DEADPOOL_MASK =
+      deferredRegister.register("deadpool_mask",
+          () -> new HatItem((HatItem.Properties) new HatItem.Properties()
+              .stacksTo(1)
+              .tab(COSMETICS_TAB)));
 
   public static final RegistryObject<Item> DOCTOR_MASK = deferredRegister.register("doctor_mask",
       () -> new HatItem((HatItem.Properties) new HatItem.Properties()
@@ -1024,11 +1004,12 @@ public class ModItems {
           .stacksTo(1)
           .tab(COSMETICS_TAB)));
 
-  public static final RegistryObject<Item> GREEN_ARMY_HELMET = deferredRegister.register("green_army_helmet",
-      () -> new HatItem((HatItem.Properties) new HatItem.Properties()
-          .setHeadshotReductionPercentage(0.2F)
-          .stacksTo(1)
-          .tab(COSMETICS_TAB)));
+  public static final RegistryObject<Item> GREEN_ARMY_HELMET =
+      deferredRegister.register("green_army_helmet",
+          () -> new HatItem((HatItem.Properties) new HatItem.Properties()
+              .setHeadshotReductionPercentage(0.2F)
+              .stacksTo(1)
+              .tab(COSMETICS_TAB)));
 
   public static final RegistryObject<Item> GREEN_BALLISTIC_HELMET =
       deferredRegister.register("green_ballistic_helmet",
@@ -1037,17 +1018,19 @@ public class ModItems {
               .stacksTo(1)
               .tab(COSMETICS_TAB)));
 
-  public static final RegistryObject<Item> GREEN_HARD_HAT = deferredRegister.register("green_hard_hat",
-      () -> new HatItem((HatItem.Properties) new HatItem.Properties()
-          .setHeadshotReductionPercentage(0.2F)
-          .stacksTo(1)
-          .tab(COSMETICS_TAB)));
+  public static final RegistryObject<Item> GREEN_HARD_HAT =
+      deferredRegister.register("green_hard_hat",
+          () -> new HatItem((HatItem.Properties) new HatItem.Properties()
+              .setHeadshotReductionPercentage(0.2F)
+              .stacksTo(1)
+              .tab(COSMETICS_TAB)));
 
-  public static final RegistryObject<Item> GREY_ARMY_HELMET = deferredRegister.register("grey_army_helmet",
-      () -> new HatItem((HatItem.Properties) new HatItem.Properties()
-          .setHeadshotReductionPercentage(0.2F)
-          .stacksTo(1)
-          .tab(COSMETICS_TAB)));
+  public static final RegistryObject<Item> GREY_ARMY_HELMET =
+      deferredRegister.register("grey_army_helmet",
+          () -> new HatItem((HatItem.Properties) new HatItem.Properties()
+              .setHeadshotReductionPercentage(0.2F)
+              .stacksTo(1)
+              .tab(COSMETICS_TAB)));
 
   public static final RegistryObject<Item> HACKER_MASK = deferredRegister.register("hacker_mask",
       () -> new HatItem((HatItem.Properties) new HatItem.Properties()
@@ -1060,11 +1043,12 @@ public class ModItems {
           .stacksTo(1)
           .tab(COSMETICS_TAB)));
 
-  public static final RegistryObject<Item> JUGGERNAUT_HELMET = deferredRegister.register("juggernaut_helmet",
-      () -> new HatItem((HatItem.Properties) new HatItem.Properties()
-          .setHeadshotReductionPercentage(0.2F)
-          .stacksTo(1)
-          .tab(COSMETICS_TAB)));
+  public static final RegistryObject<Item> JUGGERNAUT_HELMET =
+      deferredRegister.register("juggernaut_helmet",
+          () -> new HatItem((HatItem.Properties) new HatItem.Properties()
+              .setHeadshotReductionPercentage(0.2F)
+              .stacksTo(1)
+              .tab(COSMETICS_TAB)));
 
   public static final RegistryObject<Item> KNIGHT_HAT = deferredRegister.register("knight_hat",
       () -> new HatItem((HatItem.Properties) new HatItem.Properties()
@@ -1083,17 +1067,19 @@ public class ModItems {
           .stacksTo(1)
           .tab(COSMETICS_TAB)));
 
-  public static final RegistryObject<Item> NV_GOGGLES_HAT = deferredRegister.register("nv_goggles_hat",
-      () -> new HatItem((HatItem.Properties) new HatItem.Properties()
-          .setNightVision(true)
-          .stacksTo(1)
-          .tab(COSMETICS_TAB)));
+  public static final RegistryObject<Item> NV_GOGGLES_HAT =
+      deferredRegister.register("nv_goggles_hat",
+          () -> new HatItem((HatItem.Properties) new HatItem.Properties()
+              .setNightVision(true)
+              .stacksTo(1)
+              .tab(COSMETICS_TAB)));
 
-  public static final RegistryObject<Item> ORANGE_HARD_HAT = deferredRegister.register("orange_hard_hat",
-      () -> new HatItem((HatItem.Properties) new HatItem.Properties()
-          .setHeadshotReductionPercentage(0.2F)
-          .stacksTo(1)
-          .tab(COSMETICS_TAB)));
+  public static final RegistryObject<Item> ORANGE_HARD_HAT =
+      deferredRegister.register("orange_hard_hat",
+          () -> new HatItem((HatItem.Properties) new HatItem.Properties()
+              .setHeadshotReductionPercentage(0.2F)
+              .stacksTo(1)
+              .tab(COSMETICS_TAB)));
 
   public static final RegistryObject<Item> PAYDAY_MASK = deferredRegister.register("payday_mask",
       () -> new HatItem((HatItem.Properties) new HatItem.Properties()
@@ -1147,11 +1133,12 @@ public class ModItems {
           .stacksTo(1)
           .tab(COSMETICS_TAB)));
 
-  public static final RegistryObject<Item> SPETSNAZ_HELMET = deferredRegister.register("spetsnaz_helmet",
-      () -> new HatItem((HatItem.Properties) new HatItem.Properties()
-          .setHeadshotReductionPercentage(0.2F)
-          .stacksTo(1)
-          .tab(COSMETICS_TAB)));
+  public static final RegistryObject<Item> SPETSNAZ_HELMET =
+      deferredRegister.register("spetsnaz_helmet",
+          () -> new HatItem((HatItem.Properties) new HatItem.Properties()
+              .setHeadshotReductionPercentage(0.2F)
+              .stacksTo(1)
+              .tab(COSMETICS_TAB)));
 
   public static final RegistryObject<Item> TOP_HAT = deferredRegister.register("top_hat",
       () -> new HatItem((HatItem.Properties) new HatItem.Properties()
@@ -1175,11 +1162,12 @@ public class ModItems {
               .stacksTo(1)
               .tab(COSMETICS_TAB)));
 
-  public static final RegistryObject<Item> YELLOW_HARD_HAT = deferredRegister.register("yellow_hard_hat",
-      () -> new HatItem((HatItem.Properties) new HatItem.Properties()
-          .setHeadshotReductionPercentage(0.2F)
-          .stacksTo(1)
-          .tab(COSMETICS_TAB)));
+  public static final RegistryObject<Item> YELLOW_HARD_HAT =
+      deferredRegister.register("yellow_hard_hat",
+          () -> new HatItem((HatItem.Properties) new HatItem.Properties()
+              .setHeadshotReductionPercentage(0.2F)
+              .stacksTo(1)
+              .tab(COSMETICS_TAB)));
 
   public static final RegistryObject<Item> ZOMBIE_MASK = deferredRegister.register("zombie_mask",
       () -> new HatItem((HatItem.Properties) new HatItem.Properties()
@@ -1611,8 +1599,9 @@ public class ModItems {
   public static final RegistryObject<Item> SMALL_BARREL = deferredRegister.register("small_barrel",
       () -> new Item(new Item.Properties().tab(COMBAT_TAB)));
 
-  public static final RegistryObject<Item> MEDIUM_BARREL = deferredRegister.register("medium_barrel",
-      () -> new Item(new Item.Properties().tab(COMBAT_TAB)));
+  public static final RegistryObject<Item> MEDIUM_BARREL =
+      deferredRegister.register("medium_barrel",
+          () -> new Item(new Item.Properties().tab(COMBAT_TAB)));
 
   public static final RegistryObject<Item> HEAVY_BARREL = deferredRegister.register("heavy_barrel",
       () -> new Item(new Item.Properties().tab(COMBAT_TAB)));
@@ -1629,8 +1618,9 @@ public class ModItems {
   public static final RegistryObject<Item> SMALL_HANDLE = deferredRegister.register("small_handle",
       () -> new Item(new Item.Properties().tab(COMBAT_TAB)));
 
-  public static final RegistryObject<Item> MEDIUM_HANDLE = deferredRegister.register("medium_handle",
-      () -> new Item(new Item.Properties().tab(COMBAT_TAB)));
+  public static final RegistryObject<Item> MEDIUM_HANDLE =
+      deferredRegister.register("medium_handle",
+          () -> new Item(new Item.Properties().tab(COMBAT_TAB)));
 
   public static final RegistryObject<Item> HEAVY_HANDLE = deferredRegister.register("heavy_handle",
       () -> new Item(new Item.Properties().tab(COMBAT_TAB)));
