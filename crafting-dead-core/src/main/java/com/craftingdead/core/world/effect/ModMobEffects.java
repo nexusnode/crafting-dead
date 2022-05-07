@@ -28,20 +28,20 @@ import net.minecraftforge.registries.RegistryObject;
 
 public class ModMobEffects {
 
-  public static final DeferredRegister<MobEffect> MOB_EFFECTS =
+  public static final DeferredRegister<MobEffect> deferredRegister =
       DeferredRegister.create(ForgeRegistries.MOB_EFFECTS, CraftingDead.ID);
 
   public static final RegistryObject<MobEffect> SCUBA =
-      MOB_EFFECTS.register("scuba", ScubaMobEffect::new);
+      deferredRegister.register("scuba", ScubaMobEffect::new);
 
   public static final RegistryObject<MobEffect> FLASH_BLINDNESS =
-      MOB_EFFECTS.register("flash_blindness", FlashBlindnessMobEffect::new);
+      deferredRegister.register("flash_blindness", FlashBlindnessMobEffect::new);
 
   public static final RegistryObject<MobEffect> ADRENALINE =
-      MOB_EFFECTS.register("adrenaline", AdrenalineMobEffect::new);
+      deferredRegister.register("adrenaline", AdrenalineMobEffect::new);
 
   public static final RegistryObject<MobEffect> PARACHUTE =
-      MOB_EFFECTS.register("parachute", ParachuteMobEffect::new);
+      deferredRegister.register("parachute", ParachuteMobEffect::new);
 
   /**
    * If the potion effect is not present, the potion effect is applied. Otherwise, overrides the

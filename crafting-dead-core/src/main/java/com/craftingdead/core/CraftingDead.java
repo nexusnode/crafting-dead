@@ -144,19 +144,19 @@ public class CraftingDead {
 
     ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, serverConfigSpec);
 
-    ModEntityTypes.ENTITY_TYPES.register(modEventBus);
-    ModItems.ITEMS.register(modEventBus);
-    ModSoundEvents.SOUND_EVENTS.register(modEventBus);
-    ModMenuTypes.MENUS.register(modEventBus);
-    ModMobEffects.MOB_EFFECTS.register(modEventBus);
-    ModEnchantments.ENCHANTMENTS.register(modEventBus);
-    ModParticleTypes.PARTICLE_TYPES.register(modEventBus);
-    ModRecipeSerializers.RECIPE_SERIALIZERS.register(modEventBus);
+    ModEntityTypes.deferredRegister.register(modEventBus);
+    ModItems.deferredRegister.register(modEventBus);
+    ModSoundEvents.deferredRegister.register(modEventBus);
+    ModMenuTypes.deferredRegister.register(modEventBus);
+    ModMobEffects.deferredRegister.register(modEventBus);
+    ModEnchantments.deferredRegister.register(modEventBus);
+    ModParticleTypes.deferredRegister.register(modEventBus);
+    ModRecipeSerializers.deferredRegister.register(modEventBus);
 
     // Custom registries
-    ActionTypes.ACTION_TYPES.register(modEventBus);
-    AmmoProviderTypes.AMMO_PROVIDER_TYPES.register(modEventBus);
-    Attachments.ATTACHMENTS.register(modEventBus);
+    ActionTypes.deferredRegister.register(modEventBus);
+    AmmoProviderTypes.deferredRegister.register(modEventBus);
+    Attachments.deferredRegister.register(modEventBus);
     GunTypes.gunTypes.register(modEventBus);
     GunTypeFactories.gunTypeFactories.register(modEventBus);
     GunAnimations.gunAnimations.register(modEventBus);

@@ -28,16 +28,16 @@ import net.minecraftforge.registries.RegistryObject;
 
 public class ModParticleTypes {
 
-  public static final DeferredRegister<ParticleType<?>> PARTICLE_TYPES =
+  public static final DeferredRegister<ParticleType<?>> deferredRegister =
       DeferredRegister.create(ForgeRegistries.PARTICLE_TYPES, CraftingDead.ID);
 
   public static final RegistryObject<ParticleType<GrenadeSmokeParticleData>> GRENADE_SMOKE =
-      PARTICLE_TYPES.register("grenade_smoke",
+      deferredRegister.register("grenade_smoke",
           () -> create(true, GrenadeSmokeParticleData.DESERIALIZER,
               GrenadeSmokeParticleData.CODEC));
 
   public static final RegistryObject<ParticleType<FlashParticleOptions>> RGB_FLASH =
-      PARTICLE_TYPES.register("rgb_flash",
+      deferredRegister.register("rgb_flash",
           () -> create(true, FlashParticleOptions.DESERIALIZER, FlashParticleOptions.CODEC));
 
   private static <T extends ParticleOptions> ParticleType<T> create(boolean alwaysShow,

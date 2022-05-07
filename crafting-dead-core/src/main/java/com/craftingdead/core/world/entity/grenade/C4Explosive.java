@@ -18,13 +18,13 @@
 
 package com.craftingdead.core.world.entity.grenade;
 
-import java.util.Optional;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.world.entity.ExplosionSource;
 import com.craftingdead.core.world.entity.ModEntityTypes;
 import com.craftingdead.core.world.entity.grenade.FireGrenadeEntity.BounceSound;
 import com.craftingdead.core.world.item.GrenadeItem;
 import com.craftingdead.core.world.item.ModItems;
+import java.util.Optional;
 import net.minecraft.core.Direction;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.damagesource.DamageSource;
@@ -38,6 +38,7 @@ public class C4Explosive extends Grenade implements ExplosionSource {
 
   private static final BounceSound C4_BOUNCE_SOUND =
       new BounceSound(SoundEvents.PLAYER_SMALL_FALL, 1.0F, 1.5F);
+  private int knockbackPenalty;
 
   public C4Explosive(EntityType<? extends Grenade> entityIn, Level worldIn) {
     super(entityIn, worldIn);
@@ -66,6 +67,17 @@ public class C4Explosive extends Grenade implements ExplosionSource {
     if (activated) {
       if (!this.level.isClientSide()) {
         this.kill();
+        if (knockbackPenalty == 0) {
+          // Getting entity by type crashes the server for some reason, this method works fine with no big performance impact
+          var others = this.level.getEntities(this, this.getBoundingBox().inflate(2)).stream()
+              .filter(e -> e instanceof C4Explosive)
+              .map(e -> (C4Explosive) e).toList();
+          for (C4Explosive other : others) {
+            other.setKnockbackPenalty(others.size() * 2);
+          }
+          this.setKnockbackPenalty(others.size());
+        }
+
         this.level.explode(this, this.createDamageSource(), null,
             this.getX(), this.getY() + this.getBbHeight(), this.getZ(),
             CraftingDead.serverConfig.explosivesC4Radius.get().floatValue(), false,
@@ -111,6 +123,10 @@ public class C4Explosive extends Grenade implements ExplosionSource {
 
   @Override
   public double getKnockbackMultiplier() {
-    return CraftingDead.serverConfig.explosivesC4DamageMultiplier.get();
+    return CraftingDead.serverConfig.explosivesC4DamageMultiplier.get() / (knockbackPenalty > 0 ? knockbackPenalty : 1);
+  }
+
+  public void setKnockbackPenalty(int penalty) {
+    this.knockbackPenalty = penalty;
   }
 }

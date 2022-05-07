@@ -11,7 +11,9 @@
       "conditions": {
         "items": [
           {
-            "item": "craftingdead:stanag_20_round_magazine"
+            "items": [
+              "craftingdead:stanag_20_round_magazine"
+            ]
           }
         ]
       }

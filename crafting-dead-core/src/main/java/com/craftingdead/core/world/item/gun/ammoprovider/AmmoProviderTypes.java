@@ -18,8 +18,11 @@
 
 package com.craftingdead.core.world.item.gun.ammoprovider;
 
+import java.util.function.Supplier;
 import com.craftingdead.core.CraftingDead;
-import net.minecraftforge.common.util.Lazy;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.RegistryBuilder;
@@ -27,18 +30,20 @@ import net.minecraftforge.registries.RegistryObject;
 
 public class AmmoProviderTypes {
 
-  public static final DeferredRegister<AmmoProviderType> AMMO_PROVIDER_TYPES =
-      DeferredRegister.create(AmmoProviderType.class, CraftingDead.ID);
+  public static final ResourceKey<Registry<AmmoProviderType>> REGISTRY_KEY =
+      ResourceKey.createRegistryKey(new ResourceLocation(CraftingDead.ID, "ammo_provider_type"));
 
-  public static final Lazy<IForgeRegistry<AmmoProviderType>> registry =
-      Lazy.of(AmmoProviderTypes.AMMO_PROVIDER_TYPES.makeRegistry("ammo_provider_type",
-          RegistryBuilder::new));
+  public static final DeferredRegister<AmmoProviderType> deferredRegister =
+      DeferredRegister.create(REGISTRY_KEY, CraftingDead.ID);
+
+  public static final Supplier<IForgeRegistry<AmmoProviderType>> registry =
+      deferredRegister.makeRegistry(AmmoProviderType.class, RegistryBuilder::new);
 
   public static final RegistryObject<AmmoProviderType> MAGAZINE =
-      AMMO_PROVIDER_TYPES.register("magazine",
+      deferredRegister.register("magazine",
           () -> new AmmoProviderType(MagazineAmmoProvider::new));
 
   public static final RegistryObject<AmmoProviderType> REFILLABLE =
-      AMMO_PROVIDER_TYPES.register("refillable",
+      deferredRegister.register("refillable",
           () -> new AmmoProviderType(RefillableAmmoProvider::new));
 }

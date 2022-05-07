@@ -138,14 +138,14 @@ public class CraftingDeadImmerse {
     modEventBus.addListener(this::handleGatherData);
     modEventBus.addListener(this::handleCommonSetup);
 
-    ImmerseSoundEvents.soundEvents.register(modEventBus);
-    GameTypes.gameTypes.register(modEventBus);
-    ModuleTypes.moduleTypes.register(modEventBus);
-    ImmerseActionTypes.actionTypes.register(modEventBus);
-    ImmerseBlocks.blocks.register(modEventBus);
-    ImmerseItems.items.register(modEventBus);
-    ImmerseBlockEntityTypes.blockEntityTypes.register(modEventBus);
-    LandOwnerTypes.landOwnerTypes.register(modEventBus);
+    ImmerseSoundEvents.deferredRegister.register(modEventBus);
+    GameTypes.deferredRegister.register(modEventBus);
+    ModuleTypes.deferredRegister.register(modEventBus);
+    ImmerseActionTypes.deferredRegister.register(modEventBus);
+    ImmerseBlocks.deferredRegister.register(modEventBus);
+    ImmerseItems.deferredRegister.register(modEventBus);
+    ImmerseBlockEntityTypes.deferredRegister.register(modEventBus);
+    LandOwnerTypes.deferredRegister.register(modEventBus);
 
     MinecraftForge.EVENT_BUS.register(this);
   }

@@ -11,7 +11,9 @@
       "conditions": {
         "items": [
           {
-            "item": "craftingdead:medium_body"
+            "items": [
+              "craftingdead:medium_body"
+            ]
           }
         ]
       }

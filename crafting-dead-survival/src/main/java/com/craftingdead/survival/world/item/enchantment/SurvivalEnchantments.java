@@ -27,10 +27,10 @@ import net.minecraftforge.registries.RegistryObject;
 
 public class SurvivalEnchantments {
 
-  public static final DeferredRegister<Enchantment> ENCHANTMENTS =
+  public static final DeferredRegister<Enchantment> deferredRegister =
       DeferredRegister.create(ForgeRegistries.ENCHANTMENTS, CraftingDeadSurvival.ID);
 
   public static final RegistryObject<InfectionEnchantment> INFECTION =
-      ENCHANTMENTS.register("infection",
+      deferredRegister.register("infection",
           () -> new InfectionEnchantment(Enchantment.Rarity.COMMON, EquipmentSlot.MAINHAND));
 }

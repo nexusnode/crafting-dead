@@ -19,6 +19,7 @@
 package com.craftingdead.immerse.world.action;
 
 import com.craftingdead.core.world.action.ActionType;
+import com.craftingdead.core.world.action.ActionTypes;
 import com.craftingdead.core.world.action.item.ItemActionType;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.world.level.block.ImmerseBlocks;
@@ -28,13 +29,11 @@ import net.minecraftforge.registries.RegistryObject;
 
 public class ImmerseActionTypes {
 
-  @SuppressWarnings("unchecked")
-  public static final DeferredRegister<ActionType<?>> actionTypes =
-      DeferredRegister.create((Class<ActionType<?>>) (Object) ActionType.class,
-          CraftingDeadImmerse.ID);
+  public static final DeferredRegister<ActionType<?>> deferredRegister =
+      DeferredRegister.create(ActionTypes.REGISTRY_KEY, CraftingDeadImmerse.ID);
 
   public static final RegistryObject<ItemActionType<?>> BUILD_BASE_CENTER =
-      actionTypes.register("build_base_center",
+      deferredRegister.register("build_base_center",
           () -> BuildCuboidActionType.block()
               .duration(100)
               .block(ImmerseBlocks.BASE_CENTER)
@@ -43,7 +42,7 @@ public class ImmerseActionTypes {
               .build());
 
   public static final RegistryObject<ItemActionType<?>> BUILD_CAMPFIRE =
-      actionTypes.register("build_campfire",
+      deferredRegister.register("build_campfire",
           () -> BuildCuboidActionType.block()
               .duration(100)
               .block(Blocks.CAMPFIRE)
@@ -51,7 +50,7 @@ public class ImmerseActionTypes {
               .build());
 
   public static final RegistryObject<ItemActionType<?>> BUILD_CHEST =
-      actionTypes.register("build_chest",
+      deferredRegister.register("build_chest",
           () -> BuildCuboidActionType.block()
               .duration(100)
               .block(Blocks.CHEST)
@@ -59,7 +58,7 @@ public class ImmerseActionTypes {
               .build());
 
   public static final RegistryObject<ItemActionType<?>> BUILD_OAK_PLANK_WALL =
-      actionTypes.register("build_oak_plank_wall",
+      deferredRegister.register("build_oak_plank_wall",
           () -> BuildCuboidActionType.wall()
               .duration(100)
               .block(Blocks.OAK_PLANKS)
@@ -67,7 +66,7 @@ public class ImmerseActionTypes {
               .build());
 
   public static final RegistryObject<ItemActionType<?>> BUILD_SPRUCE_PLANK_WALL =
-      actionTypes.register("build_spruce_plank_wall",
+      deferredRegister.register("build_spruce_plank_wall",
           () -> BuildCuboidActionType.wall()
               .duration(100)
               .block(Blocks.SPRUCE_PLANKS)
@@ -75,7 +74,7 @@ public class ImmerseActionTypes {
               .build());
 
   public static final RegistryObject<ItemActionType<?>> BUILD_BIRCH_PLANK_WALL =
-      actionTypes.register("build_birch_plank_wall",
+      deferredRegister.register("build_birch_plank_wall",
           () -> BuildCuboidActionType.wall()
               .duration(100)
               .block(Blocks.BIRCH_PLANKS)
@@ -83,7 +82,7 @@ public class ImmerseActionTypes {
               .build());
 
   public static final RegistryObject<ItemActionType<?>> BUILD_JUNGLE_PLANK_WALL =
-      actionTypes.register("build_jungle_plank_wall",
+      deferredRegister.register("build_jungle_plank_wall",
           () -> BuildCuboidActionType.wall()
               .duration(100)
               .block(Blocks.JUNGLE_PLANKS)
@@ -91,7 +90,7 @@ public class ImmerseActionTypes {
               .build());
 
   public static final RegistryObject<ItemActionType<?>> BUILD_ACACIA_PLANK_WALL =
-      actionTypes.register("build_acacia_plank_wall",
+      deferredRegister.register("build_acacia_plank_wall",
           () -> BuildCuboidActionType.wall()
               .duration(100)
               .block(Blocks.ACACIA_PLANKS)
@@ -99,7 +98,7 @@ public class ImmerseActionTypes {
               .build());
 
   public static final RegistryObject<ItemActionType<?>> BUILD_DARK_OAK_PLANK_WALL =
-      actionTypes.register("build_dark_oak_plank_wall",
+      deferredRegister.register("build_dark_oak_plank_wall",
           () -> BuildCuboidActionType.wall()
               .duration(100)
               .block(Blocks.DARK_OAK_PLANKS)
@@ -107,7 +106,7 @@ public class ImmerseActionTypes {
               .build());
 
   public static final RegistryObject<ItemActionType<?>> BUILD_OAK_DOOR =
-      actionTypes.register("build_oak_door",
+      deferredRegister.register("build_oak_door",
           () -> BuildDoorWallActionType.builder()
               .duration(100)
               .wallBlock(Blocks.OAK_PLANKS)
@@ -116,7 +115,7 @@ public class ImmerseActionTypes {
               .build());
 
   public static final RegistryObject<ItemActionType<?>> BUILD_SPRUCE_DOOR =
-      actionTypes.register("build_spruce_door",
+      deferredRegister.register("build_spruce_door",
           () -> BuildDoorWallActionType.builder()
               .duration(100)
               .wallBlock(Blocks.SPRUCE_PLANKS)
@@ -125,7 +124,7 @@ public class ImmerseActionTypes {
               .build());
 
   public static final RegistryObject<ItemActionType<?>> BUILD_BIRCH_DOOR =
-      actionTypes.register("build_birch_door",
+      deferredRegister.register("build_birch_door",
           () -> BuildDoorWallActionType.builder()
               .duration(100)
               .wallBlock(Blocks.BIRCH_PLANKS)
@@ -134,7 +133,7 @@ public class ImmerseActionTypes {
               .build());
 
   public static final RegistryObject<ItemActionType<?>> BUILD_JUNGLE_DOOR =
-      actionTypes.register("build_jungle_door",
+      deferredRegister.register("build_jungle_door",
           () -> BuildDoorWallActionType.builder()
               .duration(100)
               .wallBlock(Blocks.JUNGLE_PLANKS)
@@ -143,7 +142,7 @@ public class ImmerseActionTypes {
               .build());
 
   public static final RegistryObject<ItemActionType<?>> BUILD_ACACIA_DOOR =
-      actionTypes.register("build_acacia_door",
+      deferredRegister.register("build_acacia_door",
           () -> BuildDoorWallActionType.builder()
               .duration(100)
               .wallBlock(Blocks.ACACIA_PLANKS)
@@ -152,7 +151,7 @@ public class ImmerseActionTypes {
               .build());
 
   public static final RegistryObject<ItemActionType<?>> BUILD_DARK_OAK_DOOR =
-      actionTypes.register("build_dark_oak_door",
+      deferredRegister.register("build_dark_oak_door",
           () -> BuildDoorWallActionType.builder()
               .duration(100)
               .wallBlock(Blocks.DARK_OAK_PLANKS)
@@ -161,7 +160,7 @@ public class ImmerseActionTypes {
               .build());
 
   public static final RegistryObject<ItemActionType<?>> BUILD_OAK_PLANK_PLATFORM =
-      actionTypes.register("build_oak_plank_platform",
+      deferredRegister.register("build_oak_plank_platform",
           () -> BuildCuboidActionType.platform()
               .duration(100)
               .block(Blocks.OAK_PLANKS)
@@ -169,7 +168,7 @@ public class ImmerseActionTypes {
               .build());
 
   public static final RegistryObject<ItemActionType<?>> BUILD_SPRUCE_PLANK_PLATFORM =
-      actionTypes.register("build_spruce_plank_platform",
+      deferredRegister.register("build_spruce_plank_platform",
           () -> BuildCuboidActionType.platform()
               .duration(100)
               .block(Blocks.SPRUCE_PLANKS)
@@ -177,7 +176,7 @@ public class ImmerseActionTypes {
               .build());
 
   public static final RegistryObject<ItemActionType<?>> BUILD_BIRCH_PLANK_PLATFORM =
-      actionTypes.register("build_birch_plank_platform",
+      deferredRegister.register("build_birch_plank_platform",
           () -> BuildCuboidActionType.platform()
               .duration(100)
               .block(Blocks.BIRCH_PLANKS)
@@ -185,7 +184,7 @@ public class ImmerseActionTypes {
               .build());
 
   public static final RegistryObject<ItemActionType<?>> BUILD_JUNGLE_PLANK_PLATFORM =
-      actionTypes.register("build_jungle_plank_platform",
+      deferredRegister.register("build_jungle_plank_platform",
           () -> BuildCuboidActionType.platform()
               .duration(100)
               .block(Blocks.JUNGLE_PLANKS)
@@ -193,7 +192,7 @@ public class ImmerseActionTypes {
               .build());
 
   public static final RegistryObject<ItemActionType<?>> BUILD_ACACIA_PLANK_PLATFORM =
-      actionTypes.register("build_acacia_plank_platform",
+      deferredRegister.register("build_acacia_plank_platform",
           () -> BuildCuboidActionType.platform()
               .duration(100)
               .block(Blocks.ACACIA_PLANKS)
@@ -201,7 +200,7 @@ public class ImmerseActionTypes {
               .build());
 
   public static final RegistryObject<ItemActionType<?>> BUILD_DARK_OAK_PLANK_PLATFORM =
-      actionTypes.register("build_dark_oak_plank_platform",
+      deferredRegister.register("build_dark_oak_plank_platform",
           () -> BuildCuboidActionType.platform()
               .duration(100)
               .block(Blocks.DARK_OAK_PLANKS)

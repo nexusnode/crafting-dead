@@ -18,6 +18,7 @@
 
 package com.craftingdead.immerse.game;
 
+import java.util.function.Supplier;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.game.network.NetworkProtocol;
 import com.craftingdead.immerse.game.survival.SurvivalClient;
@@ -26,7 +27,9 @@ import com.craftingdead.immerse.game.tdm.TdmClient;
 import com.craftingdead.immerse.game.tdm.TdmNetworkProtocol;
 import com.craftingdead.immerse.game.tdm.TdmServer;
 import com.mojang.serialization.Codec;
-import net.minecraftforge.common.util.Lazy;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.RegistryBuilder;
@@ -34,16 +37,19 @@ import net.minecraftforge.registries.RegistryObject;
 
 public class GameTypes {
 
-  public static final DeferredRegister<GameType> gameTypes =
-      DeferredRegister.create(GameType.class, CraftingDeadImmerse.ID);
+  public static final ResourceKey<Registry<GameType>> REGISTRY_KEY =
+      ResourceKey.createRegistryKey(new ResourceLocation(CraftingDeadImmerse.ID, "game_type"));
 
-  public static final Lazy<IForgeRegistry<GameType>> registry =
-      Lazy.of(gameTypes.makeRegistry("game_type", RegistryBuilder::new));
+  public static final DeferredRegister<GameType> deferredRegister =
+      DeferredRegister.create(REGISTRY_KEY, CraftingDeadImmerse.ID);
 
-  public static final RegistryObject<GameType> SURVIVAL = gameTypes.register("survival",
+  public static final Supplier<IForgeRegistry<GameType>> registry =
+      deferredRegister.makeRegistry(GameType.class, RegistryBuilder::new);
+
+  public static final RegistryObject<GameType> SURVIVAL = deferredRegister.register("survival",
       () -> new GameType(Codec.unit(SurvivalServer::new), () -> SurvivalClient::new,
           NetworkProtocol.EMPTY));
 
-  public static final RegistryObject<GameType> TEAM_DEATHMATCH = gameTypes.register("tdm",
+  public static final RegistryObject<GameType> TEAM_DEATHMATCH = deferredRegister.register("tdm",
       () -> new GameType(TdmServer.CODEC, () -> TdmClient::new, TdmNetworkProtocol.INSTANCE));
 }
