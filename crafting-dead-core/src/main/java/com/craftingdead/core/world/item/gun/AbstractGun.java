@@ -780,13 +780,13 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
     this.attachmentsDirty = false;
 
     if (this.ammoProviderChanged || writeAll) {
-      this.ammoProviderChanged = false;
       out.writeBoolean(true);
       out.writeRegistryId(this.ammoProvider.getType());
     } else {
       out.writeBoolean(false);
     }
     this.ammoProvider.encode(out, this.ammoProviderChanged || writeAll);
+    this.ammoProviderChanged = false;
 
     if (this.skinDirty || writeAll) {
       this.skinDirty = false;
