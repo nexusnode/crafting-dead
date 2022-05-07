@@ -49,7 +49,7 @@ public class GunTriggerPredicates {
       ExtraCodecs.lazyInitializedCodec(() -> registry.get().getCodec());
 
   public static final RegistryObject<PredicateRegistryEntry<Gun>> PERFORMING_SECONDARY_ACTION =
-      deferredRegister.register("performing_secondary_actions",
+      deferredRegister.register("performing_secondary_action",
           () -> PredicateRegistryEntry.of(Gun::isPerformingSecondaryAction));
 
   public static final RegistryObject<PredicateRegistryEntry<Gun>> NONE =
