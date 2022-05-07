@@ -48,6 +48,8 @@ public class C4ExplosiveRenderer extends EntityRenderer<Grenade> {
       float rotation = (entity.tickCount + partialTicks) * 15F;
       poseStack.mulPose(Vector3f.XP.rotationDegrees(rotation));
       poseStack.mulPose(Vector3f.ZP.rotationDegrees(rotation));
+    } else {
+      poseStack.mulPose(entity.getHitDirection().getRotation());
     }
 
     var vertexConsumer =

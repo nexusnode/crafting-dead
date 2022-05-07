@@ -1041,7 +1041,7 @@ public class SurvivalBlockLootTables extends BlockLoot {
                     .setWeight(15))
                 .add(LootItem.lootTableItem(ModItems.FRAG_GRENADE.get())
                     .setWeight(15))
-                .add(LootItem.lootTableItem(ModItems.C4.get())
+                .add(LootItem.lootTableItem(ModItems.C4_EXPLOSIVE.get())
                     .setWeight(15))
                 .add(LootItem.lootTableItem(ModItems.REMOTE_DETONATOR.get())
                     .setWeight(15))

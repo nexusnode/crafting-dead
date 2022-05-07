@@ -33,6 +33,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
@@ -47,6 +48,8 @@ public abstract class BounceableProjectileEntity extends Entity
   private boolean stoppedMoving;
   private int totalTicksInAir;
   private int motionStopCount;
+  private Direction hitDirection = Direction.UP;
+  protected boolean isSticky;
 
   public BounceableProjectileEntity(EntityType<? extends BounceableProjectileEntity> type,
       Level level) {
@@ -73,6 +76,10 @@ public abstract class BounceableProjectileEntity extends Entity
     this.sourceId = sourceId;
   }
 
+  public void setSticky(boolean isSticky) {
+    this.isSticky = isSticky;
+  }
+
   @Override
   public void tick() {
     super.tick();
@@ -87,7 +94,7 @@ public abstract class BounceableProjectileEntity extends Entity
       }
 
       boolean notCollided = (this.blockStanding != currentBlockState
-          && this.level.noCollision(this.getBoundingBox().inflate(0.0625D)));
+          && this.level.noCollision((new AABB(this.position(), this.position())).inflate(0.06D)));
       boolean shouldMove = !this.getDeltaMovement().equals(Vec3.ZERO) || notCollided;
 
       if (shouldMove) {
@@ -155,18 +162,18 @@ public abstract class BounceableProjectileEntity extends Entity
         } else {
           nextBounceMotion = Vec3.ZERO;
         }
-
         this.onSurfaceHit(blockRayTraceResult);
 
         // Check if the entity is still alive after hitting the surface
         if (this.isAlive()) {
-          if (nextBounceMotion != null && blockRayTraceResult.getDirection() == Direction.UP) {
+          if ((nextBounceMotion != null && blockRayTraceResult.getDirection() == Direction.UP) || this.isSticky) {
             // Stops if the next bounce is too slow
-            if (nextBounceMotion.length() < 0.1D) {
+            if ((nextBounceMotion.length() < 0.1D) || this.isSticky) {
               nextBounceMotion = Vec3.ZERO;
               this.stoppedMoving = true;
               this.blockStanding = blockHitState;
               this.onMotionStop(++this.motionStopCount);
+              this.hitDirection = blockRayTraceResult.getDirection();
             }
           }
         }
@@ -270,6 +277,8 @@ public abstract class BounceableProjectileEntity extends Entity
 
     compound.putBoolean("stoppedMoving", this.stoppedMoving);
     compound.putInt("motionStopCount", this.motionStopCount);
+    compound.putBoolean("isSticky", this.isSticky);
+    compound.putString("hitDirection", this.hitDirection.getSerializedName());
   }
 
   @Override
@@ -279,6 +288,8 @@ public abstract class BounceableProjectileEntity extends Entity
     }
     this.stoppedMoving = compound.getBoolean("stoppedMoving");
     this.motionStopCount = compound.getInt("motionStopCount");
+    this.isSticky = compound.getBoolean("isSticky");
+    this.hitDirection = Direction.byName(compound.getString("hitDirection"));
   }
 
   @Override
@@ -286,6 +297,8 @@ public abstract class BounceableProjectileEntity extends Entity
     buffer.writeBoolean(this.stoppedMoving);
     buffer.writeInt(this.totalTicksInAir);
     buffer.writeInt(this.motionStopCount);
+    buffer.writeBoolean(this.isSticky);
+    buffer.writeEnum(this.hitDirection);
   }
 
   @Override
@@ -293,11 +306,17 @@ public abstract class BounceableProjectileEntity extends Entity
     this.stoppedMoving = buffer.readBoolean();
     this.totalTicksInAir = buffer.readInt();
     this.motionStopCount = buffer.readInt();
+    this.isSticky = buffer.readBoolean();
+    this.hitDirection = buffer.readEnum(Direction.class);
   }
 
   public Optional<Entity> getSource() {
     return this.level instanceof ServerLevel level
         ? Optional.ofNullable(level.getEntity(this.sourceId))
         : Optional.empty();
+  }
+
+  public Direction getHitDirection() {
+    return hitDirection;
   }
 }

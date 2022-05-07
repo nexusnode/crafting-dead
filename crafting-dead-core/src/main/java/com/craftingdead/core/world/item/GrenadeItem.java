@@ -50,12 +50,14 @@ public class GrenadeItem extends Item {
   private final BiFunction<LivingEntity, Level, Grenade> grenadeEntitySupplier;
   private final float throwSpeed;
   private final BooleanSupplier enabled;
+  private final boolean isSticky;
 
   public GrenadeItem(Properties properties) {
     super(properties);
     this.grenadeEntitySupplier = properties.grenadeEntitySupplier;
     this.throwSpeed = properties.throwSpeed;
     this.enabled = properties.enabled;
+    this.isSticky = properties.isSticky;
   }
 
   @Override
@@ -89,6 +91,7 @@ public class GrenadeItem extends Item {
           player.getZ());
       grenadeEntity.shootFromEntity(player, player.getXRot(), player.getYRot(), 0,
           force, 1.0F);
+      grenadeEntity.setSticky(this.isSticky);
       level.addFreshEntity(grenadeEntity);
     }
 
@@ -111,6 +114,7 @@ public class GrenadeItem extends Item {
     private BiFunction<LivingEntity, Level, Grenade> grenadeEntitySupplier;
     private float throwSpeed = 1.45F;
     private BooleanSupplier enabled = () -> true;
+    private boolean isSticky;
 
     public Properties setGrenadeEntitySupplier(
         BiFunction<LivingEntity, Level, Grenade> grenadeEntitySupplier) {
@@ -125,6 +129,11 @@ public class GrenadeItem extends Item {
 
     public Properties setEnabledSupplier(BooleanSupplier enabled) {
       this.enabled = enabled;
+      return this;
+    }
+
+    public Properties setSticky(boolean isSticky) {
+      this.isSticky = isSticky;
       return this;
     }
   }

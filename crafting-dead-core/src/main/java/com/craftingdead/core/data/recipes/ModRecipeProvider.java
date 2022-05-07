@@ -577,13 +577,18 @@ public class ModRecipeProvider extends RecipeProvider {
         .define('g', Tags.Items.GUNPOWDER)
         .unlockedBy("has_gunpowder", has(Tags.Items.GUNPOWDER))
         .save(consumer);
-    ShapedRecipeBuilder.shaped(ModItems.C4.get())
+    ShapedRecipeBuilder.shaped(ModItems.C4_EXPLOSIVE.get())
         .pattern(" i ")
         .pattern("iti")
         .pattern(" i ")
         .define('i', Tags.Items.INGOTS_IRON)
         .define('t', Items.TNT)
         .unlockedBy("has_tnt", has(Items.TNT))
+        .save(consumer);
+    ShapelessRecipeBuilder.shapeless(ModItems.STICKY_C4_EXPLOSIVE.get())
+        .requires(ModItems.C4_EXPLOSIVE.get())
+        .requires(Items.SLIME_BALL)
+        .unlockedBy("has_c4", has(ModItems.C4_EXPLOSIVE.get()))
         .save(consumer);
     ShapedRecipeBuilder.shaped(ModItems.REMOTE_DETONATOR.get())
         .pattern(" i ")

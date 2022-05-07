@@ -1,0 +1,34 @@
+{
+  "parent": "minecraft:recipes/root",
+  "rewards": {
+    "recipes": [
+      "craftingdead:sticky_c4_explosive"
+    ]
+  },
+  "criteria": {
+    "has_c4": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "craftingdead:c4_explosive"
+            ]
+          }
+        ]
+      }
+    },
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "craftingdead:sticky_c4_explosive"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_c4",
+      "has_the_recipe"
+    ]
+  ]
+}
