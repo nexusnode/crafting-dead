@@ -18,6 +18,7 @@
 
 package com.craftingdead.core.world.entity.extension;
 
+import com.craftingdead.core.world.inventory.ModEquipmentSlot;
 import java.util.Optional;
 import java.util.Random;
 import javax.annotation.Nonnull;
@@ -227,6 +228,58 @@ public interface LivingExtension<E extends LivingEntity, H extends LivingHandler
    * @return the {@link LivingEntity}
    */
   E getEntity();
+
+  /**
+   * Get the drop chance for the entity equipment slots.
+   * The array indexes will be in correlation with {@link ModEquipmentSlot}
+   *
+   * <p>
+   *
+   * NOTE: Drop chances follows the vanilla drop chance formula <code>Math.max(randomFloat - (lootingLevel * 0.01F), 0.0F) < dropChance</code>
+   * Use <code>2.0F</code> for guarantee drop
+   *
+   * @return an array containing the drop chance for each slot, this array will be a copy of the original.
+   */
+  float[] getEquipDropChances();
+
+  /**
+   * Get the drop chance for the entity equipment slot.
+   *
+   * <p>
+   *
+   * NOTE: Drop chances follows the vanilla drop chance formula <code>Math.max(randomFloat - (lootingLevel * 0.01F), 0.0F) < dropChance</code>
+   * Use <code>2.0F</code> for guarantee drop
+   *
+   * @param slot - the equipment slot to get the drop chance
+   * @return the drop chance for the provided equipment slot
+   */
+  float getEquipDropChance(ModEquipmentSlot slot);
+
+  /**
+   * Defines the new drop chances for the entity equipment slots.
+   * The provided array must contain all slots from {@link ModEquipmentSlot}
+   *
+   * <p>
+   *
+   * NOTE: Drop chances follows the vanilla drop chance scheme <code>Math.max(randomFloat - (lootingLevel * 0.01F), 0.0F) < dropChance</code>
+   * Use <code>2.0F</code> for guarantee drop
+   *
+   * @param newChances - the new drop chances to be defined
+   */
+  void setEquiDropChances(float[] newChances);
+
+  /**
+   * Defines the new drop chance for the entity equipment slot.
+   *
+   * <p>
+   *
+   * NOTE: Drop chances follows the vanilla drop chance scheme <code>Math.max(randomFloat - (lootingLevel * 0.01F), 0.0F) < dropChance</code>
+   * Use <code>2.0F</code> for guarantee drop
+   *
+   * @param slot - the equipment slot to set the new drop chance
+   * @param chance - the new drop chance
+   */
+  void setEquipDropChance(ModEquipmentSlot slot, float chance);
 
   /**
    * Shorthand for {@link LivingEntity#getLevel()}.

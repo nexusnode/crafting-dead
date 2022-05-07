@@ -21,6 +21,7 @@ package com.craftingdead.core.world.entity.extension;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.event.LivingExtensionEvent;
 import com.craftingdead.core.network.NetworkChannel;
+import com.craftingdead.core.network.NetworkUtil;
 import com.craftingdead.core.network.message.play.CancelActionMessage;
 import com.craftingdead.core.network.message.play.CrouchMessage;
 import com.craftingdead.core.network.message.play.PerformActionMessage;
@@ -39,12 +40,16 @@ import io.netty.buffer.Unpooled;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import javax.annotation.Nullable;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.FloatTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.world.damagesource.DamageSource;
@@ -102,6 +107,8 @@ class BaseLivingExtension<E extends LivingEntity, H extends LivingHandler>
    */
   protected ItemStack lastHeldStack = null;
 
+  protected float[] equipDropChances = new float[ModEquipmentSlot.values().length];
+
   @Nullable
   private Action action;
 
@@ -122,6 +129,7 @@ class BaseLivingExtension<E extends LivingEntity, H extends LivingHandler>
 
   BaseLivingExtension(E entity) {
     this.entity = entity;
+    Arrays.fill(this.equipDropChances, 2.0F);
   }
 
   @Override
@@ -397,16 +405,18 @@ class BaseLivingExtension<E extends LivingEntity, H extends LivingHandler>
   }
 
   @Override
-  public boolean handleDeathLoot(DamageSource cause, Collection<ItemEntity> drops) {
+  public boolean handleDeathLoot(DamageSource cause, Collection<ItemEntity> drops, int lootingLevel) {
     if (this.handlers.values().stream()
-        .anyMatch(e -> e.handleDeathLoot(cause, drops))) {
+        .anyMatch(e -> e.handleDeathLoot(cause, drops, lootingLevel ))) {
       return true;
     }
 
     if (!this.keepInventory()) {
       for (int i = 0; i < this.itemHandler.getSlots(); i++) {
         var itemStack = this.itemHandler.extractItem(i, Integer.MAX_VALUE, false);
-        if (!itemStack.isEmpty()) {
+        var dropChance = this.equipDropChances[i];
+        if (!itemStack.isEmpty()
+            && Math.max(this.getRandom().nextFloat() - (lootingLevel * 0.01F), 0.0F) < dropChance) {
           var itemEntity = new ItemEntity(this.getLevel(), this.getEntity().getX(),
               this.getEntity().getY(), this.getEntity().getZ(), itemStack);
           itemEntity.setDefaultPickUpDelay();
@@ -486,6 +496,31 @@ class BaseLivingExtension<E extends LivingEntity, H extends LivingHandler>
   }
 
   @Override
+  public float[] getEquipDropChances() {
+    return Arrays.copyOf(this.equipDropChances, this.equipDropChances.length);
+  }
+
+  @Override
+  public float getEquipDropChance(ModEquipmentSlot slot) {
+    return this.equipDropChances[slot.getIndex()];
+  }
+
+  @Override
+  public void setEquiDropChances(float[] newChances) throws IllegalArgumentException {
+    if (newChances.length < this.equipDropChances.length) {
+      throw new IllegalArgumentException(String.format("Missing drop chances. Expected %s but %s was provided.",
+          this.equipDropChances.length, newChances.length));
+    }
+
+    this.equipDropChances = Arrays.copyOf(newChances, this.equipDropChances.length);
+  }
+
+  @Override
+  public void setEquipDropChance(ModEquipmentSlot slot, float chance) {
+    this.equipDropChances[slot.getIndex()] = chance;
+  }
+
+  @Override
   public CompoundTag serializeNBT() {
     var tag = new CompoundTag();
     tag.put("inventory", this.itemHandler.serializeNBT());
@@ -495,6 +530,12 @@ class BaseLivingExtension<E extends LivingEntity, H extends LivingHandler>
         tag.put(entry.getKey().toString(), extensionTag);
       }
     }
+
+    var dropChances = new ListTag();
+    for (float dropChance : this.equipDropChances) {
+      dropChances.add(FloatTag.valueOf(dropChance));
+    }
+    tag.put("dropChances", dropChances);
     return tag;
   }
 
@@ -505,6 +546,14 @@ class BaseLivingExtension<E extends LivingEntity, H extends LivingHandler>
       var extensionTag = tag.getCompound(entry.getKey().toString());
       if (!extensionTag.isEmpty()) {
         entry.getValue().deserializeNBT(extensionTag);
+      }
+    }
+
+    if (tag.contains("dropChances", Tag.TAG_LIST)) {
+      var dropChances = tag.getList("dropChances", Tag.TAG_FLOAT);
+
+      for (int i = 0; i < dropChances.size(); i++) {
+        this.equipDropChances[i] = dropChances.getFloat(i);
       }
     }
   }
@@ -538,6 +587,11 @@ class BaseLivingExtension<E extends LivingEntity, H extends LivingHandler>
     }
     out.writeShort(255);
 
+    out.writeBoolean(writeAll);
+    if (writeAll) {
+      NetworkUtil.writeFloatArray(out, this.equipDropChances);
+    }
+
     // Handlers
     var handlersToSend = writeAll ? this.handlers.entrySet() : this.dirtyHandlers.entrySet();
     out.writeVarInt(handlersToSend.size());
@@ -557,6 +611,11 @@ class BaseLivingExtension<E extends LivingEntity, H extends LivingHandler>
     int slot;
     while ((slot = in.readShort()) != 255) {
       this.itemHandler.setStackInSlot(slot, in.readItem());
+    }
+
+    if (in.readBoolean()) {
+      this.equipDropChances = Arrays.copyOf(NetworkUtil.readFloatArray(in, ModEquipmentSlot.values().length),
+          ModEquipmentSlot.values().length);
     }
 
     // Handlers

@@ -30,6 +30,7 @@ import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
+import org.jetbrains.annotations.NotNull;
 
 public class WeakZombie extends AdvancedZombie {
 
@@ -38,7 +39,7 @@ public class WeakZombie extends AdvancedZombie {
   }
 
 
-  public static AttributeSupplier.Builder registerAttributes() {
+  public static AttributeSupplier.Builder createAttributes() {
     return AdvancedZombie.attributeTemplate()
         .add(Attributes.FOLLOW_RANGE, 25.0D)
         .add(Attributes.MAX_HEALTH, 5.0D)
@@ -48,7 +49,7 @@ public class WeakZombie extends AdvancedZombie {
   @Nullable
   @Override
   public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty,
-      MobSpawnType spawnType, @Nullable SpawnGroupData groupData, @Nullable CompoundTag tag) {
+      @NotNull MobSpawnType spawnType, @Nullable SpawnGroupData groupData, @Nullable CompoundTag tag) {
     groupData = super.finalizeSpawn(level, difficulty, spawnType, groupData, tag);
     if (!level.isClientSide()) {
       Objects.requireNonNull(this.getAttribute(Attributes.MAX_HEALTH))

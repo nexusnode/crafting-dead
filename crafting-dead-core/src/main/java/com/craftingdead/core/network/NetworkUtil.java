@@ -18,6 +18,8 @@
 
 package com.craftingdead.core.network;
 
+import io.netty.handler.codec.DecoderException;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.Entity;
 import net.minecraftforge.common.util.LogicalSidedProvider;
 import net.minecraftforge.network.NetworkEvent;
@@ -57,5 +59,30 @@ public class NetworkUtil {
         .orElseThrow(() -> new IllegalStateException(
             String.format("Entity with ID %s of type %s is absent from client level", entityId,
                 clazz.getName())));
+  }
+
+  public static void writeFloatArray(FriendlyByteBuf buffer, float[] array) {
+    buffer.writeVarInt(array.length);
+    for (float value : array) {
+      buffer.writeFloat(value);
+    }
+  }
+
+  public static float[] readFloatArray(FriendlyByteBuf buffer) {
+    return readFloatArray(buffer, buffer.readableBytes() / 4);
+  }
+
+  public static float[] readFloatArray(FriendlyByteBuf buffer, int maxSize) {
+    int size = buffer.readVarInt();
+    if (size > maxSize) {
+      throw new DecoderException(String.format("Array with size %s is bigger than allowed %s",
+          size, maxSize));
+    }
+
+    var data = new float[size];
+    for (int i = 0; i < data.length; i++) {
+      data[i] = buffer.readFloat();
+    }
+    return data;
   }
 }
