@@ -18,6 +18,8 @@
 
 package com.craftingdead.immerse.world.level.extension;
 
+import com.craftingdead.core.world.entity.extension.LivingExtension;
+import com.craftingdead.immerse.world.level.block.entity.ImmerseBlockEntityTypes;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -101,6 +103,18 @@ public class LegacyBase implements LandOwner {
   public boolean isAllowedToBuild(UUID playerId, BlockPos blockPos) {
     return (this.members.contains(playerId) || this.ownerId.equals(playerId))
         && this.buildRegion.isInside(blockPos);
+  }
+
+  @Override
+  public void playerPlacedBlock(LivingExtension<?, ?> player, BlockPos... blocks) {
+    player.getLevel().getBlockEntity(this.getBlockPos(), ImmerseBlockEntityTypes.BASE_CENTER.get())
+        .ifPresent(base -> base.playerPlacedBlock(player, blocks));
+  }
+
+  @Override
+  public void playerRemovedBlock(LivingExtension<?, ?> player, BlockPos... blocks) {
+    player.getLevel().getBlockEntity(this.getBlockPos(), ImmerseBlockEntityTypes.BASE_CENTER.get())
+        .ifPresent(base -> base.playerRemovedBlock(player, blocks));
   }
 
   public Set<UUID> getMembers() {

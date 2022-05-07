@@ -18,22 +18,29 @@
 
 package com.craftingdead.immerse.world.level.block.entity;
 
-import java.util.UUID;
-import javax.annotation.Nullable;
+import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.immerse.game.survival.SurvivalPlayerHandler;
 import com.craftingdead.immerse.world.level.extension.LandClaim;
 import com.craftingdead.immerse.world.level.extension.LegacyBase;
 import com.craftingdead.immerse.world.level.extension.LevelExtension;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
+import javax.annotation.Nullable;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.IntArrayTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
+import org.jetbrains.annotations.NotNull;
 
 public class BaseCenterBlockEntity extends BlockEntity {
 
@@ -42,6 +49,7 @@ public class BaseCenterBlockEntity extends BlockEntity {
 
   @Nullable
   private UUID baseId;
+  private final Set<BlockPos> playerBlocks = new HashSet<>();
 
   public BaseCenterBlockEntity(BlockPos pos, BlockState state) {
     super(ImmerseBlockEntityTypes.BASE_CENTER.get(), pos, state);
@@ -102,18 +110,51 @@ public class BaseCenterBlockEntity extends BlockEntity {
     }
   }
 
-  @Override
-  protected void saveAdditional(CompoundTag tag) {
-    if (this.baseId != null) {
-      tag.putUUID("baseId", this.baseId);
+  public void playerPlacedBlock(LivingExtension<?, ?> player, BlockPos... posArray) {
+    for (BlockPos pos : posArray) {
+      this.playerBlocks.add(pos.immutable());
     }
   }
 
+  public void playerRemovedBlock(LivingExtension<?, ?> player, BlockPos... posArray) {
+    for (BlockPos pos : posArray) {
+      this.playerBlocks.remove(pos);
+    }
+  }
+
+  public void destroyPlayerBlocks() {
+    LevelExtension.getOrThrow(this.level).getLandManager()
+        .destroyBlocks(this.playerBlocks.toArray(new BlockPos[0]));
+  }
+
   @Override
-  public void load(CompoundTag tag) {
+  protected void saveAdditional(@NotNull CompoundTag tag) {
+    if (this.baseId != null) {
+      tag.putUUID("baseId", this.baseId);
+    }
+
+    var blockList = new ListTag();
+    for (BlockPos pos : playerBlocks) {
+      blockList.add(new IntArrayTag(new int[]{ pos.getX(), pos.getY(), pos.getZ() }));
+    }
+    tag.put("blocks", blockList);
+  }
+
+  @Override
+  public void load(@NotNull CompoundTag tag) {
     super.load(tag);
     if (tag.hasUUID("baseId")) {
       this.baseId = tag.getUUID("baseId");
+    }
+
+    if (tag.contains("blocks")) {
+      var blockList = tag.getList("blocks", Tag.TAG_INT_ARRAY);
+      for (int i = 0; i < blockList.size(); i++) {
+        var pos = blockList.getIntArray(i);
+        if (pos.length == 3) {
+          this.playerBlocks.add(new BlockPos(pos[0], pos[1], pos[2]));
+        }
+      }
     }
   }
 }

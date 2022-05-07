@@ -68,6 +68,13 @@ public interface LandManager extends AutoCloseable {
    */
   CompletionStage<Boolean> removeLandClaim(LandClaim landClaim);
 
+  /**
+   * Enqueue blocks for destruction. They will be split into several ticks to avoid a server freeze
+   *
+   * @param toDestroy - position of all blocks that must be destroyed
+   */
+  CompletionStage<Void> destroyBlocks(BlockPos... toDestroy);
+
   @Nullable
   LandClaim getLandClaimAt(BlockPos blockPos);
 

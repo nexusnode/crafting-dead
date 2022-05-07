@@ -18,6 +18,8 @@
 
 package com.craftingdead.immerse.game.survival;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import javax.annotation.Nullable;
@@ -28,6 +30,7 @@ import com.craftingdead.core.world.entity.extension.PlayerHandler;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.world.level.extension.LegacyBase;
 import com.craftingdead.immerse.world.level.extension.LevelExtension;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -37,6 +40,9 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.monster.Zombie;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.common.util.BlockSnapshot;
+import org.apache.commons.lang3.mutable.MutableInt;
 
 public class SurvivalPlayerHandler implements PlayerHandler {
 
@@ -135,6 +141,42 @@ public class SurvivalPlayerHandler implements PlayerHandler {
         this.setPlayersKilled(extension.getPlayersKilled());
       });
     }
+  }
+
+  @Override
+  public boolean handleBlockBreak(BlockPos pos, BlockState block, MutableInt xp) {
+    LevelExtension.getOrThrow(player.getLevel()).getLandManager()
+        .getLandOwnerAt(pos)
+        .ifPresent(base -> base.playerRemovedBlock(player, pos));
+    return false;
+  }
+
+  @Override
+  public boolean handleBlockPlace(BlockSnapshot replacedBlock, BlockState placedBlock,
+      BlockState placedAgainst) {
+    LevelExtension.getOrThrow(player.getLevel()).getLandManager()
+        .getLandOwnerAt(replacedBlock.getPos())
+        .ifPresent(base -> base.playerPlacedBlock(player, replacedBlock.getPos()));
+    return false;
+  }
+
+  @Override
+  public boolean handleMultiBlockPlace(List<BlockSnapshot> replacedBlocks, BlockState placedBlock,
+      BlockState placedAgainst) {
+    var pos = new ArrayList<BlockPos>(replacedBlocks.size());
+    for (BlockSnapshot block : replacedBlocks) {
+      // Work around neighbours updating their state when you place a block but not actually being replaced
+      if (!block.getCurrentBlock().is(block.getReplacedBlock().getBlock())) {
+        pos.add(block.getPos());
+      }
+    }
+
+    // Use the first replaced block as point of reference
+    var refBlock = pos.get(0);
+    LevelExtension.getOrThrow(player.getLevel()).getLandManager()
+        .getLandOwnerAt(refBlock)
+        .ifPresent(base -> base.playerPlacedBlock(player, pos.toArray(new BlockPos[0])));
+    return false;
   }
 
   @Override

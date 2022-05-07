@@ -18,12 +18,12 @@
 
 package com.craftingdead.immerse.world.action;
 
-import java.util.List;
-import javax.annotation.Nullable;
 import com.craftingdead.core.world.action.ActionObserver;
 import com.craftingdead.core.world.action.ProgressBar;
 import com.craftingdead.core.world.action.item.ItemAction;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
+import java.util.List;
+import javax.annotation.Nullable;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
@@ -111,6 +111,7 @@ public abstract class BuildAction extends ItemAction {
 
     blockState.getBlock().setPlacedBy(level, blockPos, blockState,
         this.getPerformer().getEntity(), this.getItemStack());
+    this.getType().getBlockPlacementHandler().accept(this.performer, blockPos);
     if (this.performer.getEntity() instanceof ServerPlayer player) {
       CriteriaTriggers.PLACED_BLOCK.trigger(player, blockPos, this.getItemStack());
     }

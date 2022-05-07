@@ -18,6 +18,7 @@
 
 package com.craftingdead.immerse.world.level.extension;
 
+import com.craftingdead.core.world.entity.extension.LivingExtension;
 import java.util.UUID;
 import com.mojang.serialization.Codec;
 import net.minecraft.core.BlockPos;
@@ -42,6 +43,10 @@ public interface LandOwner {
   }
 
   boolean isAllowedToBuild(UUID playerId, BlockPos blockPos);
+
+  void playerPlacedBlock(LivingExtension<?, ?> player, BlockPos... blocks);
+
+  void playerRemovedBlock(LivingExtension<?, ?> player, BlockPos... blocks);
 
   CompoundTag getUpdateTag();
 
