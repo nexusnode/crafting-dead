@@ -16,22 +16,20 @@
  * https://craftingdead.net/terms.php
  */
 
-package com.craftingdead.core.util;
+package com.craftingdead.core.world.item.gun.aimable;
 
-import com.google.common.base.Suppliers;
-import java.util.Optional;
-import java.util.function.Supplier;
-import javax.annotation.Nullable;
-import org.jetbrains.annotations.NotNull;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 
-public class FunctionalUtil {
+/**
+ * @param boltAction - Whether the gun has bolt action
+ */
+public record AimAttributes(boolean boltAction) {
 
-  public static <T> Optional<T> optional(@Nullable Supplier<T> supplier) {
-    return Optional.ofNullable(supplier).map(Supplier::get);
-  }
-
-  // Java is not that smart with implicit casting the google commons supplier to java util supplier
-  public static <T> Supplier<T> supplier(@NotNull T instance) {
-    return Suppliers.ofInstance(instance);
-  }
+  public static final Codec<AimAttributes> CODEC =
+      RecordCodecBuilder.create(instance -> instance
+          .group(Codec.BOOL
+              .optionalFieldOf("bolt_action", false)
+              .forGetter(AimAttributes::boltAction))
+          .apply(instance, AimAttributes::new));
 }

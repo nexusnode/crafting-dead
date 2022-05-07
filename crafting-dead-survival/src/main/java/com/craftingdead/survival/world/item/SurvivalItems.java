@@ -38,7 +38,7 @@ import net.minecraftforge.registries.RegistryObject;
 
 public class SurvivalItems {
 
-  public static final DeferredRegister<Item> ITEMS =
+  public static final DeferredRegister<Item> deferredRegister =
       DeferredRegister.create(ForgeRegistries.ITEMS, CraftingDeadSurvival.ID);
 
   public static final CreativeModeTab TAB = new CreativeModeTab(CraftingDeadSurvival.ID) {
@@ -54,58 +54,58 @@ public class SurvivalItems {
   // ================================================================================
 
   public static final RegistryObject<Item> MILITARY_LOOT_ITEM =
-      ITEMS.register("military_loot",
+      deferredRegister.register("military_loot",
           () -> new BlockItem(SurvivalBlocks.MILITARY_LOOT.get(), new Item.Properties()
               .rarity(Rarity.EPIC)
               .tab(TAB)));
 
   public static final RegistryObject<Item> MEDIC_LOOT_ITEM =
-      ITEMS.register("medic_loot",
+      deferredRegister.register("medic_loot",
           () -> new BlockItem(SurvivalBlocks.MEDICAL_LOOT.get(), new Item.Properties()
               .rarity(Rarity.EPIC)
               .tab(TAB)));
 
   public static final RegistryObject<Item> CIVILIAN_LOOT_ITEM =
-      ITEMS.register("civilian_loot",
+      deferredRegister.register("civilian_loot",
           () -> new BlockItem(SurvivalBlocks.CIVILIAN_LOOT.get(), new Item.Properties()
               .rarity(Rarity.EPIC)
               .tab(TAB)));
 
   public static final RegistryObject<Item> CIVILIAN_RARE_LOOT_ITEM =
-      ITEMS.register("civilian_rare_loot",
+      deferredRegister.register("civilian_rare_loot",
           () -> new BlockItem(SurvivalBlocks.RARE_CIVILIAN_LOOT.get(), new Item.Properties()
               .rarity(Rarity.EPIC)
               .tab(TAB)));
 
   public static final RegistryObject<Item> POLICE_LOOT_ITEM =
-      ITEMS.register("police_loot",
+      deferredRegister.register("police_loot",
           () -> new BlockItem(SurvivalBlocks.POLICE_LOOT.get(), new Item.Properties()
               .rarity(Rarity.EPIC)
               .tab(TAB)));
 
   public static final RegistryObject<Item> MILITARY_LOOT_GEN_ITEM =
-      ITEMS.register("military_loot_gen",
+      deferredRegister.register("military_loot_gen",
           () -> new BlockItem(SurvivalBlocks.MILITARY_LOOT_GENERATOR.get(), new Item.Properties()
               .tab(TAB)));
 
   public static final RegistryObject<Item> MEDIC_LOOT_GEN_ITEM =
-      ITEMS.register("medic_loot_gen",
+      deferredRegister.register("medic_loot_gen",
           () -> new BlockItem(SurvivalBlocks.MEDICAL_LOOT_GENERATOR.get(), new Item.Properties()
               .tab(TAB)));
 
   public static final RegistryObject<Item> CIVILIAN_LOOT_GEN_ITEM =
-      ITEMS.register("civilian_loot_gen",
+      deferredRegister.register("civilian_loot_gen",
           () -> new BlockItem(SurvivalBlocks.CIVILIAN_LOOT_GENERATOR.get(), new Item.Properties()
               .tab(TAB)));
 
   public static final RegistryObject<Item> CIVILIAN_RARE_LOOT_GEN_ITEM =
-      ITEMS.register("civilian_rare_loot_gen",
+      deferredRegister.register("civilian_rare_loot_gen",
           () -> new BlockItem(SurvivalBlocks.RARE_CIVILIAN_LOOT_GENERATOR.get(),
               new Item.Properties()
                   .tab(TAB)));
 
   public static final RegistryObject<Item> POLICE_LOOT_GEN_ITEM =
-      ITEMS.register("police_loot_gen",
+      deferredRegister.register("police_loot_gen",
           () -> new BlockItem(SurvivalBlocks.POLICE_LOOT_GENERATOR.get(), new Item.Properties()
               .tab(TAB)));
 
@@ -114,7 +114,7 @@ public class SurvivalItems {
   // ================================================================================
 
   public static final RegistryObject<Item> MEDICAL_DROP_RADIO =
-      ITEMS.register("medical_drop_radio",
+      deferredRegister.register("medical_drop_radio",
           () -> new SupplyDropRadioItem(
               (SupplyDropRadioItem.Properties) new SupplyDropRadioItem.Properties()
                   .setLootTable(BuiltInLootTables.MEDICAL_SUPPLY_DROP)
@@ -122,7 +122,7 @@ public class SurvivalItems {
                   .tab(TAB)));
 
   public static final RegistryObject<Item> MILITARY_DROP_RADIO =
-      ITEMS.register("military_drop_radio",
+      deferredRegister.register("military_drop_radio",
           () -> new SupplyDropRadioItem(
               (SupplyDropRadioItem.Properties) new SupplyDropRadioItem.Properties()
                   .setLootTable(BuiltInLootTables.MILITARY_SUPPLY_DROP)
@@ -133,33 +133,33 @@ public class SurvivalItems {
   // Virus
   // ================================================================================
 
-  public static final RegistryObject<GrenadeItem> PIPE_BOMB = ITEMS.register("pipe_bomb",
+  public static final RegistryObject<GrenadeItem> PIPE_BOMB = deferredRegister.register("pipe_bomb",
       () -> new GrenadeItem((GrenadeItem.Properties) new GrenadeItem.Properties()
           .setGrenadeEntitySupplier(PipeBomb::new)
           .setEnabledSupplier(CraftingDeadSurvival.serverConfig.pipeBombEnabled::get)
           .stacksTo(3)
           .tab(TAB)));
 
-  public static final RegistryObject<Item> DIRTY_RAG = ITEMS.register("dirty_rag",
+  public static final RegistryObject<Item> DIRTY_RAG = deferredRegister.register("dirty_rag",
       () -> new ActionItem(SurvivalActionTypes.WASH_RAG, new Item.Properties().tab(TAB)));
 
-  public static final RegistryObject<Item> BLOODY_RAG = ITEMS.register("bloody_rag",
+  public static final RegistryObject<Item> BLOODY_RAG = deferredRegister.register("bloody_rag",
       () -> new ActionItem(SurvivalActionTypes.WASH_RAG, new Item.Properties().tab(TAB)));
 
-  public static final RegistryObject<Item> CLEAN_RAG = ITEMS.register("clean_rag",
+  public static final RegistryObject<Item> CLEAN_RAG = deferredRegister.register("clean_rag",
       () -> new ActionItem(SurvivalActionTypes.USE_CLEAN_RAG, new Item.Properties().tab(TAB)));
 
-  public static final RegistryObject<Item> SPLINT = ITEMS.register("splint",
+  public static final RegistryObject<Item> SPLINT = deferredRegister.register("splint",
       () -> new ActionItem(SurvivalActionTypes.USE_SPLINT, new Item.Properties()
           .stacksTo(1)
           .tab(TAB)));
 
-  public static final RegistryObject<Item> RBI_SYRINGE = ITEMS.register("rbi_syringe",
+  public static final RegistryObject<Item> RBI_SYRINGE = deferredRegister.register("rbi_syringe",
       () -> new ActionItem(SurvivalActionTypes.USE_RBI_SYRINGE, new ActionItem.Properties()
           .stacksTo(1)
           .tab(TAB)));
 
-  public static final RegistryObject<Item> CURE_SYRINGE = ITEMS.register("cure_syringe",
+  public static final RegistryObject<Item> CURE_SYRINGE = deferredRegister.register("cure_syringe",
       () -> new ActionItem(SurvivalActionTypes.USE_CURE_SYRINGE, new ActionItem.Properties()
           .stacksTo(1)
           .tab(TAB)));
@@ -169,32 +169,32 @@ public class SurvivalItems {
   // ================================================================================
 
   public static final RegistryObject<Item> ADVANCED_ZOMBIE_SPAWN_EGG =
-      ITEMS.register("advanced_zombie_spawn_egg",
+      deferredRegister.register("advanced_zombie_spawn_egg",
           () -> new ForgeSpawnEggItem(SurvivalEntityTypes.ADVANCED_ZOMBIE, 0x000000, 0xFFFFFF,
               new Item.Properties().tab(TAB)));
 
   public static final RegistryObject<Item> FAST_ZOMBIE_SPAWN_EGG =
-      ITEMS.register("fast_zombie_spawn_egg",
+      deferredRegister.register("fast_zombie_spawn_egg",
           () -> new ForgeSpawnEggItem(SurvivalEntityTypes.FAST_ZOMBIE, 0x000000, 0xFFFFFF,
               new Item.Properties().tab(TAB)));
 
   public static final RegistryObject<Item> TANK_ZOMBIE_SPAWN_EGG =
-      ITEMS.register("tank_zombie_spawn_egg",
+      deferredRegister.register("tank_zombie_spawn_egg",
           () -> new ForgeSpawnEggItem(SurvivalEntityTypes.TANK_ZOMBIE, 0x000000, 0xFFFFFF,
               new Item.Properties().tab(TAB)));
 
   public static final RegistryObject<Item> WEAK_ZOMBIE_SPAWN_EGG =
-      ITEMS.register("weak_zombie_spawn_egg",
+      deferredRegister.register("weak_zombie_spawn_egg",
           () -> new ForgeSpawnEggItem(SurvivalEntityTypes.WEAK_ZOMBIE, 0x000000, 0xFFFFFF,
               new Item.Properties().tab(TAB)));
 
   public static final RegistryObject<Item> POLICE_ZOMBIE_SPAWN_EGG =
-      ITEMS.register("police_zombie_spawn_egg",
+      deferredRegister.register("police_zombie_spawn_egg",
           () -> new ForgeSpawnEggItem(SurvivalEntityTypes.POLICE_ZOMBIE, 0x000000, 0xFFFFFF,
               new Item.Properties().tab(TAB)));
 
   public static final RegistryObject<Item> DOCTOR_ZOMBIE_SPAWN_EGG =
-      ITEMS.register("doctor_zombie_spawn_egg",
+      deferredRegister.register("doctor_zombie_spawn_egg",
           () -> new ForgeSpawnEggItem(SurvivalEntityTypes.DOCTOR_ZOMBIE, 0x000000, 0xFFFFFF,
               new Item.Properties().tab(TAB)));
 }

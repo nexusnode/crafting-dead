@@ -16,10 +16,11 @@
  * https://craftingdead.net/terms.php
  */
 
-package com.craftingdead.core.world.item.gun.ammoprovider;
+package com.craftingdead.core.world.item.gun;
 
 import java.util.function.Supplier;
 import com.craftingdead.core.CraftingDead;
+import com.craftingdead.core.world.item.gun.aimable.AimableGunType;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -28,22 +29,20 @@ import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.RegistryBuilder;
 import net.minecraftforge.registries.RegistryObject;
 
-public class AmmoProviderTypes {
+public class GunTypeFactories {
 
-  public static final ResourceKey<Registry<AmmoProviderType>> REGISTRY_KEY =
-      ResourceKey.createRegistryKey(new ResourceLocation(CraftingDead.ID, "ammo_provider_type"));
+  public static final ResourceKey<Registry<GunTypeFactory>> REGISTRY_KEY =
+      ResourceKey.createRegistryKey(new ResourceLocation(CraftingDead.ID, "gun_type_factory"));
 
-  public static final DeferredRegister<AmmoProviderType> deferredRegister =
+  public static final DeferredRegister<GunTypeFactory> deferredRegister =
       DeferredRegister.create(REGISTRY_KEY, CraftingDead.ID);
 
-  public static final Supplier<IForgeRegistry<AmmoProviderType>> registry =
-      deferredRegister.makeRegistry(AmmoProviderType.class, RegistryBuilder::new);
+  public static final Supplier<IForgeRegistry<GunTypeFactory>> registry =
+      deferredRegister.makeRegistry(GunTypeFactory.class, RegistryBuilder::new);
 
-  public static final RegistryObject<AmmoProviderType> MAGAZINE =
-      deferredRegister.register("magazine",
-          () -> new AmmoProviderType(MagazineAmmoProvider::new));
+  public static final RegistryObject<GunTypeFactory> SIMPLE = deferredRegister.register("simple",
+      () -> new GunTypeFactory(GunType.DIRECT_CODEC));
 
-  public static final RegistryObject<AmmoProviderType> REFILLABLE =
-      deferredRegister.register("refillable",
-          () -> new AmmoProviderType(RefillableAmmoProvider::new));
+  public static final RegistryObject<GunTypeFactory> AIMABLE = deferredRegister.register("aimable",
+      () -> new GunTypeFactory(AimableGunType.DIRECT_CODEC));
 }

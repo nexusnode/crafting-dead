@@ -20,6 +20,7 @@ package com.craftingdead.survival.world.action;
 
 import com.craftingdead.core.capability.CapabilityUtil;
 import com.craftingdead.core.world.action.ActionType;
+import com.craftingdead.core.world.action.ActionTypes;
 import com.craftingdead.core.world.action.TargetSelector;
 import com.craftingdead.core.world.action.item.BlockItemActionType;
 import com.craftingdead.core.world.action.item.EntityItemActionType;
@@ -39,13 +40,11 @@ import net.minecraftforge.registries.RegistryObject;
 
 public class SurvivalActionTypes {
 
-  @SuppressWarnings("unchecked")
-  public static final DeferredRegister<ActionType<?>> ACTION_TYPES =
-      DeferredRegister.create((Class<ActionType<?>>) (Object) ActionType.class,
-          CraftingDeadSurvival.ID);
+  public static final DeferredRegister<ActionType<?>> deferredRegister =
+      DeferredRegister.create(ActionTypes.REGISTRY_KEY, CraftingDeadSurvival.ID);
 
   public static final RegistryObject<EntityItemActionType<?>> SHRED_CLOTHING =
-      ACTION_TYPES.register("shred_clothing",
+      deferredRegister.register("shred_clothing",
           () -> EntityItemActionType.builder(TargetSelector.SELF_ONLY)
               .forItem(CapabilityUtil.capabilityPresent(Clothing.CAPABILITY))
               .customAction((performer, target) -> {
@@ -65,14 +64,14 @@ public class SurvivalActionTypes {
               .build());
 
   public static final RegistryObject<EntityItemActionType<?>> USE_SPLINT =
-      ACTION_TYPES.register("use_splint",
+      deferredRegister.register("use_splint",
           () -> EntityItemActionType
               .builder(TargetSelector.SELF_OR_OTHERS.hasEffect(SurvivalMobEffects.BROKEN_LEG))
               .forItem(SurvivalItems.SPLINT)
               .build());
 
   public static final RegistryObject<EntityItemActionType<?>> USE_CLEAN_RAG =
-      ACTION_TYPES.register("use_clean_rag",
+      deferredRegister.register("use_clean_rag",
           () -> EntityItemActionType
               .builder(TargetSelector.SELF_OR_OTHERS.hasEffect(SurvivalMobEffects.BLEEDING))
               .forItem(SurvivalItems.CLEAN_RAG)
@@ -81,7 +80,7 @@ public class SurvivalActionTypes {
               .build());
 
   public static final RegistryObject<BlockItemActionType> WASH_RAG =
-      ACTION_TYPES.register("wash_rag",
+      deferredRegister.register("wash_rag",
           () -> BlockItemActionType.builder()
               .forItem(itemStack -> itemStack.is(SurvivalItems.DIRTY_RAG.get())
                   || itemStack.is(SurvivalItems.BLOODY_RAG.get()))
@@ -92,7 +91,7 @@ public class SurvivalActionTypes {
               .build());
 
   public static final RegistryObject<EntityItemActionType<?>> USE_SYRINGE_ON_ZOMBIE =
-      ACTION_TYPES.register("use_syringe_on_zombie",
+      deferredRegister.register("use_syringe_on_zombie",
           () -> EntityItemActionType.builder(TargetSelector.OTHERS_ONLY.ofEntityType(Zombie.class))
               .forItem(ModItems.SYRINGE)
               .duration(16)
@@ -102,7 +101,7 @@ public class SurvivalActionTypes {
               .build());
 
   public static final RegistryObject<EntityItemActionType<?>> USE_CURE_SYRINGE =
-      ACTION_TYPES.register("use_cure_syringe",
+      deferredRegister.register("use_cure_syringe",
           () -> EntityItemActionType.builder(TargetSelector.SELF_OR_OTHERS)
               .forItem(SurvivalItems.CURE_SYRINGE)
               .duration(16)
@@ -110,7 +109,7 @@ public class SurvivalActionTypes {
               .build());
 
   public static final RegistryObject<EntityItemActionType<?>> USE_RBI_SYRINGE =
-      ACTION_TYPES.register("use_rbi_syringe",
+      deferredRegister.register("use_rbi_syringe",
           () -> EntityItemActionType.builder(TargetSelector.SELF_OR_OTHERS)
               .forItem(SurvivalItems.RBI_SYRINGE)
               .duration(16)

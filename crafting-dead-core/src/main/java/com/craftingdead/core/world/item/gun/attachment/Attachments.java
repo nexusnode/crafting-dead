@@ -18,10 +18,13 @@
 
 package com.craftingdead.core.world.item.gun.attachment;
 
+import java.util.function.Supplier;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.world.inventory.GunCraftSlotType;
 import com.craftingdead.core.world.item.ModItems;
-import net.minecraftforge.common.util.Lazy;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.RegistryBuilder;
@@ -29,14 +32,17 @@ import net.minecraftforge.registries.RegistryObject;
 
 public class Attachments {
 
-  public static final DeferredRegister<Attachment> ATTACHMENTS =
-      DeferredRegister.create(Attachment.class, CraftingDead.ID);
+  public static final ResourceKey<Registry<Attachment>> REGISTRY_KEY =
+      ResourceKey.createRegistryKey(new ResourceLocation(CraftingDead.ID, "attachment"));
 
-  public static final Lazy<IForgeRegistry<Attachment>> REGISTRY =
-      Lazy.of(ATTACHMENTS.makeRegistry("attachment", RegistryBuilder::new));
+  public static final DeferredRegister<Attachment> deferredRegister =
+      DeferredRegister.create(REGISTRY_KEY, CraftingDead.ID);
+
+  public static final Supplier<IForgeRegistry<Attachment>> registry =
+      deferredRegister.makeRegistry(Attachment.class, RegistryBuilder::new);
 
   public static final RegistryObject<Attachment> RED_DOT_SIGHT =
-      ATTACHMENTS.register("red_dot_sight",
+      deferredRegister.register("red_dot_sight",
           () -> Attachment.builder()
               .addMultiplier(Attachment.MultiplierType.ZOOM, 2.5F)
               .setInventorySlot(GunCraftSlotType.OVERBARREL_ATTACHMENT)
@@ -44,7 +50,7 @@ public class Attachments {
               .build());
 
   public static final RegistryObject<Attachment> ACOG_SIGHT =
-      ATTACHMENTS.register("acog_sight",
+      deferredRegister.register("acog_sight",
           () -> Attachment.builder()
               .addMultiplier(Attachment.MultiplierType.ZOOM, 3.25F)
               .setInventorySlot(GunCraftSlotType.OVERBARREL_ATTACHMENT)
@@ -52,7 +58,7 @@ public class Attachments {
               .build());
 
   public static final RegistryObject<Attachment> LP_SCOPE =
-      ATTACHMENTS.register("lp_scope",
+      deferredRegister.register("lp_scope",
           () -> Attachment.builder()
               .addMultiplier(Attachment.MultiplierType.ZOOM, 5.0F)
               .setInventorySlot(GunCraftSlotType.OVERBARREL_ATTACHMENT)
@@ -61,7 +67,7 @@ public class Attachments {
               .build());
 
   public static final RegistryObject<Attachment> HP_SCOPE =
-      ATTACHMENTS.register("hp_scope",
+      deferredRegister.register("hp_scope",
           () -> Attachment.builder()
               .addMultiplier(Attachment.MultiplierType.ZOOM, 8.0F)
               .setInventorySlot(GunCraftSlotType.OVERBARREL_ATTACHMENT)
@@ -70,7 +76,7 @@ public class Attachments {
               .build());
 
   public static final RegistryObject<Attachment> SUPPRESSOR =
-      ATTACHMENTS.register("suppressor",
+      deferredRegister.register("suppressor",
           () -> Attachment.builder()
               .setInventorySlot(GunCraftSlotType.MUZZLE_ATTACHMENT)
               .setSoundSuppressor(true)
@@ -78,7 +84,7 @@ public class Attachments {
               .build());
 
   public static final RegistryObject<Attachment> TACTICAL_GRIP =
-      ATTACHMENTS.register("tactical_grip",
+      deferredRegister.register("tactical_grip",
           () -> Attachment.builder()
               .addMultiplier(Attachment.MultiplierType.ACCURACY, 1.15F)
               .setInventorySlot(GunCraftSlotType.UNDERBARREL_ATTACHMENT)
@@ -86,7 +92,7 @@ public class Attachments {
               .build());
 
   public static final RegistryObject<Attachment> BIPOD =
-      ATTACHMENTS.register("bipod",
+      deferredRegister.register("bipod",
           () -> Attachment.builder()
               .addMultiplier(Attachment.MultiplierType.ACCURACY, 1.05F)
               .setInventorySlot(GunCraftSlotType.UNDERBARREL_ATTACHMENT)
@@ -94,7 +100,7 @@ public class Attachments {
               .build());
 
   public static final RegistryObject<Attachment> EOTECH_SIGHT =
-      ATTACHMENTS.register("eotech_sight",
+      deferredRegister.register("eotech_sight",
           () -> Attachment.builder()
               .addMultiplier(Attachment.MultiplierType.ZOOM, 2.5F)
               .setInventorySlot(GunCraftSlotType.OVERBARREL_ATTACHMENT)

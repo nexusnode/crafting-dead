@@ -1063,7 +1063,7 @@ public class SurvivalBlockLootTables extends BlockLoot {
 
   @Override
   protected Iterable<Block> getKnownBlocks() {
-    return SurvivalBlocks.BLOCKS.getEntries().stream()
+    return SurvivalBlocks.deferredRegister.getEntries().stream()
         .map(RegistryObject::get)
         .collect(Collectors.toSet());
   }

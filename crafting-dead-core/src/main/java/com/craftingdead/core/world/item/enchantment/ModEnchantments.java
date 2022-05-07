@@ -27,11 +27,11 @@ import net.minecraftforge.registries.RegistryObject;
 
 public class ModEnchantments {
 
-  public static final DeferredRegister<Enchantment> ENCHANTMENTS =
+  public static final DeferredRegister<Enchantment> deferredRegister =
       DeferredRegister.create(ForgeRegistries.ENCHANTMENTS, CraftingDead.ID);
 
   public static final RegistryObject<ArmorPenetrationEnchantment> ARMOR_PENETRATION =
-      ENCHANTMENTS.register("armor_penetration",
+      deferredRegister.register("armor_penetration",
           () -> new ArmorPenetrationEnchantment(Enchantment.Rarity.COMMON,
               EquipmentSlot.MAINHAND));
 }

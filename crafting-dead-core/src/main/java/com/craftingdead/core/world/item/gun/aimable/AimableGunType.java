@@ -21,22 +21,46 @@ package com.craftingdead.core.world.item.gun.aimable;
 import com.craftingdead.core.capability.CapabilityUtil;
 import com.craftingdead.core.world.item.combatslot.CombatSlotProvider;
 import com.craftingdead.core.world.item.gun.Gun;
-import com.craftingdead.core.world.item.gun.GunItem;
+import com.craftingdead.core.world.item.gun.GunType;
+import com.craftingdead.core.world.item.gun.GunTypeFactories;
+import com.craftingdead.core.world.item.gun.GunTypeFactory;
 import com.craftingdead.core.world.item.scope.Scope;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 
-public class AimableGunItem extends GunItem {
+public class AimableGunType extends GunType {
 
-  /**
-   * Whether the gun has bolt action
-   */
-  private final boolean boltAction;
+  public static final Codec<AimableGunType> DIRECT_CODEC =
+      RecordCodecBuilder.create(instance -> instance
+          .group(
+              GeneralAttributes.CODEC
+                  .fieldOf("general_attributes")
+                  .forGetter(AimableGunType::getAttributes),
+              Sounds.CODEC
+                  .fieldOf("sounds")
+                  .forGetter(AimableGunType::getSounds),
+              AimAttributes.CODEC
+                  .optionalFieldOf("aim_attributes", new AimAttributes(false))
+                  .forGetter(AimableGunType::getAimAttributes))
+          .apply(instance, AimableGunType::new));
 
-  protected AimableGunItem(Builder builder) {
+  private final AimAttributes aimAttributes;
+
+  private AimableGunType(GeneralAttributes attributes, Sounds sounds, AimAttributes aimAttributes) {
+    super(attributes, sounds);
+    this.aimAttributes = aimAttributes;
+  }
+
+  protected AimableGunType(Builder builder) {
     super(builder);
-    this.boltAction = builder.boltAction;
+    this.aimAttributes = new AimAttributes(builder.boltAction);
+  }
+
+  public AimAttributes getAimAttributes() {
+    return this.aimAttributes;
   }
 
   @Override
@@ -47,19 +71,24 @@ public class AimableGunItem extends GunItem {
   }
 
   public boolean hasBoltAction() {
-    return this.boltAction;
+    return this.aimAttributes.boltAction();
   }
 
   public static Builder builder() {
     return new Builder();
   }
 
-  public static class Builder extends GunItem.Builder<Builder> {
+  @Override
+  public GunTypeFactory getFactory() {
+    return GunTypeFactories.AIMABLE.get();
+  }
+
+  public static class Builder extends GunType.Builder<Builder> {
 
     private boolean boltAction = false;
 
     private Builder() {
-      super(AimableGunItem::new);
+      super(AimableGunType::new);
     }
 
     public Builder setBoltAction(boolean boltAction) {

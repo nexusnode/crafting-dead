@@ -33,66 +33,66 @@ import net.minecraftforge.registries.RegistryObject;
 
 public class SurvivalBlocks {
 
-  public static final DeferredRegister<Block> BLOCKS =
+  public static final DeferredRegister<Block> deferredRegister =
       DeferredRegister.create(ForgeRegistries.BLOCKS, CraftingDeadSurvival.ID);
 
   public static final RegistryObject<Block> MILITARY_LOOT =
-      BLOCKS.register("military_loot",
+      deferredRegister.register("military_loot",
           () -> new LootBlock(BlockBehaviour.Properties.of(Material.STONE)
               .strength(5.0F, 5.0F)
               .noOcclusion()));
 
   public static final RegistryObject<Block> MEDICAL_LOOT =
-      BLOCKS.register("medic_loot",
+      deferredRegister.register("medic_loot",
           () -> new LootBlock(BlockBehaviour.Properties.of(Material.STONE)
               .strength(5.0F, 5.0F)
               .noOcclusion()));
 
   public static final RegistryObject<Block> CIVILIAN_LOOT =
-      BLOCKS.register("civilian_loot",
+      deferredRegister.register("civilian_loot",
           () -> new LootBlock(BlockBehaviour.Properties.of(Material.STONE)
               .strength(5.0F, 5.0F)
               .noOcclusion()));
 
   public static final RegistryObject<Block> RARE_CIVILIAN_LOOT =
-      BLOCKS.register("civilian_rare_loot",
+      deferredRegister.register("civilian_rare_loot",
           () -> new LootBlock(BlockBehaviour.Properties.of(Material.STONE)
               .strength(5.0F, 5.0F)
               .noOcclusion()));
 
   public static final RegistryObject<Block> POLICE_LOOT =
-      BLOCKS.register("police_loot",
+      deferredRegister.register("police_loot",
           () -> new LootBlock(BlockBehaviour.Properties.of(Material.STONE)
               .strength(5.0F, 5.0F)
               .noOcclusion()));
 
   public static final RegistryObject<Block> MILITARY_LOOT_GENERATOR =
-      BLOCKS.register("military_loot_gen",
+      deferredRegister.register("military_loot_gen",
           () -> lootGenerator(MILITARY_LOOT, SurvivalParticleTypes.MILITARY_LOOT_GEN,
               CraftingDeadSurvival.serverConfig.militaryLootRefreshDelayTicks::get,
               CraftingDeadSurvival.serverConfig.militaryLootEnabled::get));
 
   public static final RegistryObject<Block> MEDICAL_LOOT_GENERATOR =
-      BLOCKS.register("medic_loot_gen",
+      deferredRegister.register("medic_loot_gen",
           () -> lootGenerator(MEDICAL_LOOT, SurvivalParticleTypes.MEDIC_LOOT_GEN,
               CraftingDeadSurvival.serverConfig.medicalLootRefreshDelayTicks::get,
               CraftingDeadSurvival.serverConfig.medicalLootEnabled::get));
 
   public static final RegistryObject<Block> CIVILIAN_LOOT_GENERATOR =
-      BLOCKS.register("civilian_loot_gen",
+      deferredRegister.register("civilian_loot_gen",
           () -> lootGenerator(CIVILIAN_LOOT, SurvivalParticleTypes.CIVILIAN_LOOT_GEN,
               CraftingDeadSurvival.serverConfig.civilianLootRefreshDelayTicks::get,
               CraftingDeadSurvival.serverConfig.civilianLootEnabled::get));
 
   public static final RegistryObject<Block> RARE_CIVILIAN_LOOT_GENERATOR =
-      BLOCKS.register("civilian_rare_loot_gen",
+      deferredRegister.register("civilian_rare_loot_gen",
           () -> lootGenerator(RARE_CIVILIAN_LOOT,
               SurvivalParticleTypes.CIVILIAN_RARE_LOOT_GEN,
               CraftingDeadSurvival.serverConfig.rareCivilianLootRefreshDelayTicks::get,
               CraftingDeadSurvival.serverConfig.rareCivilianLootEnabled::get));
 
   public static final RegistryObject<Block> POLICE_LOOT_GENERATOR =
-      BLOCKS.register("police_loot_gen",
+      deferredRegister.register("police_loot_gen",
           () -> lootGenerator(POLICE_LOOT, SurvivalParticleTypes.POLICE_LOOT_GEN,
               CraftingDeadSurvival.serverConfig.policeLootRefreshDelayTicks::get,
               CraftingDeadSurvival.serverConfig.policeLootEnabled::get));

@@ -18,10 +18,13 @@
 
 package com.craftingdead.immerse.game.module;
 
+import java.util.function.Supplier;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.game.module.shop.ShopNetworkProtocol;
 import com.craftingdead.immerse.game.network.NetworkProtocol;
-import net.minecraftforge.common.util.Lazy;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.RegistryBuilder;
@@ -29,15 +32,18 @@ import net.minecraftforge.registries.RegistryObject;
 
 public class ModuleTypes {
 
-  public static final DeferredRegister<ModuleType> moduleTypes =
-      DeferredRegister.create(ModuleType.class, CraftingDeadImmerse.ID);
+  public static final ResourceKey<Registry<ModuleType>> REGISTRY_KEY =
+      ResourceKey.createRegistryKey(new ResourceLocation(CraftingDeadImmerse.ID, "module_type"));
 
-  public static final Lazy<IForgeRegistry<ModuleType>> REGISTRY =
-      Lazy.of(moduleTypes.makeRegistry("module_types", RegistryBuilder::new));
+  public static final DeferredRegister<ModuleType> deferredRegister =
+      DeferredRegister.create(REGISTRY_KEY, CraftingDeadImmerse.ID);
+
+  public static final Supplier<IForgeRegistry<ModuleType>> registry =
+      deferredRegister.makeRegistry(ModuleType.class, RegistryBuilder::new);
 
   public static final RegistryObject<ModuleType> TEAM =
-      moduleTypes.register("team", () -> new ModuleType(NetworkProtocol.EMPTY));
+      deferredRegister.register("team", () -> new ModuleType(NetworkProtocol.EMPTY));
 
   public static final RegistryObject<ModuleType> SHOP =
-      moduleTypes.register("shop", () -> new ModuleType(ShopNetworkProtocol.INSTANCE));
+      deferredRegister.register("shop", () -> new ModuleType(ShopNetworkProtocol.INSTANCE));
 }

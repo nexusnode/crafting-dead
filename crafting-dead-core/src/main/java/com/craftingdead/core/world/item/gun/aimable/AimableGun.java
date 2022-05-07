@@ -30,19 +30,19 @@ import net.minecraft.Util;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 
-public final class AimableGun extends TypedGun<AimableGunItem> implements Scope {
+public final class AimableGun extends TypedGun<AimableGunType> implements Scope {
 
   private boolean waitingForBoltAction;
 
   public static AimableGun create(Function<AimableGun, AimableGunClient> clientFactory,
-      ItemStack itemStack, AimableGunItem type) {
+      ItemStack itemStack, AimableGunType type) {
     AimableGun gun = new AimableGun(clientFactory, itemStack, type);
     gun.initialize();
     return gun;
   }
 
   private AimableGun(Function<AimableGun, AimableGunClient> clientFactory, ItemStack itemStack,
-      AimableGunItem type) {
+      AimableGunType type) {
     super(clientFactory, itemStack, type);
   }
 

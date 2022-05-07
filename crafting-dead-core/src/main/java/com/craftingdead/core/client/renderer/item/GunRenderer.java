@@ -36,7 +36,7 @@ import com.craftingdead.core.client.util.RenderUtil;
 import com.craftingdead.core.util.EasingFunction;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.item.gun.Gun;
-import com.craftingdead.core.world.item.gun.GunItem;
+import com.craftingdead.core.world.item.GunItem;
 import com.craftingdead.core.world.item.gun.attachment.Attachment;
 import com.craftingdead.core.world.item.gun.attachment.Attachments;
 import com.craftingdead.core.world.item.gun.skin.Paint;
@@ -584,11 +584,11 @@ public class GunRenderer implements CustomItemRenderer {
     dependencies.addAll(this.properties.ironSights().stream()
         .map(Pair::getFirst)
         .collect(Collectors.toSet()));
-    dependencies.addAll(this.item.getAcceptedAttachments().stream()
+    dependencies.addAll(this.item.asGun().getAcceptedAttachments().stream()
         .map(Attachment::getRegistryName)
         .map(GunRenderer::getAttachmentModelLocation)
         .collect(Collectors.toSet()));
-    dependencies.addAll(this.item.getAcceptedMagazines().stream()
+    dependencies.addAll(this.item.asGun().getAcceptedMagazines().stream()
         .map(Item::getRegistryName)
         .map(GunRenderer::getMagazineModelLocation)
         .collect(Collectors.toSet()));

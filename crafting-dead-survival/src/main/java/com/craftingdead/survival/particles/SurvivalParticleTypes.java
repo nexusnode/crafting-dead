@@ -27,21 +27,21 @@ import net.minecraftforge.registries.RegistryObject;
 
 public class SurvivalParticleTypes {
 
-  public static final DeferredRegister<ParticleType<?>> PARTICLE_TYPES =
+  public static final DeferredRegister<ParticleType<?>> deferredRegister =
       DeferredRegister.create(ForgeRegistries.PARTICLE_TYPES, CraftingDeadSurvival.ID);
 
   public static final RegistryObject<SimpleParticleType> MILITARY_LOOT_GEN =
-      PARTICLE_TYPES.register("military_loot_gen", () -> new SimpleParticleType(false));
+      deferredRegister.register("military_loot_gen", () -> new SimpleParticleType(false));
 
   public static final RegistryObject<SimpleParticleType> MEDIC_LOOT_GEN =
-      PARTICLE_TYPES.register("medic_loot_gen", () -> new SimpleParticleType(false));
+      deferredRegister.register("medic_loot_gen", () -> new SimpleParticleType(false));
 
   public static final RegistryObject<SimpleParticleType> CIVILIAN_LOOT_GEN =
-      PARTICLE_TYPES.register("civilian_loot_gen", () -> new SimpleParticleType(false));
+      deferredRegister.register("civilian_loot_gen", () -> new SimpleParticleType(false));
 
   public static final RegistryObject<SimpleParticleType> CIVILIAN_RARE_LOOT_GEN =
-      PARTICLE_TYPES.register("civilian_rare_loot_gen", () -> new SimpleParticleType(false));
+      deferredRegister.register("civilian_rare_loot_gen", () -> new SimpleParticleType(false));
 
   public static final RegistryObject<SimpleParticleType> POLICE_LOOT_GEN =
-      PARTICLE_TYPES.register("police_loot_gen", () -> new SimpleParticleType(false));
+      deferredRegister.register("police_loot_gen", () -> new SimpleParticleType(false));
 }

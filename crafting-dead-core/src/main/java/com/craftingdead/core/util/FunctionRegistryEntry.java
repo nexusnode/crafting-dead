@@ -18,20 +18,30 @@
 
 package com.craftingdead.core.util;
 
-import com.google.common.base.Suppliers;
-import java.util.Optional;
-import java.util.function.Supplier;
-import javax.annotation.Nullable;
-import org.jetbrains.annotations.NotNull;
+import java.util.function.Function;
+import net.minecraftforge.registries.ForgeRegistryEntry;
 
-public class FunctionalUtil {
+public class FunctionRegistryEntry<T, R> extends ForgeRegistryEntry<FunctionRegistryEntry<T, R>>
+    implements Function<T, R> {
 
-  public static <T> Optional<T> optional(@Nullable Supplier<T> supplier) {
-    return Optional.ofNullable(supplier).map(Supplier::get);
+  private final Function<T, R> fun;
+
+  public FunctionRegistryEntry(Function<T, R> fun) {
+    this.fun = fun;
   }
 
-  // Java is not that smart with implicit casting the google commons supplier to java util supplier
-  public static <T> Supplier<T> supplier(@NotNull T instance) {
-    return Suppliers.ofInstance(instance);
+  @Override
+  public R apply(T type) {
+    return fun.apply(type);
+  }
+
+  public static <T, R> FunctionRegistryEntry<T, R> of(Function<T, R> fun) {
+    return new FunctionRegistryEntry<>(fun);
+  }
+
+  // Work around type erasure
+  @SuppressWarnings("unchecked")
+  public static <T, R> Class<FunctionRegistryEntry<T, R>> asClass() {
+    return (Class<FunctionRegistryEntry<T, R>>) (Class<?>) FunctionRegistryEntry.class;
   }
 }

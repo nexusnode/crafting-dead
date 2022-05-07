@@ -760,7 +760,7 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
         .stream()
         .map(Tag::getAsString)
         .map(ResourceLocation::new)
-        .map(Attachments.REGISTRY.get()::getValue)
+        .map(Attachments.registry.get()::getValue)
         .collect(Collectors.toSet()));
     this.setPaintStack(ItemStack.of(nbt.getCompound("paintStack")));
     this.skin = Skin.CODEC.parse(NbtOps.INSTANCE, nbt.get("skin")).result().orElse(null);
