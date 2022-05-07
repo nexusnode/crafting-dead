@@ -92,7 +92,7 @@ public class SupplyDropLootTables
             .add(LootItem.lootTableItem(ModItems.BOLT_CUTTERS.get())
                 .apply(
                     SetItemCountFunction.setCount(BinomialDistributionGenerator.binomial(2, 0.7F))))
-            .add(LootItem.lootTableItem(ModItems.C4.get())
+            .add(LootItem.lootTableItem(ModItems.C4_EXPLOSIVE.get())
                 .apply(
                     SetItemCountFunction.setCount(BinomialDistributionGenerator.binomial(6, 0.2F))))
             .add(LootItem.lootTableItem(ModItems.REMOTE_DETONATOR.get())

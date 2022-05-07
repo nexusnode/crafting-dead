@@ -706,7 +706,7 @@ public class ModItems {
               .stacksTo(1)
               .tab(COMBAT_TAB)));
 
-  public static final RegistryObject<GrenadeItem> C4 =
+  public static final RegistryObject<GrenadeItem> C4_EXPLOSIVE =
       deferredRegister.register("c4_explosive",
           () -> new GrenadeItem((GrenadeItem.Properties) new GrenadeItem.Properties()
               .setGrenadeEntitySupplier(C4Explosive::new)
@@ -715,7 +715,7 @@ public class ModItems {
               .stacksTo(1)
               .tab(COMBAT_TAB)));
 
-  public static final RegistryObject<GrenadeItem> STICKY_C4 = 
+  public static final RegistryObject<GrenadeItem> STICKY_C4_EXPLOSIVE =
       deferredRegister.register("sticky_c4_explosive",
           () -> new GrenadeItem((GrenadeItem.Properties) new GrenadeItem.Properties()
               .setGrenadeEntitySupplier(C4Explosive::new)
@@ -725,7 +725,7 @@ public class ModItems {
               .stacksTo(1)
               .tab(COMBAT_TAB)));
 
-  public static final RegistryObject<Item> REMOTE_DETONATOR = 
+  public static final RegistryObject<Item> REMOTE_DETONATOR =
       deferredRegister.register("remote_detonator",
           () -> new RemoteDetonatorItem(new Item.Properties()
               .stacksTo(1)

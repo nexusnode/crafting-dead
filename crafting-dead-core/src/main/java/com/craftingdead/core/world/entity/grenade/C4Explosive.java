@@ -110,7 +110,7 @@ public class C4Explosive extends Grenade implements ExplosionSource {
 
   @Override
   public GrenadeItem asItem() {
-    return this.isSticky ? ModItems.STICKY_C4.get() : ModItems.C4.get();
+    return this.isSticky ? ModItems.STICKY_C4_EXPLOSIVE.get() : ModItems.C4_EXPLOSIVE.get();
   }
 
   @Override
