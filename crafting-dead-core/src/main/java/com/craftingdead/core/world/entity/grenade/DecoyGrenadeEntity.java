@@ -112,7 +112,7 @@ public class DecoyGrenadeEntity extends Grenade {
   }
 
   private static GunItem getRandomGun(Random random) {
-    List<GunItem> possibleGuns = ModItems.ITEMS.getEntries().stream()
+    List<GunItem> possibleGuns = ModItems.deferredRegister.getEntries().stream()
         .map(RegistryObject::get)
         .filter(GunItem.class::isInstance)
         .map(GunItem.class::cast)

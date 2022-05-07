@@ -27,7 +27,7 @@ import net.minecraftforge.registries.RegistryObject;
 
 public class ModSoundEvents {
 
-  public static final DeferredRegister<SoundEvent> SOUND_EVENTS =
+  public static final DeferredRegister<SoundEvent> deferredRegister =
       DeferredRegister.create(ForgeRegistries.SOUND_EVENTS, CraftingDead.ID);
 
   public static final RegistryObject<SoundEvent> ACR_SHOOT = register("acr_shoot");
@@ -141,6 +141,6 @@ public class ModSoundEvents {
 
   private static RegistryObject<SoundEvent> register(String name) {
     ResourceLocation registryName = new ResourceLocation(CraftingDead.ID, name);
-    return SOUND_EVENTS.register(name, () -> new SoundEvent(registryName));
+    return deferredRegister.register(name, () -> new SoundEvent(registryName));
   }
 }

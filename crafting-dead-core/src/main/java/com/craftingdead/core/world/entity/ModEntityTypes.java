@@ -35,11 +35,11 @@ import net.minecraftforge.registries.RegistryObject;
 
 public class ModEntityTypes {
 
-  public static final DeferredRegister<EntityType<?>> ENTITY_TYPES =
+  public static final DeferredRegister<EntityType<?>> deferredRegister =
       DeferredRegister.create(ForgeRegistries.ENTITIES, CraftingDead.ID);
 
   public static final RegistryObject<EntityType<C4Explosive>> C4_EXPLOSIVE =
-      ENTITY_TYPES.register("c4_explosive", () -> create("c4_explosive",
+      deferredRegister.register("c4_explosive", () -> create("c4_explosive",
           EntityType.Builder
               .<C4Explosive>of(C4Explosive::new, MobCategory.MISC)
               .setTrackingRange(64)
@@ -47,7 +47,7 @@ public class ModEntityTypes {
               .sized(0.65F, 0.25F)
               .setShouldReceiveVelocityUpdates(false)));
   public static final RegistryObject<EntityType<DecoyGrenadeEntity>> DECOY_GRENADE =
-      ENTITY_TYPES.register("decoy_grenade", () -> create("decoy_grenade",
+      deferredRegister.register("decoy_grenade", () -> create("decoy_grenade",
           EntityType.Builder
               .<DecoyGrenadeEntity>of(DecoyGrenadeEntity::new, MobCategory.MISC)
               .setTrackingRange(64)
@@ -56,7 +56,7 @@ public class ModEntityTypes {
               .setShouldReceiveVelocityUpdates(false)));
 
   public static final RegistryObject<EntityType<FireGrenadeEntity>> FIRE_GRENADE =
-      ENTITY_TYPES.register("fire_grenade", () -> create("fire_grenade",
+      deferredRegister.register("fire_grenade", () -> create("fire_grenade",
           EntityType.Builder
               .<FireGrenadeEntity>of(FireGrenadeEntity::new, MobCategory.MISC)
               .setTrackingRange(64)
@@ -65,7 +65,7 @@ public class ModEntityTypes {
               .setShouldReceiveVelocityUpdates(false)));
 
   public static final RegistryObject<EntityType<FlashGrenadeEntity>> FLASH_GRENADE =
-      ENTITY_TYPES.register("flash_grenade", () -> create("flash_grenade",
+      deferredRegister.register("flash_grenade", () -> create("flash_grenade",
           EntityType.Builder
               .<FlashGrenadeEntity>of(FlashGrenadeEntity::new, MobCategory.MISC)
               .setTrackingRange(64)
@@ -74,7 +74,7 @@ public class ModEntityTypes {
               .setShouldReceiveVelocityUpdates(false)));
 
   public static final RegistryObject<EntityType<FragGrenade>> FRAG_GRENADE =
-      ENTITY_TYPES.register("frag_grenade", () -> create("frag_grenade",
+      deferredRegister.register("frag_grenade", () -> create("frag_grenade",
           EntityType.Builder
               .<FragGrenade>of(FragGrenade::new, MobCategory.MISC)
               .setTrackingRange(64)
@@ -83,7 +83,7 @@ public class ModEntityTypes {
               .setShouldReceiveVelocityUpdates(false)));
 
   public static final RegistryObject<EntityType<SmokeGrenadeEntity>> SMOKE_GRENADE =
-      ENTITY_TYPES.register("smoke_grenade", () -> create("smoke_grenade",
+      deferredRegister.register("smoke_grenade", () -> create("smoke_grenade",
           EntityType.Builder
               .<SmokeGrenadeEntity>of(SmokeGrenadeEntity::new, MobCategory.MISC)
               .setTrackingRange(64)

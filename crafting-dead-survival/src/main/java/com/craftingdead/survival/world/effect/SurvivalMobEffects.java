@@ -26,15 +26,15 @@ import net.minecraftforge.registries.RegistryObject;
 
 public class SurvivalMobEffects {
 
-  public static final DeferredRegister<MobEffect> MOB_EFFECTS =
+  public static final DeferredRegister<MobEffect> deferredRegister =
       DeferredRegister.create(ForgeRegistries.MOB_EFFECTS, CraftingDeadSurvival.ID);
 
   public static final RegistryObject<MobEffect> INFECTION =
-      MOB_EFFECTS.register("infection", InfectionMobEffect::new);
+      deferredRegister.register("infection", InfectionMobEffect::new);
 
   public static final RegistryObject<MobEffect> BLEEDING =
-      MOB_EFFECTS.register("bleeding", BleedingMobEffect::new);
+      deferredRegister.register("bleeding", BleedingMobEffect::new);
 
   public static final RegistryObject<MobEffect> BROKEN_LEG =
-      MOB_EFFECTS.register("broken_leg", BrokenLegMobEffect::new);
+      deferredRegister.register("broken_leg", BrokenLegMobEffect::new);
 }

@@ -27,11 +27,11 @@ import net.minecraftforge.registries.RegistryObject;
 
 public class ImmerseBlockEntityTypes {
 
-  public static final DeferredRegister<BlockEntityType<?>> blockEntityTypes =
+  public static final DeferredRegister<BlockEntityType<?>> deferredRegister =
       DeferredRegister.create(ForgeRegistries.BLOCK_ENTITIES, CraftingDeadImmerse.ID);
 
   public static final RegistryObject<BlockEntityType<BaseCenterBlockEntity>> BASE_CENTER =
-      blockEntityTypes.register("base_center",
+      deferredRegister.register("base_center",
           () -> BlockEntityType.Builder
               .of(BaseCenterBlockEntity::new, ImmerseBlocks.BASE_CENTER.get())
               .build(null));

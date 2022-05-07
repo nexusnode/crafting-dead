@@ -115,13 +115,13 @@ public class CraftingDeadSurvival {
 
     MinecraftForge.EVENT_BUS.register(this);
 
-    SurvivalEnchantments.ENCHANTMENTS.register(modEventBus);
-    SurvivalActionTypes.ACTION_TYPES.register(modEventBus);
-    SurvivalItems.ITEMS.register(modEventBus);
-    SurvivalMobEffects.MOB_EFFECTS.register(modEventBus);
-    SurvivalEntityTypes.ENTITY_TYPES.register(modEventBus);
-    SurvivalParticleTypes.PARTICLE_TYPES.register(modEventBus);
-    SurvivalBlocks.BLOCKS.register(modEventBus);
+    SurvivalEnchantments.deferredRegister.register(modEventBus);
+    SurvivalActionTypes.deferredRegister.register(modEventBus);
+    SurvivalItems.deferredRegister.register(modEventBus);
+    SurvivalMobEffects.deferredRegister.register(modEventBus);
+    SurvivalEntityTypes.deferredRegister.register(modEventBus);
+    SurvivalParticleTypes.deferredRegister.register(modEventBus);
+    SurvivalBlocks.deferredRegister.register(modEventBus);
   }
 
   public ModDist getModDist() {

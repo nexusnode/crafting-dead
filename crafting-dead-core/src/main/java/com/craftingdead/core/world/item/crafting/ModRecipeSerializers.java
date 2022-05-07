@@ -27,14 +27,14 @@ import net.minecraftforge.registries.RegistryObject;
 
 public class ModRecipeSerializers {
 
-  public static final DeferredRegister<RecipeSerializer<?>> RECIPE_SERIALIZERS =
+  public static final DeferredRegister<RecipeSerializer<?>> deferredRegister =
       DeferredRegister.create(ForgeRegistries.RECIPE_SERIALIZERS, CraftingDead.ID);
 
   public static final RegistryObject<RecipeSerializer<?>> UPGRADE_MAGAZINE =
-      RECIPE_SERIALIZERS.register("upgrade_magazine",
+      deferredRegister.register("upgrade_magazine",
           UpgradeMagazineRecipe.Serializer::new);
 
   public static final RegistryObject<SimpleRecipeSerializer<?>> DUPLICATE_MAGAZINE =
-      RECIPE_SERIALIZERS.register("duplicate_magazine",
+      deferredRegister.register("duplicate_magazine",
           () -> new SimpleRecipeSerializer<>(DuplicateMagazineRecipe::new));
 }
