@@ -722,6 +722,7 @@ public class GunTypes {
   public static final RegistryObject<GunType> AS50 =
       deferredRegister.register("as50",
           () -> AimableGunType.builder()
+              .setFireDelayMs(170)
               .setDamage(14)
               .setReloadDurationTicks((int) (20 * 3.5F))
               .setAccuracy(0.9F)
