@@ -240,7 +240,7 @@ public interface LivingExtension<E extends LivingEntity, H extends LivingHandler
    *
    * @return an array containing the drop chance for each slot, this array will be a copy of the original.
    */
-  float[] getEquipDropChances();
+  float[] getEquipmentDropChances();
 
   /**
    * Get the drop chance for the entity equipment slot.
@@ -253,7 +253,7 @@ public interface LivingExtension<E extends LivingEntity, H extends LivingHandler
    * @param slot - the equipment slot to get the drop chance
    * @return the drop chance for the provided equipment slot
    */
-  float getEquipDropChance(ModEquipmentSlot slot);
+  float getEquipmentDropChance(ModEquipmentSlot slot);
 
   /**
    * Defines the new drop chances for the entity equipment slots.
@@ -266,7 +266,7 @@ public interface LivingExtension<E extends LivingEntity, H extends LivingHandler
    *
    * @param newChances - the new drop chances to be defined
    */
-  void setEquiDropChances(float[] newChances);
+  void setEquipmentDropChances(float[] newChances);
 
   /**
    * Defines the new drop chance for the entity equipment slot.
@@ -279,7 +279,7 @@ public interface LivingExtension<E extends LivingEntity, H extends LivingHandler
    * @param slot - the equipment slot to set the new drop chance
    * @param chance - the new drop chance
    */
-  void setEquipDropChance(ModEquipmentSlot slot, float chance);
+  void setEquipmentDropChance(ModEquipmentSlot slot, float chance);
 
   /**
    * Shorthand for {@link LivingEntity#getLevel()}.

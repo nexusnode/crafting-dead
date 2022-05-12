@@ -293,9 +293,9 @@ public class AdvancedZombie extends Zombie implements RangedAttackMob {
     }
 
     var extension = LivingExtension.getOrThrow(this);
-    extension.setEquipDropChance(ModEquipmentSlot.CLOTHING,
+    extension.setEquipmentDropChance(ModEquipmentSlot.CLOTHING,
         CraftingDeadSurvival.serverConfig.zombieClothingDropChance.get().floatValue());
-    extension.setEquipDropChance(ModEquipmentSlot.HAT,
+    extension.setEquipmentDropChance(ModEquipmentSlot.HAT,
         CraftingDeadSurvival.serverConfig.zombieHatDropChance.get().floatValue());
     Arrays.fill(this.handDropChances,
         CraftingDeadSurvival.serverConfig.zombieHandDropChance.get().floatValue());
