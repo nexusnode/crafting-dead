@@ -18,7 +18,6 @@
 
 package com.craftingdead.survival.world.entity.monster;
 
-import com.craftingdead.survival.tags.SurvivalItemTags;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
@@ -32,6 +31,7 @@ import com.craftingdead.core.world.entity.grenade.FlashGrenadeEntity;
 import com.craftingdead.core.world.inventory.ModEquipmentSlot;
 import com.craftingdead.core.world.item.gun.Gun;
 import com.craftingdead.survival.CraftingDeadSurvival;
+import com.craftingdead.survival.tags.SurvivalItemTags;
 import com.craftingdead.survival.world.entity.SurvivalPlayerHandler;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
@@ -64,7 +64,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.ServerLevelAccessor;
-import org.jetbrains.annotations.NotNull;
 
 public class AdvancedZombie extends Zombie implements RangedAttackMob {
 
@@ -196,26 +195,32 @@ public class AdvancedZombie extends Zombie implements RangedAttackMob {
   }
 
   protected ItemStack createHeldItem() {
-    return this.getRandomItem(SurvivalItemTags.ZOMBIE_HAND_LOOT, CraftingDeadSurvival.serverConfig.zombieHandSpawnChance.get())
+    return this
+        .getRandomItem(SurvivalItemTags.ZOMBIE_HAND_LOOT,
+            CraftingDeadSurvival.serverConfig.zombieHandSpawnChance.get().floatValue())
         .map(Item::getDefaultInstance)
         .orElse(ItemStack.EMPTY);
   }
 
   protected ItemStack createClothingItem() {
-    return this.getRandomItem(SurvivalItemTags.ZOMBIE_CLOTHING_LOOT, CraftingDeadSurvival.serverConfig.zombieClothingSpawnChance.get())
+    return this
+        .getRandomItem(SurvivalItemTags.ZOMBIE_CLOTHING_LOOT,
+            CraftingDeadSurvival.serverConfig.zombieClothingSpawnChance.get().floatValue())
         .map(Item::getDefaultInstance)
         .orElse(ItemStack.EMPTY);
   }
 
   protected ItemStack getHatStack() {
-    return this.getRandomItem(SurvivalItemTags.ZOMBIE_HAT_LOOT, CraftingDeadSurvival.serverConfig.zombieHatSpawnChance.get())
+    return this
+        .getRandomItem(SurvivalItemTags.ZOMBIE_HAT_LOOT,
+            CraftingDeadSurvival.serverConfig.zombieHatSpawnChance.get().floatValue())
         .map(Item::getDefaultInstance)
         .orElse(ItemStack.EMPTY);
   }
 
   @SuppressWarnings("deprecation")
-  protected Optional<Item> getRandomItem(TagKey<Item> tagKey, double probability) {
-    return this.random.nextDouble() < probability
+  protected Optional<Item> getRandomItem(TagKey<Item> tagKey, float probability) {
+    return this.random.nextFloat() < probability
         ? Registry.ITEM.getTag(tagKey)
             .flatMap(tag -> tag.getRandomElement(this.random))
             .map(Holder::value)
@@ -280,8 +285,8 @@ public class AdvancedZombie extends Zombie implements RangedAttackMob {
 
   @Nullable
   @Override
-  public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, @NotNull DifficultyInstance difficulty,
-      @NotNull MobSpawnType spawnType, @Nullable SpawnGroupData groupData, @Nullable CompoundTag tag) {
+  public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty,
+      MobSpawnType spawnType, @Nullable SpawnGroupData groupData, @Nullable CompoundTag tag) {
     groupData = super.finalizeSpawn(level, difficulty, spawnType, groupData, tag);
     if (!level.isClientSide()) {
       Objects.requireNonNull(this.getAttribute(Attributes.ATTACK_KNOCKBACK))
