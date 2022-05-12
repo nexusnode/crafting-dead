@@ -256,8 +256,8 @@ final class PlayerExtensionImpl<E extends Player>
   }
 
   @Override
-  public boolean handleDeathLoot(DamageSource cause, Collection<ItemEntity> drops) {
-    if (super.handleDeathLoot(cause, drops)) {
+  public boolean handleDeathLoot(DamageSource cause, Collection<ItemEntity> drops, int lootingLevel) {
+    if (super.handleDeathLoot(cause, drops, lootingLevel)) {
       return true;
     }
 

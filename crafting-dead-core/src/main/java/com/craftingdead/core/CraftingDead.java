@@ -302,7 +302,7 @@ public class CraftingDead {
     event.getEntity()
         .getCapability(LivingExtension.CAPABILITY)
         .ifPresent(living -> event.setCanceled(
-            living.handleDeathLoot(event.getSource(), event.getDrops())));
+            living.handleDeathLoot(event.getSource(), event.getDrops(), event.getLootingLevel())));
   }
 
   @SubscribeEvent(priority = EventPriority.LOWEST)

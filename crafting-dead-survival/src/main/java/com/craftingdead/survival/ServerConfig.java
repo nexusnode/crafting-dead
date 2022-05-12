@@ -76,6 +76,12 @@ public class ServerConfig {
   public final ForgeConfigSpec.IntValue tankZombieMaxSpawn;
   public final ForgeConfigSpec.IntValue fastZombieMaxSpawn;
   public final ForgeConfigSpec.IntValue weakZombieMaxSpawn;
+  public final ForgeConfigSpec.DoubleValue zombieHatSpawnChance;
+  public final ForgeConfigSpec.DoubleValue zombieHandSpawnChance;
+  public final ForgeConfigSpec.DoubleValue zombieClothingSpawnChance;
+  public final ForgeConfigSpec.DoubleValue zombieHatDropChance;
+  public final ForgeConfigSpec.DoubleValue zombieHandDropChance;
+  public final ForgeConfigSpec.DoubleValue zombieClothingDropChance;
   public final ForgeConfigSpec.DoubleValue zombieAttackKnockback;
   public final ForgeConfigSpec.BooleanValue zombieDeathLootEnabled;
 
@@ -223,8 +229,7 @@ public class ServerConfig {
           .translation("options.craftingdeadsurvival.server.zombies.spawning.baby_zombies.enable")
           .define("babyZombiesEnabled", true);
       this.advancedZombiesEnabled = builder
-          .translation(
-              "options.craftingdeadsurvival.server.zombies.spawning.advanced_zombie.enable")
+          .translation("options.craftingdeadsurvival.server.zombies.spawning.advanced_zombie.enable")
           .define("advancedZombiesEnabled", true);
       this.tankZombiesEnabled = builder
           .translation("options.craftingdeadsurvival.server.zombies.spawning.tank_zombie.enable")
@@ -236,8 +241,7 @@ public class ServerConfig {
           .translation("options.craftingdeadsurvival.server.zombies.spawning.weak_zombie.enable")
           .define("weakZombiesEnabled", true);
       this.advancedZombieSpawnWeight = builder
-          .translation(
-              "options.craftingdeadsurvival.server.zombies.spawning.advanced_zombie.weight")
+          .translation("options.craftingdeadsurvival.server.zombies.spawning.advanced_zombie.weight")
           .defineInRange("advancedZombieSpawnWeight", 40, 1, Integer.MAX_VALUE);
       this.tankZombieSpawnWeight = builder
           .translation("options.craftingdeadsurvival.server.zombies.spawning.tank_zombie.weight")
@@ -249,8 +253,7 @@ public class ServerConfig {
           .translation("options.craftingdeadsurvival.server.zombies.spawning.weak_zombie.weight")
           .defineInRange("weakZombieSpawnWeight", 30, 1, Integer.MAX_VALUE);
       this.advancedZombieMinSpawn = builder
-          .translation(
-              "options.craftingdeadsurvival.server.zombies.spawning.advanced_zombie.min_spawn")
+          .translation("options.craftingdeadsurvival.server.zombies.spawning.advanced_zombie.min_spawn")
           .defineInRange("advancedZombieMinSpawn", 2, 1, Integer.MAX_VALUE);
       this.tankZombieMinSpawn = builder
           .translation("options.craftingdeadsurvival.server.zombies.spawning.tank_zombie.min_spawn")
@@ -262,8 +265,7 @@ public class ServerConfig {
           .translation("options.craftingdeadsurvival.server.zombies.spawning.weak_zombie.min_spawn")
           .defineInRange("weakZombieMinSpawn", 2, 1, Integer.MAX_VALUE);
       this.advancedZombieMaxSpawn = builder
-          .translation(
-              "options.craftingdeadsurvival.server.zombies.spawning.advanced_zombie.max_spawn")
+          .translation("options.craftingdeadsurvival.server.zombies.spawning.advanced_zombie.max_spawn")
           .defineInRange("advancedZombieMaxSpawn", 8, 1, Integer.MAX_VALUE);
       this.tankZombieMaxSpawn = builder
           .translation("options.craftingdeadsurvival.server.zombies.spawning.tank_zombie.max_spawn")
@@ -277,6 +279,30 @@ public class ServerConfig {
       builder.pop();
 
       builder.push("misc");
+      this.zombieHatSpawnChance = builder
+          .translation("options.craftingdeadsurvival.server.zombies.misc.zombie_hat_spawn_chance")
+          .comment("Spawn chance percentage (1.0 = 100% chance)")
+          .defineInRange("zombieHatSpawnChance", 0.05D, 0D, 1.0D);
+      this.zombieHandSpawnChance = builder
+          .translation("options.craftingdeadsurvival.server.zombies.misc.zombie_hand_spawn_chance")
+          .comment("Spawn chance percentage (1.0 = 100% chance)")
+          .defineInRange("zombieHandSpawnChance", 0.15D, 0D, 1.0D);
+      this.zombieClothingSpawnChance = builder
+          .translation("options.craftingdeadsurvival.server.zombies.misc.zombie_clothing_spawn_chance")
+          .comment("Spawn chance percentage (1.0 = 100% chance)")
+          .defineInRange("zombieClothingSpawnChance", 0.25D, 0D, 1.0D);
+      this.zombieHatDropChance = builder
+          .translation("options.craftingdeadsurvival.server.zombies.misc.zombie_hat_drop_chance")
+          .comment("Drop chance percentage (drop chance based on vanilla formula, use 2.0 for guarantee drop)")
+          .defineInRange("zombieHatDropChance", 2.0D, 0D, 2.0D);
+      this.zombieHandDropChance = builder
+          .translation("options.craftingdeadsurvival.server.zombies.misc.zombie_hand_drop_chance")
+          .comment("Drop chance percentage (drop chance based on vanilla formula, use 2.0 for guarantee drop)")
+          .defineInRange("zombieHandDropChance", 0.085D, 0D, 2.0D);
+      this.zombieClothingDropChance = builder
+          .translation("options.craftingdeadsurvival.server.zombies.misc.zombie_clothing_drop_chance")
+          .comment("Drop chance percentage (drop chance based on vanilla formula, use 2.0 for guarantee drop)")
+          .defineInRange("zombieClothingDropChance", 2.00D, 0D, 2.0D);
       this.zombieAttackKnockback = builder
           .translation("options.craftingdeadsurvival.server.zombies.misc.attack_knockback")
           .comment("Additional knockback given to all zombies")

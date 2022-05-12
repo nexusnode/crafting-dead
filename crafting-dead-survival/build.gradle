@@ -50,7 +50,7 @@ minecraft {
             property 'forge.logging.markers', 'SCAN,REGISTRIES'
             property 'forge.logging.console.level', 'debug'
 
-            args '--mod', 'craftingdeadsurvival', '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
+            args '--mod', 'craftingdeadsurvival', '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/'), '--existing-mod', 'craftingdead'
 
             environment 'target', 'fmluserdevdata'
 

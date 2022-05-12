@@ -33,7 +33,7 @@ public class SurvivalZombieHandler implements LivingHandler {
       new LivingHandlerType<>(new ResourceLocation(CraftingDeadSurvival.ID, "zombie_handler"));
 
   @Override
-  public boolean handleDeathLoot(DamageSource cause, Collection<ItemEntity> loot) {
+  public boolean handleDeathLoot(DamageSource cause, Collection<ItemEntity> loot, int lootingLevel) {
     return !CraftingDeadSurvival.serverConfig.zombieDeathLootEnabled.get();
   }
 

@@ -81,9 +81,10 @@ public interface LivingHandler extends INBTSerializable<CompoundTag>, Synched {
    *
    * @param cause - the DamageSource that caused the drop to occur
    * @param loot - a collections of {@link ItemEntity}s that will be dropped
+   * @param lootingLevel - the amount of loot that will be dropped.
    * @return if the event should be cancelled
    */
-  default boolean handleDeathLoot(DamageSource cause, Collection<ItemEntity> loot) {
+  default boolean handleDeathLoot(DamageSource cause, Collection<ItemEntity> loot, int lootingLevel) {
     return false;
   }
 

@@ -37,7 +37,7 @@ public class TankZombie extends AdvancedZombie {
     super(type, world);
   }
 
-  public static AttributeSupplier.Builder registerAttributes() {
+  public static AttributeSupplier.Builder createAttributes() {
     return AdvancedZombie.attributeTemplate()
         .add(Attributes.FOLLOW_RANGE, 20.0D)
         .add(Attributes.MAX_HEALTH, 100.0D)
