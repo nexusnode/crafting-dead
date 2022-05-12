@@ -166,7 +166,8 @@ public abstract class BounceableProjectileEntity extends Entity
 
         // Check if the entity is still alive after hitting the surface
         if (this.isAlive()) {
-          if ((nextBounceMotion != null && blockRayTraceResult.getDirection() == Direction.UP) || this.isSticky) {
+          if ((nextBounceMotion != null && blockRayTraceResult.getDirection() == Direction.UP)
+              || this.isSticky) {
             // Stops if the next bounce is too slow
             if ((nextBounceMotion.length() < 0.1D) || this.isSticky) {
               nextBounceMotion = Vec3.ZERO;
@@ -289,7 +290,10 @@ public abstract class BounceableProjectileEntity extends Entity
     this.stoppedMoving = compound.getBoolean("stoppedMoving");
     this.motionStopCount = compound.getInt("motionStopCount");
     this.isSticky = compound.getBoolean("isSticky");
-    this.hitDirection = Direction.byName(compound.getString("hitDirection"));
+    var hitDirection = Direction.byName(compound.getString("hitDirection"));
+    if (hitDirection != null) {
+      this.hitDirection = hitDirection;
+    }
   }
 
   @Override
