@@ -18,12 +18,12 @@
 
 package com.craftingdead.survival.world.entity.monster;
 
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
 import javax.annotation.Nullable;
-import com.craftingdead.core.tags.ModItemTags;
 import com.craftingdead.core.world.entity.ai.FollowAttractiveGrenadeGoal;
 import com.craftingdead.core.world.entity.ai.LookAtEntityGoal;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
@@ -31,6 +31,7 @@ import com.craftingdead.core.world.entity.grenade.FlashGrenadeEntity;
 import com.craftingdead.core.world.inventory.ModEquipmentSlot;
 import com.craftingdead.core.world.item.gun.Gun;
 import com.craftingdead.survival.CraftingDeadSurvival;
+import com.craftingdead.survival.tags.SurvivalItemTags;
 import com.craftingdead.survival.world.entity.SurvivalPlayerHandler;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
@@ -77,10 +78,6 @@ public class AdvancedZombie extends Zombie implements RangedAttackMob {
   private static final AttributeModifier HEALTH_MODIFIER_BABY =
       new AttributeModifier(HEALTH_MODIFIER_BABY_UUID, "Baby health reduction", -1.5D,
           AttributeModifier.Operation.MULTIPLY_BASE);
-
-  private static final float MELEE_CHANCE = 0.15F;
-  private static final float CLOTHING_CHANCE = 0.25F;
-  private static final float HAT_CHANCE = 0.05F;
 
   private static final EntityDataAccessor<Integer> TEXTURE_NUMBER =
       SynchedEntityData.defineId(AdvancedZombie.class, EntityDataSerializers.INT);
@@ -198,19 +195,25 @@ public class AdvancedZombie extends Zombie implements RangedAttackMob {
   }
 
   protected ItemStack createHeldItem() {
-    return this.getRandomItem(ModItemTags.MELEES, MELEE_CHANCE)
+    return this
+        .getRandomItem(SurvivalItemTags.ZOMBIE_HAND_LOOT,
+            CraftingDeadSurvival.serverConfig.zombieHandSpawnChance.get().floatValue())
         .map(Item::getDefaultInstance)
         .orElse(ItemStack.EMPTY);
   }
 
   protected ItemStack createClothingItem() {
-    return this.getRandomItem(ModItemTags.CLOTHING, CLOTHING_CHANCE)
+    return this
+        .getRandomItem(SurvivalItemTags.ZOMBIE_CLOTHING_LOOT,
+            CraftingDeadSurvival.serverConfig.zombieClothingSpawnChance.get().floatValue())
         .map(Item::getDefaultInstance)
         .orElse(ItemStack.EMPTY);
   }
 
   protected ItemStack getHatStack() {
-    return this.getRandomItem(ModItemTags.HATS, HAT_CHANCE)
+    return this
+        .getRandomItem(SurvivalItemTags.ZOMBIE_HAT_LOOT,
+            CraftingDeadSurvival.serverConfig.zombieHatSpawnChance.get().floatValue())
         .map(Item::getDefaultInstance)
         .orElse(ItemStack.EMPTY);
   }
@@ -293,6 +296,14 @@ public class AdvancedZombie extends Zombie implements RangedAttackMob {
       Objects.requireNonNull(this.getAttribute(Attributes.ATTACK_DAMAGE))
           .setBaseValue(CraftingDeadSurvival.serverConfig.advancedZombieAttackDamage.get());
     }
+
+    var extension = LivingExtension.getOrThrow(this);
+    extension.setEquipmentDropChance(ModEquipmentSlot.CLOTHING,
+        CraftingDeadSurvival.serverConfig.zombieClothingDropChance.get().floatValue());
+    extension.setEquipmentDropChance(ModEquipmentSlot.HAT,
+        CraftingDeadSurvival.serverConfig.zombieHatDropChance.get().floatValue());
+    Arrays.fill(this.handDropChances,
+        CraftingDeadSurvival.serverConfig.zombieHandDropChance.get().floatValue());
     return groupData;
   }
 }

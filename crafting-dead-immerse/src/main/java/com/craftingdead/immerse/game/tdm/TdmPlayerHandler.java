@@ -112,7 +112,7 @@ public class TdmPlayerHandler<P extends Player> implements PlayerHandler {
   }
 
   @Override
-  public boolean handleDeathLoot(DamageSource cause, Collection<ItemEntity> drops) {
+  public boolean handleDeathLoot(DamageSource cause, Collection<ItemEntity> drops, int lootingLevel) {
     return true;
   }
 

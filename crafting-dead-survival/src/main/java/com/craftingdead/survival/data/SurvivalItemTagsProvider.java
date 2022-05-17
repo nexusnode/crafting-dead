@@ -20,9 +20,10 @@ package com.craftingdead.survival.data;
 
 import com.craftingdead.core.tags.ModItemTags;
 import com.craftingdead.survival.CraftingDeadSurvival;
+import com.craftingdead.survival.tags.SurvivalItemTags;
 import com.craftingdead.survival.world.item.SurvivalItems;
-import net.minecraft.data.tags.BlockTagsProvider;
 import net.minecraft.data.DataGenerator;
+import net.minecraft.data.tags.BlockTagsProvider;
 import net.minecraft.data.tags.ItemTagsProvider;
 import net.minecraftforge.common.data.ExistingFileHelper;
 
@@ -37,6 +38,10 @@ public class SurvivalItemTagsProvider extends ItemTagsProvider {
   public void addTags() {
     this.tag(ModItemTags.SYRINGES).add(SurvivalItems.RBI_SYRINGE.get(),
         SurvivalItems.CURE_SYRINGE.get());
+
+    this.tag(SurvivalItemTags.ZOMBIE_CLOTHING_LOOT).addTag(ModItemTags.CLOTHING);
+    this.tag(SurvivalItemTags.ZOMBIE_HAT_LOOT).addTag(ModItemTags.HATS);
+    this.tag(SurvivalItemTags.ZOMBIE_HAND_LOOT).addTag(ModItemTags.MELEES);
   }
 
   @Override

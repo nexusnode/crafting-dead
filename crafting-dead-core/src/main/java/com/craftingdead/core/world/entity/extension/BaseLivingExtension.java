@@ -18,6 +18,12 @@
 
 package com.craftingdead.core.world.entity.extension;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import javax.annotation.Nullable;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.event.LivingExtensionEvent;
 import com.craftingdead.core.network.NetworkChannel;
@@ -26,9 +32,9 @@ import com.craftingdead.core.network.message.play.CrouchMessage;
 import com.craftingdead.core.network.message.play.PerformActionMessage;
 import com.craftingdead.core.sounds.ModSoundEvents;
 import com.craftingdead.core.world.action.Action;
-import com.craftingdead.core.world.entity.EntityUtil;
 import com.craftingdead.core.world.action.ActionObserver;
 import com.craftingdead.core.world.action.ActionType;
+import com.craftingdead.core.world.entity.EntityUtil;
 import com.craftingdead.core.world.inventory.ModEquipmentSlot;
 import com.craftingdead.core.world.item.MeleeWeaponItem;
 import com.craftingdead.core.world.item.ModItems;
@@ -39,12 +45,10 @@ import io.netty.buffer.Unpooled;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import javax.annotation.Nullable;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.FloatTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.world.damagesource.DamageSource;
@@ -102,6 +106,8 @@ class BaseLivingExtension<E extends LivingEntity, H extends LivingHandler>
    */
   protected ItemStack lastHeldStack = null;
 
+  protected float[] equipmentDropChances = new float[ModEquipmentSlot.values().length];
+
   @Nullable
   private Action action;
 
@@ -122,6 +128,7 @@ class BaseLivingExtension<E extends LivingEntity, H extends LivingHandler>
 
   BaseLivingExtension(E entity) {
     this.entity = entity;
+    Arrays.fill(this.equipmentDropChances, 2.0F);
   }
 
   @Override
@@ -397,16 +404,19 @@ class BaseLivingExtension<E extends LivingEntity, H extends LivingHandler>
   }
 
   @Override
-  public boolean handleDeathLoot(DamageSource cause, Collection<ItemEntity> drops) {
+  public boolean handleDeathLoot(DamageSource cause, Collection<ItemEntity> drops,
+      int lootingLevel) {
     if (this.handlers.values().stream()
-        .anyMatch(e -> e.handleDeathLoot(cause, drops))) {
+        .anyMatch(e -> e.handleDeathLoot(cause, drops, lootingLevel))) {
       return true;
     }
 
     if (!this.keepInventory()) {
       for (int i = 0; i < this.itemHandler.getSlots(); i++) {
         var itemStack = this.itemHandler.extractItem(i, Integer.MAX_VALUE, false);
-        if (!itemStack.isEmpty()) {
+        var dropChance = this.equipmentDropChances[i];
+        if (!itemStack.isEmpty()
+            && Math.max(this.getRandom().nextFloat() - (lootingLevel * 0.01F), 0.0F) < dropChance) {
           var itemEntity = new ItemEntity(this.getLevel(), this.getEntity().getX(),
               this.getEntity().getY(), this.getEntity().getZ(), itemStack);
           itemEntity.setDefaultPickUpDelay();
@@ -418,13 +428,17 @@ class BaseLivingExtension<E extends LivingEntity, H extends LivingHandler>
   }
 
   @Override
-  public boolean handleBlockPlace(BlockSnapshot replacedBlock, BlockState placedBlock, BlockState placedAgainst) {
-    return this.handlers.values().stream().anyMatch(e -> e.handleBlockPlace(replacedBlock, placedBlock, placedAgainst));
+  public boolean handleBlockPlace(BlockSnapshot replacedBlock, BlockState placedBlock,
+      BlockState placedAgainst) {
+    return this.handlers.values().stream()
+        .anyMatch(e -> e.handleBlockPlace(replacedBlock, placedBlock, placedAgainst));
   }
 
   @Override
-  public boolean handleMultiBlockPlace(List<BlockSnapshot> replacedBlocks, BlockState placedBlock, BlockState placedAgainst) {
-    return this.handlers.values().stream().anyMatch(e -> e.handleMultiBlockPlace(replacedBlocks, placedBlock, placedAgainst));
+  public boolean handleMultiBlockPlace(List<BlockSnapshot> replacedBlocks, BlockState placedBlock,
+      BlockState placedAgainst) {
+    return this.handlers.values().stream()
+        .anyMatch(e -> e.handleMultiBlockPlace(replacedBlocks, placedBlock, placedAgainst));
   }
 
   protected boolean keepInventory() {
@@ -486,6 +500,32 @@ class BaseLivingExtension<E extends LivingEntity, H extends LivingHandler>
   }
 
   @Override
+  public float[] getEquipmentDropChances() {
+    return Arrays.copyOf(this.equipmentDropChances, this.equipmentDropChances.length);
+  }
+
+  @Override
+  public float getEquipmentDropChance(ModEquipmentSlot slot) {
+    return this.equipmentDropChances[slot.getIndex()];
+  }
+
+  @Override
+  public void setEquipmentDropChances(float[] newChances) throws IllegalArgumentException {
+    if (newChances.length < this.equipmentDropChances.length) {
+      throw new IllegalArgumentException(
+          String.format("Missing drop chances. Expected %s but %s was provided.",
+              this.equipmentDropChances.length, newChances.length));
+    }
+
+    this.equipmentDropChances = Arrays.copyOf(newChances, this.equipmentDropChances.length);
+  }
+
+  @Override
+  public void setEquipmentDropChance(ModEquipmentSlot slot, float chance) {
+    this.equipmentDropChances[slot.getIndex()] = chance;
+  }
+
+  @Override
   public CompoundTag serializeNBT() {
     var tag = new CompoundTag();
     tag.put("inventory", this.itemHandler.serializeNBT());
@@ -495,6 +535,12 @@ class BaseLivingExtension<E extends LivingEntity, H extends LivingHandler>
         tag.put(entry.getKey().toString(), extensionTag);
       }
     }
+
+    var dropChances = new ListTag();
+    for (float dropChance : this.equipmentDropChances) {
+      dropChances.add(FloatTag.valueOf(dropChance));
+    }
+    tag.put("dropChances", dropChances);
     return tag;
   }
 
@@ -505,6 +551,14 @@ class BaseLivingExtension<E extends LivingEntity, H extends LivingHandler>
       var extensionTag = tag.getCompound(entry.getKey().toString());
       if (!extensionTag.isEmpty()) {
         entry.getValue().deserializeNBT(extensionTag);
+      }
+    }
+
+    if (tag.contains("dropChances", Tag.TAG_LIST)) {
+      var dropChances = tag.getList("dropChances", Tag.TAG_FLOAT);
+
+      for (int i = 0; i < dropChances.size(); i++) {
+        this.equipmentDropChances[i] = dropChances.getFloat(i);
       }
     }
   }
