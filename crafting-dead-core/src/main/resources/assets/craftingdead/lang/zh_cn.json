@@ -11,8 +11,10 @@
   "tutorial.open_equipment_menu.title":"打开设备菜单",
   "tutorial.open_equipment_menu.description": "按 %s",
   
-  "death.attack.bullet": "%1$s 被射杀",
-  "death.attack.bullet.headshot": "%1$s 被击中头部",
+  "death.attack.bullet": "%s 被 %s 射杀",
+  "death.attack.bullet.item": "%s 被 %s 和 %s 射杀",
+  "death.attack.bullet.headshot": "%1$s 被 %s 击中头部",
+  "death.attack.bullet.headshot.item": "%1$s 的头部被 %s 和 %s 共同击中",
   
   "options.craftingdead.client.hit_marker_mode": "攻击标记模式",
   "options.craftingdead.client.kill_sound_enabled": "砍杀声音",
@@ -339,7 +341,7 @@
   "gun.accuracy": "精准度: ",
   "gun.range": "范围: ",
   "clothing_item.water_breathing": "赋予水下呼吸能力",
-  "clothing_item.water_speed": "赋予水呼吸能力",
+  "clothing_item.water_speed": "增加水下移动速度",
   "paint.accepted_guns":"配合使用:",
 
   "attachment_multiplier_type.damage": "伤害",
