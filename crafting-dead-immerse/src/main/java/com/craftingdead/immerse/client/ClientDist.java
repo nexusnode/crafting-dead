@@ -32,7 +32,7 @@ import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.ModDist;
-import com.craftingdead.immerse.client.fake.FakePlayerEntity;
+import com.craftingdead.immerse.client.fake.FakePlayer;
 import com.craftingdead.immerse.client.gui.IngameGui;
 import com.craftingdead.immerse.client.gui.screen.menu.MainMenuView;
 import com.craftingdead.immerse.client.gui.view.ViewScreen;
@@ -259,7 +259,7 @@ public class ClientDist implements ModDist {
 
   @SubscribeEvent
   public void handleRenderNameplate(RenderNameplateEvent event) {
-    if (event.getEntity() instanceof FakePlayerEntity) {
+    if (event.getEntity() instanceof FakePlayer) {
       event.setResult(Event.Result.DENY);
     }
   }

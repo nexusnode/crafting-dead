@@ -32,7 +32,7 @@ import net.minecraft.network.chat.TranslatableComponent;
 
 public class ServerListView extends ParentView {
 
-  protected final ServerList serverProvider;
+  protected final ServerList serverList;
 
   protected final ParentView listView;
 
@@ -46,9 +46,9 @@ public class ServerListView extends ParentView {
   @Nullable
   private CompletableFuture<Void> refreshFuture;
 
-  public ServerListView(ServerList serverEntryProvider) {
+  public ServerListView(ServerList serverList) {
     super(new Properties<>());
-    this.serverProvider = serverEntryProvider;
+    this.serverList = serverList;
 
     this.listView = new ParentView(new Properties<>().id("content"));
     this.addChild(this.listView);
@@ -141,8 +141,11 @@ public class ServerListView extends ParentView {
       this.listView.clearChildren();
       this.selectedItem = null;
       this.updateSelected();
-      this.refreshFuture = this.serverProvider.load()
-          .thenAcceptAsync(servers -> servers.forEach(this::addServer), this.minecraft);
+      this.refreshFuture = this.serverList.load()
+          .thenAcceptAsync(servers -> {
+            servers.map(ServerItemView::new).forEach(this.listView::addChild);
+            this.listView.layout();
+          }, this.minecraft);
     }
   }
 
@@ -152,10 +155,5 @@ public class ServerListView extends ParentView {
         serverItem.ping();
       }
     }
-  }
-
-  protected void addServer(ServerEntry entry) {
-    this.listView.addChild(new ServerItemView(entry));
-    this.listView.layout();
   }
 }

@@ -99,7 +99,8 @@ public class MutableServerListView extends ServerListView {
   private void addServer(String host) {
     var address = ServerAddress.parseString(host);
     var entry = new ServerEntry(null, address.getHost(), address.getPort());
-    this.addServer(entry);
+    this.listView.addChild(new ServerItemView(entry));
+    this.listView.layout();
     this.saveServerList();
   }
 
@@ -110,7 +111,7 @@ public class MutableServerListView extends ServerListView {
   }
 
   private void saveServerList() {
-    ((MutableServerList) this.serverProvider)
+    ((MutableServerList) this.serverList)
         .save(this.listView.getChildViews().stream()
             .filter(ServerItemView.class::isInstance)
             .map(ServerItemView.class::cast)
