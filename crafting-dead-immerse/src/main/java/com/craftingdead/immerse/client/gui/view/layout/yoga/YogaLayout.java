@@ -25,6 +25,7 @@ import org.lwjgl.util.yoga.YGSize;
 import org.lwjgl.util.yoga.Yoga;
 import com.craftingdead.immerse.client.gui.view.Overflow;
 import com.craftingdead.immerse.client.gui.view.Point;
+import com.craftingdead.immerse.client.gui.view.Point.Type;
 import com.craftingdead.immerse.client.gui.view.layout.Layout;
 import com.craftingdead.immerse.client.gui.view.layout.MeasureMode;
 import com.craftingdead.immerse.client.gui.view.property.StyleableProperty;
@@ -35,6 +36,8 @@ import com.craftingdead.immerse.client.gui.view.style.shorthand.ShorthandArgMapp
 import com.craftingdead.immerse.client.gui.view.style.shorthand.ShorthandDispatcher;
 
 public class YogaLayout implements Layout {
+
+  public static final Point UNDEFINED = new Point(Type.FIXED, Yoga.YGUndefined);
 
   /**
    * Maps a {@link Yoga} YGMeasureMode to a {@link MeasureMode}.
@@ -112,13 +115,13 @@ public class YogaLayout implements Layout {
             this.borderTopWidth, this.borderRightWidth, this.borderBottomWidth,
             this.borderLeftWidth);
 
-    this.top = StyleableProperty.create("top", Point.class, Point.ZERO,
+    this.top = StyleableProperty.create("top", Point.class, UNDEFINED,
         value -> value.dispatch(this::setTop, this::setTopPercent, null));
-    this.right = StyleableProperty.create("right", Point.class, Point.ZERO,
+    this.right = StyleableProperty.create("right", Point.class, UNDEFINED,
         value -> value.dispatch(this::setRight, this::setRightPercent, null));
-    this.bottom = StyleableProperty.create("bottom", Point.class, Point.ZERO,
+    this.bottom = StyleableProperty.create("bottom", Point.class, UNDEFINED,
         value -> value.dispatch(this::setBottom, this::setBottomPercent, null));
-    this.left = StyleableProperty.create("left", Point.class, Point.ZERO,
+    this.left = StyleableProperty.create("left", Point.class, UNDEFINED,
         value -> value.dispatch(this::setLeft, this::setLeftPercent, null));
     this.inset = ShorthandDispatcher.create("inset", Point.class, ShorthandArgMapper.BOX_MAPPER,
         this.top, this.right, this.bottom, this.left);

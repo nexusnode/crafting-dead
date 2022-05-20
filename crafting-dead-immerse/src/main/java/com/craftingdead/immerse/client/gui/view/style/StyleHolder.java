@@ -23,7 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.OptionalInt;
 import java.util.function.Supplier;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import com.craftingdead.immerse.client.gui.view.property.StyleableProperty;
 import com.craftingdead.immerse.client.gui.view.state.States;
 import com.craftingdead.immerse.client.gui.view.style.parser.TransitionParser;
