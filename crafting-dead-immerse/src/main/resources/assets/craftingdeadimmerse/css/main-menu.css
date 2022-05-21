@@ -30,16 +30,18 @@
 }
 
 MainMenuView {
-    flex-direction: row-reverse;
-    justify-content: flex-end;
+    flex-direction: row;
 }
 
 MainMenuView > #content {
-    flex-grow: 1;
+    width: 100%;
+    height: 100%;
+    margin-left: 30;
 }
 
 MainMenuView > #content > * {
-    flex-grow: 1;
+    width: 100%;
+    height: 100%;
     position: absolute;
 }
 
@@ -47,6 +49,7 @@ MainMenuView > #side-bar {
     border-right-width: 1;
     height: 100%;
     width: 30;
+    position: absolute;
     align-items: center;
     background-color: rgba(119, 119, 119, 0.35);
     border-right-color: rgba(181, 181, 181, 0.5);
