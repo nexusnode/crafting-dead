@@ -18,7 +18,7 @@
 
 package com.craftingdead.immerse.game.tdm.message;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.immerse.game.module.team.ServerTeamModule;
 import com.craftingdead.immerse.game.tdm.TdmServer;

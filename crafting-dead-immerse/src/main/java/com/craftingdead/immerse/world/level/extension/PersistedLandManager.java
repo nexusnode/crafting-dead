@@ -22,7 +22,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.SortedSet;
 import java.util.function.BooleanSupplier;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import com.mojang.logging.LogUtils;
 import org.slf4j.Logger;
 import it.unimi.dsi.fastutil.objects.ObjectLinkedOpenHashSet;

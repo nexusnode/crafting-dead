@@ -22,7 +22,7 @@ import java.util.Collections;
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.function.Supplier;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import com.craftingdead.core.world.inventory.GunCraftSlotType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;

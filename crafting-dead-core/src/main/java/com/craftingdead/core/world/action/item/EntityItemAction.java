@@ -19,7 +19,7 @@
 package com.craftingdead.core.world.action.item;
 
 import java.util.Optional;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import com.craftingdead.core.util.RayTraceUtil;
 import com.craftingdead.core.world.action.ActionObserver;
 import com.craftingdead.core.world.action.ProgressBar;

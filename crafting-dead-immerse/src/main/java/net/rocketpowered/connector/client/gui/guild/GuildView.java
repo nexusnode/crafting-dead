@@ -19,7 +19,7 @@
 package net.rocketpowered.connector.client.gui.guild;
 
 import java.util.Set;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import com.craftingdead.immerse.client.gui.view.PanoramaView;
 import com.craftingdead.immerse.client.gui.view.ParentView;
 import com.craftingdead.immerse.client.gui.view.TextView;

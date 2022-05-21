@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import com.craftingdead.core.world.action.Action;
 import com.craftingdead.core.world.action.TargetSelector;
 import com.craftingdead.core.world.entity.extension.LivingExtension;

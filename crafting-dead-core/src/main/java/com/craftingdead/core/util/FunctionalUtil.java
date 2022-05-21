@@ -21,7 +21,7 @@ package com.craftingdead.core.util;
 import com.google.common.base.Suppliers;
 import java.util.Optional;
 import java.util.function.Supplier;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.NotNull;
 
 public class FunctionalUtil {

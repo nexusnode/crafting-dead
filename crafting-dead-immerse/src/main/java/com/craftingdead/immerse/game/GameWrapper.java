@@ -20,7 +20,7 @@ package com.craftingdead.immerse.game;
 
 import java.util.Collection;
 import java.util.Map;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import com.craftingdead.core.network.Synched;
 import com.craftingdead.immerse.game.module.GameModule;
 import com.craftingdead.immerse.game.module.ModuleType;

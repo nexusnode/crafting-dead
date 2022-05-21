@@ -19,7 +19,7 @@
 package com.craftingdead.immerse.world.level.block;
 
 import com.craftingdead.immerse.Permissions;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import com.craftingdead.immerse.world.level.block.entity.BaseCenterBlockEntity;
 import com.craftingdead.immerse.world.level.block.entity.ImmerseBlockEntityTypes;
 import net.minecraft.core.BlockPos;

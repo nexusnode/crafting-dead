@@ -20,7 +20,7 @@ package com.craftingdead.immerse.client.gui.view.style.parser;
 
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import com.mojang.logging.LogUtils;
 import org.slf4j.Logger;
 import org.jdesktop.core.animation.timing.Interpolator;

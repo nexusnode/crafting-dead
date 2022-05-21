@@ -20,7 +20,7 @@ package com.craftingdead.core.world.entity;
 
 import java.util.Optional;
 import java.util.UUID;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;

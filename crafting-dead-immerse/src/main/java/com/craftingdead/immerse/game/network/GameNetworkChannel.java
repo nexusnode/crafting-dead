@@ -19,7 +19,7 @@
 package com.craftingdead.immerse.game.network;
 
 import java.io.IOException;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import org.apache.commons.lang3.tuple.Pair;
 import com.mojang.logging.LogUtils;
 import org.slf4j.Logger;

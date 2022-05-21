@@ -19,7 +19,7 @@
 package com.craftingdead.core.data.recipes;
 
 import java.util.function.Consumer;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import com.craftingdead.core.world.item.crafting.ModRecipeSerializers;
 import com.google.gson.JsonObject;
 import net.minecraft.advancements.Advancement;

@@ -19,7 +19,7 @@
 package com.craftingdead.survival.world.entity.monster;
 
 import java.util.Objects;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import com.craftingdead.survival.CraftingDeadSurvival;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.DifficultyInstance;

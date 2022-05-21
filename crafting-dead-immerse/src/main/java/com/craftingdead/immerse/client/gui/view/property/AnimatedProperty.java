@@ -18,7 +18,7 @@
 
 package com.craftingdead.immerse.client.gui.view.property;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public interface AnimatedProperty<T> extends Property<T> {
 

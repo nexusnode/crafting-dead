@@ -27,7 +27,7 @@ import com.craftingdead.core.world.item.combatslot.CombatSlotProvider;
 import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.BooleanSupplier;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;

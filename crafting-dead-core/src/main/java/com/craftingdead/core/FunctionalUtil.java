@@ -20,7 +20,7 @@ package com.craftingdead.core;
 
 import java.util.Optional;
 import java.util.function.Supplier;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public class FunctionalUtil {
 

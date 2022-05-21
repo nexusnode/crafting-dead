@@ -25,7 +25,7 @@ import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import org.apache.commons.lang3.Validate;
 import com.mojang.logging.LogUtils;
 import org.slf4j.Logger;

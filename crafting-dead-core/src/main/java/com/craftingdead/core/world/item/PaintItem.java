@@ -21,7 +21,7 @@ package com.craftingdead.core.world.item;
 import java.util.List;
 import java.util.OptionalInt;
 import java.util.concurrent.ThreadLocalRandom;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import com.craftingdead.core.capability.CapabilityUtil;
 import com.craftingdead.core.world.item.gun.skin.Paint;
 import com.craftingdead.core.world.item.gun.skin.Skin;

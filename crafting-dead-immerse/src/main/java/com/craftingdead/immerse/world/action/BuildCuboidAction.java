@@ -19,7 +19,7 @@
 package com.craftingdead.immerse.world.action;
 
 import java.util.List;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.immerse.util.BlockUtil;
 import com.google.common.collect.ImmutableList;

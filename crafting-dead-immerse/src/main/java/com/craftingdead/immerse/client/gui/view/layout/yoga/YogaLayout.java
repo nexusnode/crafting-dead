@@ -19,7 +19,7 @@
 package com.craftingdead.immerse.client.gui.view.layout.yoga;
 
 import java.util.function.Consumer;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import org.lwjgl.util.yoga.YGMeasureFunc;
 import org.lwjgl.util.yoga.YGSize;
 import org.lwjgl.util.yoga.Yoga;

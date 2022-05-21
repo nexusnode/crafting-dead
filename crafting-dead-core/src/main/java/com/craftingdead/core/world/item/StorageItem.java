@@ -20,7 +20,7 @@ package com.craftingdead.core.world.item;
 
 
 import java.util.List;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import com.craftingdead.core.capability.CapabilityUtil;
 import com.craftingdead.core.world.inventory.GenericMenu;
 import com.craftingdead.core.world.inventory.ModEquipmentSlot;

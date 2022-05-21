@@ -20,7 +20,7 @@ package com.craftingdead.core.world.item;
 
 import java.util.Collection;
 import java.util.function.Supplier;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import net.minecraft.network.chat.Component;

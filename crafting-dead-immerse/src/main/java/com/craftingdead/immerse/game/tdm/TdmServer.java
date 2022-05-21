@@ -21,7 +21,7 @@ package com.craftingdead.immerse.game.tdm;
 import java.time.Duration;
 import java.util.Optional;
 import java.util.function.Consumer;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import com.craftingdead.core.event.GunEvent;
 import com.craftingdead.core.event.LivingExtensionEvent;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;

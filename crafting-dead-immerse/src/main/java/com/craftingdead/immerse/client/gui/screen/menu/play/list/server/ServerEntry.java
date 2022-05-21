@@ -19,7 +19,7 @@
 package com.craftingdead.immerse.client.gui.screen.menu.play.list.server;
 
 import java.util.Optional;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import net.minecraft.client.multiplayer.resolver.ServerAddress;
 
 public class ServerEntry {

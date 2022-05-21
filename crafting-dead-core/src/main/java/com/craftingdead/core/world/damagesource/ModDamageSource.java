@@ -18,7 +18,7 @@
 
 package com.craftingdead.core.world.damagesource;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import com.craftingdead.core.world.entity.grenade.Grenade;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.EntityDamageSource;

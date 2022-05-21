@@ -23,7 +23,7 @@ import com.craftingdead.core.world.action.ProgressBar;
 import com.craftingdead.core.world.action.item.ItemAction;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
 import java.util.List;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;

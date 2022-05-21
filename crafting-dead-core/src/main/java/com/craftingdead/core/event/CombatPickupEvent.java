@@ -18,7 +18,7 @@
 
 package com.craftingdead.core.event;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import com.craftingdead.core.world.item.combatslot.CombatSlot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.eventbus.api.Cancelable;

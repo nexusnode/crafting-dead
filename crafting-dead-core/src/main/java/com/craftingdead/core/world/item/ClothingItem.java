@@ -20,7 +20,7 @@ package com.craftingdead.core.world.item;
 
 import java.util.List;
 import java.util.Map.Entry;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import com.craftingdead.core.capability.CapabilityUtil;
 import com.craftingdead.core.world.item.clothing.Clothing;
 import com.craftingdead.core.world.item.clothing.DefaultClothing;

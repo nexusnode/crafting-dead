@@ -18,7 +18,7 @@
 
 package com.craftingdead.immerse.client.gui.view;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import org.jdesktop.core.animation.timing.Animator;
 import org.jdesktop.core.animation.timing.Animator.Direction;
 import com.craftingdead.immerse.client.gui.view.property.AnimatedProperty;

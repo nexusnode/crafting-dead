@@ -18,7 +18,7 @@
 
 package com.craftingdead.core.client.renderer.entity.layers;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;

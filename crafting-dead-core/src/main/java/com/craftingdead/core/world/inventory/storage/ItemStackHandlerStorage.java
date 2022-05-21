@@ -18,7 +18,7 @@
 
 package com.craftingdead.core.world.inventory.storage;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import com.craftingdead.core.world.inventory.ModEquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.player.Inventory;

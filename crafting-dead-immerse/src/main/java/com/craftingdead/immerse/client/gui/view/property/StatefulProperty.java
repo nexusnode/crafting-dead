@@ -19,7 +19,7 @@
 package com.craftingdead.immerse.client.gui.view.property;
 
 import java.util.Objects;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import com.craftingdead.immerse.client.gui.view.state.StateListener;
 import com.craftingdead.immerse.client.gui.view.state.States;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;

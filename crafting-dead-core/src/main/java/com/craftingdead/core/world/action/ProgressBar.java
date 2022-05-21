@@ -19,7 +19,7 @@
 package com.craftingdead.core.world.action;
 
 import java.util.Optional;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
 import it.unimi.dsi.fastutil.floats.FloatUnaryOperator;
 import net.minecraft.network.chat.Component;

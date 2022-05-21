@@ -20,7 +20,7 @@ package com.craftingdead.core.world.item.gun;
 
 import java.util.HashMap;
 import java.util.Optional;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.client.ClientDist;
 import com.craftingdead.core.client.animation.Animation;

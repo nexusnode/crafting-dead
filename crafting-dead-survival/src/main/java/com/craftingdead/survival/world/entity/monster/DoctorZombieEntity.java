@@ -19,7 +19,7 @@
 package com.craftingdead.survival.world.entity.monster;
 
 import java.util.Objects;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import com.craftingdead.core.tags.ModItemTags;
 import com.craftingdead.core.world.item.ModItems;
 import com.craftingdead.survival.CraftingDeadSurvival;

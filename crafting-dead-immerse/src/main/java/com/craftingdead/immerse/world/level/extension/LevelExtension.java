@@ -20,7 +20,7 @@ package com.craftingdead.immerse.world.level.extension;
 
 import java.io.IOException;
 import java.util.function.BooleanSupplier;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import com.craftingdead.core.capability.CapabilityUtil;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import net.minecraft.nbt.CompoundTag;

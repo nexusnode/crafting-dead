@@ -20,7 +20,7 @@ package com.craftingdead.core.client.renderer.entity.layers;
 
 import java.util.Objects;
 import java.util.function.Consumer;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import com.craftingdead.core.client.util.RenderUtil;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.inventory.ModEquipmentSlot;

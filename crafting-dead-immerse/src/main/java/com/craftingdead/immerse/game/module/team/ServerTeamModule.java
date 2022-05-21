@@ -19,7 +19,7 @@
 package com.craftingdead.immerse.game.module.team;
 
 import java.util.UUID;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.immerse.game.module.ServerModule;
 import net.minecraft.server.level.ServerPlayer;

@@ -20,7 +20,7 @@ package com.craftingdead.immerse.client.gui.view.property;
 
 import java.util.function.Consumer;
 import java.util.function.Supplier;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public interface ValueAccessor<T> {
 

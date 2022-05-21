@@ -22,7 +22,7 @@ import com.craftingdead.core.world.inventory.ModEquipmentSlot;
 import java.util.Optional;
 import java.util.Random;
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.capability.CapabilityUtil;
 import com.craftingdead.core.world.action.Action;
