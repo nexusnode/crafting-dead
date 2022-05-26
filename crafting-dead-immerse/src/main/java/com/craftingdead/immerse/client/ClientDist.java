@@ -36,7 +36,7 @@ import com.craftingdead.immerse.client.fake.FakePlayer;
 import com.craftingdead.immerse.client.gui.IngameGui;
 import com.craftingdead.immerse.client.gui.screen.menu.MainMenuView;
 import com.craftingdead.immerse.client.gui.view.ViewScreen;
-import com.craftingdead.immerse.client.gui.view.style.StylesheetManager;
+import com.craftingdead.immerse.client.gui.view.style.StyleSheetManager;
 import com.craftingdead.immerse.client.renderer.BlueprintOutlineRenderer;
 import com.craftingdead.immerse.client.renderer.SpectatorRenderer;
 import com.craftingdead.immerse.client.renderer.entity.layer.TeamClothingLayer;
@@ -197,7 +197,7 @@ public class ClientDist implements ModDist {
   // ================================================================================
 
   private void handleRegisterClientReloadListeners(RegisterClientReloadListenersEvent event) {
-    event.registerReloadListener(StylesheetManager.getInstance());
+    event.registerReloadListener(StyleSheetManager.getInstance());
   }
 
   @SuppressWarnings({"rawtypes", "unchecked"})

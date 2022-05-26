@@ -21,7 +21,7 @@ package com.craftingdead.immerse.client.gui.view;
 import java.util.Collections;
 import java.util.List;
 import com.craftingdead.immerse.client.gui.view.layout.Layout;
-import com.craftingdead.immerse.client.gui.view.style.StylesheetManager;
+import com.craftingdead.immerse.client.gui.view.style.StyleSheetManager;
 import com.craftingdead.immerse.client.gui.view.style.tree.StyleList;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
@@ -170,7 +170,7 @@ public final class ViewScreen extends Screen {
   }
 
   public void setStylesheets(List<ResourceLocation> stylesheets) {
-    this.styleList = StylesheetManager.getInstance().refreshStylesheets(stylesheets);
+    this.styleList = StyleSheetManager.getInstance().refreshStylesheets(stylesheets);
     this.root.refreshStyle();
   }
 
