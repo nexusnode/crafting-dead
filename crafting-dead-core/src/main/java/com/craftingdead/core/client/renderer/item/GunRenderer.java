@@ -526,7 +526,7 @@ public class GunRenderer implements CustomItemRenderer {
     }
 
     for (var attachment : gun.getAttachments()) {
-      var transform = this.properties.attachementTransforms()
+      var transform = this.properties.attachmentTransforms()
           .getOrDefault(attachment.getRegistryName(), Transformation.identity());
       transform.push(matrixStack);
       {
