@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Optional;
 import org.jetbrains.annotations.Nullable;
 import com.craftingdead.immerse.client.gui.view.layout.LayoutParent;
-import com.craftingdead.immerse.client.gui.view.property.StyleableProperty;
 import com.craftingdead.immerse.client.gui.view.style.StyleHolder;
 import com.craftingdead.immerse.client.gui.view.style.StyleParent;
 import com.craftingdead.immerse.util.ThreadSafe;
@@ -38,29 +37,33 @@ public class ParentView extends View implements ContainerEventHandler, StylePare
   // Bottom to top order
   private View[] sortedChildren = new View[0];
 
-  private LayoutParent layoutParent;
+  private LayoutParent layoutParent = LayoutParent.NILL;
 
   @Nullable
   private GuiEventListener focusedListener;
   private boolean dragging;
 
-  public ParentView(Properties<?> properties) {
+  public ParentView(Properties properties) {
     super(properties);
-    this.registerProperty(
-        StyleableProperty.create("display", Display.class, Display.FLEX, this::setDisplay));
+
+    this.getStyle().display.addListener(this::setDisplay);
+    this.setDisplay(this.getStyle().display.get());
   }
 
   private void setDisplay(Display display) {
-    if (this.layoutParent != null) {
-      this.layoutParent.gatherDispatchers(this.getStyle()::removeDispatcher);
-      this.layoutParent.gatherListeners(this.stateManager::addListener);
+    if (this.layoutParent != LayoutParent.NILL) {
       this.children.forEach(this::clearLayout);
       this.layoutParent.close();
     }
-    this.layoutParent = display.createLayoutParent();
-    this.layoutParent.gatherDispatchers(this.getStyle()::registerDispatcher);
-    this.layoutParent.gatherListeners(this.stateManager::removeListener);
-    this.children.forEach(this::setupLayout);
+
+    if (display != Display.NONE || this.layoutParent != LayoutParent.NILL) {
+      this.layoutParent = display.createLayoutParent();
+      this.layoutParent.setAll(this.getStyle());
+      this.children.forEach(this::setupLayout);
+      if (this.isAdded()) {
+        this.layout();
+      }
+    }
   }
 
   public final List<? extends View> getChildViews() {
@@ -118,12 +121,10 @@ public class ParentView extends View implements ContainerEventHandler, StylePare
     this.children.add(view);
     this.sortedChildren = this.children.toArray(new View[0]);
     this.sortChildren();
-    view.getStyle().setParent(this);
+    view.getStyleHolder().setParent(this);
     view.parent = this;
 
-    if (this.layoutParent != null) {
-      this.setupLayout(view);
-    }
+    this.setupLayout(view);
 
     if (this.isAdded()) {
       view.added();
@@ -136,7 +137,7 @@ public class ParentView extends View implements ContainerEventHandler, StylePare
 
   private void clearLayout(View view) {
     this.layoutParent.removeChild(view.getLayout());
-    view.setLayout(null);
+    view.getLayout().close();
   }
 
   @Override
@@ -200,9 +201,9 @@ public class ParentView extends View implements ContainerEventHandler, StylePare
     if (this.layoutParent != null) {
       this.clearLayout(view);
     }
-    view.getStyle().setParent(null);
+    view.getStyleHolder().setParent(null);
     view.parent = null;
-    view.getStyle().setStyleSupplier(null);
+    view.getStyleHolder().setStyleSupplier(null);
     if (this.focusedListener == view) {
       this.setFocused(null);
     }
@@ -238,16 +239,17 @@ public class ParentView extends View implements ContainerEventHandler, StylePare
       return;
     }
 
-    // Do this twice because the content width depends on if a scrollbar exists which depends on the
-    // content height etc.
-
+    var wasScrollbarEnabled = this.isScrollbarEnabled();
     this.layoutParent.layout(this.getContentWidth(), this.getContentHeight());
     this.children.forEach(View::layout);
     super.layout();
 
-    this.layoutParent.layout(this.getContentWidth(), this.getContentHeight());
-    this.children.forEach(View::layout);
-    super.layout();
+    // Re-layout to account for scrollbar width.
+    if (wasScrollbarEnabled != this.isScrollbarEnabled()) {
+      this.layoutParent.layout(this.getContentWidth(), this.getContentHeight());
+      this.children.forEach(View::layout);
+      super.layout();
+    }
   }
 
   @Override
@@ -400,7 +402,7 @@ public class ParentView extends View implements ContainerEventHandler, StylePare
 
   @Override
   public List<StyleHolder> getChildStyles() {
-    return this.children.stream().map(View::getStyle).toList();
+    return this.children.stream().map(View::getStyleHolder).toList();
   }
 
   @Override

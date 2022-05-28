@@ -26,41 +26,46 @@ import org.lwjgl.glfw.GLFW;
 import com.craftingdead.immerse.client.gui.view.event.ActionEvent;
 import com.craftingdead.immerse.client.gui.view.layout.MeasureMode;
 import com.craftingdead.immerse.client.util.RenderUtil;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.Tesselator;
-import com.mojang.blaze3d.vertex.VertexFormat;
+import io.github.humbleui.skija.Font;
+import io.github.humbleui.skija.FontMgr;
+import io.github.humbleui.skija.FontStyle;
+import io.github.humbleui.skija.FontStyleSet;
+import io.github.humbleui.skija.Paint;
+import io.github.humbleui.skija.PaintMode;
+import io.github.humbleui.skija.PaintStrokeCap;
+import io.github.humbleui.skija.TextLine;
+import io.github.humbleui.skija.shaper.Shaper;
+import io.github.humbleui.skija.shaper.ShapingOptions;
+import io.github.humbleui.types.Rect;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
 import net.minecraft.client.gui.components.events.ContainerEventHandler;
 import net.minecraft.client.gui.components.events.GuiEventListener;
-import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvent;
-import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec2;
 
 public class DropdownView extends View implements ContainerEventHandler {
 
   public static final int DEFAULT_HEIGHT = 14;
-  public static final int DEFAULT_ITEM_BACKGROUND_COLOUR = 0x444444;
-  public static final int DEFAULT_SELECTED_ITEM_BACKGROUND_COLOUR = 0x222222;
-  public static final int DEFAULT_HOVERED_ITEM_BACKGROUND_COLOUR = 0x333333;
+  public static final int DEFAULT_ITEM_BACKGROUND_COLOR = 0xFF444444;
+  public static final int DEFAULT_SELECTED_ITEM_BACKGROUND_COLOR = 0xFF222222;
+  public static final int DEFAULT_HOVERED_ITEM_BACKGROUND_COLOR = 0xFF333333;
 
   public static final int Z_OFFSET = 5;
-  public static final float DEFAULT_ARROW_WIDTH = 12.0F;
-  public static final float DEFAULT_ARROW_HEIGHT = 5.0F;
-  public static final float DEFAULT_ARROW_LINE_WIDTH = 1.6F;
-  public static final float DEFAULT_X_ARROW_OFFSET = 0.18F;
+  public static final float DEFAULT_ARROW_WIDTH = 6.0F;
+  public static final float DEFAULT_ARROW_HEIGHT = 2.5F;
+  public static final float DEFAULT_ARROW_LINE_WIDTH = 1F;
+  public static final float DEFAULT_X_ARROW_OFFSET = 0.15F;
 
   private final List<Item> items = new ArrayList<>();
 
-  private int itemBackgroundColour;
-  private int selectedItemBackgroundColour;
-  private int hoveredItemBackgroundColour;
+  private int itemBackgroundColor;
+  private int selectedItemBackgroundColor;
+  private int hoveredItemBackgroundColor;
 
   private boolean expanded = false;
   private int focusedItemIndex;
@@ -69,8 +74,6 @@ public class DropdownView extends View implements ContainerEventHandler {
   private float arrowWidth;
   private float arrowHeight;
   private float arrowLineWidth;
-  private float arrowLineWidthX;
-  private float arrowLineWidthY;
   private float xArrowOffset;
 
   private boolean dragging;
@@ -85,7 +88,9 @@ public class DropdownView extends View implements ContainerEventHandler {
   @Nullable
   private GuiEventListener lastHoveredListener;
 
-  public DropdownView(Properties<?> properties) {
+  private FontMgr fontManager = FontMgr.getDefault();
+
+  public DropdownView(Properties properties) {
     super(properties.focusable(true));
     this.addListener(ActionEvent.class, event -> {
       if (this.expanded) {
@@ -94,14 +99,32 @@ public class DropdownView extends View implements ContainerEventHandler {
       this.toggleExpanded();
     });
 
-    this.itemBackgroundColour = DEFAULT_ITEM_BACKGROUND_COLOUR;
-    this.selectedItemBackgroundColour = DEFAULT_SELECTED_ITEM_BACKGROUND_COLOUR;
-    this.hoveredItemBackgroundColour = DEFAULT_HOVERED_ITEM_BACKGROUND_COLOUR;
+    this.itemBackgroundColor = DEFAULT_ITEM_BACKGROUND_COLOR;
+    this.selectedItemBackgroundColor = DEFAULT_SELECTED_ITEM_BACKGROUND_COLOR;
+    this.hoveredItemBackgroundColor = DEFAULT_HOVERED_ITEM_BACKGROUND_COLOR;
     this.arrowWidth = DEFAULT_ARROW_WIDTH;
     this.arrowHeight = DEFAULT_ARROW_HEIGHT;
     this.arrowLineWidth = DEFAULT_ARROW_LINE_WIDTH;
-    this.calculateArrowLineWidthProjections();
     this.xArrowOffset = DEFAULT_X_ARROW_OFFSET;
+
+    this.getStyle().fontFamily.addListener(__ -> this.items.forEach(Item::refreshTextLine));
+  }
+
+  @Override
+  public void styleRefreshed(FontMgr fontManager) {
+    if (this.fontManager != FontMgr.getDefault()) {
+      this.fontManager.close();
+    }
+    this.fontManager = fontManager;
+    this.items.forEach(Item::refreshTextLine);
+  }
+
+  @Override
+  public void close() {
+    super.close();
+    if (this.fontManager != FontMgr.getDefault()) {
+      this.fontManager.close();
+    }
   }
 
   @Override
@@ -116,19 +139,16 @@ public class DropdownView extends View implements ContainerEventHandler {
 
   public DropdownView setArrowWidth(float arrowWidth) {
     this.arrowWidth = arrowWidth;
-    this.calculateArrowLineWidthProjections();
     return this;
   }
 
   public DropdownView setArrowHeight(float arrowHeight) {
     this.arrowHeight = arrowHeight;
-    this.calculateArrowLineWidthProjections();
     return this;
   }
 
   public DropdownView setArrowLineWidth(float arrowLineWidth) {
     this.arrowLineWidth = arrowLineWidth;
-    this.calculateArrowLineWidthProjections();
     return this;
   }
 
@@ -141,17 +161,17 @@ public class DropdownView extends View implements ContainerEventHandler {
   }
 
   public DropdownView setItemBackgroundColour(int itemBackgroundColour) {
-    this.itemBackgroundColour = itemBackgroundColour;
+    this.itemBackgroundColor = itemBackgroundColour;
     return this;
   }
 
   public DropdownView setSelectedItemBackgroundColour(int selectedItemBackgroundColour) {
-    this.selectedItemBackgroundColour = selectedItemBackgroundColour;
+    this.selectedItemBackgroundColor = selectedItemBackgroundColour;
     return this;
   }
 
   public DropdownView setHoveredItemBackgroundColour(int hoveredItemBackgroundColour) {
-    this.hoveredItemBackgroundColour = hoveredItemBackgroundColour;
+    this.hoveredItemBackgroundColor = hoveredItemBackgroundColour;
     return this;
   }
 
@@ -204,6 +224,7 @@ public class DropdownView extends View implements ContainerEventHandler {
   @Override
   protected void layout() {
     super.layout();
+    this.items.forEach(Item::refreshTextLine);
   }
 
   @Override
@@ -257,71 +278,63 @@ public class DropdownView extends View implements ContainerEventHandler {
   public void renderContent(PoseStack poseStack, int mouseX, int mouseY, float partialTicks) {
     super.renderContent(poseStack, mouseX, mouseY, partialTicks);
 
-    this.selectedItem.render(poseStack, Type.SELECTED, 255 << 24);
+    this.selectedItem.render(poseStack, Type.SELECTED, this.getAlpha());
     this.renderArrow(poseStack);
 
     float alpha = Mth.clamp((Util.getMillis() - this.fadeStartTimeMs) / 100.0F, 0.0F, 1.0F);
     if (!this.expanded) {
       alpha = 1.0F - alpha;
     }
-    int opacity = Mth.ceil(alpha * 255.0F) << 24;
-    if ((opacity & 0xFC000000) != 0) {
-      for (var item : this.items) {
-        Type type;
-        if (item.disabled) {
-          type = Type.DISABLED;
-        } else if (item == this.selectedItem) {
-          type = Type.HIGHLIGHTED;
-        } else if (item.isMouseOver(mouseX, mouseY) || this.focusedItemIndex == item.index) {
-          type = Type.HOVERED;
-        } else {
-          type = Type.NONE;
-        }
 
-        item.render(poseStack, type, opacity);
+    if (alpha == 0.0F) {
+      return;
+    }
+
+    for (var item : this.items) {
+      Type type;
+      if (item.disabled) {
+        type = Type.DISABLED;
+      } else if (item == this.selectedItem) {
+        type = Type.HIGHLIGHTED;
+      } else if (item.isMouseOver(mouseX, mouseY) || this.focusedItemIndex == item.index) {
+        type = Type.HOVERED;
+      } else {
+        type = Type.NONE;
+      }
+
+      item.render(poseStack, type, alpha * this.getAlpha());
+    }
+  }
+
+  @SuppressWarnings("resource")
+  private void renderArrow(PoseStack poseStack) {
+    var xOffset =
+        this.getScaledContentX() + this.getScaledContentWidth() * (1 - this.xArrowOffset);
+    var yOffset =
+        (this.getScaledContentY() + (this.getScaledContentHeight() - this.arrowHeight) / 2.0F);
+
+    this.skia.begin();
+    {
+      var canvas = this.skia.canvas();
+      try (var paint = new Paint().setStrokeCap(PaintStrokeCap.ROUND)
+          .setStrokeWidth(this.arrowLineWidth * (float) this.window.getGuiScale())
+          .setColor(0xFFFFFFFF)
+          .setMode(PaintMode.FILL)) {
+        canvas.drawLine(
+            (xOffset) * (float) this.window.getGuiScale(),
+            yOffset * (float) this.window.getGuiScale(),
+            ((xOffset) + this.arrowWidth / 2.0F) * (float) this.window.getGuiScale(),
+            (yOffset + this.arrowHeight) * (float) this.window.getGuiScale(),
+            paint);
+        canvas.drawLine(
+            (xOffset + this.arrowWidth / 2.0F) * (float) this.window.getGuiScale(),
+            (yOffset + this.arrowHeight) * (float) this.window.getGuiScale(),
+            (xOffset + this.arrowWidth) * (float) this.window.getGuiScale(),
+            yOffset * (float) this.window.getGuiScale(),
+            paint);
       }
     }
-  }
-
-  private void renderArrow(PoseStack poseStack) {
-    // TODO make it smoother around the edges?
-    poseStack.pushPose();
-    {
-      var xOffset =
-          this.getScaledContentX() + this.getScaledContentWidth() * (1 - this.xArrowOffset);
-      var yOffset =
-          (this.getScaledContentY() + (this.getScaledContentHeight() - this.arrowHeight) / 2d);
-      poseStack.translate(xOffset, yOffset, 0);
-      RenderSystem.setShader(GameRenderer::getPositionShader);
-      RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-      final var matrix = poseStack.last().pose();
-      final var tessellator = Tesselator.getInstance();
-      final var builder = tessellator.getBuilder();
-      builder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION);
-      builder.vertex(matrix, 0.0F, 0.0F, 0.0F).endVertex();
-      builder.vertex(matrix, this.arrowWidth / 2.0F, this.arrowHeight, 0.0F).endVertex();
-      builder.vertex(matrix, this.arrowWidth / 2.0F, this.arrowHeight - this.arrowLineWidthY, 0.0F)
-          .endVertex();
-      builder.vertex(matrix, this.arrowLineWidthX, 0.0F, 0.0F).endVertex();
-      tessellator.end();
-      builder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION);
-      builder.vertex(matrix, this.arrowWidth - this.arrowLineWidthX, 0.0F, 0.0F).endVertex();
-      builder.vertex(matrix, this.arrowWidth / 2.0F, this.arrowHeight - this.arrowLineWidthY, 0.0F)
-          .endVertex();
-      builder.vertex(matrix, this.arrowWidth / 2.0F, this.arrowHeight, 0.0F).endVertex();
-      builder.vertex(matrix, this.arrowWidth, 0.0F, 0.0F).endVertex();
-      tessellator.end();
-    }
-    poseStack.popPose();
-  }
-
-  private void calculateArrowLineWidthProjections() {
-    var arrowLinePitchRad =
-        Math.toRadians(90) - Math.atan(this.arrowWidth / 2.0F / this.arrowHeight);
-    this.arrowLineWidthX = this.arrowLineWidth / (float) Math.sin(arrowLinePitchRad);
-    this.arrowLineWidthY =
-        this.arrowHeight
-            - (float) Math.tan(arrowLinePitchRad) * (this.arrowWidth / 2.0F - this.arrowLineWidthX);
+    this.skia.end();
   }
 
   private enum Type {
@@ -336,33 +349,60 @@ public class DropdownView extends View implements ContainerEventHandler {
 
     private boolean disabled = false;
 
+    private TextLine textLine;
+
     public Item(int index, Component text, Runnable actionListener) {
       this.index = index;
       this.text = text;
       this.actionListener = actionListener;
+      this.refreshTextLine();
     }
 
-    private void render(PoseStack poseStack, Type type, int opacity) {
+    private void refreshTextLine() {
+      var style = this.text.getStyle();
+      var fontStyle = style.isBold() && style.isItalic()
+          ? FontStyle.BOLD_ITALIC
+          : style.isBold()
+              ? FontStyle.BOLD
+              : style.isItalic()
+                  ? FontStyle.ITALIC
+                  : FontStyle.NORMAL;
+
+      FontStyleSet fontSet = FontStyleSet.makeEmpty();
+      for (var family : DropdownView.this.getStyle().fontFamily.get()) {
+        fontSet = DropdownView.this.fontManager.matchFamily(family);
+        if (fontSet.count() > 0) {
+          break;
+        }
+      }
+
+      this.textLine = Shaper.make(DropdownView.this.fontManager).shapeLine(this.text.getString(),
+          new Font(fontSet.matchStyle(fontStyle), DropdownView.this.getStyle().fontSize.get()
+              * (float) DropdownView.this.window.getGuiScale()),
+          ShapingOptions.DEFAULT);
+    }
+
+    private void render(PoseStack poseStack, Type type, float alpha) {
       float y = this.getY();
 
-      int backgroundColour = DropdownView.this.itemBackgroundColour;
-      int textColour = ChatFormatting.GRAY.getColor();
+      int backgroundColor = DropdownView.this.itemBackgroundColor;
+      int textColor = ChatFormatting.GRAY.getColor();
 
       switch (type) {
         case SELECTED:
           y = DropdownView.this.getScaledContentY();
-          backgroundColour ^= 0x000000;
-          backgroundColour += 128 << 24;
-          textColour = ChatFormatting.WHITE.getColor();
+          backgroundColor ^= 0x000000;
+          backgroundColor += 128 << 24;
+          textColor = ChatFormatting.WHITE.getColor();
           break;
         case HIGHLIGHTED:
-          backgroundColour = DropdownView.this.selectedItemBackgroundColour;
+          backgroundColor = DropdownView.this.selectedItemBackgroundColor;
           break;
         case DISABLED:
-          textColour = ChatFormatting.DARK_GRAY.getColor();
+          textColor = ChatFormatting.DARK_GRAY.getColor();
           break;
         case HOVERED:
-          backgroundColour = DropdownView.this.hoveredItemBackgroundColour;
+          backgroundColor = DropdownView.this.hoveredItemBackgroundColor;
           break;
         default:
           break;
@@ -370,26 +410,41 @@ public class DropdownView extends View implements ContainerEventHandler {
 
       this.render(poseStack, DropdownView.this.getScaledContentX(), y,
           DropdownView.this.getScaledContentWidth(), DropdownView.this.getItemHeight(),
-          backgroundColour | opacity, textColour | opacity);
+          backgroundColor, textColor, alpha);
     }
 
+    @SuppressWarnings("resource")
     private void render(PoseStack poseStack, float x, float y, float width, float height,
-        int backgroundColour, int textColour) {
-      RenderSystem.setShader(GameRenderer::getPositionColorShader);
-      RenderUtil.fillWidthHeight(poseStack, x, y, width, height, backgroundColour);
-
-      var font = DropdownView.this.minecraft.font;
-
-      poseStack.pushPose();
+        int backgroundColor, int textColor, float alpha) {
+      DropdownView.this.skia.begin();
       {
-        poseStack.translate(0.0D, 0.0D, 400.0D);
-        float textY = y + (height - DropdownView.this.minecraft.font.lineHeight) / 2 + 1;
-        for (FormattedCharSequence line : font.split(this.text, (int) width)) {
-          font.draw(poseStack, line, x + 3, textY, textColour);
-          textY += DropdownView.this.minecraft.font.lineHeight;
+        var canvas = DropdownView.this.skia.canvas();
+
+        var style = this.text.getStyle();
+        var scale = (float) DropdownView.this.window.getGuiScale();
+
+        canvas.translate(x * scale, y * scale);
+        canvas.scale(DropdownView.this.getXScale(), DropdownView.this.getYScale());
+
+        try (var paint = new Paint()
+            .setMode(PaintMode.FILL)
+            .setColor(RenderUtil.multiplyAlpha(backgroundColor, alpha))) {
+          canvas.drawRect(Rect.makeWH(width * scale, height * scale), paint);
         }
+
+        try (var paint = new Paint()
+            .setColor(RenderUtil.multiplyAlpha(style.getColor() == null
+                ? DropdownView.this.getStyle().color.get().valueHex()
+                : style.getColor().getValue() + (255 << 24), alpha))) {
+          canvas.translate(4 * scale,
+              this.textLine.getHeight() + ((height * scale)) / 2.0F
+                  - this.textLine.getXHeight() * 2.0F);
+          canvas.drawTextLine(this.textLine, 0, 0, paint);
+        }
+
+        canvas.resetMatrix();
       }
-      poseStack.popPose();
+      DropdownView.this.skia.end();
     }
 
     private void select() {

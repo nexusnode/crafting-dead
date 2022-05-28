@@ -18,35 +18,39 @@
 
 package com.craftingdead.immerse.client.gui.view.style.adapter;
 
-import com.craftingdead.immerse.util.StringCountUtil;
+import java.util.function.Function;
 
-public class DoubleTranslator
-    implements StyleDecoder<Double>, StyleEncoder<Double>, StyleValidator<Double> {
+public interface StyleParser<T> {
 
-  @Override
-  public String encode(Double value, boolean prettyPrint) {
-    return value.toString();
-  }
+  /**
+   * Validate a css string and return the consumed length. return 0 for an invalid css String.
+   *
+   * @param style css string
+   * @return the consumed chars count
+   */
+  int validate(String style);
 
-  @Override
-  public Double decode(String style) {
-    if (style.contains("%")) {
-      return Double.valueOf(style.replace('%', '\0')) / 100;
-    }
-    return Double.valueOf(style);
-  }
+  /**
+   * Parse a css string and return the value.
+   *
+   * @param style css string
+   * @return the decoded value
+   */
+  T parse(String style);
 
-  @Override
-  public int validate(String style) {
-    int doubleLength = StringCountUtil.floatAtStart(style);
+  static <T> StyleParser<T> create(Function<String, Integer> validator,
+      Function<String, T> parser) {
+    return new StyleParser<>() {
 
-    if (doubleLength == 0) {
-      return 0;
-    }
+      @Override
+      public int validate(String style) {
+        return validator.apply(style);
+      }
 
-    if (doubleLength < style.length() && style.charAt(doubleLength) == '%') {
-      return doubleLength + 1;
-    }
-    return doubleLength;
+      @Override
+      public T parse(String style) {
+        return parser.apply(style);
+      }
+    };
   }
 }

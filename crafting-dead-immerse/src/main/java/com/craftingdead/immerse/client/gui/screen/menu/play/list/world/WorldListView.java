@@ -31,6 +31,7 @@ import com.craftingdead.immerse.client.gui.screen.Theme;
 import com.craftingdead.immerse.client.gui.view.Animation;
 import com.craftingdead.immerse.client.gui.view.ParentView;
 import com.craftingdead.immerse.client.gui.view.View;
+import com.craftingdead.immerse.client.gui.view.style.Percentage;
 import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.level.storage.LevelStorageException;
@@ -51,9 +52,9 @@ public class WorldListView extends ParentView {
   private final View recreateButton;
 
   public WorldListView() {
-    super(new Properties<>());
+    super(new Properties());
 
-    this.listView = new ParentView(new Properties<>().id("content"));
+    this.listView = new ParentView(new Properties().id("content"));
     this.loadWorlds();
 
     this.playButton = Theme.createGreenButton(
@@ -81,13 +82,13 @@ public class WorldListView extends ParentView {
         () -> this.getSelectedItem().ifPresent(WorldItemView::recreateWorld));
     this.recreateButton.setEnabled(false);
 
-    var controls = new ParentView(new Properties<>().id("controls"));
+    var controls = new ParentView(new Properties().id("controls"));
 
-    var firstRow = new ParentView(new Properties<>());
+    var firstRow = new ParentView(new Properties());
     firstRow.addChild(this.playButton);
     firstRow.addChild(createButton);
 
-    var secondRow = new ParentView(new Properties<>());
+    var secondRow = new ParentView(new Properties());
     secondRow.addChild(this.deleteButton);
     secondRow.addChild(this.editButton);
     secondRow.addChild(this.recreateButton);
@@ -106,9 +107,9 @@ public class WorldListView extends ParentView {
     int delay = 0;
     for (var view : this.listView.getChildViews()) {
       new Animator.Builder()
-          .addTarget(Animation.forProperty(view.getAlphaProperty())
-              .keyFrames(new KeyFrames.Builder<>(0.0F)
-                  .addFrame(1.0F)
+          .addTarget(Animation.forProperty(view.getStyle().opacity)
+              .keyFrames(new KeyFrames.Builder<>(Percentage.ZERO)
+                  .addFrame(Percentage.ONE_HUNDRED)
                   .build())
               .build())
           .setStartDelay(delay, TimeUnit.MILLISECONDS)

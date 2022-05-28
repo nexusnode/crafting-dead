@@ -16,31 +16,16 @@
  * https://craftingdead.net/terms.php
  */
 
-package com.craftingdead.immerse.client.gui.view.style.adapter;
+package com.craftingdead.immerse.client.gui.view.layout;
 
-import java.util.Locale;
+public enum Align {
 
-public class EnumTranslator<T extends Enum<T>>
-    implements StyleDecoder<T>, StyleEncoder<T>, StyleValidator<T> {
-
-  private final Class<T> type;
-
-  public EnumTranslator(Class<T> type) {
-    this.type = type;
-  }
-
-  @Override
-  public String encode(T value, boolean prettyPrint) {
-    return value.toString().toLowerCase(Locale.ROOT).replace('_', '-');
-  }
-
-  @Override
-  public T decode(String style) {
-    return Enum.valueOf(this.type, style.toUpperCase(Locale.ROOT).replace('-', '_'));
-  }
-
-  @Override
-  public int validate(String style) {
-    return style.length();
-  }
+  AUTO,
+  FLEX_START,
+  CENTER,
+  FLEX_END,
+  STRETCH,
+  BASELINE,
+  SPACE_BETWEEN,
+  SPACE_AROUND;
 }

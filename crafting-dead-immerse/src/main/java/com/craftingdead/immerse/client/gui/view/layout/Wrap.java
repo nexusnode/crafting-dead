@@ -16,27 +16,11 @@
  * https://craftingdead.net/terms.php
  */
 
-package com.craftingdead.immerse.client.gui.view.layout.yoga;
+package com.craftingdead.immerse.client.gui.view.layout;
 
-import org.lwjgl.util.yoga.Yoga;
+public enum Wrap {
 
-public enum YogaPositionType {
-  /**
-   * The component is positioned relative to its normal position.
-   */
-  RELATIVE(Yoga.YGPositionTypeRelative),
-  /**
-   * The component is positioned relative to its parent.
-   */
-  ABSOLUTE(Yoga.YGPositionTypeAbsolute);
-
-  private final int yogaType;
-
-  private YogaPositionType(int yogaType) {
-    this.yogaType = yogaType;
-  }
-
-  public int getYogaType() {
-    return this.yogaType;
-  }
+  NO_WRAP,
+  WRAP_REVERSE,
+  WRAP;
 }

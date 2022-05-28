@@ -70,16 +70,14 @@ public class ManageMembersView extends ParentView {
   private Disposable listener;
 
   public ManageMembersView(Consumer<View> viewConsumer) {
-    super(new Properties<>().styleClasses("page").backgroundBlur(50));
+    super(new Properties().styleClasses("page").backgroundBlur(50));
 
-    this.addChild(new TextView(new Properties<>().id("title"))
-        .setText(TITLE)
-        .setCentered(true));
+    this.addChild(new TextView(new Properties().id("title")).setText(TITLE));
 
     this.addChild(
-        this.membersListView = new ParentView(new Properties<>().id("list")));
+        this.membersListView = new ParentView(new Properties().id("list")));
 
-    this.controlsView = new ParentView(new Properties<>().id("controls"));
+    this.controlsView = new ParentView(new Properties().id("controls"));
 
     this.controlsView.addChild(
         this.promoteButton = Theme.createBlueButton(

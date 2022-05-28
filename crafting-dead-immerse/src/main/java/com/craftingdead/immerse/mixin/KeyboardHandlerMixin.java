@@ -45,8 +45,7 @@ public class KeyboardHandlerMixin {
           && Rocket.getGameClientGateway().isPresent()) {
         callbackInfo.cancel();
         var screen = new ViewScreen(TextComponent.EMPTY, new GuildView());
-        screen.setStylesheets(
-            List.of(new ResourceLocation(CraftingDeadImmerse.ID, "css/guild.css")));
+        screen.setStylesheets(List.of(new ResourceLocation(CraftingDeadImmerse.ID, "guild")));
         Minecraft.getInstance().setScreen(screen);
       }
     }

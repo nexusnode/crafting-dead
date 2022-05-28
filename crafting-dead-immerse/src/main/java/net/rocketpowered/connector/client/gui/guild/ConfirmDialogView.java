@@ -27,13 +27,11 @@ import net.minecraft.network.chat.Component;
 public class ConfirmDialogView extends ParentView {
 
   public ConfirmDialogView(Component message, Runnable yesListener, Runnable noListener) {
-    super(new Properties<>().styleClasses("dialog").backgroundBlur(50));
+    super(new Properties().styleClasses("dialog").backgroundBlur(50));
 
-    this.addChild(new TextView(new Properties<>())
-        .setText(message)
-        .setCentered(true));
+    this.addChild(new TextView(new Properties()).setText(message));
 
-    var controlsView = new ParentView(new Properties<>().id("controls"));
+    var controlsView = new ParentView(new Properties().id("controls"));
     this.addChild(controlsView);
 
     controlsView.addChild(Theme.createGreenButton(CommonComponents.GUI_YES, yesListener));

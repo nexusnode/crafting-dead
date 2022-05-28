@@ -66,7 +66,7 @@ public class StyleSelectorHierarchic implements StyleSelector {
       return false;
 
     if (this.isDirectChild()) {
-      if (!this.parentSelector.match(styleHolder.getParent().getStyle())) {
+      if (!this.parentSelector.match(styleHolder.getParent().getStyleHolder())) {
         return false;
       }
     } else {
@@ -74,11 +74,11 @@ public class StyleSelectorHierarchic implements StyleSelector {
 
       var matched = false;
       while (current != null) {
-        if (this.parentSelector.match(current.getStyle())) {
+        if (this.parentSelector.match(current.getStyleHolder())) {
           matched = true;
           break;
         }
-        current = current.getStyle().getParent();
+        current = current.getStyleHolder().getParent();
       }
       if (!matched) {
         return false;

@@ -19,166 +19,88 @@
 package com.craftingdead.immerse.client.gui.view.style;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import javax.annotation.Nonnull;
-import org.jetbrains.annotations.Nullable;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
+import java.util.concurrent.CompletionException;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.client.gui.view.style.parser.StyleSheetParser;
 import com.craftingdead.immerse.client.gui.view.style.tree.StyleList;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
-import com.google.common.util.concurrent.ListenableFuture;
-import com.mojang.logging.LogUtils;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
+import io.github.humbleui.skija.Data;
+import io.github.humbleui.skija.Typeface;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
+import net.minecraft.server.packs.resources.SimplePreparableReloadListener;
+import net.minecraft.util.profiling.ProfilerFiller;
 
-public class StyleSheetManager implements ResourceManagerReloadListener {
+public class StyleSheetManager
+    extends SimplePreparableReloadListener<Map<ResourceLocation, StyleList>> {
 
   private static final ResourceLocation USER_AGENT =
-      new ResourceLocation(CraftingDeadImmerse.ID, "css/user-agent.css");
-
-  private static final Logger logger = LogUtils.getLogger();
+      new ResourceLocation(CraftingDeadImmerse.ID, "user-agent");
 
   private static StyleSheetManager instance;
 
-  private final LoadingCache<ResourceLocation, StyleList> styleCache;
+  private Map<ResourceLocation, StyleList> styleLists = Collections.emptyMap();
 
-  private final Map<String, Theme> themes = new HashMap<>();
-
-  private StyleSheetManager() {
-    this.styleCache = CacheBuilder.newBuilder()
-        .maximumSize(100)
-        .expireAfterAccess(10, TimeUnit.MINUTES)
-        .build(new CacheLoader<>() {
-          @Override
-          public StyleList load(@Nonnull ResourceLocation stylesheet) throws IOException {
-            return StyleSheetParser.loadStylesheet(stylesheet);
-          }
-
-          @Override
-          public ListenableFuture<StyleList> reload(ResourceLocation key, StyleList oldValue)
-              throws Exception {
-            logger.info("Stylesheet has been forced to reload {}", key);
-            return super.reload(key, oldValue);
-          }
-        });
+  public StyleList createStyleList(Iterable<ResourceLocation> styleSheets) {
+    var userAgentList = this.styleLists.get(USER_AGENT);
+    var list = userAgentList == null ? new StyleList() : new StyleList(userAgentList);
+    for (var name : styleSheets) {
+      var styleSheet = this.styleLists.get(name);
+      if (styleSheet == null) {
+        throw new IllegalArgumentException("Unknown style sheet: " + name);
+      }
+      list.merge(styleSheet);
+    }
+    return list;
   }
 
   @Override
-  public void onResourceManagerReload(ResourceManager resourceManager) {
-    for (var key : this.styleCache.asMap().keySet()) {
-      this.styleCache.refresh(key);
-    }
-  }
+  protected Map<ResourceLocation, StyleList> prepare(ResourceManager resourceManager,
+      ProfilerFiller profilerFiller) {
+    var resources = resourceManager.listResources("css", resource -> resource.endsWith(".css"));
+    Map<ResourceLocation, StyleList> styleLists = new HashMap<>();
+    Multimap<StyleList, ResourceLocation> pendingMerge = HashMultimap.create();
 
-  public void forceReload(Iterable<ResourceLocation> styleSheets) {
-    this.forceReload(styleSheets, null);
-  }
-
-  public StyleList forceReload(Iterable<ResourceLocation> styleSheets, @Nullable String themeId) {
-    styleSheets.forEach(this.styleCache::refresh);
-    return this.refreshStylesheets(styleSheets, themeId);
-  }
-
-  public StyleList refreshStylesheets(Iterable<ResourceLocation> styleSheets) {
-    return this.refreshStylesheets(styleSheets, null);
-  }
-
-  public StyleList refreshStylesheets(Iterable<ResourceLocation> styleSheets,
-      @Nullable String themeId) {
-    StyleList userAgentList = null;
-    try {
-      userAgentList = this.getStyleList(USER_AGENT);
-    } catch (ExecutionException e) {
-      e.printStackTrace();
-    }
-    var list = themeId != null
-        ? new StyleList(this.getTheme(themeId))
-        : userAgentList != null ? new StyleList(userAgentList) : new StyleList();
-    list.merge(this.loadStylesheets(styleSheets));
-    return list;
-  }
-
-  public StyleList loadStylesheets(Iterable<ResourceLocation> styleSheets) {
-    var list = new StyleList();
-    for (var styleSheet : styleSheets) {
-      try {
-        list.merge(this.getStyleList(styleSheet));
-      } catch (ExecutionException e) {
-        logger.error("Error loading stylesheet {} {}", styleSheet, e);
+    for (var resource : resources) {
+      var path = resource.getPath();
+      var name = new ResourceLocation(resource.getNamespace(),
+          path.substring("css/".length(), path.length() - ".css".length()));
+      try (var inputStream = resourceManager.getResource(resource).getInputStream()) {
+        var result = StyleSheetParser.loadStyleSheet(inputStream,
+            fontLocation -> loadFont(resourceManager, fontLocation));
+        styleLists.put(name, result.styleList());
+        pendingMerge.putAll(result.styleList(), result.dependencies());
+      } catch (IOException e) {
+        throw new CompletionException(e);
       }
     }
-    return list;
-  }
 
-  private StyleList getStyleList(ResourceLocation styleSheet) throws ExecutionException {
-    return this.styleCache.get(styleSheet);
-  }
-
-  public void addTheme(String themeId, ResourceLocation styleSheet) {
-    if (StringUtils.isEmpty(themeId)) {
-      throw new IllegalArgumentException("Invalid theme " + themeId);
-    }
-    try {
-      if (!this.themes.containsKey(themeId)) {
-        this.createTheme(themeId);
+    pendingMerge.forEach((styleList, dependencyLocation) -> {
+      var dependency = styleLists.get(dependencyLocation);
+      if (dependency == null) {
+        throw new IllegalStateException("Style sheet not found: " + dependencyLocation.toString());
+      } else {
+        styleList.merge(dependency);
       }
+    });
 
-      var theme = this.themes.get(themeId);
-
-      if (theme.styleSheets().contains(styleSheet)) {
-        return;
-      }
-
-      theme.styleSheets().add(styleSheet);
-      theme.styleList().merge(this.getStyleList(styleSheet));
-    } catch (ExecutionException e) {
-      e.printStackTrace();
-    }
+    return styleLists;
   }
 
-  public void removeTheme(String themeId, ResourceLocation styleSheet) {
-    if (StringUtils.isEmpty(themeId)) {
-      throw new IllegalArgumentException("Invalid theme " + themeId);
-    }
-
-    var theme = this.themes.get(themeId);
-    if (theme == null) {
-      return;
-    }
-
-    if (!theme.styleSheets().contains(styleSheet)) {
-      return;
-    }
-
-    theme.styleSheets().remove(styleSheet);
-    theme.styleList(this.loadStylesheets(theme.styleSheets()));
+  @Override
+  protected void apply(Map<ResourceLocation, StyleList> styleLists, ResourceManager resourceManager,
+      ProfilerFiller profilerFiller) {
+    this.styleLists = styleLists;
   }
 
-  private StyleList getTheme(String themeId) {
-    if (!this.themes.containsKey(themeId)) {
-      this.createTheme(themeId);
-    }
-    return this.themes.get(themeId).styleList();
-  }
-
-  private void createTheme(String themeId) {
-    try {
-      var theme = new Theme();
-      theme.styleSheets().add(USER_AGENT);
-      theme.styleList().merge(this.getStyleList(USER_AGENT));
-      this.themes.put(themeId, theme);
-    } catch (ExecutionException e) {
-      e.printStackTrace();
+  private static Typeface loadFont(ResourceManager resourceManager, ResourceLocation location)
+      throws IOException {
+    try (var inputStream = resourceManager.getResource(location).getInputStream()) {
+      return Typeface.makeFromData(Data.makeFromBytes(inputStream.readAllBytes()));
     }
   }
 
@@ -187,23 +109,5 @@ public class StyleSheetManager implements ResourceManagerReloadListener {
       instance = new StyleSheetManager();
     }
     return instance;
-  }
-
-  private static class Theme {
-
-    private final List<ResourceLocation> styleSheets = new ArrayList<>();
-    private StyleList styleList = new StyleList();
-
-    public StyleList styleList() {
-      return this.styleList;
-    }
-
-    public void styleList(StyleList styleList) {
-      this.styleList = styleList;
-    }
-
-    public List<ResourceLocation> styleSheets() {
-      return this.styleSheets;
-    }
   }
 }

@@ -50,25 +50,25 @@ public class MemberView extends ParentView {
   private final TextView rankView;
 
   public MemberView(GuildPayload guild, GuildMemberPayload member) {
-    super(new Properties<>().styleClasses("item").unscaleBorder(false).focusable(true));
+    super(new Properties().styleClasses("item").unscaleBorder(false).focusable(true));
 
     this.guild = guild;
 
-    this.avatarView = new AvatarView(new Properties<>(),
+    this.avatarView = new AvatarView(new Properties(),
         new GameProfile(member.user().minecraftProfile().id(), null));
-    this.avatarView.defineBorderColorState(Theme.OFFLINE);
+    this.avatarView.getStyle().defineBorderColorState(Theme.OFFLINE);
     this.addChild(this.avatarView);
 
-    var textView = new ParentView(new Properties<>().id("text"));
+    var textView = new ParentView(new Properties().id("text"));
     this.addChild(textView);
 
-    this.nameView = new TextView(new Properties<>())
+    this.nameView = new TextView(new Properties())
         .setWrap(false)
         .setText(member.user().minecraftProfile().name());
-    this.nameView.getColorProperty().defineState(Theme.OFFLINE);
+    this.nameView.getStyle().color.defineState(Theme.OFFLINE);
     textView.addChild(this.nameView);
 
-    this.rankView = new TextView(new Properties<>()).setWrap(false);
+    this.rankView = new TextView(new Properties()).setWrap(false);
     textView.addChild(this.rankView);
 
     this.updateMember(member);
@@ -99,15 +99,15 @@ public class MemberView extends ParentView {
 
     this.rankView.setText(new TextComponent(owner ? "Owner" : rank.getDisplayName().orElse(""))
         .withStyle(ChatFormatting.ITALIC));
-    this.rankView.getColorProperty().defineState(color);
+    this.rankView.getStyle().color.defineState(color);
 
-    this.getLeftBorderColorProperty().defineState(color);
+    this.getStyle().borderLeftColor.defineState(color);
   }
 
   private void updatePresence(UserPresencePayload presence) {
     var color = presence.online() ? Theme.ONLINE : Theme.OFFLINE;
-    this.avatarView.defineBorderColorState(color);
-    this.nameView.getColorProperty().defineState(color);
+    this.avatarView.getStyle().defineBorderColorState(color);
+    this.nameView.getStyle().color.defineState(color);
   }
 
   @Override

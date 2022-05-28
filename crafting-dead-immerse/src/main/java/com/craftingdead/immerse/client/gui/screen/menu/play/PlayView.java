@@ -26,7 +26,7 @@ import org.jdesktop.core.animation.timing.TimingTargetAdapter;
 import org.jdesktop.core.animation.timing.interpolators.SplineInterpolator;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.client.gui.screen.Theme;
-import com.craftingdead.immerse.client.gui.screen.menu.AnimatableView;
+import com.craftingdead.immerse.client.gui.screen.menu.TransitionView;
 import com.craftingdead.immerse.client.gui.screen.menu.play.list.server.JsonServerList;
 import com.craftingdead.immerse.client.gui.screen.menu.play.list.server.MutableServerListView;
 import com.craftingdead.immerse.client.gui.screen.menu.play.list.server.NbtServerList;
@@ -42,16 +42,20 @@ import com.craftingdead.immerse.sounds.ImmerseSoundEvents;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.TranslatableComponent;
 
-public class PlayView extends ParentView implements AnimatableView {
+public class PlayView extends ParentView implements TransitionView {
 
-  private final ParentView content = new ParentView(new Properties<>().id("content"));
+  private final ParentView content = new ParentView(new Properties().id("content"));
   private final ParentView officialContent =
-      new ParentView(new Properties<>().id("official-content"));
+      new ParentView(new Properties().id("official-content"));
+
+  private final Animator entranceAnimator;
+  private final Animator exitAnimator;
+  private Runnable removeCallback;
 
   public PlayView() {
-    super(new Properties<>().backgroundBlur(50));
+    super(new Properties().backgroundBlur(50));
 
-    var officialView = new ParentView(new Properties<>().id("official"));
+    var officialView = new ParentView(new Properties().id("official"));
 
     var survivalServerListView = new ServerListView(new JsonServerList(
         Paths.get(System.getProperty("user.dir"), "survival_servers.json")));
@@ -59,21 +63,19 @@ public class PlayView extends ParentView implements AnimatableView {
     var deathmatchServerListView = new ServerListView(new JsonServerList(
         Paths.get(System.getProperty("user.dir"), "tdm_servers.json")));
 
-    var survivalTab = (TabsView.TabView) new TabsView.TabView()
-        .setSelectedListener(() -> this.officialContent.replace(survivalServerListView))
-        .setText(new TranslatableComponent("menu.play.tab.survival"));
-    survivalTab.addActionSound(ImmerseSoundEvents.TAB_SELECT.get());
-    survivalTab.addHoverSound(ImmerseSoundEvents.TAB_HOVER.get());
-
-    var deathmatchTab = (TabsView.TabView) new TabsView.TabView()
-        .setSelectedListener(() -> this.officialContent.replace(deathmatchServerListView))
-        .setText(new TranslatableComponent("menu.play.tab.tdm"));
-    deathmatchTab.addActionSound(ImmerseSoundEvents.TAB_SELECT.get());
-    deathmatchTab.addHoverSound(ImmerseSoundEvents.TAB_HOVER.get());
-
-    officialView.addChild(new TabsView(new Properties<>())
-        .addTab(survivalTab)
-        .addTab(deathmatchTab));
+    officialView.addChild(new TabsView(new Properties())
+        .addTab(() -> this.officialContent.replace(survivalServerListView),
+            new TranslatableComponent("menu.play.tab.survival"),
+            tab -> {
+              tab.addActionSound(ImmerseSoundEvents.TAB_SELECT.get());
+              tab.addHoverSound(ImmerseSoundEvents.TAB_HOVER.get());
+            })
+        .addTab(() -> this.officialContent.replace(deathmatchServerListView),
+            new TranslatableComponent("menu.play.tab.tdm"),
+            tab -> {
+              tab.addActionSound(ImmerseSoundEvents.TAB_SELECT.get());
+              tab.addHoverSound(ImmerseSoundEvents.TAB_HOVER.get());
+            }));
     officialView.addChild(this.officialContent);
 
     var singleplayerView = new WorldListView();
@@ -81,11 +83,10 @@ public class PlayView extends ParentView implements AnimatableView {
     var customServerListView = new MutableServerListView(new NbtServerList(
         CraftingDeadImmerse.getInstance().getModDir().resolve("custom_servers.dat")));
 
-    this.addChild(new TextView(new Properties<>().id("title"))
-        .setShadow(true)
+    this.addChild(new TextView(new Properties().id("title"))
         .setText(new TranslatableComponent("menu.play.title")));
     this.addChild(Theme.newSeparator());
-    this.addChild(new DropdownView(new Properties<>())
+    this.addChild(new DropdownView(new Properties())
         .setExpandSound(ImmerseSoundEvents.DROP_DOWN_EXPAND.get())
         .setItemHoverSound(ImmerseSoundEvents.TAB_HOVER.get())
         .addItem(new TranslatableComponent("menu.play.dropdown.official"),
@@ -96,6 +97,30 @@ public class PlayView extends ParentView implements AnimatableView {
             () -> this.dropDownSelect(customServerListView)));
     this.addChild(Theme.newSeparator());
     this.addChild(this.content);
+
+    this.entranceAnimator = new Animator.Builder()
+        .addTarget(Animation.forProperty(this.getStyle().xTranslation)
+            .keyFrames(new KeyFrames.Builder<>((float) -this.window.getWidth())
+                .addFrame(0.0F)
+                .build())
+            .build())
+        .setInterpolator(new SplineInterpolator(0.1F, 1.0F, 0.1F, 1.0F))
+        .setDuration(250L, TimeUnit.MILLISECONDS)
+        .build();
+
+    this.exitAnimator = new Animator.Builder()
+        .addTarget(Animation.forProperty(this.getStyle().xTranslation)
+            .to((float) -this.window.getWidth())
+            .build())
+
+        .setDuration(250L, TimeUnit.MILLISECONDS)
+        .addTarget(new TimingTargetAdapter() {
+          @Override
+          public void end(Animator source) {
+            PlayView.this.removeCallback.run();
+          }
+        })
+        .build();
   }
 
   private void dropDownSelect(View content) {
@@ -111,36 +136,21 @@ public class PlayView extends ParentView implements AnimatableView {
   @Override
   protected void added() {
     super.added();
+    this.entranceAnimator.start();
     this.minecraft.getSoundManager().play(
         SimpleSoundInstance.forUI(ImmerseSoundEvents.MAIN_MENU_PRESS_PLAY.get(), 1.0F));
-
-    new Animator.Builder()
-        .addTarget(Animation.forProperty(this.getXTranslationProperty())
-            .keyFrames(new KeyFrames.Builder<>((float) -this.window.getWidth())
-                .addFrame(0.0F)
-                .build())
-            .build())
-        .setInterpolator(new SplineInterpolator(0.1F, 1.0F, 0.1F, 1.0F))
-        .setDuration(250L, TimeUnit.MILLISECONDS)
-        .build()
-        .start();
   }
 
   @Override
-  public void animateRemoval(Runnable remove) {
-    new Animator.Builder()
-        .addTarget(Animation.forProperty(this.getXTranslationProperty())
-            .to((float) -this.window.getWidth())
-            .build())
+  protected void removed() {
+    super.removed();
+    this.entranceAnimator.stop();
+    this.exitAnimator.stop();
+  }
 
-        .setDuration(250L, TimeUnit.MILLISECONDS)
-        .addTarget(new TimingTargetAdapter() {
-          @Override
-          public void end(Animator source) {
-            remove.run();
-          }
-        })
-        .build()
-        .start();
+  @Override
+  public void transitionOut(Runnable removeCallback) {
+    this.removeCallback = removeCallback;
+    this.exitAnimator.start();
   }
 }

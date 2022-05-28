@@ -28,7 +28,7 @@ public class PanoramaView extends View {
 
   private final PanoramaRenderer panorama;
 
-  public PanoramaView(Properties<?> properties, CubeMap cubeMap) {
+  public PanoramaView(Properties properties, CubeMap cubeMap) {
     super(properties);
     Objects.requireNonNull(cubeMap, "cubeMap cannot be null");
     this.panorama = new PanoramaRenderer(cubeMap);

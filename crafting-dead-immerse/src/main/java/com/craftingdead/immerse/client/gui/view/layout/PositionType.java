@@ -16,26 +16,15 @@
  * https://craftingdead.net/terms.php
  */
 
-package com.craftingdead.immerse.client.gui.view.layout.yoga;
+package com.craftingdead.immerse.client.gui.view.layout;
 
-import org.lwjgl.util.yoga.Yoga;
-
-public enum YogaJustify {
-
-  FLEX_START(Yoga.YGJustifyFlexStart),
-  CENTER(Yoga.YGJustifyCenter),
-  FLEX_END(Yoga.YGJustifyFlexEnd),
-  SPACE_BETWEEN(Yoga.YGJustifySpaceBetween),
-  SPACE_AROUND(Yoga.YGJustifySpaceAround),
-  SPACE_EVENLY(Yoga.YGJustifySpaceEvenly);
-
-  private final int yogaType;
-
-  private YogaJustify(int yogaType) {
-    this.yogaType = yogaType;
-  }
-
-  public int getYogaType() {
-    return this.yogaType;
-  }
+public enum PositionType {
+  /**
+   * The component is positioned relative to its normal position.
+   */
+  RELATIVE,
+  /**
+   * The component is positioned relative to its parent.
+   */
+  ABSOLUTE;
 }

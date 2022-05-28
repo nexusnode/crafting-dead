@@ -16,22 +16,14 @@
  * https://craftingdead.net/terms.php
  */
 
-package com.craftingdead.immerse.client.gui.view.layout.yoga;
+package com.craftingdead.immerse.client.gui.view.layout;
 
-import org.lwjgl.util.yoga.Yoga;
+public enum Justify {
 
-public enum YogaWrap {
-
-  NO_WRAP(Yoga.YGWrapNoWrap), WRAP_REVERSE(Yoga.YGWrapReverse), WRAP(Yoga.YGWrapWrap);
-
-  private final int yogaType;
-
-  private YogaWrap(int yogaType) {
-    this.yogaType = yogaType;
-
-  }
-
-  public int getYogaType() {
-    return this.yogaType;
-  }
+  FLEX_START,
+  CENTER,
+  FLEX_END,
+  SPACE_BETWEEN,
+  SPACE_AROUND,
+  SPACE_EVENLY;
 }

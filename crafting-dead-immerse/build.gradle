@@ -8,6 +8,9 @@ repositories {
     maven {
         url 'https://maven.tarbits.co.uk/'
     }
+      maven {
+    url "https://packages.jetbrains.team/maven/p/skija/maven"
+  }
 }
 
 mixin {
@@ -106,6 +109,9 @@ dependencies {
     }
     
     library group: 'net.rocketpowered', name: 'rocket-api', version: '0.0.5'
+    
+      shaded_library "io.github.humbleui:skija-windows:0.102.0"
+    
     
     runtimeOnly fg.deobf("net.rocketpowered:rocket-connector:${minecraft_version}-0.0.7")
 }

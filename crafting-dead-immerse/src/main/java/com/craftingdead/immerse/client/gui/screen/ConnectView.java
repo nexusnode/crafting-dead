@@ -75,26 +75,23 @@ public class ConnectView extends ParentView {
   private final TextView animationView;
 
   public ConnectView(Screen lastScreen, ServerAddress address) {
-    super(new Properties<>());
+    super(new Properties());
     this.lastScreen = lastScreen;
 
     this.addChild(Theme.createBackground());
-    this.addChild(new FogView(new Properties<>()));
+    this.addChild(new FogView(new Properties()));
 
-    var dialog = new ParentView(new Properties<>().id("dialog").backgroundBlur(50.0F));
+    var dialog = new ParentView(new Properties().id("dialog").backgroundBlur(50.0F));
     this.addChild(dialog);
     dialog.addChild(this.statusView =
-        new TextView(new Properties<>().id("status"))
-            .setText(new TranslatableComponent("connect.connecting"))
-            .setCentered(true));
+        new TextView(new Properties().id("status"))
+            .setText(new TranslatableComponent("connect.connecting")));
     dialog.addChild(this.animationView =
-        new TextView(new Properties<>().id("animation"))
-            .setText(this.nextAnimation())
-            .setCentered(true));
+        new TextView(new Properties().id("animation"))
+            .setText(this.nextAnimation()));
 
-    var cancelButton = new TextView(new Properties<>().id("cancel-button").focusable(true))
-        .setText(CommonComponents.GUI_CANCEL)
-        .setCentered(true);
+    var cancelButton = new TextView(new Properties().id("cancel-button").focusable(true))
+        .setText(CommonComponents.GUI_CANCEL);
     cancelButton.addActionSound(ImmerseSoundEvents.BUTTON_CLICK.get());
     cancelButton.addListener(ActionEvent.class, event -> {
       this.aborted = true;
@@ -186,7 +183,7 @@ public class ConnectView extends ParentView {
   public static Screen createScreen(Screen lastScreen, ServerAddress address) {
     var screen =
         new ViewScreen(NarratorChatListener.NO_TITLE, new ConnectView(lastScreen, address));
-    screen.setStylesheets(List.of(new ResourceLocation(CraftingDeadImmerse.ID, "css/connect.css")));
+    screen.setStylesheets(List.of(new ResourceLocation(CraftingDeadImmerse.ID, "connect")));
     return screen;
   }
 }

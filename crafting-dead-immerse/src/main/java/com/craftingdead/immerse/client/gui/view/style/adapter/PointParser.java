@@ -21,28 +21,11 @@ package com.craftingdead.immerse.client.gui.view.style.adapter;
 import com.craftingdead.immerse.client.gui.view.Point;
 import com.craftingdead.immerse.util.StringCountUtil;
 
-public class PointTranslator
-    implements StyleEncoder<Point>, StyleDecoder<Point>, StyleValidator<Point> {
+public class PointParser implements StyleParser<Point> {
 
-  @Override
-  public String encode(Point value, boolean prettyPrint) {
-    return switch (value.type()) {
-      case FIXED -> String.valueOf(value.value());
-      case PERCENTAGE -> String.valueOf(value.value()) + "%";
-      case AUTO -> "auto";
-    };
-  }
+  public static final PointParser INSTANCE = new PointParser();
 
-  @Override
-  public Point decode(String style) {
-    if (style.contains("%")) {
-      return Point.percentage(Float.parseFloat(style.replace('%', '\0')));
-    } else if (style.equals("auto")) {
-      return Point.AUTO;
-    } else {
-      return Point.fixed(Float.parseFloat(style));
-    }
-  }
+  private PointParser() {}
 
   @Override
   public int validate(String style) {
@@ -56,5 +39,16 @@ public class PointTranslator
       return floatLength + 1;
     }
     return floatLength;
+  }
+
+  @Override
+  public Point parse(String style) {
+    if (style.contains("%")) {
+      return Point.percentage(Float.parseFloat(style.replace('%', '\0')));
+    } else if (style.equals("auto")) {
+      return Point.AUTO;
+    } else {
+      return Point.fixed(Float.parseFloat(style.replace("px", "")));
+    }
   }
 }

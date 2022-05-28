@@ -19,16 +19,23 @@
 package com.craftingdead.immerse.client.gui.view.style.tree;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import com.craftingdead.immerse.client.gui.view.style.StyleHolder;
 import com.craftingdead.immerse.client.gui.view.style.selector.SimpleStyleSelector;
 import com.craftingdead.immerse.client.gui.view.style.selector.StyleSelector;
 import com.google.common.collect.Lists;
+import io.github.humbleui.skija.FontMgr;
+import io.github.humbleui.skija.Typeface;
+import io.github.humbleui.skija.paragraph.TypefaceFontProvider;
 
 public class StyleList {
 
   private final StyleRule wildcard = new StyleRule(new SimpleStyleSelector().addWildcard());
   private final List<StyleRule> rules = Lists.newArrayList(this.wildcard);
+
+  private final Map<String, Typeface> fonts = new HashMap<>();
 
   public StyleList() {}
 
@@ -36,9 +43,20 @@ public class StyleList {
     this.merge(original);
   }
 
-  public StyleList merge(StyleList src) {
-    src.getRules().forEach(rule -> this.addRule(rule.selector(), rule.properties()));
+  public StyleList merge(StyleList source) {
+    source.rules.forEach(rule -> this.addRule(rule.selector(), rule.properties()));
+    this.fonts.putAll(source.fonts);
     return this;
+  }
+
+  public FontMgr createFontManager() {
+    var fontManager = new TypefaceFontProvider();
+    this.fonts.forEach((name, typeface) -> fontManager.registerTypeface(typeface, name));
+    return fontManager;
+  }
+
+  public void addFont(String name, Typeface typeface) {
+    this.fonts.put(name, typeface);
   }
 
   public void addRule(StyleSelector selector, List<StyleProperty> properties) {

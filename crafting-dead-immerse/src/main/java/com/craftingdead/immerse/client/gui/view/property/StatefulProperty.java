@@ -18,10 +18,13 @@
 
 package com.craftingdead.immerse.client.gui.view.property;
 
+import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 import org.jetbrains.annotations.Nullable;
 import com.craftingdead.immerse.client.gui.view.state.StateListener;
 import com.craftingdead.immerse.client.gui.view.state.States;
+import com.google.common.collect.Lists;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
@@ -31,9 +34,13 @@ public class StatefulProperty<T> implements StateListener, AnimatedProperty<T> {
 
   private final Class<T> type;
 
-  private final ValueAccessor<T> accessor;
+  private final T defaultValue;
 
   private final Int2ObjectMap<T> stateValues = new Int2ObjectOpenHashMap<>();
+
+  private final List<Consumer<T>> listeners;
+
+  private T value;
 
   private Transition transition = Transition.INSTANT;
 
@@ -43,10 +50,12 @@ public class StatefulProperty<T> implements StateListener, AnimatedProperty<T> {
   @Nullable
   private T animatedValue;
 
-  protected StatefulProperty(String name, Class<T> type, ValueAccessor<T> accessor) {
+  @SafeVarargs
+  protected StatefulProperty(String name, Class<T> type, T defaultValue, Consumer<T>... listeners) {
     this.name = name;
     this.type = type;
-    this.accessor = accessor;
+    this.defaultValue = defaultValue;
+    this.listeners = Lists.newArrayList(listeners);
     this.resetState(0);
   }
 
@@ -99,8 +108,7 @@ public class StatefulProperty<T> implements StateListener, AnimatedProperty<T> {
    */
   protected final void resetState(int state) {
     if (state == 0) {
-      this.accessor.reset();
-      this.setState(0, this.accessor.get());
+      this.setState(0, this.defaultValue);
     } else {
       this.stateValues.remove(state);
     }
@@ -108,12 +116,17 @@ public class StatefulProperty<T> implements StateListener, AnimatedProperty<T> {
 
   @Override
   public final T get() {
-    return this.animatedValue != null ? this.animatedValue : this.accessor.get();
+    return this.animatedValue != null ? this.animatedValue : this.value;
   }
 
   @Override
   public final void set(T value) {
-    this.accessor.set(value);
+    this.value = value;
+    this.changed(value);
+  }
+
+  private void changed(T value) {
+    this.listeners.forEach(listener -> listener.accept(value));
   }
 
   @Override
@@ -124,6 +137,11 @@ public class StatefulProperty<T> implements StateListener, AnimatedProperty<T> {
   @Override
   public final void setAnimatedValue(@Nullable T animatedValue) {
     this.animatedValue = animatedValue;
+    this.changed(this.get());
+  }
+
+  public void addListener(Consumer<T> listener) {
+    this.listeners.add(listener);
   }
 
   @Override
@@ -137,7 +155,7 @@ public class StatefulProperty<T> implements StateListener, AnimatedProperty<T> {
       this.transitionStopListener.run();
     }
 
-    if (!Objects.equals(newValue, this.accessor.get())) {
+    if (!Objects.equals(newValue, this.value)) {
       if (animate) {
         this.transitionStopListener = this.transition.transition(this, newValue);
       } else {

@@ -18,60 +18,77 @@
 
 package com.craftingdead.immerse.client.gui.view;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import org.jetbrains.annotations.Nullable;
 import com.craftingdead.immerse.client.gui.view.layout.Layout;
 import com.craftingdead.immerse.client.gui.view.layout.MeasureMode;
-import com.craftingdead.immerse.client.gui.view.property.StyleableProperty;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.Tesselator;
-import net.minecraft.Util;
-import net.minecraft.client.gui.Font;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.resources.language.ClientLanguage;
+import io.github.humbleui.skija.FontMgr;
+import io.github.humbleui.skija.FontStyle;
+import io.github.humbleui.skija.Paint;
+import io.github.humbleui.skija.PictureRecorder;
+import io.github.humbleui.skija.paragraph.DecorationStyle;
+import io.github.humbleui.skija.paragraph.FontCollection;
+import io.github.humbleui.skija.paragraph.Paragraph;
+import io.github.humbleui.skija.paragraph.ParagraphBuilder;
+import io.github.humbleui.skija.paragraph.ParagraphStyle;
+import io.github.humbleui.skija.paragraph.TextStyle;
+import io.github.humbleui.types.Rect;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.TextComponent;
-import net.minecraft.util.FormattedCharSequence;
-import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec2;
 
 public class TextView extends View {
 
-  private static final Component ELLIPSIS = new TextComponent("...");
-
-  private final StyleableProperty<Color> colorProperty =
-      Util.make(StyleableProperty.create("color", Color.class, Color.WHITE),
-          this::registerProperty);
-
-  private Component text = TextComponent.EMPTY;
-  private Font font;
-  private boolean shadow;
-  private boolean centered;
+  private FormattedText text = TextComponent.EMPTY;
   private boolean wrap = true;
 
-  private List<FormattedCharSequence> lines = new ArrayList<>();
+  @Nullable
+  private Paragraph paragraph = null;
+  private int textCount;
 
-  public TextView(Properties<?> properties) {
+  private FontMgr fontManager = FontMgr.getDefault();
+
+  public TextView(Properties properties) {
     super(properties);
-    this.font = this.minecraft.font;
-    this.shadow = true;
-    this.centered = false;
+    this.getStyle().color.addListener(color -> {
+      if (this.paragraph != null && this.isAdded()) {
+        this.paragraph.updateForegroundPaint(0, this.textCount,
+            new Paint().setColor(color.valueHex()));
+        this.paragraph.layout(this.getContentWidth() * (float) this.window.getGuiScale());
+      }
+    });
+    this.getStyle().fontFamily.addListener(__ -> this.buildParagraph());
+    this.getStyle().fontSize.addListener(fontSize -> {
+      if (this.paragraph != null && this.isAdded()) {
+        this.paragraph.updateFontSize(0, this.textCount, fontSize);
+        this.paragraph.layout(this.getContentWidth() * (float) this.window.getGuiScale());
+      }
+    });
+    this.getStyle().textAlign.addListener(textAlign -> {
+      if (this.paragraph != null && this.isAdded()) {
+        this.paragraph.updateAlignment(textAlign);
+        this.paragraph.layout(this.getContentWidth() * (float) this.window.getGuiScale());
+      }
+    });
+    this.getStyle().textShadow.addListener(__ -> this.buildParagraph());
   }
 
   @Override
-  protected void setLayout(@Nullable Layout layout) {
-    super.setLayout(layout);
-    if (layout != null) {
-      layout.setMeasureFunction(this::measure);
+  public void styleRefreshed(FontMgr fontManager) {
+    if (this.fontManager != FontMgr.getDefault()) {
+      this.fontManager.close();
     }
+    this.fontManager = fontManager;
+    this.buildParagraph();
   }
 
-  public StyleableProperty<Color> getColorProperty() {
-    return this.colorProperty;
+  @Override
+  protected void setLayout(Layout layout) {
+    super.setLayout(layout);
+    layout.setMeasureFunction(this::measure);
   }
 
   public TextView setWrap(boolean wrap) {
@@ -83,31 +100,13 @@ public class TextView extends View {
     return this;
   }
 
-  public TextView setFontRenderer(Font fontRenderer) {
-    this.font = fontRenderer;
-    if (this.isAdded()) {
-      this.getLayout().markDirty();
-      this.parent.layout();
-    }
-    return this;
-  }
-
-  public TextView setShadow(boolean shadow) {
-    this.shadow = shadow;
-    return this;
-  }
-
-  public TextView setCentered(boolean centered) {
-    this.centered = centered;
-    return this;
-  }
-
   public TextView setText(@Nullable String text) {
     return this.setText(Component.nullToEmpty(text));
   }
 
-  public TextView setText(Component text) {
+  public TextView setText(FormattedText text) {
     this.text = text;
+    this.buildParagraph();
     if (this.isAdded()) {
       this.getLayout().markDirty();
       this.parent.layout();
@@ -115,134 +114,128 @@ public class TextView extends View {
     return this;
   }
 
+  @SuppressWarnings("resource")
+  private void buildParagraph() {
+    if (this.paragraph != null) {
+      this.paragraph.close();
+      this.paragraph = null;
+    }
+    this.textCount = 0;
+
+    try (var paragraphStyle = new ParagraphStyle()
+        .setAlignment(this.getStyle().textAlign.get())
+        .setEllipsis("...")
+        .setMaxLinesCount(this.wrap ? Integer.MAX_VALUE : 1);
+        var fontCollection = new FontCollection()
+            .setDefaultFontManager(this.fontManager)
+            .setDynamicFontManager(FontMgr.getDefault());
+        var builder = new ParagraphBuilder(paragraphStyle, fontCollection)) {
+      this.text.visit((style, content) -> {
+        try (var textStyle = new TextStyle()
+            .setFontSize(this.getStyle().fontSize.get() * (float) this.window.getGuiScale())
+            .setFontFamilies(this.getStyle().fontFamily.get())
+            .addShadows(this.getStyle().textShadow.get())
+            .setColor(style.getColor() == null
+                ? this.getStyle().color.get().valueHex()
+                : style.getColor().getValue() + (255 << 24))
+            .setFontStyle(style.isBold() && style.isItalic()
+                ? FontStyle.BOLD_ITALIC
+                : style.isBold()
+                    ? FontStyle.BOLD
+                    : style.isItalic()
+                        ? FontStyle.ITALIC
+                        : FontStyle.NORMAL)
+            .setDecorationStyle(DecorationStyle.NONE
+                .withUnderline(style.isUnderlined())
+                .withLineThrough(style.isStrikethrough()))) {
+          builder.pushStyle(textStyle);
+          builder.addText(content);
+          this.textCount += content.length();
+          builder.popStyle();
+        }
+        return Optional.empty();
+      }, Style.EMPTY);
+      this.paragraph = builder.build();
+    }
+  }
+
   @Override
   public void layout() {
+    if (this.paragraph != null) {
+      this.paragraph.updateFontSize(0, this.textCount,
+          this.getStyle().fontSize.get() * (float) this.window.getGuiScale());
+      this.paragraph.layout(this.getContentWidth() * (float) this.window.getGuiScale());
+    }
     super.layout();
-    this.generateLines(this.getContentWidth());
   }
 
   private Vec2 measure(MeasureMode widthMode, float width, MeasureMode heightMode, float height) {
-    var actualWidth = this.font.width(this.text);
+    this.paragraph.updateFontSize(0, this.textCount,
+        this.getStyle().fontSize.get() * (float) this.window.getGuiScale());
     switch (widthMode) {
       case UNDEFINED:
-        width = actualWidth;
-        break;
-      case AT_MOST:
-        width = Math.min(actualWidth, width);
+        this.paragraph.layout(Float.MAX_VALUE);
+        width = this.paragraph.getMaxIntrinsicWidth() / (float) this.window.getGuiScale();
         break;
       default:
+        this.paragraph.layout(width * (float) this.window.getGuiScale());
         break;
     }
-    this.generateLines(width);
-    return new Vec2(width, this.lines.size() * this.font.lineHeight);
-  }
-
-  private void generateLines(float width) {
-    int floorWidth = Mth.floor(width);
-    if (this.wrap) {
-      this.lines = this.font.split(this.text, floorWidth);
-      return;
-    }
-
-    int textWidth = this.font.width(this.text);
-    FormattedText finalText;
-    if (textWidth > floorWidth) {
-      final var ellipsis = ELLIPSIS.copy().withStyle(this.text.getStyle());
-      final var ellipsisWidth = this.font.width(ellipsis);
-      finalText = FormattedText.composite(
-          this.font.substrByWidth(this.text, floorWidth - ellipsisWidth), ellipsis);
-    } else {
-      finalText = this.font.substrByWidth(this.text, floorWidth);
-    }
-    this.lines = List.of(ClientLanguage.getInstance().getVisualOrder(finalText));
+    return new Vec2(width, this.paragraph.getHeight() / (float) this.window.getGuiScale());
   }
 
   @Override
   public float computeFullHeight() {
-    return this.lines.size() * this.font.lineHeight;
+    return this.paragraph == null
+        ? super.computeFullHeight()
+        : this.paragraph.getHeight() / (float) this.window.getGuiScale();
   }
 
   @Override
   public boolean mouseClicked(double mouseX, double mouseY, int button) {
-    return super.mouseClicked(mouseX, mouseY, button)
-        || this.componentStyleAtWidth(mouseX, mouseY)
-            .map(this.minecraft.screen::handleComponentClicked)
-            .orElse(false);
+    return super.mouseClicked(mouseX, mouseY, button);
   }
 
+  @SuppressWarnings("resource")
   @Override
   public void renderContent(PoseStack poseStack, int mouseX, int mouseY, float partialTicks) {
     super.renderContent(poseStack, mouseX, mouseY, partialTicks);
+    if (this.paragraph != null) {
+      this.skia.begin();
+      {
+        var canvas = this.skia.canvas();
 
-    final var color4i = this.colorProperty.get().getValue4i();
+        canvas.translate(
+            this.getScaledContentX() * (float) this.window.getGuiScale(),
+            this.getScaledContentY() * (float) this.window.getGuiScale());
 
-    final int opacity = Mth.ceil(this.getAlpha() * color4i[3]) << 24;
-    if ((opacity & 0xFC000000) == 0) {
-      return;
-    }
+        canvas.scale(this.getXScale(), this.getYScale());
 
-    int color = opacity
-        | ((color4i[0] & 0xFF) << 16)
-        | ((color4i[1] & 0xFF) << 8)
-        | ((color4i[2] & 0xFF) << 0);
-
-    poseStack.pushPose();
-    {
-
-      final var xScale = this.getXScale();
-      final var yScale = this.getYScale();
-
-      // Ceil x and y pos because text renders weirdly with decimal values.
-      // Don't ceil x and y pos if they are being animated because it will look choppy.
-
-      var yTranslation = this.getScaledContentY() + (this.centered
-          ? (this.getContentHeight() - this.font.lineHeight * this.lines.size()) / 2.0D
-          : 0.0D);
-      if (!this.getYTranslationProperty().isBeingAnimated() && yScale == Mth.ceil(yScale)) {
-        yTranslation = Mth.ceil(yTranslation);
-      }
-
-      var xTranslation = this.getScaledContentX();
-      if (!this.getXTranslationProperty().isBeingAnimated() && xScale == Mth.ceil(xScale)) {
-        xTranslation = Mth.ceil(xTranslation);
-      }
-
-      poseStack.translate(xTranslation, yTranslation, 51.0D);
-
-      poseStack.scale(xScale, yScale, 1.0F);
-      var bufferSource = MultiBufferSource.immediate(Tesselator.getInstance().getBuilder());
-      for (int i = 0; i < this.lines.size(); i++) {
-        var line = this.lines.get(i);
-        poseStack.pushPose();
-        {
-          poseStack.translate(0.0D, i * this.font.lineHeight, 0.0D);
-          var x = this.centered
-              ? (this.getContentWidth() - this.font.width(line)) / 2.0F
-              : 0;
-          this.font.drawInBatch(line, x, 0.0F, color, this.shadow, poseStack.last().pose(),
-              bufferSource, false, 0, com.craftingdead.core.client.util.RenderUtil.FULL_LIGHT);
+        try (var recorder = new PictureRecorder()) {
+          var recordingCanvas = recorder.beginRecording(
+              Rect.makeWH(this.paragraph.getMaxWidth(), this.paragraph.getHeight()));
+          this.paragraph.paint(recordingCanvas, 0, 0);
+          var picture = recorder.finishRecordingAsPicture();
+          try (var paint = new Paint().setAlphaf(this.getAlpha())) {
+            canvas.drawPicture(picture, null, paint);
+          }
         }
-        poseStack.popPose();
-      }
 
-      bufferSource.endBatch();
+        canvas.resetMatrix();
+      }
+      this.skia.end();
     }
-    poseStack.popPose();
   }
 
-  public Optional<Style> componentStyleAtWidth(double mouseX, double mouseY) {
-    final var offsetMouseX = Mth.floor((mouseX - this.getContentX()) / this.getXScale());
-    final var offsetMouseY = Mth.floor((mouseY - this.getContentY()) / this.getYScale());
-    final var lines = this.lines.size();
-    if (offsetMouseX >= 0 && offsetMouseY >= 0 && offsetMouseX <= this.getContentWidth()
-        && offsetMouseY < (this.font.lineHeight * lines + lines)) {
-      int maxLines = offsetMouseY / this.font.lineHeight;
-      if (maxLines >= 0 && maxLines < this.lines.size()) {
-        var line = this.lines.get(maxLines);
-        return Optional.ofNullable(
-            this.font.getSplitter().componentStyleAtWidth(line, offsetMouseX));
-      }
+  @Override
+  public void close() {
+    super.close();
+    if (this.paragraph != null) {
+      this.paragraph.close();
+      this.paragraph = null;
     }
-    return Optional.empty();
+    if (this.fontManager != FontMgr.getDefault()) {
+      this.fontManager.close();
+    }
   }
 }

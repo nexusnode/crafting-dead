@@ -23,16 +23,16 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
-import com.craftingdead.immerse.client.gui.view.style.StyleSheetManager;
 import com.craftingdead.immerse.client.gui.view.style.tree.StyleList;
 import com.craftingdead.immerse.client.gui.view.style.tree.StyleProperty;
 import com.craftingdead.immerse.util.NumberedLineIterator;
 import com.mojang.logging.LogUtils;
-import net.minecraft.client.Minecraft;
+import io.github.humbleui.skija.Typeface;
 import net.minecraft.resources.ResourceLocation;
 
 public class StyleSheetParser {
@@ -40,15 +40,18 @@ public class StyleSheetParser {
   private static final Logger logger = LogUtils.getLogger();
 
   private static final String IMPORT = "@import";
+  private static final String FONT_FACE = "@font-face";
 
   private StyleSheetParser() {}
 
-  public static StyleList loadStylesheet(ResourceLocation styleSheet) throws IOException {
-    var resource = Minecraft.getInstance().getResourceManager().getResource(styleSheet);
-    return loadStylesheet(resource.getInputStream());
+  @FunctionalInterface
+  public interface FontLoader {
+
+    Typeface load(ResourceLocation location) throws IOException;
   }
 
-  public static StyleList loadStylesheet(InputStream inputStream) throws IOException {
+  public static ParseResult loadStyleSheet(InputStream inputStream, FontLoader fontLoader)
+      throws IOException {
     var list = new StyleList();
     var dependencies = new ArrayList<ResourceLocation>();
     try (var reader = new InputStreamReader(inputStream, StandardCharsets.UTF_8)) {
@@ -70,40 +73,77 @@ public class StyleSheetParser {
           continue;
         }
 
-        if (line.startsWith(IMPORT)) {
-          var url = line.substring(IMPORT.length())
-              .replace("url(", "")
-              .replace(")", "")
-              .replace(";", "")
-              .replace("\"", "")
-              .trim();
-          dependencies.add(new ResourceLocation(url));
+        if (line.startsWith("@")) {
+          if (line.startsWith(FONT_FACE)) {
+            readFontFace(iterator, list, fontLoader);
+          } else if (line.startsWith(IMPORT)) {
+            dependencies.add(new ResourceLocation(line.substring(IMPORT.length())
+                .replace("'", "")
+                .replace("\"", "")
+                .replace(";", "")
+                .trim()));
+          } else {
+            logger.warn("Unknown at-rule: {}", line);
+          }
           continue;
         }
 
-        if (!dependencies.isEmpty()) {
-          list.merge(StyleSheetManager.getInstance().loadStylesheets(dependencies));
-          dependencies.clear();
-        }
-        if (line.contains("{")) {
-          var selectors = StyleSelectorParser.readSelectors(line);
-          var rules = readBlock(iterator);
 
-          for (var selector : selectors) {
-            list.addRule(selector, rules);
-          }
-        } else {
-          logger.error("Expected { at line " + iterator.getLineNumber());
+        var selectors = StyleSelectorParser.readSelectors(line, iterator);
+        var rules = readBlock(iterator);
+        for (var selector : selectors) {
+          list.addRule(selector, rules);
         }
       }
 
-      // Load dependencies even if the styleSheet is empty
-      if (!dependencies.isEmpty()) {
-        list.merge(StyleSheetManager.getInstance().loadStylesheets(dependencies));
-        dependencies.clear();
-      }
-      return list;
+      return new ParseResult(list, dependencies);
     }
+  }
+
+  public record ParseResult(StyleList styleList, Collection<ResourceLocation> dependencies) {}
+
+  private static void readFontFace(NumberedLineIterator content, StyleList styleList,
+      FontLoader fontLoader) throws IOException {
+    int startLineNumber = content.getLineNumber();
+    var currentLine = content.nextLine().trim();
+    String fontFamily = null;
+    ResourceLocation location = null;
+    while (!StringUtils.contains(currentLine, "}")) {
+      if (currentLine.startsWith("font-family")) {
+        char quote;
+        if (currentLine.contains("\"")) {
+          quote = '"';
+        } else {
+          quote = '\'';
+        }
+        fontFamily =
+            currentLine.substring(currentLine.indexOf(quote) + 1, currentLine.lastIndexOf(quote));
+        currentLine = content.nextLine().trim();
+        continue;
+      }
+
+      if (currentLine.startsWith("src")) {
+        var url = currentLine.substring(currentLine.indexOf(':') + 1)
+            .replace("'", "")
+            .replace("\"", "")
+            .replace(";", "")
+            .trim();
+        location = new ResourceLocation(url);
+      }
+      currentLine = content.nextLine().trim();
+    }
+
+    if (fontFamily == null) {
+      logger.error("No font-family property specified for font-face at line: {}", startLineNumber);
+      return;
+    }
+
+    if (location == null) {
+      logger.error("No src property specified for font-face at line: {}", startLineNumber);
+      return;
+    }
+
+    styleList.addFont(fontFamily, fontLoader.load(location));
   }
 
   private static List<StyleProperty> readBlock(NumberedLineIterator content) {

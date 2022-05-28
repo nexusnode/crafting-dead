@@ -19,17 +19,20 @@
 package com.craftingdead.immerse.client.gui.view.style;
 
 import java.util.Set;
+import io.github.humbleui.skija.FontMgr;
 
 public interface Styleable {
+
+  default void styleRefreshed(FontMgr fontManager) {}
 
   String getId();
 
   Set<String> getStyleClasses();
 
-  StyleHolder getStyle();
+  StyleHolder getStyleHolder();
 
   default void setStyle(String style) {
-    this.getStyle().parseInlineCSS(style);
+    this.getStyleHolder().parseInlineCSS(style);
   }
 
   String getType();

@@ -26,51 +26,64 @@ import com.craftingdead.immerse.client.gui.view.Animation;
 import com.craftingdead.immerse.client.gui.view.ParentView;
 import com.craftingdead.immerse.client.gui.view.ViewUtil;
 
-public class HomeView extends ParentView implements AnimatableView {
+public class HomeView extends ParentView implements TransitionView {
 
   private final ParentView newsComponent;
 
-  public HomeView() {
-    super(new Properties<>());
+  private final Animator entranceAnimator;
+  private final Animator exitAnimator;
+  private Runnable removeCallback;
 
-    this.newsComponent = new ParentView(new Properties<>().id("news").backgroundBlur(50.0F));
+  public HomeView() {
+    super(new Properties());
+
+    this.newsComponent = new ParentView(new Properties().id("news").backgroundBlur(50.0F));
     ViewUtil.addAll(this.newsComponent, new File("news.xml"));
 
     this.addChild(this.newsComponent);
-  }
 
-  @Override
-  protected void added() {
-    super.added();
-    new Animator.Builder()
-        .addTarget(Animation.forProperty(this.newsComponent.getXScaleProperty())
+    this.entranceAnimator = new Animator.Builder()
+        .addTarget(Animation.forProperty(this.newsComponent.getStyle().xScale)
             .to(0.3F, 1.0F)
             .build())
-        .addTarget(Animation.forProperty(this.newsComponent.getYScaleProperty())
+        .addTarget(Animation.forProperty(this.newsComponent.getStyle().yScale)
             .to(0.3F, 1.0F)
             .build())
         .setDuration(250L, TimeUnit.MILLISECONDS)
-        .build()
-        .start();
-  }
-
-  @Override
-  public void animateRemoval(Runnable remove) {
-    new Animator.Builder()
-        .addTarget(Animation.forProperty(this.newsComponent.getXScaleProperty())
+        .build();
+    this.exitAnimator = new Animator.Builder()
+        .addTarget(Animation.forProperty(this.newsComponent.getStyle().xScale)
             .to(0.3F)
             .build())
-        .addTarget(Animation.forProperty(this.newsComponent.getYScaleProperty())
+        .addTarget(Animation.forProperty(this.newsComponent.getStyle().yScale)
             .to(0.3F)
             .build())
         .setDuration(250L, TimeUnit.MILLISECONDS)
         .addTarget(new TimingTargetAdapter() {
           @Override
           public void end(Animator source) {
-            remove.run();
+            HomeView.this.removeCallback.run();
           }
         })
-        .build()
-        .start();
+        .build();
+  }
+
+  @Override
+  protected void added() {
+    super.added();
+    this.entranceAnimator.start();
+  }
+
+  @Override
+  protected void removed() {
+    super.removed();
+    this.entranceAnimator.stop();
+    this.exitAnimator.stop();
+  }
+
+  @Override
+  public void transitionOut(Runnable removeCallback) {
+    this.removeCallback = removeCallback;
+    this.exitAnimator.start();
   }
 }

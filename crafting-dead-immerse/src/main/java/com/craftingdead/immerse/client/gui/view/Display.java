@@ -24,7 +24,7 @@ import com.craftingdead.immerse.client.gui.view.layout.yoga.YogaLayoutParent;
 
 public enum Display {
 
-  FLEX(YogaLayoutParent::new);
+  NONE(() -> LayoutParent.NILL), FLEX(YogaLayoutParent::new);
 
   private final Supplier<LayoutParent> layoutParentFactory;
 

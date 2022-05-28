@@ -34,7 +34,7 @@ public class FogView extends View {
 
   private static long fogStartTime = Util.getMillis();
 
-  public FogView(Properties<?> properties) {
+  public FogView(Properties properties) {
     super(properties);
   }
 
@@ -55,6 +55,7 @@ public class FogView extends View {
     {
       poseStack.scale(4F, 4F, 4F);
       RenderSystem.enableBlend();
+
       RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 0.3F * this.getAlpha());
 
       RenderSystem.setShaderTexture(0, SMOKE_TEXTURE);

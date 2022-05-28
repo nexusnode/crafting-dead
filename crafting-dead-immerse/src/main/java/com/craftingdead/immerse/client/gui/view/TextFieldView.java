@@ -24,8 +24,6 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
-import com.craftingdead.immerse.client.gui.view.property.StyleableProperty;
-import com.craftingdead.immerse.client.gui.view.property.StatefulProperty;
 import com.craftingdead.immerse.client.util.RenderUtil;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -56,14 +54,6 @@ public class TextFieldView extends View {
   private int cursorIndex;
   private int highlightIndex;
 
-  private final StyleableProperty<Color> textColor = Util.make(
-      StyleableProperty.create("text_color", Color.class, new Color(0xFFE0E0E0)),
-      this::registerProperty);
-
-  private final StyleableProperty<Color> textColorUneditable = Util.make(
-      StyleableProperty.create("text_color_uneditable", Color.class, new Color(0xFF707070)),
-      this::registerProperty);
-
   @Nullable
   private Component placeholder;
   private String suggestion;
@@ -72,7 +62,7 @@ public class TextFieldView extends View {
   private BiFunction<String, Integer, FormattedCharSequence> formatter =
       (value, p_195610_1_) -> FormattedCharSequence.forward(value, Style.EMPTY);
 
-  public TextFieldView(Properties<?> properties) {
+  public TextFieldView(Properties properties) {
     super(properties.focusable(true));
     this.font = this.minecraft.font;
   }
@@ -336,7 +326,7 @@ public class TextFieldView extends View {
   }
 
   public boolean canConsumeInput() {
-    return this.isFocused() && this.isEditable();
+    return this.isFocused();
   }
 
   @Override
@@ -374,8 +364,7 @@ public class TextFieldView extends View {
   @Override
   protected void renderContent(PoseStack poseStack, int mouseX, int mouseY, float partialTicks) {
     super.renderContent(poseStack, mouseX, mouseY, partialTicks);
-    int textColor =
-        this.editable ? this.textColor.get().getHex() : this.textColorUneditable.get().getHex();
+    int textColor = this.getStyle().color.get().valueHex();
     int cursorIndex = this.cursorIndex - this.displayIndex;
     int highlightMaxIndex = this.highlightIndex - this.displayIndex;
     var text = this.font.plainSubstrByWidth(this.value.substring(this.displayIndex),
@@ -496,17 +485,9 @@ public class TextFieldView extends View {
     return this.cursorIndex;
   }
 
-  public StatefulProperty<Color> getTextColorProperty() {
-    return this.textColor;
-  }
-
-  public StatefulProperty<Color> getTextColorUneditableProperty() {
-    return this.textColorUneditable;
-  }
-
   @Override
   public boolean changeFocus(boolean forward) {
-    if (this.editable && super.changeFocus(forward)) {
+    if (super.changeFocus(forward)) {
       if (forward) {
         this.frame = 0;
       }
@@ -514,15 +495,6 @@ public class TextFieldView extends View {
     }
 
     return false;
-  }
-
-  private boolean isEditable() {
-    return this.editable;
-  }
-
-  public TextFieldView setEditable(boolean editable) {
-    this.editable = editable;
-    return this;
   }
 
   public void setHighlightIndex(int highlightIndex) {

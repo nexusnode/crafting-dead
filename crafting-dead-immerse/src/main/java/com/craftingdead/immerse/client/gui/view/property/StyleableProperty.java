@@ -22,12 +22,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-import org.jetbrains.annotations.Nullable;
 import com.craftingdead.immerse.client.gui.view.style.PropertyDispatcher;
 import com.craftingdead.immerse.client.gui.view.style.StyleSource;
-import com.craftingdead.immerse.client.gui.view.style.adapter.StyleDecoder;
-import com.craftingdead.immerse.client.gui.view.style.adapter.StyleTranslatorRegistry;
-import com.craftingdead.immerse.client.gui.view.style.adapter.StyleValidator;
+import com.craftingdead.immerse.client.gui.view.style.adapter.StyleParser;
+import com.craftingdead.immerse.client.gui.view.style.adapter.StyleParserRegistry;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
@@ -37,13 +35,12 @@ public class StyleableProperty<T> extends StatefulProperty<T> implements Propert
 
   private final Map<String, T> styleCache = new HashMap<>();
 
-  private final StyleValidator<T> validator;
-  private final StyleDecoder<T> decoder;
+  private final StyleParser<T> parser;
 
-  public StyleableProperty(String name, Class<T> type, ValueAccessor<T> accessor) {
-    super(name, type, accessor);
-    this.validator = StyleTranslatorRegistry.getInstance().getValidator(type);
-    this.decoder = StyleTranslatorRegistry.getInstance().getDecoder(type);
+  @SafeVarargs
+  public StyleableProperty(String name, Class<T> type, T defaultValue, Consumer<T>... listeners) {
+    super(name, type, defaultValue, listeners);
+    this.parser = StyleParserRegistry.getInstance().getParser(type);
   }
 
   @Override
@@ -57,7 +54,7 @@ public class StyleableProperty<T> extends StatefulProperty<T> implements Propert
     var current = this.sources.get(state);
     if (current == null || source.compareTo(current) > -1) {
       this.sources.put(state, source);
-      var value = this.styleCache.computeIfAbsent(style, this.decoder::decode);
+      var value = this.styleCache.computeIfAbsent(style, this.parser::parse);
       this.setState(state, value);
       return true;
     }
@@ -77,15 +74,6 @@ public class StyleableProperty<T> extends StatefulProperty<T> implements Propert
 
   @Override
   public int validate(String style) {
-    return this.validator.validate(style);
-  }
-
-  public static <T> StyleableProperty<T> create(String name, Class<T> type, T defaultValue) {
-    return create(name, type, defaultValue, null);
-  }
-
-  public static <T> StyleableProperty<T> create(String name, Class<T> type, T defaultValue,
-      @Nullable Consumer<T> listener) {
-    return new StyleableProperty<>(name, type, ValueAccessor.simple(defaultValue, listener));
+    return this.parser.validate(style);
   }
 }

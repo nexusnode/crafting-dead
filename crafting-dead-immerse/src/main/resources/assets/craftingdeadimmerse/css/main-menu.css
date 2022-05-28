@@ -1,4 +1,4 @@
-@import url("craftingdeadimmerse:css/theme.css");
+@import "craftingdeadimmerse:theme";
 
 #home {
     margin: 5;
@@ -12,8 +12,12 @@
 
 #play {
     margin: 5;
-    width: 14;
+    width: 16;
     aspect-ratio: 1;
+}
+
+#play:hover #home {
+    color: #666666;
 }
 
 #settings {
@@ -33,29 +37,29 @@ MainMenuView {
     flex-direction: row;
 }
 
-MainMenuView > #content {
+MainMenuView>#content {
     width: 100%;
     height: 100%;
     margin-left: 30;
 }
 
-MainMenuView > #content > * {
+MainMenuView>#content>* {
     width: 100%;
     height: 100%;
     position: absolute;
 }
 
-MainMenuView > #side-bar {
+MainMenuView>#side-bar {
     border-right-width: 1;
     height: 100%;
-    width: 30;
+    width: 32;
     position: absolute;
     align-items: center;
     background-color: rgba(119, 119, 119, 0.35);
     border-right-color: rgba(181, 181, 181, 0.5);
 }
 
-MainMenuView > #entity-container {
+MainMenuView>#entity-container {
     width: 25%;
     height: 50%;
     top: 30%;
@@ -65,7 +69,7 @@ MainMenuView > #entity-container {
     justify-content: center;
 }
 
-MainMenuView > #entity-container > EntityView {
+MainMenuView>#entity-container>EntityView {
     aspect-ratio: 1;
     width: 100%;
     height: 100%;
@@ -81,7 +85,7 @@ HomeView {
     z-index: -2;
 }
 
-HomeView > #news {
+HomeView>#news {
     width: 45%;
     height: 75%;
     padding: 10;
@@ -91,7 +95,7 @@ HomeView > #news {
 }
 
 /* Don't shrink the text so it can scroll */
-HomeView > #news > TextView {
+HomeView>#news>TextView {
     flex-shrink: 0;
 }
 
@@ -99,46 +103,50 @@ PlayView {
     background-color: rgba(119, 119, 119, 0.35);
 }
 
-PlayView > #content {
+PlayView>#content {
     flex-grow: 1;
 }
 
-PlayView > #content > * {
+PlayView>#content>* {
     flex-grow: 1;
 }
 
-PlayView > #content > #official > TabsView {
+PlayView>#content>#official>TabsView {
     height: 20;
     z-index: 5;
     flex-shrink: 0;
 }
 
-PlayView > #content > #official > #official-content {
+PlayView>#content>#official>#official-content {
     flex-grow: 1;
 }
 
-PlayView > #title {
-    width: 25;
+PlayView>#title {
     height: 30;
-    padding-top: 12;
-    margin-left: 20;
-    scale: 2;
+    padding-top: 6;
+    padding-bottom: 6;
+    margin-left: 10;
+    font-size: 14;
 }
 
-PlayView > DropdownView {
+PlayView>DropdownView {
     width: 100;
     height: 21;
     margin: 2;
     margin-left: 10;
 }
 
-ServerListView, MutableServerListView, WorldListView {
+ServerListView,
+MutableServerListView,
+WorldListView {
     flex-grow: 1;
     background-color: rgba(0, 0, 0, 0.25);
 }
 
 /* Button section */
-ServerListView > #controls, MutableServerListView > #controls, WorldListView > #controls {
+ServerListView>#controls,
+MutableServerListView>#controls,
+WorldListView>#controls {
     height: 56;
     flex-shrink: 0;
     justify-content: center;
@@ -147,7 +155,9 @@ ServerListView > #controls, MutableServerListView > #controls, WorldListView > #
 }
 
 /* Button rows */
-ServerListView > #controls > *, MutableServerListView > #controls > *, WorldListView > #controls > * {
+ServerListView>#controls>*,
+MutableServerListView>#controls>*,
+WorldListView>#controls>* {
     flex-grow: 1;
     flex-shrink: 0;
     width: 220;
@@ -156,19 +166,18 @@ ServerListView > #controls > *, MutableServerListView > #controls > *, WorldList
 }
 
 /* Buttons */
-ServerListView > #controls > ParentView > *, MutableServerListView > #controls > ParentView > *, WorldListView > #controls > ParentView > * {
+ServerListView>#controls>ParentView>*,
+MutableServerListView>#controls>ParentView>*,
+WorldListView>#controls>ParentView>* {
     margin: 3;
 }
 
-ServerListView > #content, MutableServerListView > #content {
+ServerListView>#content,
+MutableServerListView>#content {
     flex-grow: 1;
     padding-bottom: 7;
     overflow: scroll;
     align-items: center;
-}
-
-PlayView ServerListView, PlayView MutableServerListView {
-    margin-top: 1;
 }
 
 ServerItemView {
@@ -186,24 +195,29 @@ ServerItemView {
     flex-shrink: 0;
 }
 
-ServerItemView > #motd {
+ServerItemView>TextView {
+    text-align: center;
+}
+
+ServerItemView>#motd {
     flex-grow: 1;
 }
 
-ServerItemView > #ping, ServerItemView > #players {
+ServerItemView>#ping,
+ServerItemView>#players {
     flex-basis: 60;
     margin-left: 10;
 }
 
-ServerItemView > #map {
+ServerItemView>#map {
     flex-basis: 90;
 }
 
-MutableServerListView > #controls > * {
+MutableServerListView>#controls>* {
     width: 300;
 }
 
-WorldListView > #content {
+WorldListView>#content {
     flex-grow: 1;
     padding-top: 4;
     padding-bottom: 10;
@@ -220,19 +234,19 @@ WorldItemView {
     flex-shrink: 0;
 }
 
-WorldItemView > #icon {
+WorldItemView>#icon {
     height: 38;
     width: 38;
     margin-right: 5;
 }
 
-WorldItemView > #texts {
+WorldItemView>#texts {
     width: 120;
     flex-grow: 1;
     padding-bottom: 1;
     justify-content: center;
 }
 
-WorldItemView > #texts > #info {
+WorldItemView>#texts>#info {
     margin-top: 2;
 }

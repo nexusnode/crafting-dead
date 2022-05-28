@@ -34,23 +34,21 @@ public class CreateGuildDialogView extends ParentView {
   public static final Component TITLE = new TranslatableComponent("view.guild.create_guild");
 
   public CreateGuildDialogView(BiConsumer<String, String> resultConsumer, Runnable cancelListener) {
-    super(new Properties<>().styleClasses("dialog").backgroundBlur(50));
+    super(new Properties().styleClasses("dialog").backgroundBlur(50));
 
-    this.addChild(new TextView(new Properties<>())
-        .setText(TITLE)
-        .setCentered(true));
+    this.addChild(new TextView(new Properties()).setText(TITLE));
 
-    var nameFieldView = new TextFieldView(new Properties<>());
+    var nameFieldView = new TextFieldView(new Properties());
     nameFieldView.setPlaceholder(new TextComponent("Name"));
     nameFieldView.setMaxLength(GuildConstants.GUILD_NAME_MAX_LENGTH);
     this.addChild(nameFieldView);
 
-    var tagFieldView = new TextFieldView(new Properties<>());
+    var tagFieldView = new TextFieldView(new Properties());
     tagFieldView.setPlaceholder(new TextComponent("Tag"));
     tagFieldView.setMaxLength(GuildConstants.GUILD_TAG_MAX_LENGTH);
     this.addChild(tagFieldView);
 
-    var controlsView = new ParentView(new Properties<>().id("controls"));
+    var controlsView = new ParentView(new Properties().id("controls"));
     this.addChild(controlsView);
 
     var createButtonView = Theme.createGreenButton(new TextComponent("Create"),

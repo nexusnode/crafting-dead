@@ -30,7 +30,7 @@ public class EntityView extends View {
 
   private final LivingEntity livingEntity;
 
-  public EntityView(Properties<?> properties, LivingEntity entity) {
+  public EntityView(Properties properties, LivingEntity entity) {
     super(properties);
     this.livingEntity = entity;
   }

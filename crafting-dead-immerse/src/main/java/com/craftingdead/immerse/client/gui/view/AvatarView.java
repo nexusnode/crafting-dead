@@ -30,7 +30,7 @@ public class AvatarView extends View {
 
   private ResourceLocation textureLocation;
 
-  public AvatarView(Properties<?> properties, GameProfile gameProfile) {
+  public AvatarView(Properties properties, GameProfile gameProfile) {
     super(properties);
     this.textureLocation = DefaultPlayerSkin.getDefaultSkin(gameProfile.getId());
     this.minecraft.getSkinManager().registerSkins(gameProfile,

@@ -16,16 +16,9 @@
  * https://craftingdead.net/terms.php
  */
 
-package com.craftingdead.immerse.client.gui.view.style.adapter;
+package com.craftingdead.immerse.client.gui.screen.menu;
 
-@FunctionalInterface
-public interface StyleDecoder<T> {
+public interface TransitionView {
 
-  /**
-   * Decode a css string and return the value.
-   *
-   * @param style css string
-   * @return the decoded value
-   */
-  T decode(String style);
+  void transitionOut(Runnable removeCallback);
 }

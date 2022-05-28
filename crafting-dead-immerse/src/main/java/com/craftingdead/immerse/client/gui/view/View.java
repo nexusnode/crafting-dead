@@ -18,17 +18,20 @@
 
 package com.craftingdead.immerse.client.gui.view;
 
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
-import org.jetbrains.annotations.Nullable;
 import org.jdesktop.core.animation.timing.Animator;
 import org.jdesktop.core.animation.timing.PropertySetter;
 import org.jdesktop.core.animation.timing.interpolators.LinearInterpolator;
 import org.jdesktop.core.animation.timing.interpolators.SplineInterpolator;
+import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
+import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.client.ClientDist;
+import com.craftingdead.immerse.client.gui.Skia;
 import com.craftingdead.immerse.client.gui.view.event.ActionEvent;
 import com.craftingdead.immerse.client.gui.view.event.AddedEvent;
 import com.craftingdead.immerse.client.gui.view.event.CharTypeEvent;
@@ -39,23 +42,20 @@ import com.craftingdead.immerse.client.gui.view.event.MouseEvent;
 import com.craftingdead.immerse.client.gui.view.event.MouseLeaveEvent;
 import com.craftingdead.immerse.client.gui.view.event.RemovedEvent;
 import com.craftingdead.immerse.client.gui.view.layout.Layout;
-import com.craftingdead.immerse.client.gui.view.property.StyleableProperty;
 import com.craftingdead.immerse.client.gui.view.state.StateManager;
 import com.craftingdead.immerse.client.gui.view.state.States;
 import com.craftingdead.immerse.client.gui.view.style.CascadeStyleable;
 import com.craftingdead.immerse.client.gui.view.style.StyleHolder;
-import com.craftingdead.immerse.client.gui.view.style.shorthand.ShorthandArgMapper;
-import com.craftingdead.immerse.client.gui.view.style.shorthand.ShorthandDispatcher;
 import com.craftingdead.immerse.client.gui.view.style.tree.StyleList;
 import com.craftingdead.immerse.client.util.RenderUtil;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableSet;
 import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.Tesselator;
-import com.mojang.blaze3d.vertex.VertexFormat;
+import io.github.humbleui.skija.Paint;
+import io.github.humbleui.skija.PaintMode;
+import io.github.humbleui.types.RRect;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiComponent;
@@ -87,11 +87,13 @@ public class View extends GuiComponent
 
   protected final Window window = this.minecraft.getWindow();
 
+  protected final Skia skia = CraftingDeadImmerse.getInstance().getClientDist().getSkia();
+
   private final IEventBus eventBus = BusBuilder.builder().build();
 
-  private final StyleHolder styleHolder = new StyleHolder(this);
-
   protected final StateManager stateManager = new StateManager();
+
+  private final ViewStyle style;
 
   /*
    * ========== State ==========
@@ -102,8 +104,7 @@ public class View extends GuiComponent
   @Nullable
   ParentView parent;
   int index;
-  @Nullable
-  private Layout layout;
+  private Layout layout = Layout.NILL;
   private float lastScrollOffset;
   private float scrollOffset;
   private float scrollVelocity;
@@ -111,61 +112,6 @@ public class View extends GuiComponent
   private long lastClickTimeMs;
   private boolean closed;
   private boolean added;
-
-  /*
-   * ========== Style ==========
-   */
-
-  private final StyleableProperty<Integer> zIndex =
-      Util.make(StyleableProperty.create("z-index", Integer.class, 1, value -> {
-        if (this.parent != null) {
-          this.parent.sortChildren();
-        }
-      }), this::registerProperty);
-
-  private final StyleableProperty<Float> xScale =
-      Util.make(StyleableProperty.create("x-scale", Float.class, 1.0F),
-          this::registerProperty);
-  private final StyleableProperty<Float> yScale =
-      Util.make(StyleableProperty.create("y-scale", Float.class, 1.0F),
-          this::registerProperty);
-
-  private final StyleableProperty<Float> xTranslation =
-      Util.make(StyleableProperty.create("x-translation", Float.class, 0.0F),
-          this::registerProperty);
-  private final StyleableProperty<Float> yTranslation =
-      Util.make(StyleableProperty.create("y-translation", Float.class, 0.0F),
-          this::registerProperty);
-
-  private final StyleableProperty<Float> alpha =
-      Util.make(StyleableProperty.create("alpha", Float.class, 1.0F), this::registerProperty);
-
-  private final StyleableProperty<Color> backgroundColor =
-      Util.make(StyleableProperty.create("background-color", Color.class, Color.TRANSPARENT),
-          this::registerProperty);
-
-  private final StyleableProperty<Float> outlineWidth =
-      Util.make(StyleableProperty.create("outline-width", Float.class, 0.0F),
-          this::registerProperty);
-  private final StyleableProperty<Color> outlineColor =
-      Util.make(StyleableProperty.create("outline-color", Color.class, Color.BLACK),
-          this::registerProperty);
-
-  private final StyleableProperty<Float> borderRadius =
-      Util.make(StyleableProperty.create("border-radius", Float.class, 0.0F),
-          this::registerProperty);
-  private final StyleableProperty<Color> leftBorderColor =
-      Util.make(StyleableProperty.create("border-left-color", Color.class, Color.BLACK),
-          this::registerProperty);
-  private final StyleableProperty<Color> rightBorderColor =
-      Util.make(StyleableProperty.create("border-right-color", Color.class, Color.BLACK),
-          this::registerProperty);
-  private final StyleableProperty<Color> topBorderColor =
-      Util.make(StyleableProperty.create("border-top-color", Color.class, Color.BLACK),
-          this::registerProperty);
-  private final StyleableProperty<Color> bottomBorderColor =
-      Util.make(StyleableProperty.create("border-bottom-color", Color.class, Color.BLACK),
-          this::registerProperty);
 
   /*
    * ========== Properties ==========
@@ -184,7 +130,7 @@ public class View extends GuiComponent
   private final boolean unscaleOutline;
   private final boolean focusable;
 
-  public View(Properties<?> properties) {
+  public View(Properties properties) {
     this.id = properties.id;
     this.styleClasses = properties.styleClasses.build();
     this.tooltip = properties.tooltip;
@@ -196,27 +142,10 @@ public class View extends GuiComponent
     this.unscaleOutline = properties.unscaleOutline;
     this.focusable = properties.focusable;
 
-    this.styleHolder.registerDispatcher(
-        ShorthandDispatcher.create("scale", Float.class, ShorthandArgMapper.TWO,
-            this.xScale, this.yScale));
-
-    this.styleHolder.registerDispatcher(
-        ShorthandDispatcher.create("border-color", Color.class, ShorthandArgMapper.BOX_MAPPER,
-            this.leftBorderColor, this.rightBorderColor,
-            this.topBorderColor, this.bottomBorderColor));
+    this.style = new ViewStyle(this);
 
     this.eventBus.start();
     this.stateManager.addState(States.ENABLED);
-  }
-
-  protected <T> void registerProperty(StyleableProperty<T> property) {
-    this.stateManager.addListener(property);
-    this.styleHolder.registerDispatcher(property);
-  }
-
-  protected <T> void removeProperty(StyleableProperty<T> property) {
-    this.stateManager.removeListener(property);
-    this.styleHolder.removeProperty(property.getName());
   }
 
   protected float computeFullHeight() {
@@ -226,9 +155,10 @@ public class View extends GuiComponent
   protected void added() {
     this.added = true;
     Supplier<StyleList> styleSupplier =
-        this.parent == null ? this.screen::getStyleList : this.parent.getStyle().getStyleSupplier();
-    this.getStyle().setStyleSupplier(styleSupplier);
-    this.getStyle().refresh();
+        this.parent == null ? this.screen::getStyleList
+            : this.parent.getStyleHolder().getStyleSupplier();
+    this.getStyleHolder().setStyleSupplier(styleSupplier);
+    this.getStyleHolder().refresh();
     this.stateManager.notifyListeners(false);
     this.post(new AddedEvent());
   }
@@ -238,17 +168,10 @@ public class View extends GuiComponent
     this.post(new RemovedEvent());
   }
 
-  protected void setLayout(@Nullable Layout layout) {
-    if (this.layout != null) {
-      this.layout.gatherListeners(this.stateManager::removeListener);
-      this.layout.gatherDispatchers(this.styleHolder::removeDispatcher);
-      this.layout.close();
-    }
+  protected void setLayout(Layout layout) {
+    Objects.requireNonNull(layout, "layout cannot be null.");
     this.layout = layout;
-    if (this.layout != null) {
-      this.layout.gatherListeners(this.stateManager::addListener);
-      this.layout.gatherDispatchers(this.styleHolder::registerDispatcher);
-    }
+    this.layout.setAll(this.getStyle());
   }
 
   protected void layout() {
@@ -277,14 +200,16 @@ public class View extends GuiComponent
     }
   }
 
+  @SuppressWarnings("resource")
   @Override
   public final void render(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
     final var topBorderWidth = this.unscale(this.layout.getTopBorder(), this.unscaleBorder);
     final var bottomBorderWidth = this.unscale(this.layout.getBottomBorder(), this.unscaleBorder);
     final var leftBorderWidth = this.unscale(this.layout.getLeftBorder(), this.unscaleBorder);
     final var rightBorderWidth = this.unscale(this.layout.getRightBorder(), this.unscaleBorder);
-    final var borderRadius = this.unscale(this.borderRadius.get(), this.unscaleBorder);
-    final var outlineWidth = this.unscale(this.outlineWidth.get(), this.unscaleOutline);
+    final var borderRadius = this.unscale(this.style.borderRadius.get(), this.unscaleBorder);
+    final var outlineWidth = this.unscale(this.style.outlineWidth.get(), this.unscaleOutline);
+    final var scale = (float) this.window.getGuiScale();
 
     if (this.backgroundBlur != null) {
       this.backgroundBlur.process(partialTick);
@@ -308,143 +233,88 @@ public class View extends GuiComponent
       RenderSystem.disableBlend();
     }
 
-    final var roundedRectShader = ClientDist.getRoundedRectShader();
-    RenderSystem.setShader(roundedRectShader::instance);
-    roundedRectShader.radius()
-        .set(borderRadius, borderRadius, borderRadius, borderRadius);
-    roundedRectShader.position()
-        .set(this.getScaledX() - outlineWidth, this.getScaledY() - outlineWidth);
-    roundedRectShader.size()
-        .set(this.getScaledWidth() + (outlineWidth * 2.0F),
-            this.getScaledHeight() + (outlineWidth * 2.0F));
-    roundedRectShader.outlineWidth().set(outlineWidth);
-    roundedRectShader.outlineColor().set(this.outlineColor.get().getValue4f());
 
-    if (!this.backgroundColor.get().isTransparent() || !this.outlineColor.get().isTransparent()) {
-      var color = this.backgroundColor.get().getValue4f();
-      color[3] *= this.getAlpha();
-      var x = this.getScaledX() - outlineWidth;
-      var y = this.getScaledY() - outlineWidth;
-      var x2 = this.getScaledX() + this.getScaledWidth() + outlineWidth;
-      var y2 = this.getScaledY() + this.getScaledHeight() + outlineWidth;
-      RenderUtil.fill(poseStack.last().pose(), x, y,
-          this.getZOffset(), x2, y2, color[0], color[1], color[2], color[3]);
+
+    // if (this.backgroundBlur != null) {
+    // var image = this.skia.surface.makeImageSnapshot(IRect.makeXYWH(
+    // (int) (this.getScaledX() * this.window.getGuiScale()),
+    // (int) (this.getScaledY() * this.window.getGuiScale()),
+    // (int) (this.getScaledWidth() * this.window.getGuiScale()),
+    // (int) (this.getScaledHeight() * this.window.getGuiScale())));
+    //
+    // this.skia.begin();
+    // {
+    // this.skia.canvas().drawImage(image,
+    // this.getScaledX() * (float) this.window.getGuiScale(),
+    // this.getScaledY() * (float) this.window.getGuiScale(),
+    // new Paint().setImageFilter(ImageFilter.makeBlur(5, 5, FilterTileMode.DECAL)));
+    // }
+    // this.skia.end();
+    // }
+
+
+    this.skia.begin();
+    {
+      var canvas = this.skia.canvas();
+
+      var radii = new float[] {
+          borderRadius * scale,
+          borderRadius * scale,
+          borderRadius * scale,
+          borderRadius * scale};
+
+      var rect = RRect.makeComplexXYWH(
+          this.getScaledX() * scale,
+          this.getScaledY() * scale,
+          this.getScaledWidth() * scale,
+          this.getScaledHeight() * scale,
+          radii);
+
+      if (leftBorderWidth > 0 || topBorderWidth > 0 || rightBorderWidth > 0
+          || bottomBorderWidth > 0) {
+        try (var paint = new Paint().setColor(0xFFFF0000)) {
+          var innerRect = RRect.makeComplexLTRB(
+              rect.getLeft() + leftBorderWidth * scale,
+              rect.getTop() - topBorderWidth * scale,
+              rect.getRight() - rightBorderWidth * scale,
+              rect.getBottom() + bottomBorderWidth * scale,
+              radii);
+          canvas.drawDRRect(rect, innerRect, paint);
+        }
+      }
+
+      try (var paint = new Paint()
+          .setMode(PaintMode.FILL)
+          .setColor(RenderUtil.multiplyAlpha(this.style.backgroundColor.get().valueHex(),
+              this.getAlpha()))) {
+        canvas.drawRRect(rect, paint);
+      }
+
+      if (outlineWidth > 0.0F) {
+        try (var paint = new Paint()
+            .setMode(PaintMode.STROKE)
+            .setStrokeWidth(outlineWidth < 1.0F ? 0.0F : outlineWidth * scale)
+            .setColor(RenderUtil.multiplyAlpha(this.style.outlineColor.get().valueHex(),
+                this.getAlpha()))) {
+          canvas.drawRRect(rect, paint);
+        }
+      }
     }
+    this.skia.end();
 
-    RenderSystem.disableTexture();
-    RenderSystem.enableBlend();
-    RenderSystem.defaultBlendFunc();
-
-    final var tessellator = Tesselator.getInstance();
-    final var builder = tessellator.getBuilder();
-
-    if (leftBorderWidth > 0F) {
-      var x2 = this.getScaledX() + leftBorderWidth;
-      var x = this.getScaledX();
-      var y2 = this.getScaledY() + this.getScaledHeight();
-
-      var color = this.leftBorderColor.get().getValue4f();
-
-      builder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
-      builder.vertex(x, y2, this.getZOffset())
-          .color(color[0], color[1], color[2], color[3])
-          .endVertex();
-      builder.vertex(x2, y2 - bottomBorderWidth, this.getZOffset())
-          .color(color[0], color[1], color[2], color[3])
-          .endVertex();
-      builder.vertex(x2, this.getScaledY() + topBorderWidth, this.getZOffset())
-          .color(color[0], color[1], color[2], color[3])
-          .endVertex();
-      builder.vertex(x, this.getScaledY(), this.getZOffset())
-          .color(color[0], color[1], color[2], color[3])
-          .endVertex();
-      tessellator.end();
-    }
-    if (rightBorderWidth > 0F) {
-      var x2 = this.getScaledX() + this.getScaledWidth();
-      var x = x2 - rightBorderWidth;
-      var y2 = this.getScaledY() + this.getScaledHeight();
-
-      var color = this.rightBorderColor.get().getValue4f();
-
-      builder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
-      builder.vertex(x, y2 - bottomBorderWidth, this.getZOffset())
-          .color(color[0], color[1], color[2], color[3])
-          .endVertex();
-      builder.vertex(x2, y2, this.getZOffset())
-          .color(color[0], color[1], color[2], color[3])
-          .endVertex();
-      builder.vertex(x2, this.getScaledY(), this.getZOffset())
-          .color(color[0], color[1], color[2], color[3])
-          .endVertex();
-      builder.vertex(x, this.getScaledY() + topBorderWidth, this.getZOffset())
-          .color(color[0], color[1], color[2], color[3])
-          .endVertex();
-      tessellator.end();
-    }
-
-    if (topBorderWidth > 0F) {
-      var x2 = this.getScaledX() + this.getScaledWidth();
-      var y2 = this.getScaledY() + topBorderWidth;
-
-      var color = this.topBorderColor.get().getValue4f();
-
-      builder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
-      builder.vertex(this.getScaledX() + leftBorderWidth, y2, this.getZOffset())
-          .color(color[0], color[1], color[2], color[3])
-          .endVertex();
-      builder.vertex(x2 - rightBorderWidth, y2, this.getZOffset())
-          .color(color[0], color[1], color[2], color[3])
-          .endVertex();
-      builder.vertex(x2, this.getScaledY(), this.getZOffset())
-          .color(color[0], color[1], color[2], color[3])
-          .endVertex();
-      builder.vertex(this.getScaledX(), this.getScaledY(), this.getZOffset())
-          .color(color[0], color[1], color[2], color[3])
-          .endVertex();
-      tessellator.end();
-    }
-    if (bottomBorderWidth > 0F) {
-      float x2 = this.getScaledX() + this.getScaledWidth();
-      float y2 = this.getScaledY() + this.getScaledHeight();
-      float y = y2 - bottomBorderWidth;
-
-      float[] color = this.bottomBorderColor.get().getValue4f();
-
-      builder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
-      builder.vertex(this.getScaledX(), y2, this.getZOffset())
-          .color(color[0], color[1], color[2], color[3])
-          .endVertex();
-      builder.vertex(x2, y2, this.getZOffset())
-          .color(color[0], color[1], color[2], color[3])
-          .endVertex();
-      builder.vertex(x2 - rightBorderWidth, y, this.getZOffset())
-          .color(color[0], color[1], color[2], color[3])
-          .endVertex();
-      builder.vertex(this.getScaledX() + leftBorderWidth, y, this.getZOffset())
-          .color(color[0], color[1], color[2], color[3])
-          .endVertex();
-      tessellator.end();
-    }
-
-
-    RenderSystem.enableTexture();
-    RenderSystem.disableBlend();
 
     if (this.tooltip != null && this.isHovered()) {
-      this.tooltip.render(this.minecraft.font, poseStack,
-          10.0F + this.getX() + this.getWidth(), this.getY());
+      // this.tooltip.render(this.minecraft.font, poseStack,
+      // 10.0F + this.getX() + this.getWidth(), this.getY());
     }
 
     // ---- Render Content----
 
-    final boolean scissor = this.layout.getOverflow().shouldScissor();
+    final var scissor = this.layout.getOverflow().shouldScissor();
     if (scissor) {
-      final var scale = this.window.getGuiScale();
       ScissorStack.push(
           (int) (this.getScaledX() * scale),
-          (int) (this.window.getHeight()
-              - (this.getScaledY() + this.getScaledHeight()) * scale),
+          (int) (this.getScaledY() * scale),
           (int) (this.getScaledWidth() * scale),
           (int) (this.getScaledHeight() * scale));
     }
@@ -463,28 +333,34 @@ public class View extends GuiComponent
 
       final var scrollbarWidth = SCROLLBAR_WIDTH * this.getXScale();
 
-      final var scrollbarRadius = scrollbarWidth / 2.0F + 0.75F;
+      final var scrollbarRadius = (scrollbarWidth / 2.0F) * scale;
 
       final var scrollbarX2 = scrollbarX + scrollbarWidth;
       final var scaledY2 = scaledY + this.getScaledHeight();
 
-      RenderSystem.setShader(roundedRectShader::instance);
-
-      roundedRectShader.radius().set(scrollbarRadius, scrollbarRadius, scrollbarRadius,
-          scrollbarRadius);
-      roundedRectShader.outlineWidth().set(0.0F);
-
-      // Background
-      roundedRectShader.position().set(scrollbarX, scaledY);
-      roundedRectShader.size().set(scrollbarWidth, this.getScaledHeight());
-      RenderUtil.fill(poseStack, scrollbarX, scaledY, scrollbarX2, scaledY2, 0x40000000);
-
-      // Bar
-      final var scrollbarY = this.getScrollbarY();
-      final var scrollbarY2 = scrollbarY + this.getScrollbarHeight();
-      roundedRectShader.position().set(scrollbarX, scrollbarY);
-      roundedRectShader.size().set(scrollbarWidth, this.getScrollbarHeight());
-      RenderUtil.fill(poseStack, scrollbarX, scrollbarY, scrollbarX2, scrollbarY2, 0x4CFFFFFF);
+      this.skia.begin();
+      {
+        var canvas = this.skia.canvas();
+        canvas.drawRRect(
+            RRect.makeLTRB(
+                scrollbarX * scale,
+                scaledY * scale,
+                scrollbarX2 * scale,
+                scaledY2 * scale,
+                scrollbarRadius),
+            new Paint().setMode(PaintMode.FILL).setColor(0x40000000));
+        final var scrollbarY = this.getScrollbarY();
+        final var scrollbarY2 = scrollbarY + this.getScrollbarHeight();
+        canvas.drawRRect(
+            RRect.makeLTRB(
+                scrollbarX * scale,
+                scrollbarY * scale,
+                scrollbarX2 * scale,
+                scrollbarY2 * scale,
+                scrollbarRadius),
+            new Paint().setMode(PaintMode.FILL).setColor(0x4CFFFFFF));
+      }
+      this.skia.end();
     }
   }
 
@@ -862,12 +738,15 @@ public class View extends GuiComponent
 
   public final float getScaledContentX() {
     return this.getContentX()
-        + (this.getContentWidth() - (this.getContentWidth() * this.xScale.get())) / 2.0F
-        + (this.layout.getLeftPadding() - (this.layout.getLeftPadding() * this.xScale.get())) / 2.0F
-        + (this.layout.getRightPadding() - (this.layout.getRightPadding() * this.xScale.get()))
+        + (this.getContentWidth() - (this.getContentWidth() * this.style.xScale.get())) / 2.0F
+        + (this.layout.getLeftPadding()
+            - (this.layout.getLeftPadding() * this.style.xScale.get()))
+            / 2.0F
+        + (this.layout.getRightPadding()
+            - (this.layout.getRightPadding() * this.style.xScale.get()))
             / 2.0F
         + (this.isScrollbarEnabled()
-            ? (SCROLLBAR_WIDTH - (SCROLLBAR_WIDTH * this.xScale.get())) / 2.0F
+            ? (SCROLLBAR_WIDTH - (SCROLLBAR_WIDTH * this.style.xScale.get())) / 2.0F
             : 0.0F);
   }
 
@@ -878,14 +757,15 @@ public class View extends GuiComponent
   }
 
   public final float getScaledX() {
-    return this.getX() + (this.getWidth() - (this.getWidth() * this.xScale.get())) / 2.0F;
+    return this.getX()
+        + (this.getWidth() - (this.getWidth() * this.style.xScale.get())) / 2.0F;
   }
 
   public final float getX() {
-    final float left = this.layout.getLeft();
+    final float left = this.layout.getX();
     return left
-        + (left * this.getXScale()) - (left * this.xScale.get())
-        + this.xTranslation.get()
+        + (left * this.getXScale()) - (left * this.style.xScale.get())
+        + this.style.xTranslation.get()
         + (this.parent == null
             ? 0.0F
             : this.parent.getScaledContentX())
@@ -894,9 +774,13 @@ public class View extends GuiComponent
 
   public final float getScaledContentY() {
     return this.getContentY()
-        + (this.getContentHeight() - (this.getContentHeight() * this.yScale.get())) / 2.0F
-        + (this.layout.getTopPadding() - (this.layout.getTopPadding() * this.yScale.get())) / 2.0F
-        + (this.layout.getBottomPadding() - (this.layout.getBottomPadding() * this.yScale.get()))
+        + (this.getContentHeight() - (this.getContentHeight() * this.style.yScale.get()))
+            / 2.0F
+        + (this.layout.getTopPadding()
+            - (this.layout.getTopPadding() * this.style.yScale.get()))
+            / 2.0F
+        + (this.layout.getBottomPadding()
+            - (this.layout.getBottomPadding() * this.style.yScale.get()))
             / 2.0F;
   }
 
@@ -910,14 +794,15 @@ public class View extends GuiComponent
   }
 
   public final float getScaledY() {
-    return this.getY() + (this.getHeight() - (this.getHeight() * this.yScale.get())) / 2.0F;
+    return this.getY()
+        + (this.getHeight() - (this.getHeight() * this.style.yScale.get())) / 2.0F;
   }
 
   public final float getY() {
-    final float top = this.layout.getTop();
+    final float top = this.layout.getY();
     return top
-        + (top * this.getYScale()) - (top * this.yScale.get())
-        + this.yTranslation.get()
+        + (top * this.getYScale()) - (top * this.style.yScale.get())
+        + this.style.yTranslation.get()
         + (this.parent == null
             ? 0.0F
             : this.parent.getScaledContentY())
@@ -968,78 +853,19 @@ public class View extends GuiComponent
   }
 
   public float getZOffset() {
-    return this.index + this.zIndex.get();
+    return this.index + this.style.zIndex.get();
   }
 
   public final float getXScale() {
-    return (this.parent == null ? 1.0F : this.parent.getXScale()) * this.xScale.get();
+    return (this.parent == null ? 1.0F : this.parent.getXScale()) * this.style.xScale.get();
   }
 
   public final float getYScale() {
-    return (this.parent == null ? 1.0F : this.parent.getYScale()) * this.yScale.get();
+    return (this.parent == null ? 1.0F : this.parent.getYScale()) * this.style.yScale.get();
   }
 
   public final float getAlpha() {
-    return (this.parent == null ? 1.0F : this.parent.getAlpha()) * this.alpha.get();
-  }
-
-  public final StyleableProperty<Float> getXTranslationProperty() {
-    return this.xTranslation;
-  }
-
-  public final StyleableProperty<Float> getYTranslationProperty() {
-    return this.yTranslation;
-  }
-
-  public final StyleableProperty<Float> getXScaleProperty() {
-    return this.xScale;
-  }
-
-  public final StyleableProperty<Float> getYScaleProperty() {
-    return this.yScale;
-  }
-
-  public final StyleableProperty<Color> getTopBorderColorProperty() {
-    return this.topBorderColor;
-  }
-
-  public final StyleableProperty<Color> getRightBorderColorProperty() {
-    return this.rightBorderColor;
-  }
-
-  public final StyleableProperty<Color> getBottomBorderColorProperty() {
-    return this.bottomBorderColor;
-  }
-
-  public final StyleableProperty<Color> getLeftBorderColorProperty() {
-    return this.leftBorderColor;
-  }
-
-  public final StyleableProperty<Float> getOutlineWidthProperty() {
-    return this.outlineWidth;
-  }
-
-  public final StyleableProperty<Color> getOutlineColorProperty() {
-    return this.outlineColor;
-  }
-
-  public final StyleableProperty<Color> getBackgroundColorProperty() {
-    return this.backgroundColor;
-  }
-
-  public final StyleableProperty<Float> getBorderRadiusProperty() {
-    return this.borderRadius;
-  }
-
-  public final StyleableProperty<Float> getAlphaProperty() {
-    return this.alpha;
-  }
-
-  public final void defineBorderColorState(Color color, int... states) {
-    this.topBorderColor.defineState(color, states);
-    this.rightBorderColor.defineState(color, states);
-    this.bottomBorderColor.defineState(color, states);
-    this.leftBorderColor.defineState(color, states);
+    return (this.parent == null ? 1.0F : this.parent.getAlpha()) * this.style.opacity.get().value();
   }
 
   public final void setEnabled(boolean enabled) {
@@ -1124,8 +950,8 @@ public class View extends GuiComponent
   }
 
   @Override
-  public StyleHolder getStyle() {
-    return this.styleHolder;
+  public StyleHolder getStyleHolder() {
+    return this.style.getStyleHolder();
   }
 
   @Override
@@ -1137,10 +963,14 @@ public class View extends GuiComponent
   }
 
   public void refreshStyle() {
-    this.styleHolder.refresh();
+    this.style.getStyleHolder().refresh();
   }
 
-  public static class Properties<SELF extends Properties<SELF>> {
+  public ViewStyle getStyle() {
+    return this.style;
+  }
+
+  public static class Properties {
 
     @Nullable
     private String id;
@@ -1156,67 +986,62 @@ public class View extends GuiComponent
     private boolean unscaleOutline = true;
     private boolean focusable;
 
-    public SELF id(String id) {
+    public Properties id(String id) {
       this.id = id;
-      return this.self();
+      return this;
     }
 
-    public SELF styleClasses(String... styleClasses) {
+    public Properties styleClasses(String... styleClasses) {
       this.styleClasses.add(styleClasses);
-      return this.self();
+      return this;
     }
 
-    public SELF styleClasses(Iterable<String> styleClasses) {
+    public Properties styleClasses(Iterable<String> styleClasses) {
       this.styleClasses.addAll(styleClasses);
-      return this.self();
+      return this;
     }
 
-    public final SELF tooltip(@Nullable Tooltip tooltip) {
+    public final Properties tooltip(@Nullable Tooltip tooltip) {
       this.tooltip = tooltip;
-      return this.self();
+      return this;
     }
 
-    public final SELF backgroundBlur(float blurRadius) {
+    public final Properties backgroundBlur(float blurRadius) {
       if (this.backgroundBlur != null) {
         this.backgroundBlur.close();
       }
       this.backgroundBlur = new Blur(blurRadius);
-      return this.self();
+      return this;
     }
 
-    public final SELF doubleClick(boolean doubleClick) {
+    public final Properties doubleClick(boolean doubleClick) {
       this.doubleClick = doubleClick;
-      return this.self();
+      return this;
     }
 
-    public final SELF unscaleWidth(boolean unscaleWidth) {
+    public final Properties unscaleWidth(boolean unscaleWidth) {
       this.unscaleWidth = unscaleWidth;
-      return this.self();
+      return this;
     }
 
-    public final SELF unscaleHeight(boolean unscaleHeight) {
+    public final Properties unscaleHeight(boolean unscaleHeight) {
       this.unscaleHeight = unscaleHeight;
-      return this.self();
+      return this;
     }
 
-    public final SELF unscaleBorder(boolean unscaleBorder) {
+    public final Properties unscaleBorder(boolean unscaleBorder) {
       this.unscaleBorder = unscaleBorder;
-      return this.self();
+      return this;
     }
 
-    public final SELF unscaleOutline(boolean unscaleOutline) {
+    public final Properties unscaleOutline(boolean unscaleOutline) {
       this.unscaleOutline = unscaleOutline;
-      return this.self();
+      return this;
     }
 
-    public final SELF focusable(boolean focusable) {
+    public final Properties focusable(boolean focusable) {
       this.focusable = focusable;
-      return this.self();
-    }
-
-    @SuppressWarnings("unchecked")
-    protected SELF self() {
-      return (SELF) this;
+      return this;
     }
   }
 }

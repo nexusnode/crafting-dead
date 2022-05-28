@@ -43,7 +43,7 @@ import reactor.core.scheduler.Schedulers;
 
 public class GuildView extends ParentView {
 
-  private final ParentView contentView = new ParentView(new Properties<>().id("content"));
+  private final ParentView contentView = new ParentView(new Properties().id("content"));
 
   private final ParentView sideBarView;
 
@@ -66,39 +66,35 @@ public class GuildView extends ParentView {
   private Disposable guildMemberListener;
 
   public GuildView() {
-    super(new Properties<>());
+    super(new Properties());
 
     this.yourGuildView = new YourGuildView(this::setContentView);
     var manageMembersView = new ManageMembersView(this::setContentView);
     this.invitesView = new InvitesView();
 
-    this.addChild(new PanoramaView(new Properties<>(), TitleScreen.CUBE_MAP));
+    this.addChild(new PanoramaView(new Properties(), TitleScreen.CUBE_MAP));
 
     this.addChild(
-        this.sideBarView = new ParentView(new Properties<>().id("side-bar").backgroundBlur(50.0F)));
+        this.sideBarView = new ParentView(new Properties().id("side-bar").backgroundBlur(50.0F)));
 
-    this.manageMembersButtonView = new TextView(new Properties<>().focusable(true))
-        .setText(ManageMembersView.TITLE)
-        .setCentered(true);
+    this.manageMembersButtonView = new TextView(new Properties().focusable(true))
+        .setText(ManageMembersView.TITLE);
     this.manageMembersButtonView.addListener(ActionEvent.class,
         event -> this.setContentView(manageMembersView));
 
-    this.yourGuildButtonView = new TextView(new Properties<>().focusable(true))
-        .setText(YourGuildView.TITLE)
-        .setCentered(true);
+    this.yourGuildButtonView = new TextView(new Properties().focusable(true))
+        .setText(YourGuildView.TITLE);
     this.yourGuildButtonView.addListener(ActionEvent.class,
         event -> this.setContentView(this.yourGuildView));
 
-    this.invitesButtonView = new TextView(new Properties<>().focusable(true))
-        .setText(InvitesView.TITLE)
-        .setCentered(true);
+    this.invitesButtonView = new TextView(new Properties().focusable(true))
+        .setText(InvitesView.TITLE);
     this.invitesButtonView.addListener(ActionEvent.class,
         event -> this.setContentView(this.invitesView));
     this.sideBarView.addChild(this.invitesButtonView);
 
-    this.createGuildButtonView = new TextView(new Properties<>().focusable(true))
-        .setText(CreateGuildDialogView.TITLE)
-        .setCentered(true);
+    this.createGuildButtonView = new TextView(new Properties().focusable(true))
+        .setText(CreateGuildDialogView.TITLE);
     this.createGuildButtonView.addListener(ActionEvent.class,
         event -> this.setContentView(new CreateGuildDialogView((name, tag) -> {
           Rocket.getGameClientGateway()

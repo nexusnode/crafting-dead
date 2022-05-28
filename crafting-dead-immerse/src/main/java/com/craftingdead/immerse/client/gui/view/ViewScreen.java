@@ -41,6 +41,8 @@ public final class ViewScreen extends Screen {
 
   private boolean keepOpen;
 
+  private boolean layout;
+
   public ViewScreen(Component title, ParentView root) {
     super(title);
     this.minecraft = Minecraft.getInstance();
@@ -48,6 +50,16 @@ public final class ViewScreen extends Screen {
     this.height = this.minecraft.getWindow().getGuiScaledHeight();
     this.root = root;
     this.root.setLayout(new Layout() {
+
+      @Override
+      public float getX() {
+        return 0.0F;
+      }
+
+      @Override
+      public float getY() {
+        return 0.0F;
+      }
 
       @Override
       public float getWidth() {
@@ -79,18 +91,12 @@ public final class ViewScreen extends Screen {
 
   @Override
   public void init() {
+
     if (!this.root.isAdded()) {
       this.root.added();
     }
 
-    this.root.layout();
-
-    // Reset mouse pos
-    var scaledMouseX =
-        this.minecraft.mouseHandler.xpos() / this.minecraft.getWindow().getGuiScale();
-    var scaledMouseY =
-        this.minecraft.mouseHandler.ypos() / this.minecraft.getWindow().getGuiScale();
-    this.mouseMoved(scaledMouseX, scaledMouseY);
+    this.layout = true;
   }
 
   @Override
@@ -156,6 +162,17 @@ public final class ViewScreen extends Screen {
 
   @Override
   public void tick() {
+    if (this.layout) {
+      this.layout = false;
+      this.root.layout();
+
+      // Reset mouse pos
+      var scaledMouseX =
+          this.minecraft.mouseHandler.xpos() / this.minecraft.getWindow().getGuiScale();
+      var scaledMouseY =
+          this.minecraft.mouseHandler.ypos() / this.minecraft.getWindow().getGuiScale();
+      this.mouseMoved(scaledMouseX, scaledMouseY);
+    }
     this.root.tick();
   }
 
@@ -170,7 +187,7 @@ public final class ViewScreen extends Screen {
   }
 
   public void setStylesheets(List<ResourceLocation> stylesheets) {
-    this.styleList = StyleSheetManager.getInstance().refreshStylesheets(stylesheets);
+    this.styleList = StyleSheetManager.getInstance().createStyleList(stylesheets);
     this.root.refreshStyle();
   }
 

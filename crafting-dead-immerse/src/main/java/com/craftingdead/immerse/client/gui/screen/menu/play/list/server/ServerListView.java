@@ -28,6 +28,7 @@ import com.craftingdead.immerse.client.gui.screen.Theme;
 import com.craftingdead.immerse.client.gui.view.Animation;
 import com.craftingdead.immerse.client.gui.view.ParentView;
 import com.craftingdead.immerse.client.gui.view.View;
+import com.craftingdead.immerse.client.gui.view.style.Percentage;
 import net.minecraft.network.chat.TranslatableComponent;
 
 public class ServerListView extends ParentView {
@@ -47,10 +48,10 @@ public class ServerListView extends ParentView {
   private CompletableFuture<Void> refreshFuture;
 
   public ServerListView(ServerList serverList) {
-    super(new Properties<>());
+    super(new Properties());
     this.serverList = serverList;
 
-    this.listView = new ParentView(new Properties<>().id("content"));
+    this.listView = new ParentView(new Properties().id("content"));
     this.addChild(this.listView);
 
     this.playButton = Theme.createGreenButton(
@@ -58,7 +59,7 @@ public class ServerListView extends ParentView {
         () -> this.getSelectedItem().ifPresent(ServerItemView::connect));
     this.playButton.setEnabled(false);
 
-    this.controlsView = new ParentView(new ParentView.Properties<>().id("controls"));
+    this.controlsView = new ParentView(new ParentView.Properties().id("controls"));
     this.controlsView.addChild(this.createTopRowControls());
     this.controlsView.addChild(this.createBottomRowControls());
 
@@ -68,13 +69,13 @@ public class ServerListView extends ParentView {
   }
 
   protected ParentView createTopRowControls() {
-    var view = new ParentView(new ParentView.Properties<>());
+    var view = new ParentView(new Properties());
     view.addChild(this.playButton);
     return view;
   }
 
   protected ParentView createBottomRowControls() {
-    var view = new ParentView(new ParentView.Properties<>());
+    var view = new ParentView(new Properties());
 
     var quickRefreshButton = Theme.createBlueButton(
         new TranslatableComponent("view.server_list.button.quick_refresh"), this::quickRefresh);
@@ -93,14 +94,14 @@ public class ServerListView extends ParentView {
     int delay = 0;
     for (var view : this.listView.getChildViews()) {
       new Animator.Builder()
-          .addTarget(Animation.forProperty(view.getXTranslationProperty())
+          .addTarget(Animation.forProperty(view.getStyle().xTranslation)
               .keyFrames(new KeyFrames.Builder<>(-100.0F)
                   .addFrame(0.0F)
                   .build())
               .build())
-          .addTarget(Animation.forProperty(view.getAlphaProperty())
-              .keyFrames(new KeyFrames.Builder<>(0.0F)
-                  .addFrame(1.0F)
+          .addTarget(Animation.forProperty(view.getStyle().opacity)
+              .keyFrames(new KeyFrames.Builder<>(Percentage.ZERO)
+                  .addFrame(Percentage.ONE_HUNDRED)
                   .build())
               .build())
           .setStartDelay(delay, TimeUnit.MILLISECONDS)

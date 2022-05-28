@@ -21,12 +21,11 @@ package com.craftingdead.immerse.client;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
-import org.jetbrains.annotations.Nullable;
-import com.mojang.logging.LogUtils;
-import org.slf4j.Logger;
 import org.jdesktop.core.animation.timing.Animator;
 import org.jdesktop.core.animation.timing.sources.ManualTimingSource;
+import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
+import org.slf4j.Logger;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
@@ -34,8 +33,8 @@ import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.ModDist;
 import com.craftingdead.immerse.client.fake.FakePlayer;
 import com.craftingdead.immerse.client.gui.IngameGui;
+import com.craftingdead.immerse.client.gui.Skia;
 import com.craftingdead.immerse.client.gui.screen.menu.MainMenuView;
-import com.craftingdead.immerse.client.gui.view.ViewScreen;
 import com.craftingdead.immerse.client.gui.view.style.StyleSheetManager;
 import com.craftingdead.immerse.client.renderer.BlueprintOutlineRenderer;
 import com.craftingdead.immerse.client.renderer.SpectatorRenderer;
@@ -52,6 +51,7 @@ import com.craftingdead.immerse.util.LwjglNativeUtil;
 import com.craftingdead.immerse.world.item.BlueprintItem;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import com.mojang.logging.LogUtils;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.TitleScreen;
@@ -104,6 +104,8 @@ public class ClientDist implements ModDist {
 
   private final Minecraft minecraft;
 
+  private final Skia skia;
+
   @Nullable
   private LogicalServer logicalServer;
 
@@ -136,9 +138,14 @@ public class ClientDist implements ModDist {
     modBus.addListener(this::handleRegisterClientReloadListeners);
     MinecraftForge.EVENT_BUS.register(this);
     this.minecraft = Minecraft.getInstance();
+    this.skia = new Skia();
     this.spectatorRenderer = new SpectatorRenderer();
     this.blueprintOutlineRenderer = new BlueprintOutlineRenderer();
     this.ingameGui = new IngameGui();
+  }
+
+  public Skia getSkia() {
+    return this.skia;
   }
 
   @Nullable
@@ -324,11 +331,11 @@ public class ClientDist implements ModDist {
 
     if (event.getScreen() instanceof TitleScreen
         || event.getScreen() instanceof JoinMultiplayerScreen) {
-      if (this.minecraft.screen instanceof ViewScreen screen
-          && screen.getRoot() instanceof MainMenuView) {
-        event.setCanceled(true);
-        return;
-      }
+      // if (this.minecraft.screen instanceof ViewScreen screen
+      // && screen.getRoot() instanceof MainMenuView) {
+      // event.setCanceled(true);
+      // return;
+      // }
       event.setScreen(MainMenuView.createScreen());
     }
   }

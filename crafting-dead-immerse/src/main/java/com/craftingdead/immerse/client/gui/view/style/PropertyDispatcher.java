@@ -20,12 +20,17 @@ package com.craftingdead.immerse.client.gui.view.style;
 
 import java.util.function.Predicate;
 import com.craftingdead.immerse.client.gui.view.property.Transition;
+import com.google.common.base.Predicates;
 
 public interface PropertyDispatcher<T> {
 
   void setTransition(Transition transition);
 
   boolean defineState(StyleSource source, String style, int state);
+
+  default void reset() {
+    this.reset(Predicates.alwaysTrue());
+  }
 
   void reset(Predicate<StyleSource> filter);
 

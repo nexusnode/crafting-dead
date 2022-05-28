@@ -30,13 +30,11 @@ public class TextDialogView extends ParentView {
 
   public TextDialogView(Component message, Component placeholder, Consumer<String> resultConsumer,
       Runnable cancelListener) {
-    super(new Properties<>().styleClasses("dialog").backgroundBlur(50));
+    super(new Properties().styleClasses("dialog").backgroundBlur(50));
 
-    this.addChild(new TextView(new Properties<>())
-        .setText(message)
-        .setCentered(true));
+    this.addChild(new TextView(new Properties()).setText(message));
 
-    var usernameFieldView = new TextFieldView(new Properties<>());
+    var usernameFieldView = new TextFieldView(new Properties());
     usernameFieldView.setPlaceholder(placeholder);
     var sendButtonView = Theme.createGreenButton(CommonComponents.GUI_PROCEED,
         () -> resultConsumer.accept(usernameFieldView.getValue()));
@@ -44,7 +42,7 @@ public class TextDialogView extends ParentView {
     usernameFieldView.setResponder(value -> sendButtonView.setEnabled(!value.isBlank()));
     this.addChild(usernameFieldView);
 
-    var controlsView = new ParentView(new Properties<>().id("controls"));
+    var controlsView = new ParentView(new Properties().id("controls"));
     this.addChild(controlsView);
 
     controlsView.addChild(sendButtonView);

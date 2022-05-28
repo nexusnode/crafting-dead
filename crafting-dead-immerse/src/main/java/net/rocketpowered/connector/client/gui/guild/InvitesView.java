@@ -72,17 +72,15 @@ public class InvitesView extends ParentView {
   private Set<GuildInvitePayload> lastInvites = Collections.emptySet();
 
   public InvitesView() {
-    super(new Properties<>().styleClasses("page").backgroundBlur(50));
+    super(new Properties().styleClasses("page").backgroundBlur(50));
 
-    this.addChild(new TextView(new Properties<>().id("title"))
-        .setText(TITLE)
-        .setCentered(true));
+    this.addChild(new TextView(new Properties().id("title")).setText(TITLE));
 
-    this.invitesListView = new ParentView(new Properties<>().id("list"));
+    this.invitesListView = new ParentView(new Properties().id("list"));
 
     this.addChild(this.invitesListView);
 
-    this.controlsView = new ParentView(new Properties<>().id("controls"));
+    this.controlsView = new ParentView(new Properties().id("controls"));
     this.controlsView.addChild(
         this.acceptButton = Theme.createBlueButton(
             new TextComponent("Accept"),
@@ -181,32 +179,32 @@ public class InvitesView extends ParentView {
     private Disposable memberListener;
 
     public InviteView(GuildInvitePayload invite) {
-      super(new Properties<>().styleClasses("item").unscaleBorder(false).focusable(true));
+      super(new Properties().styleClasses("item").unscaleBorder(false).focusable(true));
 
       this.invite = invite;
 
-      this.totalMembersView = new TextView(new Properties<>());
-      this.onlineMemebrsView = new TextView(new Properties<>());
-      this.onlineMemebrsView.getColorProperty().defineState(Theme.ONLINE);
-      this.offlineMemebrsView = new TextView(new Properties<>());
-      this.offlineMemebrsView.getColorProperty().defineState(Color.GRAY);
+      this.totalMembersView = new TextView(new Properties());
+      this.onlineMemebrsView = new TextView(new Properties());
+      this.onlineMemebrsView.getStyle().color.defineState(Theme.ONLINE);
+      this.offlineMemebrsView = new TextView(new Properties());
+      this.offlineMemebrsView.getStyle().color.defineState(Color.GRAY);
 
-      this.addChild(new TextView(new Properties<>())
+      this.addChild(new TextView(new Properties())
           .setText(new TextComponent(this.invite.guild().name())
               .withStyle(ChatFormatting.BOLD)));
 
-      var playerCountsView = new ParentView(new Properties<>().id("player-counts"));
+      var playerCountsView = new ParentView(new Properties().id("player-counts"));
 
       this.addChild(playerCountsView);
       playerCountsView.addChild(this.totalMembersView);
-      playerCountsView.addChild(new TextView(new Properties<>())
+      playerCountsView.addChild(new TextView(new Properties())
           .setText(new TextComponent(" | ")));
       playerCountsView.addChild(this.onlineMemebrsView);
-      playerCountsView.addChild(new TextView(new Properties<>())
+      playerCountsView.addChild(new TextView(new Properties())
           .setText(new TextComponent(" | ")));
       playerCountsView.addChild(this.offlineMemebrsView);
       if (this.invite.sender() != null) {
-        this.addChild(new TextView(new Properties<>())
+        this.addChild(new TextView(new Properties())
             .setText(
                 new TextComponent("Invited by " + this.invite.sender().minecraftProfile().name())
                     .withStyle(ChatFormatting.ITALIC)));

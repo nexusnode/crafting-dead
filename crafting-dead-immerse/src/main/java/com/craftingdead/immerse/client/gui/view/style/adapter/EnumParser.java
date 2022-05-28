@@ -16,9 +16,25 @@
  * https://craftingdead.net/terms.php
  */
 
-package com.craftingdead.immerse.client.gui.screen.menu;
+package com.craftingdead.immerse.client.gui.view.style.adapter;
 
-public interface AnimatableView {
+import java.util.Locale;
 
-  void animateRemoval(Runnable remove);
+public class EnumParser<T extends Enum<T>> implements StyleParser<T> {
+
+  private final Class<T> type;
+
+  public EnumParser(Class<T> type) {
+    this.type = type;
+  }
+
+  @Override
+  public int validate(String style) {
+    return style.length();
+  }
+
+  @Override
+  public T parse(String style) {
+    return Enum.valueOf(this.type, style.toUpperCase(Locale.ROOT).replace('-', '_'));
+  }
 }

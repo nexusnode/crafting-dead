@@ -70,22 +70,20 @@ public class YourGuildView extends ParentView {
   private GuildMemberPayload selfMember;
 
   public YourGuildView(Consumer<View> contentConsumer) {
-    super(new Properties<>().styleClasses("page").backgroundBlur(50));
+    super(new Properties().styleClasses("page").backgroundBlur(50));
 
     this.contentConsumer = contentConsumer;
 
-    this.addChild(new TextView(new Properties<>().id("title"))
-        .setText(TITLE)
-        .setCentered(true));
+    this.addChild(new TextView(new Properties().id("title")).setText(TITLE));
 
-    var guildView = new ParentView(new Properties<>().id("guild"));
+    var guildView = new ParentView(new Properties().id("guild"));
     this.addChild(guildView);
 
     guildView.addChild(
-        this.informationView = new ParentView(new Properties<>().id("information")));
+        this.informationView = new ParentView(new Properties().id("information")));
 
     guildView.addChild(
-        this.membersView = new ParentView(new Properties<>().id("members")));
+        this.membersView = new ParentView(new Properties().id("members")));
 
     this.transferButton = Theme.createRedButton(new TextComponent("Transfer"),
         () -> this.contentConsumer.accept(new TextDialogView(
@@ -182,26 +180,23 @@ public class YourGuildView extends ParentView {
   private void updateInformation(GameClientGateway gateway) {
     this.informationView.clearChildren();
 
-    this.informationView.addChild(new TextView(new Properties<>())
+    this.informationView.addChild(new TextView(new Properties())
         .setText(new TextComponent("")
             .append(new TextComponent("Name: ")
                 .withStyle(ChatFormatting.GRAY))
-            .append(this.guild.name()))
-        .setShadow(false));
-    this.informationView.addChild(new TextView(new Properties<>())
+            .append(this.guild.name())));
+    this.informationView.addChild(new TextView(new Properties())
         .setText(new TextComponent("")
             .append(new TextComponent("Tag: ")
                 .withStyle(ChatFormatting.GRAY))
-            .append(this.guild.tag()))
-        .setShadow(false));
-    this.informationView.addChild(new TextView(new Properties<>())
+            .append(this.guild.tag())));
+    this.informationView.addChild(new TextView(new Properties())
         .setText(new TextComponent("")
             .append(new TextComponent("Owner: ")
                 .withStyle(ChatFormatting.GRAY))
-            .append(this.guild.owner().minecraftProfile().name()))
-        .setShadow(false));
+            .append(this.guild.owner().minecraftProfile().name())));
 
-    var controlsView = new ParentView(new Properties<>().id("controls"));
+    var controlsView = new ParentView(new Properties().id("controls"));
     this.informationView.addChild(controlsView);
 
     var permissions = this.guild.getPermissions(this.selfMember);

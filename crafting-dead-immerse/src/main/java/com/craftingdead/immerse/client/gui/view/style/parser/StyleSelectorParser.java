@@ -24,13 +24,20 @@ import com.craftingdead.immerse.client.gui.view.style.selector.StructuralSelecto
 import com.craftingdead.immerse.client.gui.view.style.selector.StyleSelector;
 import com.craftingdead.immerse.client.gui.view.style.selector.StyleSelectorHierarchic;
 import com.craftingdead.immerse.client.gui.view.style.selector.StyleSelectorType;
+import com.craftingdead.immerse.util.NumberedLineIterator;
 
 class StyleSelectorParser {
 
   private StyleSelectorParser() {}
 
-  static StyleSelector[] readSelectors(String selector) {
-    selector = selector.replace('{', ' ').trim();
+  static StyleSelector[] readSelectors(String currentLine, NumberedLineIterator iterator) {
+    var selectorBuilder = new StringBuilder(currentLine.trim());
+    while (!currentLine.endsWith("{")) {
+      currentLine = iterator.nextLine().trim();
+      selectorBuilder.append(currentLine);
+    }
+
+    var selector = selectorBuilder.toString().replace("{", "").trim();
     if (selector.contains(",")) {
       var selectors = new StyleSelector[StringUtils.countMatches(selector, ",") + 1];
       int i = 0;
@@ -39,8 +46,9 @@ class StyleSelectorParser {
         i++;
       }
       return selectors;
-    } else
-      return new StyleSelector[] {readSingleSelector(cleanSelector(selector))};
+    }
+
+    return new StyleSelector[] {readSingleSelector(cleanSelector(selector))};
   }
 
   static StyleSelector readSingleSelector(String selector) {
@@ -57,6 +65,7 @@ class StyleSelectorParser {
         while (cleanSelector.charAt(i + count) == ' ') {
           count++;
         }
+
         if (!isToken(cleanSelector.charAt(i + count))
             && !isToken(cleanSelector.charAt(i - 1))) {
           cleanSelector.replace(i, i + count, ">>");

@@ -42,31 +42,24 @@ class ServerItemView extends ParentView {
   private long lastAnimationUpdateMs;
 
   ServerItemView(ServerEntry serverEntry) {
-    super(new Properties<>().styleClasses("item").doubleClick(true).focusable(true));
+    super(new Properties().styleClasses("item").doubleClick(true).focusable(true));
     this.serverEntry = serverEntry;
 
-    this.motdComponent = new TextView(new Properties<>().id("motd"))
+    this.motdComponent = new TextView(new Properties().id("motd"))
         .setText("...")
-        .setShadow(false)
-        .setCentered(true)
         .setWrap(false);
 
-    this.pingComponent = new TextView(new Properties<>().id("ping"))
-        .setText("...")
-        .setShadow(false)
-        .setCentered(true);
-    this.playersAmountComponent = new TextView(new Properties<>().id("players"))
-        .setText("...")
-        .setShadow(false)
-        .setCentered(true);
+    this.pingComponent = new TextView(new Properties().id("ping"))
+        .setText("...");
+    this.playersAmountComponent = new TextView(new Properties().id("players"))
+        .setText("...");
 
     this.addListener(ActionEvent.class, event -> this.connect());
     this.addChild(this.motdComponent);
-    this.addChild(new TextView(new Properties<>().id("map"))
+    this.addChild(new TextView(new Properties().id("map"))
         .setText(new TextComponent(this.serverEntry.getMap().orElse("-"))
             .withStyle(ChatFormatting.GRAY))
-        .setShadow(false)
-        .setCentered(true));
+        .setWrap(false));
     this.addChild(this.pingComponent);
     this.addChild(this.playersAmountComponent);
 
@@ -107,18 +100,18 @@ class ServerItemView extends ParentView {
   private void updateServerInfo(ServerPinger.PingData pingData) {
     this.motdComponent.setText(pingData.getMotd());
     if (pingData.getPing() >= 0) {
-      long ping = pingData.getPing();
-      String pingText = ping + "ms";
+      var ping = pingData.getPing();
+      ChatFormatting pingColor;
       if (ping < 200) {
-        pingText = ChatFormatting.GREEN + pingText;
+        pingColor = ChatFormatting.GREEN;
       } else if (ping < 400) {
-        pingText = ChatFormatting.YELLOW + pingText;
+        pingColor = ChatFormatting.YELLOW;
       } else if (ping < 1200) {
-        pingText = ChatFormatting.RED + pingText;
+        pingColor = ChatFormatting.RED;
       } else {
-        pingText = ChatFormatting.DARK_RED + pingText;
+        pingColor = ChatFormatting.DARK_RED;
       }
-      this.pingComponent.setText(new TextComponent(pingText));
+      this.pingComponent.setText(new TextComponent(ping + "ms").withStyle(pingColor));
     } else {
       this.pingComponent.setText(new TextComponent("?"));
     }

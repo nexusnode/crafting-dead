@@ -19,6 +19,7 @@
 package com.craftingdead.immerse.client.gui.view.style;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.OptionalInt;
@@ -50,6 +51,10 @@ public class StyleHolder {
       var propertyName = split[0].trim();
       this.setProperty(propertyName, split[1].trim(), INLINE_SOURCE);
     }
+  }
+
+  public Collection<PropertyDispatcher<?>> getDispatchers() {
+    return this.dispatchers.values();
   }
 
   private void setProperty(String propertyName, String value, StyleSource source) {
@@ -90,14 +95,12 @@ public class StyleHolder {
       return;
     }
 
-
     var styleList = this.styleSupplier.get();
     if (styleList == null) {
       return;
     }
 
     var rules = styleList.getRulesMatching(this);
-
     var transitions = new ArrayList<StyleTransition>();
 
     this.resetToDefault();
@@ -133,6 +136,8 @@ public class StyleHolder {
     for (var transition : transitions) {
       transition.apply(this.dispatchers);
     }
+
+    this.owner.styleRefreshed(styleList.createFontManager());
   }
 
   @Nullable

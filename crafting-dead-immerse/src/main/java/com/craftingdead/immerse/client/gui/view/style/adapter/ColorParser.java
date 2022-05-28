@@ -22,8 +22,9 @@ import java.text.NumberFormat;
 import java.util.regex.Pattern;
 import com.craftingdead.immerse.client.gui.view.Color;
 
-public class ColorTranslator
-    implements StyleDecoder<Color>, StyleEncoder<Color>, StyleValidator<Color> {
+public class ColorParser implements StyleParser<Color> {
+
+  public static final ColorParser INSTANCE = new ColorParser();
 
   private final NumberFormat colorFormat;
 
@@ -34,47 +35,38 @@ public class ColorTranslator
   private final Pattern rgbaColorPattern =
       Pattern.compile("^rgba\\((\\s?\\d+\\s?,\\s?){3}(\\s?\\d+\\s?)\\)");
 
-  public ColorTranslator() {
+  private ColorParser() {
     this.colorFormat = NumberFormat.getInstance();
     this.colorFormat.setMinimumFractionDigits(0);
     this.colorFormat.setMaximumFractionDigits(1);
   }
 
   @Override
-  public String encode(Color value, boolean prettyPrint) {
-    var builder = new StringBuilder();
-
-    if (prettyPrint) {
-      builder.append(value.getHex())
-          .append(" (")
-          .append(colorFormat.format(value.getRed()))
-          .append(",")
-          .append(colorFormat.format(value.getGreen()))
-          .append(",")
-          .append(colorFormat.format(value.getBlue()))
-          .append(",")
-          .append(colorFormat.format(value.getAlpha()))
-          .append(")");
-    } else {
-      builder.append(value.getHex())
-          .append(" ")
-          .append(value.getAlpha() * 100)
-          .append("%");
+  public int validate(String style) {
+    if (this.hexColorPattern.matcher(style).matches()) {
+      if (this.hexAlphaColorPattern.matcher(style).matches()) {
+        return style.substring(0, style.indexOf("%") + 1).length();
+      }
+      return 7;
     }
-    return builder.toString();
+    if (!this.rgbColorPattern.matcher(style).matches()
+        && !rgbaColorPattern.matcher(style).matches()) {
+      return 0;
+    }
+    return style.substring(0, style.indexOf(")") + 1).length();
   }
 
   @Override
-  public Color decode(String style) {
+  public Color parse(String style) {
     // Hexa Color ex: #FF0011 20%
     if (style.startsWith("#")) {
       if (!style.contains(" ")) {
-        return Color.fromHex(style);
+        return Color.parseWithFullAlpha(style);
       } else {
         var split = style.split(" ");
         var rgb = split[0];
         var alpha = Float.parseFloat(split[1].substring(0, split[1].length() - 1)) / 100;
-        return Color.fromHex(rgb, alpha);
+        return Color.parseWithAlpha(rgb, alpha);
       }
     }
     // RGB or RGBA Color ex: rgba(255, 255, 255, 255)
@@ -110,26 +102,14 @@ public class ColorTranslator
         }
         i++;
       }
-      return new Color(redValue, greenValue, blueValue, alphaValue);
+      return Color.create(redValue, greenValue, blueValue, alphaValue);
     }
-    if (ColorConstants.hasConstant(style)) {
-      return ColorConstants.getColor(style);
-    }
-    throw new RuntimeException("Invalid color: " + style);
-  }
 
-  @Override
-  public int validate(String style) {
-    if (this.hexColorPattern.matcher(style).matches()) {
-      if (this.hexAlphaColorPattern.matcher(style).matches()) {
-        return style.substring(0, style.indexOf("%") + 1).length();
-      }
-      return 7;
+    var color = NamedColors.getColor(style);
+    if (color != null) {
+      return color;
     }
-    if (!this.rgbColorPattern.matcher(style).matches()
-        && !rgbaColorPattern.matcher(style).matches()) {
-      return 0;
-    }
-    return style.substring(0, style.indexOf(")") + 1).length();
+
+    throw new RuntimeException("Invalid color: " + style);
   }
 }

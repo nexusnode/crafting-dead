@@ -69,7 +69,7 @@ class WorldItemView extends ParentView {
   private final WorldListView parentWorldList;
 
   WorldItemView(LevelSummary worldSummary, WorldListView parentWorldList) {
-    super(new Properties<>().styleClasses("item").doubleClick(true).focusable(true));
+    super(new Properties().styleClasses("item").doubleClick(true).focusable(true));
     this.worldSummary = worldSummary;
     this.parentWorldList = parentWorldList;
     var displayName = worldSummary.getLevelName();
@@ -90,20 +90,17 @@ class WorldItemView extends ParentView {
     }
 
     this.addListener(ActionEvent.class, event -> this.joinWorld(), true);
-    this.addChild(new ImageView(new Properties<>().id("icon")).setImage(worldIcon));
+    this.addChild(new ImageView(new Properties().id("icon")).setImage(worldIcon));
 
-    var texts = new ParentView(new Properties<>().id("texts"));
-    texts.addChild(new TextView(new Properties<>())
-        .setText(displayName)
-        .setShadow(false));
-    texts.addChild(new TextView(new Properties<>().id("info"))
+    var texts = new ParentView(new Properties().id("texts"));
+    texts.addChild(new TextView(new Properties())
+        .setText(displayName));
+    texts.addChild(new TextView(new Properties().id("info"))
         .setText(new TextComponent(info)
-            .withStyle(ChatFormatting.GRAY))
-        .setShadow(false));
-    texts.addChild(new TextView(new Properties<>())
+            .withStyle(ChatFormatting.GRAY)));
+    texts.addChild(new TextView(new Properties())
         .setText(new TextComponent(description)
-            .withStyle(ChatFormatting.GRAY))
-        .setShadow(false));
+            .withStyle(ChatFormatting.GRAY)));
     this.addChild(texts);
   }
 

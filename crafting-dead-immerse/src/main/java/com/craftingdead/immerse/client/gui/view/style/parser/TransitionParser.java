@@ -20,22 +20,20 @@ package com.craftingdead.immerse.client.gui.view.style.parser;
 
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
-import org.jetbrains.annotations.Nullable;
-import com.mojang.logging.LogUtils;
-import org.slf4j.Logger;
 import org.jdesktop.core.animation.timing.Interpolator;
+import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
 import com.craftingdead.immerse.client.gui.view.style.StyleTransition;
-import com.craftingdead.immerse.client.gui.view.style.adapter.InterpolatorTranslator;
-import com.craftingdead.immerse.client.gui.view.style.adapter.StyleDecoder;
-import com.craftingdead.immerse.client.gui.view.style.adapter.StyleTranslatorRegistry;
-import com.craftingdead.immerse.client.gui.view.style.adapter.StyleValidator;
+import com.craftingdead.immerse.client.gui.view.style.adapter.InterpolatorParser;
+import com.craftingdead.immerse.client.gui.view.style.adapter.StyleParser;
+import com.craftingdead.immerse.client.gui.view.style.adapter.StyleParserRegistry;
+import com.mojang.logging.LogUtils;
 
 public class TransitionParser {
 
   private static final Logger logger = LogUtils.getLogger();
 
-  private final StyleValidator<Interpolator> interpolatorValidator;
-  private final StyleDecoder<Interpolator> interpolatorDecoder;
+  private final StyleParser<Interpolator> interpolatorParser;
 
   @Nullable
   private String property;
@@ -47,14 +45,11 @@ public class TransitionParser {
   private String interpolator;
 
   public TransitionParser() {
-    this(StyleTranslatorRegistry.getInstance().getValidator(Interpolator.class),
-        StyleTranslatorRegistry.getInstance().getDecoder(Interpolator.class));
+    this(StyleParserRegistry.getInstance().getParser(Interpolator.class));
   }
 
-  public TransitionParser(StyleValidator<Interpolator> interpolatorValidator,
-      StyleDecoder<Interpolator> interpolatorDecoder) {
-    this.interpolatorValidator = interpolatorValidator;
-    this.interpolatorDecoder = interpolatorDecoder;
+  public TransitionParser(StyleParser<Interpolator> interpolatorParser) {
+    this.interpolatorParser = interpolatorParser;
   }
 
   public boolean tryParse(String name, String value) {
@@ -71,7 +66,7 @@ public class TransitionParser {
 
         if (values.length == 3) {
           var temp = values[2];
-          if (this.interpolatorValidator.validate(temp) > 0) {
+          if (this.interpolatorParser.validate(temp) > 0) {
             this.interpolator = temp;
           } else {
             this.delay = temp;
@@ -112,7 +107,7 @@ public class TransitionParser {
     StyleTransition.TargetSelector[] selectors = {StyleTransition.TargetSelector.ALL};
     long[] delays = {0L};
     long[] durations = {0L};
-    Interpolator[] interpolators = {InterpolatorTranslator.EASE};
+    Interpolator[] interpolators = {InterpolatorParser.EASE};
 
     if (this.property != null) {
       var properties = this.property.split(" ");
@@ -174,7 +169,7 @@ public class TransitionParser {
       var interpolatorsStr = this.interpolator.split(" ");
       interpolators = new Interpolator[interpolatorsStr.length];
       for (int i = 0; i < interpolatorsStr.length; i++) {
-        interpolators[i] = this.interpolatorDecoder.decode(interpolatorsStr[i]);
+        interpolators[i] = this.interpolatorParser.parse(interpolatorsStr[i]);
       }
     }
 

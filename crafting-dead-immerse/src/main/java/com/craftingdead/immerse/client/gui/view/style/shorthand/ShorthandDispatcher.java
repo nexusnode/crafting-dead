@@ -23,21 +23,21 @@ import java.util.function.Predicate;
 import com.craftingdead.immerse.client.gui.view.property.Transition;
 import com.craftingdead.immerse.client.gui.view.style.PropertyDispatcher;
 import com.craftingdead.immerse.client.gui.view.style.StyleSource;
-import com.craftingdead.immerse.client.gui.view.style.adapter.StyleTranslatorRegistry;
-import com.craftingdead.immerse.client.gui.view.style.adapter.StyleValidator;
+import com.craftingdead.immerse.client.gui.view.style.adapter.StyleParser;
+import com.craftingdead.immerse.client.gui.view.style.adapter.StyleParserRegistry;
 
 public class ShorthandDispatcher<T> implements PropertyDispatcher<T> {
 
   private final String name;
-  private final StyleValidator<T> validator;
+  private final StyleParser<T> parser;
   private final ShorthandArgMapper argMapper;
   private final PropertyDispatcher<T>[] dispatchers;
 
   @SafeVarargs
-  public ShorthandDispatcher(String name, StyleValidator<T> validator, ShorthandArgMapper argMapper,
+  public ShorthandDispatcher(String name, StyleParser<T> parser, ShorthandArgMapper argMapper,
       PropertyDispatcher<T>... dispatchers) {
     this.name = name;
-    this.validator = validator;
+    this.parser = parser;
     this.argMapper = argMapper;
     this.dispatchers = dispatchers;
   }
@@ -47,7 +47,7 @@ public class ShorthandDispatcher<T> implements PropertyDispatcher<T> {
     var values = new ArrayList<String>();
     var current = rawValue;
     while (!current.isEmpty()) {
-      var validated = this.validator.validate(current);
+      var validated = this.parser.validate(current);
       if (validated == 0) {
         break;
       }
@@ -72,7 +72,7 @@ public class ShorthandDispatcher<T> implements PropertyDispatcher<T> {
   public String getName() {
     return this.name;
   }
-  
+
   @Override
   public void setTransition(Transition transition) {
     for (var dispatcher : this.dispatchers) {
@@ -83,7 +83,7 @@ public class ShorthandDispatcher<T> implements PropertyDispatcher<T> {
   @SafeVarargs
   public static <T> ShorthandDispatcher<T> create(String name, Class<T> type,
       ShorthandArgMapper argMapper, PropertyDispatcher<T>... properties) {
-    return new ShorthandDispatcher<>(name, StyleTranslatorRegistry.getInstance().getValidator(type),
+    return new ShorthandDispatcher<>(name, StyleParserRegistry.getInstance().getParser(type),
         argMapper, properties);
   }
 }

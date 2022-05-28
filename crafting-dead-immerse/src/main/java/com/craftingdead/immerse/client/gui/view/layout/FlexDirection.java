@@ -16,16 +16,12 @@
  * https://craftingdead.net/terms.php
  */
 
-package com.craftingdead.immerse.client.gui.view.style.adapter;
+package com.craftingdead.immerse.client.gui.view.layout;
 
-@FunctionalInterface
-public interface StyleValidator<T> {
+public enum FlexDirection {
 
-  /**
-   * Validate a css string and return the consumed length. return 0 for an invalid css String.
-   *
-   * @param style css string
-   * @return the consumed chars count
-   */
-  int validate(String style);
+  COLUMN,
+  COLUMN_REVERSE,
+  ROW,
+  ROW_REVERSE;
 }

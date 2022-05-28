@@ -31,9 +31,9 @@ public class Tooltip {
 
   private final Component text;
   private final StatefulProperty<Integer> opacity =
-      StyleableProperty.create("alpha", Integer.class, 0);
+      new StyleableProperty<>("alpha", Integer.class, 0);
   private final StatefulProperty<Integer> textOpacity =
-      StyleableProperty.create("text-alpha", Integer.class, 0);
+      new StyleableProperty<>("text-alpha", Integer.class, 0);
 
   public Tooltip(Component text) {
     this.text = text;

@@ -60,24 +60,24 @@ public class MainMenuView extends ParentView {
 
   private static final Component TITLE = new TranslatableComponent("menu.home.title");
 
-  private final ParentView contentContainer = new ParentView(new Properties<>().id("content"));
+  private final ParentView contentContainer = new ParentView(new Properties().id("content"));
 
   public MainMenuView() {
-    super(new Properties<>());
+    super(new Properties());
 
     var homeView = new HomeView();
     var playView = new PlayView();
 
     this.addChild(Theme.createBackground());
 
-    this.addChild(new FogView(new Properties<>()));
+    this.addChild(new FogView(new Properties()));
 
-    var sideBar = new ParentView(new Properties<>().id("side-bar").backgroundBlur(50.0F));
+    var sideBar = new ParentView(new Properties().id("side-bar").backgroundBlur(50.0F));
 
     var homeButton = Theme.createImageButton(
-        new ResourceLocation(CraftingDeadImmerse.ID, "textures/gui/icon.png"),
+        new ResourceLocation(CraftingDeadImmerse.ID, "textures/gui/logo.svg"),
         () -> this.transitionTo(homeView),
-        new Properties<>()
+        new Properties()
             .id("home")
             .tooltip(new Tooltip(new TranslatableComponent("menu.home_button"))));
     sideBar.addChild(homeButton);
@@ -85,33 +85,30 @@ public class MainMenuView extends ParentView {
     sideBar.addChild(Theme.newSeparator());
 
     var playButton = Theme.createImageButton(
-        new ResourceLocation(CraftingDeadImmerse.ID, "textures/gui/play.png"),
+        new ResourceLocation(CraftingDeadImmerse.ID, "textures/gui/play.svg"),
         () -> this.transitionTo(playView),
-        new Properties<>()
+        new Properties()
             .id("play")
             .styleClasses("grow-button")
             .tooltip(new Tooltip(new TranslatableComponent("menu.play_button"))));
-    playButton.setBilinearFiltering(true);
     sideBar.addChild(playButton);
 
     var settingsButton = Theme.createImageButton(
-        new ResourceLocation(CraftingDeadImmerse.ID, "textures/gui/settings.png"),
+        new ResourceLocation(CraftingDeadImmerse.ID, "textures/gui/settings.svg"),
         () -> this.getScreen().keepOpenAndSetScreen(
             new OptionsScreen(this.getScreen(), this.minecraft.options)),
-        new Properties<>()
+        new Properties()
             .id("settings")
             .styleClasses("grow-button")
             .tooltip(new Tooltip(new TranslatableComponent("menu.options"))));
-    settingsButton.setBilinearFiltering(true);
     sideBar.addChild(settingsButton);
 
     var quitButton = Theme.createImageButton(
-        new ResourceLocation(CraftingDeadImmerse.ID, "textures/gui/power.png"),
+        new ResourceLocation(CraftingDeadImmerse.ID, "textures/gui/power.svg"),
         this.minecraft::stop,
-        new Properties<>()
+        new Properties()
             .id("quit")
             .styleClasses("grow-button"));
-    quitButton.setBilinearFiltering(true);
     sideBar.addChild(quitButton);
 
     var fakePlayerEntity = new FakePlayer(this.minecraft.getUser().getGameProfile());
@@ -125,8 +122,8 @@ public class MainMenuView extends ParentView {
     var livingExtension = LivingExtension.getOrThrow(fakePlayerEntity);
     livingExtension.getItemHandler().insertItem(ModEquipmentSlot.HAT.getIndex(), hatItem, false);
 
-    var entityContainer = new ParentView(new Properties<>().id("entity-container"));
-    entityContainer.addChild(new EntityView(new Properties<>(), fakePlayerEntity));
+    var entityContainer = new ParentView(new Properties().id("entity-container"));
+    entityContainer.addChild(new EntityView(new Properties(), fakePlayerEntity));
     this.addChild(entityContainer);
 
     this.addChild(this.contentContainer);
@@ -143,8 +140,8 @@ public class MainMenuView extends ParentView {
     }
     if (views.size() == 1) {
       var currentView = views.get(0);
-      if (currentView instanceof AnimatableView animatable) {
-        animatable.animateRemoval(() -> {
+      if (currentView instanceof TransitionView animatable) {
+        animatable.transitionOut(() -> {
           this.contentContainer.removeChild(currentView);
           this.contentContainer.layout();
         });
@@ -158,8 +155,7 @@ public class MainMenuView extends ParentView {
 
   public static Screen createScreen() {
     var screen = new ViewScreen(TITLE, new MainMenuView());
-    screen.setStylesheets(
-        List.of(new ResourceLocation(CraftingDeadImmerse.ID, "css/main-menu.css")));
+    screen.setStylesheets(List.of(new ResourceLocation(CraftingDeadImmerse.ID, "main-menu")));
     return screen;
   }
 }

@@ -23,23 +23,22 @@ import it.unimi.dsi.fastutil.floats.FloatConsumer;
 public record Point(Type type, float value) {
 
   public static final Point ZERO = new Point(Type.FIXED, 0.0F);
+  public static final Point UNDEFINED = new Point(Type.FIXED, Float.NaN);
   public static final Point AUTO = new Point(Type.AUTO, 0.0F);
 
-  public void dispatch(FloatConsumer fixedConsumer, FloatConsumer percentageConsumer,
-      Runnable autoConsumer) {
+  public void dispatch(FloatConsumer fixed, FloatConsumer percentage) {
     switch (this.type) {
-      case FIXED: {
-        fixedConsumer.accept(this.value);
-        break;
-      }
-      case PERCENTAGE: {
-        percentageConsumer.accept(this.value);
-        break;
-      }
-      case AUTO: {
-        autoConsumer.run();
-        break;
-      }
+      case FIXED -> fixed.accept(this.value);
+      case PERCENTAGE -> percentage.accept(this.value);
+      case AUTO -> throw new UnsupportedOperationException("Auto not supported.");
+    };
+  }
+
+  public void dispatch(FloatConsumer fixed, FloatConsumer percentage, Runnable auto) {
+    switch (this.type) {
+      case FIXED -> fixed.accept(this.value);
+      case PERCENTAGE -> percentage.accept(this.value);
+      case AUTO -> auto.run();
     };
   }
 

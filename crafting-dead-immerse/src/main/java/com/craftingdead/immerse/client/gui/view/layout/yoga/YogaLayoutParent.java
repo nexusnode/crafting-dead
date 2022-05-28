@@ -18,61 +18,55 @@
 
 package com.craftingdead.immerse.client.gui.view.layout.yoga;
 
-import java.util.function.Consumer;
 import org.lwjgl.util.yoga.Yoga;
+import com.craftingdead.immerse.client.gui.view.ViewStyle;
+import com.craftingdead.immerse.client.gui.view.layout.Align;
+import com.craftingdead.immerse.client.gui.view.layout.FlexDirection;
+import com.craftingdead.immerse.client.gui.view.layout.Justify;
 import com.craftingdead.immerse.client.gui.view.layout.Layout;
 import com.craftingdead.immerse.client.gui.view.layout.LayoutParent;
-import com.craftingdead.immerse.client.gui.view.property.StyleableProperty;
-import com.craftingdead.immerse.client.gui.view.state.StateListener;
-import com.craftingdead.immerse.client.gui.view.style.PropertyDispatcher;
+import com.craftingdead.immerse.client.gui.view.layout.Wrap;
 
-public class YogaLayoutParent implements LayoutParent {
-
-  private final StyleableProperty<YogaFlexDirection> flexDirection;
-  private final StyleableProperty<YogaWrap> flexWrap;
-  private final StyleableProperty<YogaAlign> alignItems;
-  private final StyleableProperty<YogaAlign> alignContent;
-  private final StyleableProperty<YogaJustify> justifyContent;
+public final class YogaLayoutParent implements LayoutParent {
 
   private final long node;
 
   public YogaLayoutParent() {
     this.node = Yoga.YGNodeNew();
-    this.flexDirection = StyleableProperty.create("flex-direction", YogaFlexDirection.class,
-        YogaFlexDirection.COLUMN, this::setFlexDirection);
-    this.flexWrap = StyleableProperty.create("flex-wrap", YogaWrap.class,
-        YogaWrap.NO_WRAP, this::setFlexWrap);
-    this.alignItems = StyleableProperty.create("align-items", YogaAlign.class,
-        YogaAlign.STRETCH, this::setAlignItems);
-    this.alignContent = StyleableProperty.create("align-content", YogaAlign.class,
-        YogaAlign.FLEX_START, this::setAlignContent);
-    this.justifyContent = StyleableProperty.create("justify-content", YogaJustify.class,
-        YogaJustify.FLEX_START, this::setJustifyContent);
   }
 
-  public final YogaLayoutParent setFlexDirection(YogaFlexDirection flexDirection) {
-    Yoga.YGNodeStyleSetFlexDirection(this.node, flexDirection.getYogaType());
-    return this;
+  @Override
+  public void setAll(ViewStyle style) {
+    this.setFlexDirection(style.flexDirection.get());
+    this.setFlexWrap(style.flexWrap.get());
+    this.setAlignItems(style.alignItems.get());
+    this.setAlignContent(style.alignContent.get());
+    this.setJustifyContent(style.justifyContent.get());
   }
 
-  public final YogaLayoutParent setFlexWrap(YogaWrap flexDirection) {
-    Yoga.YGNodeStyleSetFlexWrap(this.node, flexDirection.getYogaType());
-    return this;
+  @Override
+  public void setFlexDirection(FlexDirection flexDirection) {
+    Yoga.YGNodeStyleSetFlexDirection(this.node, YogaUtil.getFlexDirection(flexDirection));
   }
 
-  public final YogaLayoutParent setAlignItems(YogaAlign align) {
-    Yoga.YGNodeStyleSetAlignItems(this.node, align.getYogaType());
-    return this;
+  @Override
+  public void setFlexWrap(Wrap wrap) {
+    Yoga.YGNodeStyleSetFlexWrap(this.node, YogaUtil.getWrap(wrap));
   }
 
-  public final YogaLayoutParent setAlignContent(YogaAlign align) {
-    Yoga.YGNodeStyleSetAlignContent(this.node, align.getYogaType());
-    return this;
+  @Override
+  public void setAlignItems(Align align) {
+    Yoga.YGNodeStyleSetAlignItems(this.node, YogaUtil.getAlign(align));
   }
 
-  public final YogaLayoutParent setJustifyContent(YogaJustify justify) {
-    Yoga.YGNodeStyleSetJustifyContent(this.node, justify.getYogaType());
-    return this;
+  @Override
+  public void setAlignContent(Align align) {
+    Yoga.YGNodeStyleSetAlignContent(this.node, YogaUtil.getAlign(align));
+  }
+
+  @Override
+  public void setJustifyContent(Justify justify) {
+    Yoga.YGNodeStyleSetJustifyContent(this.node, YogaUtil.getJustify(justify));
   }
 
   @Override
@@ -92,29 +86,12 @@ public class YogaLayoutParent implements LayoutParent {
 
   @Override
   public void layout(float width, float height) {
+    Yoga.YGNodeMarkDirtyAndPropogateToDescendants(this.node);
     Yoga.YGNodeCalculateLayout(this.node, width, height, Yoga.YGDirectionLTR);
   }
 
   @Override
   public void close() {
     Yoga.YGNodeFree(this.node);
-  }
-
-  @Override
-  public void gatherDispatchers(Consumer<PropertyDispatcher<?>> consumer) {
-    this.gatherStyleProperties(consumer);
-  }
-
-  @Override
-  public void gatherListeners(Consumer<StateListener> consumer) {
-    this.gatherStyleProperties(consumer);
-  }
-
-  private void gatherStyleProperties(Consumer<? super StyleableProperty<?>> consumer) {
-    consumer.accept(this.flexDirection);
-    consumer.accept(this.flexWrap);
-    consumer.accept(this.alignItems);
-    consumer.accept(this.alignContent);
-    consumer.accept(this.justifyContent);
   }
 }
