@@ -40,7 +40,7 @@ public record GunRendererProperties(
     Transformation aimingTransform,
     Transformation sprintingTransform,
     Transformation backTransform,
-    Map<ResourceLocation, Transformation> attachementTransforms,
+    Map<ResourceLocation, Transformation> attachmentTransforms,
     Map<ResourceLocation, Transformation> magazineTransforms,
     Map<HandTransform, Pair<Transformation, Transformation>> handTransforms,
     List<Pair<ResourceLocation, Transformation>> ironSights) implements ItemRendererProperties {
@@ -57,25 +57,25 @@ public record GunRendererProperties(
           .group(
               ResourceLocation.CODEC
                   .fieldOf("model")
-                  .forGetter(t -> t.modelLocation),
+                  .forGetter(GunRendererProperties::modelLocation),
               RenderUtil.TRANSFORMATION_MATRIX_CODEC
                   .fieldOf("muzzle_flash_transform")
-                  .forGetter(t -> t.muzzleFlashTransform),
+                  .forGetter(GunRendererProperties::muzzleFlashTransform),
               RenderUtil.TRANSFORMATION_MATRIX_CODEC
                   .optionalFieldOf("aiming_transform", Transformation.identity())
-                  .forGetter(t -> t.aimingTransform),
+                  .forGetter(GunRendererProperties::aimingTransform),
               RenderUtil.TRANSFORMATION_MATRIX_CODEC
                   .optionalFieldOf("sprinting_transform", DEFAULT_SPRINTING_TRANSFORM)
-                  .forGetter(t -> t.sprintingTransform),
+                  .forGetter(GunRendererProperties::sprintingTransform),
               RenderUtil.TRANSFORMATION_MATRIX_CODEC
                   .optionalFieldOf("back_transform", Transformation.identity())
-                  .forGetter(t -> t.backTransform),
+                  .forGetter(GunRendererProperties::backTransform),
               Codec.unboundedMap(ResourceLocation.CODEC, RenderUtil.TRANSFORMATION_MATRIX_CODEC)
-                  .optionalFieldOf("attachement_transforms", Collections.emptyMap())
-                  .forGetter(t -> t.attachementTransforms),
+                  .optionalFieldOf("attachment_transforms", Collections.emptyMap())
+                  .forGetter(GunRendererProperties::attachmentTransforms),
               Codec.unboundedMap(ResourceLocation.CODEC, RenderUtil.TRANSFORMATION_MATRIX_CODEC)
                   .optionalFieldOf("magazine_transforms", Collections.emptyMap())
-                  .forGetter(t -> t.magazineTransforms),
+                  .forGetter(GunRendererProperties::magazineTransforms),
               Codec
                   .unboundedMap(HandTransform.CODEC,
                       Codec.mapPair(
@@ -85,10 +85,10 @@ public record GunRendererProperties(
                               Transformation.identity()))
                           .codec())
                   .optionalFieldOf("hand_transforms", Collections.emptyMap())
-                  .forGetter(t -> t.handTransforms),
+                  .forGetter(GunRendererProperties::handTransforms),
               Codec.compoundList(ResourceLocation.CODEC, RenderUtil.TRANSFORMATION_MATRIX_CODEC)
                   .optionalFieldOf("iron_sights", Collections.emptyList())
-                  .forGetter(t -> t.ironSights))
+                  .forGetter(GunRendererProperties::ironSights))
           .apply(instance, GunRendererProperties::new));
 
   @Override
