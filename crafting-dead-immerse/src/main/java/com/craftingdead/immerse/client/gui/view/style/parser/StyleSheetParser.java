@@ -162,8 +162,8 @@ public class StyleSheetParser {
         currentLine = content.nextLine();
         continue;
       }
-      var rule = currentLine.replace(';', ' ').trim().split(":", 2);
-      elements.add(new StyleProperty(rule[0].trim(), rule[1].trim()));
+      var rule = currentLine.replace(';', ' ').strip().split(":", 2);
+      elements.add(new StyleProperty(rule[0].strip(), rule[1].strip()));
       if (!content.hasNext()) {
         return Collections.emptyList();
       }

@@ -70,7 +70,7 @@ public class YourGuildView extends ParentView {
   private GuildMemberPayload selfMember;
 
   public YourGuildView(Consumer<View> contentConsumer) {
-    super(new Properties().styleClasses("page").backgroundBlur(50));
+    super(new Properties().styleClasses("page", "blur"));
 
     this.contentConsumer = contentConsumer;
 

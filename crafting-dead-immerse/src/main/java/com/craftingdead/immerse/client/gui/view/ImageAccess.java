@@ -1,4 +1,4 @@
-package com.craftingdead.immerse.client.gui;
+package com.craftingdead.immerse.client.gui.view;
 
 import io.github.humbleui.skija.Canvas;
 import io.github.humbleui.skija.Paint;

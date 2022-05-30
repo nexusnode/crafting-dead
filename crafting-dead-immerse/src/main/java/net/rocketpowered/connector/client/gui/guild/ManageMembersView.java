@@ -70,7 +70,7 @@ public class ManageMembersView extends ParentView {
   private Disposable listener;
 
   public ManageMembersView(Consumer<View> viewConsumer) {
-    super(new Properties().styleClasses("page").backgroundBlur(50));
+    super(new Properties().styleClasses("page", "blur"));
 
     this.addChild(new TextView(new Properties().id("title")).setText(TITLE));
 

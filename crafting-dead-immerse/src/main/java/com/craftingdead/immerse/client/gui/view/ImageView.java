@@ -22,9 +22,6 @@ import java.io.IOException;
 import java.util.Optional;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
-import com.craftingdead.immerse.client.gui.ImageAccess;
-import com.craftingdead.immerse.client.gui.SimpleImageAccess;
-import com.craftingdead.immerse.client.gui.SvgImageAccess;
 import com.craftingdead.immerse.client.gui.view.layout.Layout;
 import com.craftingdead.immerse.client.gui.view.layout.MeasureMode;
 import com.craftingdead.immerse.client.util.RenderUtil;
@@ -60,28 +57,36 @@ public class ImageView extends View {
     layout.setMeasureFunction(this::measure);
   }
 
-
-
-  public final ImageView setImage(ResourceLocation imageLocation) {
+  private void setImage(ImageAccess image) {
     if (this.image != null) {
       this.image.close();
-      this.image = null;
     }
+
+    this.image = image;
+
+    if (this.hasLayout()) {
+      this.getLayout().markDirty();
+    }
+  }
+
+  public final ImageView setImage(Image image) {
+    this.setImage(new SimpleImageAccess(image));
+    return this;
+  }
+
+  public final ImageView setImage(ResourceLocation imageLocation) {
     try (var inputStream =
         this.minecraft.getResourceManager().getResource(imageLocation).getInputStream()) {
       var bytes = inputStream.readAllBytes();
       if (imageLocation.getPath().endsWith(".svg")) {
-        this.image = new SvgImageAccess(new SVGDOM(Data.makeFromBytes(bytes)));
+        this.setImage(new SvgImageAccess(new SVGDOM(Data.makeFromBytes(bytes))));
       } else {
-        this.image = new SimpleImageAccess(Image.makeFromEncoded(bytes));
+        this.setImage(new SimpleImageAccess(Image.makeFromEncoded(bytes)));
       }
     } catch (IOException e) {
       logger.warn("Failed to load image: {}", imageLocation, e);
     }
 
-    if (this.hasLayout()) {
-      this.getLayout().markDirty();
-    }
     return this;
   }
 

@@ -1,6 +1,8 @@
 package com.craftingdead.immerse.client.gui.view.style.adapter;
 
 import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ArrayParser<T> implements StyleParser<T[]> {
 
@@ -17,14 +19,17 @@ public class ArrayParser<T> implements StyleParser<T[]> {
     return style.length();
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public T[] parse(String style) {
-    var elements = style.replace("'", "").replace("\"", "").split(",");
-    @SuppressWarnings("unchecked")
-    T[] result = (T[]) Array.newInstance(this.type, elements.length);
-    for (int i = 0; i < elements.length; i++) {
-      result[i] = this.elementParser.parse(elements[i].trim());
+    List<T> elements = new ArrayList<>();
+    int index = 0;
+    while (index < style.length()) {
+      var elementLength = this.elementParser.validate(style);
+      var endIndex = index + elementLength;
+      elements.add(this.elementParser.parse(style.substring(index, endIndex)));
+      index += elementLength;
     }
-    return result;
+    return elements.toArray(length -> (T[]) Array.newInstance(this.type, length));
   }
 }

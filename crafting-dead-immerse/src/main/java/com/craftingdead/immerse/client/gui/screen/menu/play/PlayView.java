@@ -53,7 +53,7 @@ public class PlayView extends ParentView implements TransitionView {
   private Runnable removeCallback;
 
   public PlayView() {
-    super(new Properties().backgroundBlur(50));
+    super(new Properties().styleClasses("blur"));
 
     var officialView = new ParentView(new Properties().id("official"));
 

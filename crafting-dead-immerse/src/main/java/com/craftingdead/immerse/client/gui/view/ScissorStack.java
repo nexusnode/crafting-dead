@@ -20,6 +20,7 @@ package com.craftingdead.immerse.client.gui.view;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
+import org.jetbrains.annotations.Nullable;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.renderer.Rect2i;
 
@@ -31,36 +32,47 @@ public class ScissorStack {
     push(new Rect2i(x, y, width, height));
   }
 
-  public static void push(Rect2i region) {
-    Rect2i parentRegion = peek();
-    regionStack.push(region);
-    if (parentRegion == null) {
-      RenderSystem.enableScissor(region.getX(), region.getY(), region.getWidth(),
-          region.getHeight());
-    } else {
-      int x = Math.min(region.getX(), parentRegion.getX());
-      int y = Math.max(region.getY(), parentRegion.getY());
-      int x2 = Math.min(region.getX() + region.getWidth(),
-          parentRegion.getX() + parentRegion.getWidth());
-      int y2 = Math.min(region.getY() + region.getHeight(),
-          parentRegion.getY() + parentRegion.getHeight());
-      RenderSystem.enableScissor(x, y, Math.max(x2 - x, 0), Math.max(y2 - y, 0));
+  public static void push(Rect2i rect) {
+    var parentRect = peek();
+    regionStack.push(rect);
+    if (parentRect == null) {
+      apply(rect);
+      return;
     }
+
+    int x = Math.min(rect.getX(), parentRect.getX());
+    int y = Math.max(rect.getY(), parentRect.getY());
+    int x2 = Math.min(rect.getX() + rect.getWidth(),
+        parentRect.getX() + parentRect.getWidth());
+    int y2 = Math.min(rect.getY() + rect.getHeight(),
+        parentRect.getY() + parentRect.getHeight());
+    RenderSystem.enableScissor(x, y, Math.max(x2 - x, 0), Math.max(y2 - y, 0));
   }
 
   public static void pop() {
     if (!regionStack.isEmpty()) {
       regionStack.pop();
-      Rect2i region = regionStack.peek();
-      if (region != null) {
-        RenderSystem.enableScissor(region.getX(), region.getY(), region.getWidth(),
-            region.getHeight());
+      if (apply()) {
         return;
       }
     }
     RenderSystem.disableScissor();
   }
 
+  private static void apply(Rect2i rect) {
+    RenderSystem.enableScissor(rect.getX(), rect.getY(), rect.getWidth(), rect.getHeight());
+  }
+
+  public static boolean apply() {
+    var rect = peek();
+    if (rect == null) {
+      return false;
+    }
+    apply(rect);
+    return true;
+  }
+
+  @Nullable
   public static Rect2i peek() {
     return regionStack.peek();
   }

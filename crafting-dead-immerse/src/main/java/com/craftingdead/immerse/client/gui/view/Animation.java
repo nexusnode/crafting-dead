@@ -18,13 +18,13 @@
 
 package com.craftingdead.immerse.client.gui.view;
 
-import org.jetbrains.annotations.Nullable;
 import org.jdesktop.core.animation.timing.Animator;
 import org.jdesktop.core.animation.timing.Animator.Direction;
-import com.craftingdead.immerse.client.gui.view.property.AnimatedProperty;
-import com.craftingdead.immerse.client.gui.view.property.StatefulProperty;
 import org.jdesktop.core.animation.timing.KeyFrames;
 import org.jdesktop.core.animation.timing.TimingTargetAdapter;
+import org.jetbrains.annotations.Nullable;
+import com.craftingdead.immerse.client.gui.view.property.AnimatedProperty;
+import com.craftingdead.immerse.client.gui.view.property.StatefulProperty;
 
 public class Animation<T> extends TimingTargetAdapter {
 
@@ -41,9 +41,7 @@ public class Animation<T> extends TimingTargetAdapter {
 
   @Override
   public void timingEvent(Animator source, double fraction) {
-    this.property.setAnimatedValue(source.isRunning()
-        ? this.keyFrames.getInterpolatedValueAt(fraction)
-        : null);
+    this.property.setAnimatedValue(this.keyFrames.getInterpolatedValueAt(fraction));
   }
 
   @Override
@@ -64,6 +62,11 @@ public class Animation<T> extends TimingTargetAdapter {
 
     final double fraction = source.getCurrentDirection() == Direction.FORWARD ? 0.0 : 1.0;
     this.timingEvent(source, fraction);
+  }
+
+  @Override
+  public void end(Animator source) {
+    this.property.clearAnimatedValue();
   }
 
   public static <T> Builder<T> forProperty(StatefulProperty<T> property) {

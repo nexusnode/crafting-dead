@@ -27,7 +27,7 @@ import net.minecraft.network.chat.Component;
 public class ConfirmDialogView extends ParentView {
 
   public ConfirmDialogView(Component message, Runnable yesListener, Runnable noListener) {
-    super(new Properties().styleClasses("dialog").backgroundBlur(50));
+    super(new Properties().styleClasses("dialog", "blur"));
 
     this.addChild(new TextView(new Properties()).setText(message));
 

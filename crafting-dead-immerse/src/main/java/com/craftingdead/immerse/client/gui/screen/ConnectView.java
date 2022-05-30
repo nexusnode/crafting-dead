@@ -81,7 +81,7 @@ public class ConnectView extends ParentView {
     this.addChild(Theme.createBackground());
     this.addChild(new FogView(new Properties()));
 
-    var dialog = new ParentView(new Properties().id("dialog").backgroundBlur(50.0F));
+    var dialog = new ParentView(new Properties().id("dialog").styleClasses("blur"));
     this.addChild(dialog);
     dialog.addChild(this.statusView =
         new TextView(new Properties().id("status"))

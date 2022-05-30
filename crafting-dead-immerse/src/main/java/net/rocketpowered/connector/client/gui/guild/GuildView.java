@@ -75,7 +75,7 @@ public class GuildView extends ParentView {
     this.addChild(new PanoramaView(new Properties(), TitleScreen.CUBE_MAP));
 
     this.addChild(
-        this.sideBarView = new ParentView(new Properties().id("side-bar").backgroundBlur(50.0F)));
+        this.sideBarView = new ParentView(new Properties().id("side-bar").styleClasses("blur")));
 
     this.manageMembersButtonView = new TextView(new Properties().focusable(true))
         .setText(ManageMembersView.TITLE);

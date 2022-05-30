@@ -34,7 +34,7 @@ public class CreateGuildDialogView extends ParentView {
   public static final Component TITLE = new TranslatableComponent("view.guild.create_guild");
 
   public CreateGuildDialogView(BiConsumer<String, String> resultConsumer, Runnable cancelListener) {
-    super(new Properties().styleClasses("dialog").backgroundBlur(50));
+    super(new Properties().styleClasses("dialog", "blur"));
 
     this.addChild(new TextView(new Properties()).setText(TITLE));
 

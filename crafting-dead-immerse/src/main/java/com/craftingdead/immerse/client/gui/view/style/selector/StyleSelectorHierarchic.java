@@ -35,9 +35,6 @@ public class StyleSelectorHierarchic implements StyleSelector {
     this.parentSelector = parentSelector;
     this.childSelector = childSelector;
     this.directChild = directChild;
-
-    this.pseudoClasses.addAll(parentSelector.getPseudoClasses());
-    this.pseudoClasses.addAll(childSelector.getPseudoClasses());
   }
 
   @Override

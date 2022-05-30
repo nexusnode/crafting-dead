@@ -8,6 +8,10 @@ TextView, TabView, DropdownView {
     font-size: 7;
 }
 
+.blur {
+    backdrop-filter: blur(20px);
+}
+
 .seperator {
     height: 1;
     width: 100%;

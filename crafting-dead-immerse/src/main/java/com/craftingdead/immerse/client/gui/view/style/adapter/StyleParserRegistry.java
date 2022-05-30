@@ -20,10 +20,10 @@ package com.craftingdead.immerse.client.gui.view.style.adapter;
 
 import java.util.IdentityHashMap;
 import java.util.Map;
-import java.util.function.Function;
 import org.jdesktop.core.animation.timing.Interpolator;
 import com.craftingdead.immerse.client.gui.view.Color;
 import com.craftingdead.immerse.client.gui.view.Display;
+import com.craftingdead.immerse.client.gui.view.Filter;
 import com.craftingdead.immerse.client.gui.view.Overflow;
 import com.craftingdead.immerse.client.gui.view.Point;
 import com.craftingdead.immerse.client.gui.view.layout.Align;
@@ -50,7 +50,8 @@ public class StyleParserRegistry {
   }
 
   private static final StyleParser<String> STRING_PARSER =
-      StyleParser.create(String::length, Function.identity());
+      StyleParser.create(str -> Math.max(str.indexOf(' ') + 1, str.length()),
+          str -> str.replace("'", "").replace("\"", ""));
   private static final StyleParser<Boolean> BOOLEAN_PARSER =
       StyleParser.create(StringCountUtil::boolAtStart, Boolean::valueOf);
   private static final StyleParser<Integer> INTEGER_PARSER =
@@ -84,6 +85,7 @@ public class StyleParserRegistry {
   private void registerBuiltins() {
     this.registerParser(String[].class, new ArrayParser<>(String.class, STRING_PARSER));
     this.registerParser(Shadow[].class, new ArrayParser<>(Shadow.class, ShadowParser.INSTANCE));
+    this.registerParser(Filter[].class, new ArrayParser<>(Filter.class, FilterParser.INSTANCE));
 
     this.registerParser(String.class, STRING_PARSER);
     this.registerParser(Boolean.class, BOOLEAN_PARSER);

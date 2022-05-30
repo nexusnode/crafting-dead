@@ -33,8 +33,8 @@ import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.ModDist;
 import com.craftingdead.immerse.client.fake.FakePlayer;
 import com.craftingdead.immerse.client.gui.IngameGui;
-import com.craftingdead.immerse.client.gui.Skia;
 import com.craftingdead.immerse.client.gui.screen.menu.MainMenuView;
+import com.craftingdead.immerse.client.gui.view.Skia;
 import com.craftingdead.immerse.client.gui.view.style.StyleSheetManager;
 import com.craftingdead.immerse.client.renderer.BlueprintOutlineRenderer;
 import com.craftingdead.immerse.client.renderer.SpectatorRenderer;
@@ -87,7 +87,7 @@ import reactor.core.scheduler.Schedulers;
 
 public class ClientDist implements ModDist {
 
-  private static final ManualTimingSource TIMING_SOURCE = new ManualTimingSource();
+  private static final ManualTimingSource timingSource = new ManualTimingSource();
 
   public static final KeyMapping SWITCH_TEAMS =
       new KeyMapping("key.switch_teams", KeyConflictContext.UNIVERSAL, KeyModifier.NONE,
@@ -99,7 +99,7 @@ public class ClientDist implements ModDist {
   private static final Logger logger = LogUtils.getLogger();
 
   static {
-    Animator.setDefaultTimingSource(TIMING_SOURCE);
+    Animator.setDefaultTimingSource(timingSource);
   }
 
   private final Minecraft minecraft;
@@ -377,7 +377,7 @@ public class ClientDist implements ModDist {
   public void handleRenderTick(TickEvent.RenderTickEvent event) {
     switch (event.phase) {
       case START:
-        TIMING_SOURCE.tick();
+        timingSource.tick();
         break;
       default:
         break;

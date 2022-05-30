@@ -72,7 +72,7 @@ public class InvitesView extends ParentView {
   private Set<GuildInvitePayload> lastInvites = Collections.emptySet();
 
   public InvitesView() {
-    super(new Properties().styleClasses("page").backgroundBlur(50));
+    super(new Properties().styleClasses("page", "blur"));
 
     this.addChild(new TextView(new Properties().id("title")).setText(TITLE));
 

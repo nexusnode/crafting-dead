@@ -72,7 +72,7 @@ public class MainMenuView extends ParentView {
 
     this.addChild(new FogView(new Properties()));
 
-    var sideBar = new ParentView(new Properties().id("side-bar").backgroundBlur(50.0F));
+    var sideBar = new ParentView(new Properties().id("side-bar").styleClasses("blur"));
 
     var homeButton = Theme.createImageButton(
         new ResourceLocation(CraftingDeadImmerse.ID, "textures/gui/logo.svg"),

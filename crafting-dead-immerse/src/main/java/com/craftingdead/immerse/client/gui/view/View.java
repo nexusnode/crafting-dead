@@ -30,12 +30,9 @@ import org.jdesktop.core.animation.timing.interpolators.SplineInterpolator;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 import com.craftingdead.immerse.CraftingDeadImmerse;
-import com.craftingdead.immerse.client.ClientDist;
-import com.craftingdead.immerse.client.gui.Skia;
 import com.craftingdead.immerse.client.gui.view.event.ActionEvent;
 import com.craftingdead.immerse.client.gui.view.event.AddedEvent;
 import com.craftingdead.immerse.client.gui.view.event.CharTypeEvent;
-import com.craftingdead.immerse.client.gui.view.event.FocusChangedEvent;
 import com.craftingdead.immerse.client.gui.view.event.KeyEvent;
 import com.craftingdead.immerse.client.gui.view.event.MouseEnterEvent;
 import com.craftingdead.immerse.client.gui.view.event.MouseEvent;
@@ -51,17 +48,19 @@ import com.craftingdead.immerse.client.util.RenderUtil;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableSet;
 import com.mojang.blaze3d.platform.Window;
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import io.github.humbleui.skija.Canvas;
+import io.github.humbleui.skija.ClipMode;
 import io.github.humbleui.skija.Paint;
 import io.github.humbleui.skija.PaintMode;
+import io.github.humbleui.types.Point;
 import io.github.humbleui.types.RRect;
+import io.github.humbleui.types.Rect;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.components.Widget;
 import net.minecraft.client.gui.components.events.GuiEventListener;
-import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.Mth;
@@ -121,8 +120,6 @@ public class View extends GuiComponent
   private final Set<String> styleClasses;
   @Nullable
   private final Tooltip tooltip;
-  @Nullable
-  private final Blur backgroundBlur;
   private final boolean doubleClick;
   private final boolean unscaleWidth;
   private final boolean unscaleHeight;
@@ -134,7 +131,6 @@ public class View extends GuiComponent
     this.id = properties.id;
     this.styleClasses = properties.styleClasses.build();
     this.tooltip = properties.tooltip;
-    this.backgroundBlur = properties.backgroundBlur;
     this.doubleClick = properties.doubleClick;
     this.unscaleWidth = properties.unscaleWidth;
     this.unscaleHeight = properties.unscaleHeight;
@@ -170,6 +166,10 @@ public class View extends GuiComponent
 
   protected void setLayout(Layout layout) {
     Objects.requireNonNull(layout, "layout cannot be null.");
+    if (this.layout == layout) {
+      return;
+    }
+    this.layout.close();
     this.layout = layout;
     this.layout.setAll(this.getStyle());
   }
@@ -194,114 +194,11 @@ public class View extends GuiComponent
       this.scrollVelocity = 0.0F;
     }
     this.scrollOffset = this.clampScrollOffset(this.scrollOffset);
-
-    if (this.backgroundBlur != null) {
-      this.backgroundBlur.tick();
-    }
   }
 
-  @SuppressWarnings("resource")
   @Override
   public final void render(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
-    final var topBorderWidth = this.unscale(this.layout.getTopBorder(), this.unscaleBorder);
-    final var bottomBorderWidth = this.unscale(this.layout.getBottomBorder(), this.unscaleBorder);
-    final var leftBorderWidth = this.unscale(this.layout.getLeftBorder(), this.unscaleBorder);
-    final var rightBorderWidth = this.unscale(this.layout.getRightBorder(), this.unscaleBorder);
-    final var borderRadius = this.unscale(this.style.borderRadius.get(), this.unscaleBorder);
-    final var outlineWidth = this.unscale(this.style.outlineWidth.get(), this.unscaleOutline);
-    final var scale = (float) this.window.getGuiScale();
-
-    if (this.backgroundBlur != null) {
-      this.backgroundBlur.process(partialTick);
-      if (borderRadius > 0.0F) {
-        final var shader = ClientDist.getRoundedTexShader();
-        RenderSystem.setShader(shader::instance);
-        shader.radius().set(borderRadius, borderRadius, borderRadius, borderRadius);
-        shader.position().set(this.getScaledX() - outlineWidth, this.getScaledY() - outlineWidth);
-        shader.size().set(this.getScaledWidth() + (outlineWidth * 2.0F),
-            this.getScaledHeight() + (outlineWidth * 2.0F));
-      } else {
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
-      }
-      RenderSystem.enableBlend();
-      RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, this.getAlpha());
-      this.backgroundBlur.render(poseStack, this.getScaledX() - outlineWidth,
-          this.getScaledY() - outlineWidth,
-          this.getScaledWidth() + (outlineWidth * 2.0F),
-          this.getScaledHeight() + (outlineWidth * 2.0F));
-      RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-      RenderSystem.disableBlend();
-    }
-
-
-
-    // if (this.backgroundBlur != null) {
-    // var image = this.skia.surface.makeImageSnapshot(IRect.makeXYWH(
-    // (int) (this.getScaledX() * this.window.getGuiScale()),
-    // (int) (this.getScaledY() * this.window.getGuiScale()),
-    // (int) (this.getScaledWidth() * this.window.getGuiScale()),
-    // (int) (this.getScaledHeight() * this.window.getGuiScale())));
-    //
-    // this.skia.begin();
-    // {
-    // this.skia.canvas().drawImage(image,
-    // this.getScaledX() * (float) this.window.getGuiScale(),
-    // this.getScaledY() * (float) this.window.getGuiScale(),
-    // new Paint().setImageFilter(ImageFilter.makeBlur(5, 5, FilterTileMode.DECAL)));
-    // }
-    // this.skia.end();
-    // }
-
-
-    this.skia.begin();
-    {
-      var canvas = this.skia.canvas();
-
-      var radii = new float[] {
-          borderRadius * scale,
-          borderRadius * scale,
-          borderRadius * scale,
-          borderRadius * scale};
-
-      var rect = RRect.makeComplexXYWH(
-          this.getScaledX() * scale,
-          this.getScaledY() * scale,
-          this.getScaledWidth() * scale,
-          this.getScaledHeight() * scale,
-          radii);
-
-      if (leftBorderWidth > 0 || topBorderWidth > 0 || rightBorderWidth > 0
-          || bottomBorderWidth > 0) {
-        try (var paint = new Paint().setColor(0xFFFF0000)) {
-          var innerRect = RRect.makeComplexLTRB(
-              rect.getLeft() + leftBorderWidth * scale,
-              rect.getTop() - topBorderWidth * scale,
-              rect.getRight() - rightBorderWidth * scale,
-              rect.getBottom() + bottomBorderWidth * scale,
-              radii);
-          canvas.drawDRRect(rect, innerRect, paint);
-        }
-      }
-
-      try (var paint = new Paint()
-          .setMode(PaintMode.FILL)
-          .setColor(RenderUtil.multiplyAlpha(this.style.backgroundColor.get().valueHex(),
-              this.getAlpha()))) {
-        canvas.drawRRect(rect, paint);
-      }
-
-      if (outlineWidth > 0.0F) {
-        try (var paint = new Paint()
-            .setMode(PaintMode.STROKE)
-            .setStrokeWidth(outlineWidth < 1.0F ? 0.0F : outlineWidth * scale)
-            .setColor(RenderUtil.multiplyAlpha(this.style.outlineColor.get().valueHex(),
-                this.getAlpha()))) {
-          canvas.drawRRect(rect, paint);
-        }
-      }
-    }
-    this.skia.end();
-
+    this.drawBox();
 
     if (this.tooltip != null && this.isHovered()) {
       // this.tooltip.render(this.minecraft.font, poseStack,
@@ -310,6 +207,7 @@ public class View extends GuiComponent
 
     // ---- Render Content----
 
+    final var scale = (float) this.window.getGuiScale();
     final var scissor = this.layout.getOverflow().shouldScissor();
     if (scissor) {
       ScissorStack.push(
@@ -325,22 +223,32 @@ public class View extends GuiComponent
       ScissorStack.pop();
     }
 
-    // ---- Render Scrollbar ----
+    this.drawScrollbar();
+  }
 
-    if (this.isScrollbarEnabled()) {
-      final var scrollbarX = this.getScrollbarX();
-      final var scaledY = this.getScaledY();
+  private void drawScrollbar() {
+    if (!this.isScrollbarEnabled()) {
+      return;
+    }
 
-      final var scrollbarWidth = SCROLLBAR_WIDTH * this.getXScale();
+    final var scale = (float) this.window.getGuiScale();
 
-      final var scrollbarRadius = (scrollbarWidth / 2.0F) * scale;
+    final var scrollbarX = this.getScrollbarX();
+    final var scaledY = this.getScaledY();
 
-      final var scrollbarX2 = scrollbarX + scrollbarWidth;
-      final var scaledY2 = scaledY + this.getScaledHeight();
+    final var scrollbarWidth = SCROLLBAR_WIDTH * this.getXScale();
 
-      this.skia.begin();
-      {
-        var canvas = this.skia.canvas();
+    final var scrollbarRadius = (scrollbarWidth / 2.0F) * scale;
+
+    final var scrollbarX2 = scrollbarX + scrollbarWidth;
+    final var scaledY2 = scaledY + this.getScaledHeight();
+
+    this.skia.begin();
+    {
+      var canvas = this.skia.canvas();
+      try (var paint = new Paint()) {
+        paint.setMode(PaintMode.FILL);
+        paint.setColor(0x40000000);
         canvas.drawRRect(
             RRect.makeLTRB(
                 scrollbarX * scale,
@@ -348,9 +256,14 @@ public class View extends GuiComponent
                 scrollbarX2 * scale,
                 scaledY2 * scale,
                 scrollbarRadius),
-            new Paint().setMode(PaintMode.FILL).setColor(0x40000000));
-        final var scrollbarY = this.getScrollbarY();
-        final var scrollbarY2 = scrollbarY + this.getScrollbarHeight();
+            paint);
+      }
+
+      final var scrollbarY = this.getScrollbarY();
+      final var scrollbarY2 = scrollbarY + this.getScrollbarHeight();
+      try (var paint = new Paint()) {
+        paint.setMode(PaintMode.FILL);
+        paint.setColor(0x4CFFFFFF);
         canvas.drawRRect(
             RRect.makeLTRB(
                 scrollbarX * scale,
@@ -358,10 +271,295 @@ public class View extends GuiComponent
                 scrollbarX2 * scale,
                 scrollbarY2 * scale,
                 scrollbarRadius),
-            new Paint().setMode(PaintMode.FILL).setColor(0x4CFFFFFF));
+            paint);
       }
-      this.skia.end();
     }
+    this.skia.end();
+  }
+
+  private void drawBox() {
+    final var scale = (float) this.window.getGuiScale();
+
+    final var topBorderWidth = this.unscale(this.layout.getTopBorder(), this.unscaleBorder);
+    final var bottomBorderWidth = this.unscale(this.layout.getBottomBorder(), this.unscaleBorder);
+    final var leftBorderWidth = this.unscale(this.layout.getLeftBorder(), this.unscaleBorder);
+    final var rightBorderWidth = this.unscale(this.layout.getRightBorder(), this.unscaleBorder);
+
+    final var borderTopLeftRadius =
+        this.unscale(this.style.borderTopLeftRadius.get(), this.unscaleBorder);
+    final var borderTopRightRadius =
+        this.unscale(this.style.borderTopRightRadius.get(), this.unscaleBorder);
+    final var borderBottomRightRadius =
+        this.unscale(this.style.borderBottomRightRadius.get(), this.unscaleBorder);
+    final var borderBottomLeftRadius =
+        this.unscale(this.style.borderBottomLeftRadius.get(), this.unscaleBorder);
+
+    final var outlineWidth = this.unscale(this.style.outlineWidth.get(), this.unscaleOutline);
+
+    final var radii = new float[] {
+        borderTopLeftRadius * scale,
+        borderTopRightRadius * scale,
+        borderBottomRightRadius * scale,
+        borderBottomLeftRadius * scale
+    };
+
+    final var rect = RRect.makeComplexXYWH(
+        this.getScaledX() * scale,
+        this.getScaledY() * scale,
+        this.getScaledWidth() * scale,
+        this.getScaledHeight() * scale,
+        radii);
+
+    if (rect.getRight() <= 0 || rect.getBottom() <= 0) {
+      return;
+    }
+
+    this.skia.begin();
+    {
+      var canvas = this.skia.canvas();
+
+      this.drawBackdrop(canvas, rect);
+
+      var innerRect = RRect.makeComplexLTRB(
+          rect.getLeft() + leftBorderWidth * scale,
+          rect.getTop() + topBorderWidth * scale,
+          rect.getRight() - rightBorderWidth * scale,
+          rect.getBottom() - bottomBorderWidth * scale,
+          radii);
+
+      try (var paint = new Paint()) {
+        paint.setColor(this.style.borderTopColor.get().valueHex());
+        this.drawBorderEdge(canvas, rect, innerRect, BoxSide.TOP, paint);
+        paint.setColor(this.style.borderRightColor.get().valueHex());
+        this.drawBorderEdge(canvas, rect, innerRect, BoxSide.RIGHT, paint);
+        paint.setColor(this.style.borderBottomColor.get().valueHex());
+        this.drawBorderEdge(canvas, rect, innerRect, BoxSide.BOTTOM, paint);
+        paint.setColor(this.style.borderLeftColor.get().valueHex());
+        this.drawBorderEdge(canvas, rect, innerRect, BoxSide.LEFT, paint);
+      }
+
+      try (var paint = new Paint()) {
+        paint.setMode(PaintMode.FILL);
+        paint.setColor(RenderUtil.multiplyAlpha(this.style.backgroundColor.get().valueHex(),
+            this.getAlpha()));
+        canvas.drawRRect(rect, paint);
+      }
+
+      if (outlineWidth > 0.0F) {
+        try (var paint = new Paint()) {
+          paint.setMode(PaintMode.STROKE);
+          paint.setStrokeWidth(outlineWidth < 1.0F ? 0.0F : outlineWidth * scale);
+          paint.setColor(RenderUtil.multiplyAlpha(this.style.outlineColor.get().valueHex(),
+              this.getAlpha()));
+          paint.setAntiAlias(false);
+          canvas.drawRRect(rect.inflate(outlineWidth).withRadii(radii), paint);
+        }
+      }
+    }
+    this.skia.end();
+  }
+
+  private void drawBackdrop(Canvas canvas, RRect rect) {
+    var backdropFilters = this.style.backdropFilter.get();
+    if (backdropFilters.length == 0) {
+      return;
+    }
+
+    try (var image = this.skia.surface.makeImageSnapshot(rect.toIRect());
+        var paint = new Paint()) {
+      for (var filter : backdropFilters) {
+        filter.apply(paint);
+      }
+
+      canvas.save();
+      canvas.clipRRect(rect);
+      canvas.drawImageRect(image,
+          Rect.makeXYWH(0, 0, this.getScaledWidth() * (float) this.window.getGuiScale(),
+              this.getScaledHeight() * (float) this.window.getGuiScale()),
+          rect,
+          paint);
+      canvas.restore();
+    }
+  }
+
+  private void drawBorderEdge(Canvas canvas, RRect rect, RRect innerRect, BoxSide side,
+      Paint paint) {
+    canvas.save();
+    this.clipBorderSidePolygon(canvas, rect, innerRect, side, false, false);
+    canvas.drawDRRect(rect, innerRect, paint);
+    canvas.restore();
+  }
+
+  private void clipBorderSidePolygon(Canvas canvas, RRect outerRect, RRect innerRect,
+      BoxSide side, boolean firstEdgeMatches, boolean secondEdgeMatches) {
+    // @formatter:off
+    // For each side, create a quad that encompasses all parts of that side that may draw,
+    // including areas inside the innerBorder.
+    //
+    //         0----------------3
+    //       0  \              /  0
+    //       |\  1----------- 2  /|
+    //       | 1                1 |   
+    //       | |                | |
+    //       | |                | |  
+    //       | 2                2 |  
+    //       |/  1------------2  \| 
+    //       3  /              \  3   
+    //         0----------------3
+    //
+    // @formatter:on
+
+    var finalQuad = switch (side) {
+      case TOP -> {
+        var quad = new Point[] {
+            GeometryUtil.getTopLeft(outerRect),
+            GeometryUtil.getTopLeft(innerRect),
+            GeometryUtil.getTopRight(innerRect),
+            GeometryUtil.getTopRight(outerRect)};
+
+        // top left
+        if (innerRect._radii[0] != 0) {
+          GeometryUtil
+              .findIntersection(
+                  GeometryUtil.getTopLeft(outerRect),
+                  GeometryUtil.getTopLeft(innerRect),
+                  GeometryUtil.getBottomLeft(innerRect),
+                  GeometryUtil.getTopRight(innerRect))
+              .ifPresent(point -> quad[1] = point);
+        }
+
+        // top right
+        if (innerRect._radii[1] != 0) {
+          GeometryUtil
+              .findIntersection(
+                  GeometryUtil.getTopRight(outerRect),
+                  GeometryUtil.getTopRight(innerRect),
+                  GeometryUtil.getTopLeft(innerRect),
+                  GeometryUtil.getBottomRight(innerRect))
+              .ifPresent(point -> quad[2] = point);
+        }
+        yield quad;
+      }
+      case LEFT -> {
+        var quad = new Point[] {
+            GeometryUtil.getTopLeft(outerRect),
+            GeometryUtil.getTopLeft(innerRect),
+            GeometryUtil.getBottomLeft(innerRect),
+            GeometryUtil.getBottomLeft(outerRect)};
+
+        // top left
+        if (innerRect._radii[0] != 0) {
+          GeometryUtil
+              .findIntersection(GeometryUtil.getTopLeft(outerRect),
+                  GeometryUtil.getTopLeft(innerRect),
+                  GeometryUtil.getBottomLeft(innerRect), GeometryUtil.getTopRight(innerRect))
+              .ifPresent(point -> quad[1] = point);
+        }
+
+        // bottom left
+        if (innerRect._radii[3] != 0) {
+          GeometryUtil
+              .findIntersection(GeometryUtil.getBottomLeft(outerRect),
+                  GeometryUtil.getBottomLeft(innerRect),
+                  GeometryUtil.getTopLeft(innerRect), GeometryUtil.getBottomRight(innerRect))
+              .ifPresent(point -> quad[2] = point);
+        }
+        yield quad;
+      }
+      case BOTTOM -> {
+        var quad = new Point[] {
+            GeometryUtil.getBottomLeft(outerRect),
+            GeometryUtil.getBottomLeft(innerRect),
+            GeometryUtil.getBottomRight(innerRect),
+            GeometryUtil.getBottomRight(outerRect)};
+
+        // bottom left
+        if (innerRect._radii[3] != 0) {
+          GeometryUtil
+              .findIntersection(GeometryUtil.getBottomLeft(outerRect),
+                  GeometryUtil.getBottomLeft(innerRect),
+                  GeometryUtil.getTopLeft(innerRect), GeometryUtil.getBottomRight(innerRect))
+              .ifPresent(point -> quad[1] = point);
+        }
+
+        // bottom right
+        if (innerRect._radii[2] != 0) {
+          GeometryUtil
+              .findIntersection(GeometryUtil.getBottomRight(outerRect),
+                  GeometryUtil.getBottomRight(innerRect),
+                  GeometryUtil.getTopRight(innerRect), GeometryUtil.getBottomLeft(innerRect))
+              .ifPresent(point -> quad[2] = point);
+        }
+        yield quad;
+      }
+      case RIGHT -> {
+        var quad = new Point[] {
+            GeometryUtil.getTopRight(outerRect),
+            GeometryUtil.getTopRight(innerRect),
+            GeometryUtil.getBottomRight(innerRect),
+            GeometryUtil.getBottomRight(outerRect)};
+
+        // top right
+        if (innerRect._radii[1] != 0) {
+          GeometryUtil
+              .findIntersection(
+                  GeometryUtil.getTopRight(outerRect),
+                  GeometryUtil.getTopRight(innerRect),
+                  GeometryUtil.getTopLeft(innerRect),
+                  GeometryUtil.getBottomRight(innerRect))
+              .ifPresent(point -> quad[1] = point);
+        }
+
+        // bottom right
+        if (innerRect._radii[2] != 0) {
+          GeometryUtil
+              .findIntersection(
+                  GeometryUtil.getBottomRight(outerRect),
+                  GeometryUtil.getBottomRight(innerRect),
+                  GeometryUtil.getTopRight(innerRect),
+                  GeometryUtil.getBottomLeft(innerRect))
+              .ifPresent(point -> quad[2] = point);
+        }
+        yield quad;
+      }
+    };
+
+    // If the border matches both of its adjacent sides, don't anti-alias the clip, and
+    // if neither side matches, anti-alias the clip.
+    if (firstEdgeMatches == secondEdgeMatches) {
+      canvas.clipPath(GeometryUtil.polygonPathFromPoints(finalQuad), ClipMode.INTERSECT,
+          !firstEdgeMatches);
+      return;
+    }
+
+    // Square off the end which shouldn't be affected by antialiasing, and clip.
+    Point[] firstQuad = {
+        finalQuad[0],
+        finalQuad[1],
+        finalQuad[2],
+        side == BoxSide.TOP || side == BoxSide.BOTTOM
+            ? new Point(finalQuad[3].getX(), finalQuad[2].getY())
+            : new Point(finalQuad[2].getX(), finalQuad[3].getY()),
+        finalQuad[3]
+    };
+    canvas.clipPath(GeometryUtil.polygonPathFromPoints(firstQuad), ClipMode.INTERSECT,
+        !firstEdgeMatches);
+
+    Point[] secondQuad = {
+        finalQuad[0],
+        side == BoxSide.TOP || side == BoxSide.BOTTOM
+            ? new Point(finalQuad[0].getX(), finalQuad[1].getY())
+            : new Point(finalQuad[1].getX(), finalQuad[0].getY()),
+        finalQuad[1],
+        finalQuad[2],
+        finalQuad[3]
+    };
+
+
+    // Antialiasing affects the second side.
+    canvas.clipPath(GeometryUtil.polygonPathFromPoints(secondQuad), ClipMode.INTERSECT,
+        false);
+
   }
 
   protected final boolean isScrollbarEnabled() {
@@ -674,9 +872,7 @@ public class View extends GuiComponent
     return false;
   }
 
-  protected void focusChanged() {
-    this.post(new FocusChangedEvent());
-  }
+  protected void focusChanged() {}
 
   /**
    * Checks if mouse is over a component based on mouse position. Doesn't check whether there are
@@ -692,10 +888,7 @@ public class View extends GuiComponent
 
   public void close() {
     if (this.closed) {
-      throw new IllegalStateException("Already closed");
-    }
-    if (this.backgroundBlur != null) {
-      this.backgroundBlur.close();
+      throw new IllegalStateException("Already closed.");
     }
     this.layout.close();
     this.closed = true;
@@ -977,8 +1170,6 @@ public class View extends GuiComponent
     private final ImmutableSet.Builder<String> styleClasses = ImmutableSet.builder();
     @Nullable
     private Tooltip tooltip;
-    @Nullable
-    private Blur backgroundBlur;
     private boolean doubleClick;
     private boolean unscaleWidth;
     private boolean unscaleHeight;
@@ -1003,14 +1194,6 @@ public class View extends GuiComponent
 
     public final Properties tooltip(@Nullable Tooltip tooltip) {
       this.tooltip = tooltip;
-      return this;
-    }
-
-    public final Properties backgroundBlur(float blurRadius) {
-      if (this.backgroundBlur != null) {
-        this.backgroundBlur.close();
-      }
-      this.backgroundBlur = new Blur(blurRadius);
       return this;
     }
 

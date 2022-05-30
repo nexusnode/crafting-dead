@@ -91,6 +91,9 @@ public final class ViewScreen extends Screen {
 
   @Override
   public void init() {
+    if (this.root.isClosed()) {
+      throw new IllegalStateException("Root is closed.");
+    }
 
     if (!this.root.isAdded()) {
       this.root.added();
@@ -115,8 +118,8 @@ public final class ViewScreen extends Screen {
     while (hovered instanceof ParentView parent) {
       var nextHovered = parent
           .getChildAt(mouseX, mouseY)
-          .filter(listener -> listener instanceof View)
-          .map(listener -> (View) listener)
+          .filter(View.class::isInstance)
+          .map(View.class::cast)
           .orElse(null);
 
       if (nextHovered == null) {

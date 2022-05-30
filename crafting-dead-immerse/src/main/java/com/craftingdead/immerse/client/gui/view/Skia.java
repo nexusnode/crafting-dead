@@ -1,9 +1,10 @@
-package com.craftingdead.immerse.client.gui;
+package com.craftingdead.immerse.client.gui.view;
 
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL14;
+import org.lwjgl.opengl.GL30;
 import org.lwjgl.opengl.GL33;
-import com.craftingdead.immerse.client.gui.view.ScissorStack;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferUploader;
@@ -27,29 +28,50 @@ public class Skia implements AutoCloseable {
   public Surface surface;
   private BackendRenderTarget backendRenderTarget;
 
-  private  Canvas canvas;
-  
-  private transient boolean started;
+  private Canvas canvas;
+
+  public int framebufferId = -1;
+  public int colorBuffer = -1;
+  public int depthBufferId = -1;
 
   public void init(RenderTarget renderTarget) {
     RenderSystem.assertOnRenderThread();
-    
-    if(started) {
-      throw new IllegalStateException();
-    }
-    
+
     // Lazy init context.
     if (this.context == null) {
       this.context = DirectContext.makeGL();
     }
+    renderTarget.enableStencil();
 
+
+    if (this.framebufferId != -1) {
+      GL30.glDeleteFramebuffers(this.framebufferId);
+      GL30.glDeleteRenderbuffers(this.colorBuffer);
+      GL30.glDeleteRenderbuffers(this.depthBufferId);
+    }
+    this.framebufferId = GL30.glGenFramebuffers();
+    GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, framebufferId);
+
+    this.colorBuffer = GL30.glGenRenderbuffers();
+    GL30.glBindRenderbuffer(GL30.GL_RENDERBUFFER, colorBuffer);
+    GL30.glRenderbufferStorage(GL30.GL_RENDERBUFFER, GL30.GL_RGBA8, renderTarget.width,
+        renderTarget.height);
+    GL30.glFramebufferRenderbuffer(GL30.GL_FRAMEBUFFER, GL30.GL_COLOR_ATTACHMENT0,
+        GL30.GL_RENDERBUFFER, this.colorBuffer);
+
+    this.depthBufferId = GL30.glGenRenderbuffers();
+    GL30.glBindRenderbuffer(GL30.GL_RENDERBUFFER, depthBufferId);
+    GL30.glRenderbufferStorage(GL30.GL_RENDERBUFFER, GL30.GL_DEPTH24_STENCIL8, renderTarget.width,
+        renderTarget.height);
+    GL30.glFramebufferRenderbuffer(GL30.GL_FRAMEBUFFER, GL30.GL_DEPTH_STENCIL_ATTACHMENT,
+        GL30.GL_RENDERBUFFER, this.depthBufferId);
 
     this.closeRenderTarget();
     this.backendRenderTarget = BackendRenderTarget.makeGL(
         Minecraft.getInstance().getWindow().getWidth(),
         Minecraft.getInstance().getWindow().getHeight(),
         /* samples */0,
-        /* stencil */0,
+        /* stencil */8,
         /* fbId */1,
         FramebufferFormat.GR_GL_RGBA8);
     this.surface = Surface.makeFromBackendRenderTarget(
@@ -76,19 +98,18 @@ public class Skia implements AutoCloseable {
   }
 
   public Canvas canvas() {
-    RenderSystem.assertOnRenderThread();
-    if (this.canvas.isClosed()) {
-      throw new IllegalStateException();
-    }
     return this.canvas;
   }
 
   public void begin() {
-    if(started) {
-      throw new IllegalStateException();
-    }
-    started = true;
     RenderSystem.assertOnRenderThread();
+
+    // Undo Minecraft's changes
+    RenderSystem.pixelStore(GL11.GL_UNPACK_ROW_LENGTH, 0);
+    RenderSystem.pixelStore(GL11.GL_UNPACK_SKIP_PIXELS, 0);
+    RenderSystem.pixelStore(GL11.GL_UNPACK_SKIP_ROWS, 0);
+    RenderSystem.pixelStore(GL11.GL_UNPACK_ALIGNMENT, 4);
+
     this.context.resetAll();
 
     this.canvas.save();
@@ -100,15 +121,12 @@ public class Skia implements AutoCloseable {
   }
 
   public void end() {
-    if(!started) {
-      throw new IllegalStateException();
-    }
-    started = false;
     RenderSystem.assertOnRenderThread();
     this.canvas.restore();
 
     this.surface.flush();
 
+    // Reset OpenGL state and keep it in sync with Minecraft's tracked state.
 
     BufferUploader.reset();
     GL33.glBindSampler(0, 0);
@@ -122,19 +140,27 @@ public class Skia implements AutoCloseable {
     RenderSystem.blendEquation(GL14.GL_FUNC_ADD);
     GL14.glBlendEquation(GL14.GL_FUNC_ADD);
 
-
     RenderSystem.colorMask(true, true, true, true);
     GL11.glColorMask(true, true, true, true);
 
     RenderSystem.depthMask(true);
     GL11.glDepthMask(true);
+
+    RenderSystem.disableScissor();
+    GL11.glDisable(GL11.GL_SCISSOR_TEST);
+    ScissorStack.apply();
+
+    GL11.glDisable(GL11.GL_STENCIL_TEST);
+
+    RenderSystem.disableDepthTest();
+    GL11.glDisable(GL11.GL_DEPTH);
+
+    GL13.glActiveTexture(GL13.GL_TEXTURE0);
+    RenderSystem.activeTexture(GL13.GL_TEXTURE0);
   }
 
   @Override
   public void close() {
-    if(started) {
-      throw new IllegalStateException();
-    }
     RenderSystem.assertOnRenderThread();
     this.closeRenderTarget();
     this.context.close();

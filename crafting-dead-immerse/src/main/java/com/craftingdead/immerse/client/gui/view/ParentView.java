@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import org.jetbrains.annotations.Nullable;
+import com.craftingdead.immerse.client.gui.view.layout.Layout;
 import com.craftingdead.immerse.client.gui.view.layout.LayoutParent;
 import com.craftingdead.immerse.client.gui.view.style.StyleHolder;
 import com.craftingdead.immerse.client.gui.view.style.StyleParent;
@@ -137,7 +138,7 @@ public class ParentView extends View implements ContainerEventHandler, StylePare
 
   private void clearLayout(View view) {
     this.layoutParent.removeChild(view.getLayout());
-    view.getLayout().close();
+    view.setLayout(Layout.NILL);
   }
 
   @Override

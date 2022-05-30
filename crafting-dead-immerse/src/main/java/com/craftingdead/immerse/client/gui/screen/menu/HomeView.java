@@ -37,7 +37,7 @@ public class HomeView extends ParentView implements TransitionView {
   public HomeView() {
     super(new Properties());
 
-    this.newsComponent = new ParentView(new Properties().id("news").backgroundBlur(50.0F));
+    this.newsComponent = new ParentView(new Properties().id("news").styleClasses("blur"));
     ViewUtil.addAll(this.newsComponent, new File("news.xml"));
 
     this.addChild(this.newsComponent);

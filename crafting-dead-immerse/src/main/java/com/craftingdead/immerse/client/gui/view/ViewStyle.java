@@ -63,7 +63,10 @@ public class ViewStyle {
   public final StyleableProperty<Color> backgroundColor;
   public final StyleableProperty<Float> outlineWidth;
   public final StyleableProperty<Color> outlineColor;
-  public final StyleableProperty<Float> borderRadius;
+  public final StyleableProperty<Float> borderTopLeftRadius;
+  public final StyleableProperty<Float> borderTopRightRadius;
+  public final StyleableProperty<Float> borderBottomRightRadius;
+  public final StyleableProperty<Float> borderBottomLeftRadius;
   public final StyleableProperty<Color> borderLeftColor;
   public final StyleableProperty<Color> borderRightColor;
   public final StyleableProperty<Color> borderTopColor;
@@ -74,6 +77,7 @@ public class ViewStyle {
   public final StyleableProperty<String[]> fontFamily;
   public final StyleableProperty<Alignment> textAlign;
   public final StyleableProperty<Shadow[]> textShadow;
+  public final StyleableProperty<Filter[]> backdropFilter;
 
   private final View view;
 
@@ -267,9 +271,18 @@ public class ViewStyle {
         new StyleableProperty<>("outline-width", Float.class, 0.0F));
     this.registerProperty(this.outlineColor =
         new StyleableProperty<>("outline-color", Color.class, Color.BLACK));
-    this.registerProperty(this.borderRadius =
-        new StyleableProperty<>("border-radius", Float.class, 0.0F));
-
+    this.registerProperty(this.borderTopLeftRadius =
+        new StyleableProperty<>("border-top-left-radius", Float.class, 0.0F));
+    this.registerProperty(this.borderTopRightRadius =
+        new StyleableProperty<>("border-top-right-radius", Float.class, 0.0F));
+    this.registerProperty(this.borderBottomRightRadius =
+        new StyleableProperty<>("border-bottom-right-radius", Float.class, 0.0F));
+    this.registerProperty(this.borderBottomLeftRadius =
+        new StyleableProperty<>("border-bottom-left-radius", Float.class, 0.0F));
+    this.styleHolder.registerDispatcher(
+        ShorthandDispatcher.create("border-radius", Float.class, ShorthandArgMapper.BOX_MAPPER,
+            this.borderTopLeftRadius, this.borderTopRightRadius,
+            this.borderBottomRightRadius, this.borderBottomLeftRadius));
     this.registerProperty(this.borderTopColor =
         new StyleableProperty<>("border-top-color", Color.class, Color.BLACK));
     this.registerProperty(this.borderRightColor =
@@ -293,6 +306,8 @@ public class ViewStyle {
         new StyleableProperty<>("text-align", Alignment.class, Alignment.START));
     this.registerProperty(this.textShadow =
         new StyleableProperty<>("text-shadow", Shadow[].class, new Shadow[0]));
+    this.registerProperty(this.backdropFilter =
+        new StyleableProperty<>("backdrop-filter", Filter[].class, new Filter[0]));
   }
 
   public StyleHolder getStyleHolder() {
