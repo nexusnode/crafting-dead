@@ -23,17 +23,16 @@ import org.jdesktop.core.animation.timing.Animator.Direction;
 import org.jdesktop.core.animation.timing.KeyFrames;
 import org.jdesktop.core.animation.timing.TimingTargetAdapter;
 import org.jetbrains.annotations.Nullable;
-import com.craftingdead.immerse.client.gui.view.property.AnimatedProperty;
-import com.craftingdead.immerse.client.gui.view.property.StatefulProperty;
+import com.craftingdead.immerse.client.gui.view.property.AnimatableProperty;
 
 public class Animation<T> extends TimingTargetAdapter {
 
-  private final AnimatedProperty<T> property;
+  private final AnimatableProperty<T> property;
   private KeyFrames<T> keyFrames;
 
   private final boolean fromCurrent;
 
-  private Animation(AnimatedProperty<T> property, KeyFrames<T> keyFrames, boolean fromCurrent) {
+  private Animation(AnimatableProperty<T> property, KeyFrames<T> keyFrames, boolean fromCurrent) {
     this.property = property;
     this.keyFrames = keyFrames;
     this.fromCurrent = fromCurrent;
@@ -69,17 +68,17 @@ public class Animation<T> extends TimingTargetAdapter {
     this.property.clearAnimatedValue();
   }
 
-  public static <T> Builder<T> forProperty(StatefulProperty<T> property) {
+  public static <T> Builder<T> forProperty(AnimatableProperty<T> property) {
     return new Builder<>(property);
   }
 
   public static class Builder<T> {
 
-    private final StatefulProperty<T> property;
+    private final AnimatableProperty<T> property;
     private KeyFrames<T> keyFrames;
     private boolean fromCurrent;
 
-    private Builder(StatefulProperty<T> property) {
+    private Builder(AnimatableProperty<T> property) {
       this.property = property;
     }
 

@@ -88,14 +88,6 @@ HomeView>#news {
     margin-left: 10%;
     overflow: scroll;
     background-color: rgba(119, 119, 119, 0.35);
-    border-radius: 10;
-    border-top-left-radius: 75;
-    border-width: 10;
-    border-top-width: 25;
-    border-top-color: red;
-    border-right-color: green;
-    border-bottom-color: blue;
-    border-left-color: yellow;
 }
 
 /* Don't shrink the text so it can scroll */

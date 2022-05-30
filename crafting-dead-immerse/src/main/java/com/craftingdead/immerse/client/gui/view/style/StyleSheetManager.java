@@ -25,7 +25,6 @@ import java.util.Map;
 import java.util.concurrent.CompletionException;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.client.gui.view.style.parser.StyleSheetParser;
-import com.craftingdead.immerse.client.gui.view.style.tree.StyleList;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import io.github.humbleui.skija.Data;

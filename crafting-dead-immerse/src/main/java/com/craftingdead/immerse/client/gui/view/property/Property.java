@@ -21,6 +21,20 @@ package com.craftingdead.immerse.client.gui.view.property;
 public interface Property<T> {
 
   /**
+   * Get this property's name.
+   * 
+   * @return it's name
+   */
+  String getName();
+
+  /**
+   * Get this property's type.
+   * 
+   * @return it's type
+   */
+  Class<T> getType();
+
+  /**
    * Retrieve this property's value.
    * 
    * @return the value

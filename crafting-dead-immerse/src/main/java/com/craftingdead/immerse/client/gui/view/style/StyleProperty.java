@@ -16,17 +16,6 @@
  * https://craftingdead.net/terms.php
  */
 
-package com.craftingdead.immerse.client.gui.view.style.selector;
+package com.craftingdead.immerse.client.gui.view.style;
 
-import java.util.Optional;
-import java.util.stream.Stream;
-import com.craftingdead.immerse.client.gui.view.style.StyleNode;
-
-public interface StyleSelector {
-
-  Optional<Stream<StyleNodeState>> match(StyleNode node);
-
-  int getSpecificity();
-
-  StyleSelector addMatcher(ElementMatcher matcher);
-}
+public record StyleProperty(String name, String value) {}

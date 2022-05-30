@@ -16,17 +16,26 @@
  * https://craftingdead.net/terms.php
  */
 
-package com.craftingdead.immerse.client.gui.view.style.selector;
+package com.craftingdead.immerse.client.gui.view.style.parser.value;
 
-import java.util.Optional;
-import java.util.stream.Stream;
-import com.craftingdead.immerse.client.gui.view.style.StyleNode;
+import net.minecraft.resources.ResourceLocation;
 
-public interface StyleSelector {
+public class ResourceLocationParser implements ValueParser<ResourceLocation> {
 
-  Optional<Stream<StyleNodeState>> match(StyleNode node);
+  public static final ResourceLocationParser INSTANCE = new ResourceLocationParser();
 
-  int getSpecificity();
+  private ResourceLocationParser() {}
 
-  StyleSelector addMatcher(ElementMatcher matcher);
+  @Override
+  public int validate(String style) {
+    return style.substring(0, style.indexOf(')') + 1).length();
+  }
+
+  @Override
+  public ResourceLocation parse(String style) {
+    var pathWithNamespace = style.split("\\(");
+    var namespace = pathWithNamespace[0].trim();
+    var path = pathWithNamespace[1].replace(")", "").replace("\"", "");
+    return new ResourceLocation(namespace, path);
+  }
 }

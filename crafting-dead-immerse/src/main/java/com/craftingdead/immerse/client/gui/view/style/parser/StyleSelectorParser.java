@@ -19,11 +19,11 @@
 package com.craftingdead.immerse.client.gui.view.style.parser;
 
 import org.apache.commons.lang3.StringUtils;
+import com.craftingdead.immerse.client.gui.view.style.selector.ElementMatcher;
 import com.craftingdead.immerse.client.gui.view.style.selector.SimpleStyleSelector;
-import com.craftingdead.immerse.client.gui.view.style.selector.StructuralSelector;
 import com.craftingdead.immerse.client.gui.view.style.selector.StyleSelector;
 import com.craftingdead.immerse.client.gui.view.style.selector.StyleSelectorHierarchic;
-import com.craftingdead.immerse.client.gui.view.style.selector.StyleSelectorType;
+import com.craftingdead.immerse.client.gui.view.style.state.States;
 import com.craftingdead.immerse.util.NumberedLineIterator;
 
 class StyleSelectorParser {
@@ -91,26 +91,21 @@ class StyleSelectorParser {
   static StyleSelector parseSimple(String selectorStr) {
     var selector = new SimpleStyleSelector();
     for (var part : selectorStr.split("(?=[.#:])")) {
-      String pseudoClass = null;
-      if (part.contains(":")) {
-        pseudoClass = part.split(":")[1];
-        part = part.split(":")[0];
-      }
-      if (part.startsWith("*")) {
-        selector.add(StyleSelectorType.WILDCARD, "*");
-      } else if (part.startsWith("#")) {
-        selector.add(StyleSelectorType.ID, part.substring(1));
-      } else if (part.startsWith(".")) {
-        selector.add(StyleSelectorType.CLASS, part.substring(1));
-      } else if (pseudoClass == null) {
-        selector.add(StyleSelectorType.TYPE, part);
-      }
-      if (pseudoClass != null) {
-        if (StructuralSelector.isStructural(pseudoClass)) {
-          selector.add(StyleSelectorType.STRUCTURAL_PSEUDOCLASS, pseudoClass);
+      if (part.startsWith(":")) {
+        var pseudoClass = part.substring(1);
+        if (ElementMatcher.isStructural(pseudoClass)) {
+          selector.addMatcher(ElementMatcher.parseStructural(pseudoClass));
         } else {
-          selector.add(StyleSelectorType.PSEUDOCLASS, pseudoClass);
+          selector.addSingleState(States.get(pseudoClass).getAsInt());
         }
+      } else if (part.startsWith("*")) {
+        selector.addMatcher(ElementMatcher.WILDCARD);
+      } else if (part.startsWith("#")) {
+        selector.addMatcher(ElementMatcher.ofId(part.substring(1)));
+      } else if (part.startsWith(".")) {
+        selector.addMatcher(ElementMatcher.ofClass(part.substring(1)));
+      } else {
+        selector.addMatcher(ElementMatcher.ofType(part));
       }
     }
     return selector;

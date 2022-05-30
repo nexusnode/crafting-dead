@@ -16,17 +16,30 @@
  * https://craftingdead.net/terms.php
  */
 
-package com.craftingdead.immerse.client.gui.view.style.selector;
+package com.craftingdead.immerse.client.gui.view.style;
 
-import java.util.Optional;
-import java.util.stream.Stream;
-import com.craftingdead.immerse.client.gui.view.style.StyleNode;
+import java.util.Set;
+import org.jetbrains.annotations.Nullable;
+import com.craftingdead.immerse.client.gui.view.style.state.StateManager;
+import io.github.humbleui.skija.FontMgr;
 
-public interface StyleSelector {
+public interface StyleNode {
 
-  Optional<Stream<StyleNodeState>> match(StyleNode node);
+  default void styleRefreshed(FontMgr fontManager) {};
 
-  int getSpecificity();
+  String getType();
 
-  StyleSelector addMatcher(ElementMatcher matcher);
+  @Nullable
+  String getId();
+
+  Set<String> getStyleClasses();
+
+  StateManager getStateManager();
+
+  boolean isVisible();
+
+  @Nullable
+  StyleNode getParent();
+
+  StyleList getStyleList();
 }

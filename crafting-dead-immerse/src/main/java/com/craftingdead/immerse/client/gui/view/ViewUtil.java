@@ -53,7 +53,7 @@ public class ViewUtil {
    * @return ourself
    */
   public static void addAll(ParentView parentView, File file) {
-    addAll(parentView, file, view -> view.setStyle("flex: 1;"));
+    addAll(parentView, file, view -> view.getStyle().setStyle("flex: 1;"));
   }
 
   /**
@@ -105,7 +105,7 @@ public class ViewUtil {
 
             Node styleNode = node.getAttributes().getNamedItem("style");
             if (styleNode != null && styleNode.getNodeValue() != null) {
-              view.setStyle(styleNode.getNodeValue());
+              view.getStyle().setStyle(styleNode.getNodeValue());
             }
 
             view.getStyle().width.set(Point.percentage(100.0F));
@@ -151,7 +151,8 @@ public class ViewUtil {
             fitType = fitNode.getNodeValue();
           }
           var view = new ImageView(new View.Properties());
-          view.setStyle("width: %s;height: %s;object-fit: %s;".formatted(width, height, fitType));
+          view.getStyle().setStyle(
+              "width: %s; height: %s; object-fit: %s;".formatted(width, height, fitType));
           parentView.addChild(view);
           DownloadUtil.downloadImageAsTexture(url)
               .thenAcceptAsync(result -> result.ifPresent(image -> {

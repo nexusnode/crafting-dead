@@ -18,8 +18,8 @@
 
 package com.craftingdead.immerse.client.gui.view;
 
-import com.craftingdead.immerse.client.gui.view.property.StyleableProperty;
-import com.craftingdead.immerse.client.gui.view.property.StatefulProperty;
+import com.craftingdead.immerse.client.gui.view.property.AnimatableProperty;
+import com.craftingdead.immerse.client.gui.view.property.BaseProperty;
 import com.craftingdead.immerse.client.util.RenderUtil;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -30,10 +30,10 @@ import net.minecraft.network.chat.Component;
 public class Tooltip {
 
   private final Component text;
-  private final StatefulProperty<Integer> opacity =
-      new StyleableProperty<>("alpha", Integer.class, 0);
-  private final StatefulProperty<Integer> textOpacity =
-      new StyleableProperty<>("text-alpha", Integer.class, 0);
+  private final AnimatableProperty<Integer> opacity =
+      new BaseProperty<>("alpha", Integer.class, 0);
+  private final AnimatableProperty<Integer> textOpacity =
+      new BaseProperty<>("text-alpha", Integer.class, 0);
 
   public Tooltip(Component text) {
     this.text = text;
@@ -62,11 +62,11 @@ public class Tooltip {
 
   }
 
-  public StatefulProperty<Integer> getOpacityProperty() {
+  public AnimatableProperty<Integer> getOpacityProperty() {
     return this.opacity;
   }
 
-  public StatefulProperty<Integer> getTextOpacityProperty() {
+  public AnimatableProperty<Integer> getTextOpacityProperty() {
     return this.textOpacity;
   }
 }

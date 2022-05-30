@@ -18,29 +18,28 @@
 
 package com.craftingdead.immerse.client.gui.view.style;
 
-import java.util.Collection;
-import java.util.function.Predicate;
-import com.craftingdead.immerse.client.gui.view.property.Transition;
-import com.craftingdead.immerse.client.gui.view.style.selector.StyleNodeState;
-import com.google.common.base.Predicates;
+import java.util.ArrayList;
+import java.util.List;
+import com.craftingdead.immerse.client.gui.view.style.selector.StyleSelector;
 
-public interface PropertyDispatcher<T> {
+public record StyleRule(StyleSelector selectorList, List<StyleProperty> properties) {
 
-  void setTransition(Transition transition);
-
-  void clearTrackedNodes();
-
-  boolean defineState(StyleSource source, String style, Collection<StyleNodeState> states);
-
-  default void reset() {
-    this.reset(Predicates.alwaysTrue());
+  public StyleRule(StyleSelector selectorList) {
+    this(selectorList, new ArrayList<>());
   }
 
-  void reset(Predicate<StyleSource> filter);
-
-  default int validate(String style) {
-    return style.length();
+  public void mergeProperties(Iterable<StyleProperty> properties) {
+    properties.forEach(rule -> {
+      if (this.properties.stream().noneMatch(other -> other.name().equals(rule.name()))) {
+        this.addProperty(rule);
+      }
+    });
   }
 
-  String getName();
+  public StyleRule addProperty(StyleProperty rule) {
+    if (!this.properties.contains(rule)) {
+      this.properties.add(rule);
+    }
+    return this;
+  }
 }

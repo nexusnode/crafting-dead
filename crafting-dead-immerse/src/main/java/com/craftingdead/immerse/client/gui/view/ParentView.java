@@ -25,14 +25,14 @@ import java.util.Optional;
 import org.jetbrains.annotations.Nullable;
 import com.craftingdead.immerse.client.gui.view.layout.Layout;
 import com.craftingdead.immerse.client.gui.view.layout.LayoutParent;
-import com.craftingdead.immerse.client.gui.view.style.StyleHolder;
-import com.craftingdead.immerse.client.gui.view.style.StyleParent;
+import com.craftingdead.immerse.client.gui.view.style.StyleNode;
+import com.craftingdead.immerse.client.gui.view.style.StyleParentNode;
 import com.craftingdead.immerse.util.ThreadSafe;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.components.events.ContainerEventHandler;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 
-public class ParentView extends View implements ContainerEventHandler, StyleParent {
+public class ParentView extends View implements ContainerEventHandler, StyleParentNode {
 
   private final List<View> children = new ArrayList<>();
   // Bottom to top order
@@ -122,7 +122,6 @@ public class ParentView extends View implements ContainerEventHandler, StylePare
     this.children.add(view);
     this.sortedChildren = this.children.toArray(new View[0]);
     this.sortChildren();
-    view.getStyleHolder().setParent(this);
     view.parent = this;
 
     this.setupLayout(view);
@@ -202,9 +201,7 @@ public class ParentView extends View implements ContainerEventHandler, StylePare
     if (this.layoutParent != null) {
       this.clearLayout(view);
     }
-    view.getStyleHolder().setParent(null);
     view.parent = null;
-    view.getStyleHolder().setStyleSupplier(null);
     if (this.focusedListener == view) {
       this.setFocused(null);
     }
@@ -402,8 +399,8 @@ public class ParentView extends View implements ContainerEventHandler, StylePare
   }
 
   @Override
-  public List<StyleHolder> getChildStyles() {
-    return this.children.stream().map(View::getStyleHolder).toList();
+  public List<? extends StyleNode> getChildStyles() {
+    return this.children;
   }
 
   @Override

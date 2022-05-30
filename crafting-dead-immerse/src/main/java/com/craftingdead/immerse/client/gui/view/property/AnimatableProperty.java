@@ -16,17 +16,30 @@
  * https://craftingdead.net/terms.php
  */
 
-package com.craftingdead.immerse.client.gui.view.style.selector;
+package com.craftingdead.immerse.client.gui.view.property;
 
-import java.util.Optional;
-import java.util.stream.Stream;
-import com.craftingdead.immerse.client.gui.view.style.StyleNode;
+import org.jetbrains.annotations.Nullable;
 
-public interface StyleSelector {
+public interface AnimatableProperty<T> extends Property<T> {
 
-  Optional<Stream<StyleNodeState>> match(StyleNode node);
+  /**
+   * If this property's value is currently being overridden/animated.
+   * 
+   * @return <code>true</code> if animated, <code>false</code> otherwise
+   */
+  boolean isBeingAnimated();
 
-  int getSpecificity();
+  /**
+   * Overrides the property's current value (generally used for animations).
+   * 
+   * @param overrideValue - the override value
+   */
+  void setAnimatedValue(@Nullable T overrideValue);
 
-  StyleSelector addMatcher(ElementMatcher matcher);
+  /**
+   * Shorthand for {@code setAnimatedValue(null)}.
+   */
+  default void clearAnimatedValue() {
+    this.setAnimatedValue(null);
+  }
 }

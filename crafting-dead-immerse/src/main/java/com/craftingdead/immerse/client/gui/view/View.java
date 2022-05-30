@@ -22,7 +22,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 import org.jdesktop.core.animation.timing.Animator;
 import org.jdesktop.core.animation.timing.PropertySetter;
 import org.jdesktop.core.animation.timing.interpolators.LinearInterpolator;
@@ -39,11 +38,10 @@ import com.craftingdead.immerse.client.gui.view.event.MouseEvent;
 import com.craftingdead.immerse.client.gui.view.event.MouseLeaveEvent;
 import com.craftingdead.immerse.client.gui.view.event.RemovedEvent;
 import com.craftingdead.immerse.client.gui.view.layout.Layout;
-import com.craftingdead.immerse.client.gui.view.state.StateManager;
-import com.craftingdead.immerse.client.gui.view.state.States;
-import com.craftingdead.immerse.client.gui.view.style.CascadeStyleable;
-import com.craftingdead.immerse.client.gui.view.style.StyleHolder;
-import com.craftingdead.immerse.client.gui.view.style.tree.StyleList;
+import com.craftingdead.immerse.client.gui.view.style.StyleList;
+import com.craftingdead.immerse.client.gui.view.style.StyleNode;
+import com.craftingdead.immerse.client.gui.view.style.state.StateManager;
+import com.craftingdead.immerse.client.gui.view.style.state.States;
 import com.craftingdead.immerse.client.util.RenderUtil;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableSet;
@@ -70,7 +68,7 @@ import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.IEventBus;
 
 public class View extends GuiComponent
-    implements GuiEventListener, Widget, Comparable<View>, CascadeStyleable {
+    implements GuiEventListener, Widget, Comparable<View>, StyleNode {
 
   public static final boolean DEBUG = false;
 
@@ -90,7 +88,7 @@ public class View extends GuiComponent
 
   private final IEventBus eventBus = BusBuilder.builder().build();
 
-  protected final StateManager stateManager = new StateManager();
+  protected final StateManager stateManager = new StateManager(this);
 
   private final ViewStyle style;
 
@@ -115,6 +113,7 @@ public class View extends GuiComponent
   /*
    * ========== Properties ==========
    */
+
   @Nullable
   private final String id;
   private final Set<String> styleClasses;
@@ -149,13 +148,9 @@ public class View extends GuiComponent
   }
 
   protected void added() {
+    this.style.getStyleHolder().refresh();
+    this.stateManager.notifyListeners();
     this.added = true;
-    Supplier<StyleList> styleSupplier =
-        this.parent == null ? this.screen::getStyleList
-            : this.parent.getStyleHolder().getStyleSupplier();
-    this.getStyleHolder().setStyleSupplier(styleSupplier);
-    this.getStyleHolder().refresh();
-    this.stateManager.notifyListeners(false);
     this.post(new AddedEvent());
   }
 
@@ -348,7 +343,7 @@ public class View extends GuiComponent
       if (outlineWidth > 0.0F) {
         try (var paint = new Paint()) {
           paint.setMode(PaintMode.STROKE);
-          paint.setStrokeWidth(outlineWidth < 1.0F ? 0.0F : outlineWidth * scale);
+          paint.setStrokeWidth(outlineWidth * scale);
           paint.setColor(RenderUtil.multiplyAlpha(this.style.outlineColor.get().valueHex(),
               this.getAlpha()));
           paint.setAntiAlias(false);
@@ -707,7 +702,7 @@ public class View extends GuiComponent
     }
 
     this.stateManager.addState(States.HOVER);
-    this.stateManager.notifyListeners(true);
+    this.stateManager.notifyListeners();
 
     this.post(new MouseEnterEvent());
   }
@@ -728,7 +723,7 @@ public class View extends GuiComponent
     }
 
     this.stateManager.removeState(States.HOVER);
-    this.stateManager.notifyListeners(true);
+    this.stateManager.notifyListeners();
 
     this.post(new MouseLeaveEvent());
   }
@@ -751,7 +746,7 @@ public class View extends GuiComponent
       this.stateManager.addState(States.FOCUS_VISIBLE);
     }
     this.stateManager.addState(States.FOCUS);
-    this.stateManager.notifyListeners(true);
+    this.stateManager.notifyListeners();
     this.focusChanged();
 
     return true;
@@ -761,7 +756,7 @@ public class View extends GuiComponent
     if (this.isFocused()) {
       this.stateManager.removeState(States.FOCUS);
       this.stateManager.removeState(States.FOCUS_VISIBLE);
-      this.stateManager.notifyListeners(true);
+      this.stateManager.notifyListeners();
       this.focusChanged();
     }
   }
@@ -771,6 +766,10 @@ public class View extends GuiComponent
     if (this.post(new MouseEvent.ButtonEvent(mouseX, mouseY, button,
         GLFW.GLFW_PRESS)) == Event.Result.ALLOW) {
       return true;
+    }
+
+    if (button != GLFW.GLFW_MOUSE_BUTTON_LEFT) {
+      return false;
     }
 
     // Clicked on scrollbar region
@@ -865,7 +864,7 @@ public class View extends GuiComponent
       } else {
         this.stateManager.removeState(States.FOCUS_VISIBLE);
       }
-      this.stateManager.notifyListeners(true);
+      this.stateManager.notifyListeners();
       this.focusChanged();
       return focused;
     }
@@ -1072,7 +1071,7 @@ public class View extends GuiComponent
         this.stateManager.removeState(States.FOCUS);
       }
     }
-    this.stateManager.notifyListeners(this.added);
+    this.stateManager.notifyListeners();
   }
 
   public final boolean isHovered() {
@@ -1086,7 +1085,7 @@ public class View extends GuiComponent
   public final ViewScreen getScreen() {
     if (this.screen == null) {
       if (this.parent == null) {
-        throw new UnsupportedOperationException("Root view has no screen");
+        throw new UnsupportedOperationException("Root view has no screen.");
       }
       return this.parent.getScreen();
     }
@@ -1143,16 +1142,26 @@ public class View extends GuiComponent
   }
 
   @Override
-  public StyleHolder getStyleHolder() {
-    return this.style.getStyleHolder();
-  }
-
-  @Override
   public final String getType() {
     if (this.getClass().isAnonymousClass()) {
       return this.getClass().getSuperclass().getSimpleName();
     }
     return this.getClass().getSimpleName();
+  }
+
+  @Override
+  public StateManager getStateManager() {
+    return this.stateManager;
+  }
+
+  @Override
+  public boolean isVisible() {
+    return this.added;
+  }
+
+  @Override
+  public StyleList getStyleList() {
+    return this.getScreen().getStyleList();
   }
 
   public void refreshStyle() {

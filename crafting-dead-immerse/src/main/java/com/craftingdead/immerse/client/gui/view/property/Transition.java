@@ -32,13 +32,13 @@ public interface Transition {
   Transition INSTANT = new Transition() {
 
     @Override
-    public <T> Runnable transition(StatefulProperty<T> property, T newValue) {
+    public <T> Runnable transition(StyleableProperty<T> property, T newValue) {
       property.set(newValue);
       return () -> {};
     }
   };
 
-  <T> Runnable transition(StatefulProperty<T> property, T newValue);
+  <T> Runnable transition(StyleableProperty<T> property, T newValue);
 
   static Transition linear(long durationMs) {
     return linear(0L, durationMs);
@@ -52,7 +52,7 @@ public interface Transition {
     return new Transition() {
 
       @Override
-      public <T> Runnable transition(StatefulProperty<T> property, T newValue) {
+      public <T> Runnable transition(StyleableProperty<T> property, T newValue) {
         var stopped = new AtomicBoolean();
         var animator = new Animator.Builder()
             .setStartDelay(delayMs, TimeUnit.MILLISECONDS)

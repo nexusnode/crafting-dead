@@ -24,16 +24,16 @@ import org.jdesktop.core.animation.timing.Interpolator;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import com.craftingdead.immerse.client.gui.view.style.StyleTransition;
-import com.craftingdead.immerse.client.gui.view.style.adapter.InterpolatorParser;
-import com.craftingdead.immerse.client.gui.view.style.adapter.StyleParser;
-import com.craftingdead.immerse.client.gui.view.style.adapter.StyleParserRegistry;
+import com.craftingdead.immerse.client.gui.view.style.parser.value.InterpolatorParser;
+import com.craftingdead.immerse.client.gui.view.style.parser.value.ValueParser;
+import com.craftingdead.immerse.client.gui.view.style.parser.value.ValueParserRegistry;
 import com.mojang.logging.LogUtils;
 
 public class TransitionParser {
 
   private static final Logger logger = LogUtils.getLogger();
 
-  private final StyleParser<Interpolator> interpolatorParser;
+  private final ValueParser<Interpolator> interpolatorParser;
 
   @Nullable
   private String property;
@@ -45,10 +45,10 @@ public class TransitionParser {
   private String interpolator;
 
   public TransitionParser() {
-    this(StyleParserRegistry.getInstance().getParser(Interpolator.class));
+    this(ValueParserRegistry.getInstance().getParser(Interpolator.class));
   }
 
-  public TransitionParser(StyleParser<Interpolator> interpolatorParser) {
+  public TransitionParser(ValueParser<Interpolator> interpolatorParser) {
     this.interpolatorParser = interpolatorParser;
   }
 

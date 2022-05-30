@@ -16,17 +16,25 @@
  * https://craftingdead.net/terms.php
  */
 
-package com.craftingdead.immerse.client.gui.view.style.selector;
+package com.craftingdead.immerse.client.gui.view.style.parser.value;
 
-import java.util.Optional;
-import java.util.stream.Stream;
-import com.craftingdead.immerse.client.gui.view.style.StyleNode;
+import java.util.Locale;
 
-public interface StyleSelector {
+public class EnumParser<T extends Enum<T>> implements ValueParser<T> {
 
-  Optional<Stream<StyleNodeState>> match(StyleNode node);
+  private final Class<T> type;
 
-  int getSpecificity();
+  public EnumParser(Class<T> type) {
+    this.type = type;
+  }
 
-  StyleSelector addMatcher(ElementMatcher matcher);
+  @Override
+  public int validate(String style) {
+    return style.length();
+  }
+
+  @Override
+  public T parse(String style) {
+    return Enum.valueOf(this.type, style.toUpperCase(Locale.ROOT).replace('-', '_'));
+  }
 }
