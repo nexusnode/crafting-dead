@@ -54,7 +54,7 @@ public class CompositeButton extends Button {
   }
 
   @Override
-  public void renderButton(@NotNull PoseStack matrixStack, int mouseX, int mouseY,
+  public void renderButton(PoseStack matrixStack, int mouseX, int mouseY,
       float partialTicks) {
     RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, this.alpha);
     RenderSystem.setShaderTexture(0, this.textureLocation);
