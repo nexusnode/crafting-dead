@@ -77,15 +77,48 @@
     "magazine_transforms": {
         "craftingdead:vector_magazine": {
             "translation": [
-                -0.25,
-                -2,
-                0
+                7.5,
+                -0.3879,
+                6.5772
             ]
-        }
-    },
+        },
     "back_transform": {
         "scale": [0.5, 0.5, 0.5],
         "rotation": [0, 0, 180],
         "translation": [2, 0, -0.1]
+    },
+"attachment_transforms": {
+    "craftingdead:red_dot_sight": {
+        "translation": [
+            7.5,
+            13,
+            8
+        ]
+    },
+    "craftingdead:acog_sight": {
+        "translation": [
+            8,
+            13.5,
+            8.25
+        
+        ]
+},
+    "craftingdead:eotech_sight": {
+        "translation": [
+            7,
+            12,
+            4.75
+        
+        ]
+},
+    "craftingdead:suppressor": {
+        "translation": [
+            7,
+            8.75,
+            -9.5
+        
+        ]
+}
+}
     }
 }

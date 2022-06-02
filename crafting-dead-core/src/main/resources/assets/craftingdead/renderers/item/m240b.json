@@ -72,9 +72,9 @@
     "magazine_transforms": {
         "craftingdead:m240b_magazine": {
             "translation": [
-                0,
-                0,
-                0
+                3.75,
+                9.15,
+                12.25
             ]
         }
     },
@@ -82,5 +82,54 @@
         "scale": [0.5, 0.5, 0.5],
         "rotation": [0, 0, 180],
         "translation": [2, 0, -0.1]
-    }
+    },
+"attachment_transforms": {
+    "craftingdead:red_dot_sight": {
+        "translation": [
+            7.5,
+            13.5,
+            14.75
+        ]
+    },
+    "craftingdead:acog_sight": {
+        "translation": [
+            8,
+            13.5,
+            16.5
+        
+        ]
+},
+    "craftingdead:bipod": {
+        "translation": [
+            7,
+            7,
+            1.25
+        
+        ]
+},
+    "craftingdead:eotech_sight": {
+        "translation": [
+            7,
+            12.5,
+            14.5
+        
+        ]
+},
+    "craftingdead:suppressor": {
+        "translation": [
+            7,
+            9,
+            -16
+        
+        ]
+},
+    "craftingdead:tactical_grip": {
+        "translation": [
+            7,
+            6.75,
+            0.75
+        
+        ]
+}
+}
 }

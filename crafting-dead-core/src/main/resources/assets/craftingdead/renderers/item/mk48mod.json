@@ -77,9 +77,9 @@
     "magazine_transforms": {
         "craftingdead:mk48mod_magazine": {
             "translation": [
+                5,
                 0,
-                0,
-                0
+                4
             ]
         }
     },
@@ -87,5 +87,54 @@
         "scale": [0.5, 0.5, 0.5],
         "rotation": [0, 0, 180],
         "translation": [2, 0, -0.1]
+    },
+"attachment_transforms": {
+    "craftingdead:red_dot_sight": {
+        "translation": [
+            7.5,
+            12,
+            8
+        ]
+    },
+    "craftingdead:acog_sight": {
+        "translation": [
+            8,
+            12.5,
+            10.25
+        
+        ]
+},
+    "craftingdead:bipod": {
+        "translation": [
+            7,
+            6.25,
+            -2.75
+        
+        ]
+},
+    "craftingdead:eotech_sight": {
+        "translation": [
+            7,
+            11,
+            7.75
+        
+        ]
+},
+    "craftingdead:suppressor": {
+        "translation": [
+            7,
+            7.75,
+            -16
+        
+        ]
+},
+    "craftingdead:tactical_grip": {
+        "translation": [
+            7,
+            6,
+            -1.75
+        
+        ]
     }
+}
 }

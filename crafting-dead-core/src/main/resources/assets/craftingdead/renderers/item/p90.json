@@ -83,5 +83,47 @@
         "scale": [0.5, 0.5, 0.5],
         "rotation": [0, 0, 180],
         "translation": [2, 0.4, 0]
-    }
+    },
+"magazine_transforms": {
+    "craftingdead:p90_magazine": {
+        "translation": [
+            7,
+            8,
+            3
+        ]
+    },
+"attachment_transforms": {
+"craftingdead:red_dot_sight": {
+    "translation": [
+        7,
+        12,
+        1.25
+    ]
+},
+"craftingdead:acog_sight": {
+    "translation": [
+        7,
+        11.75,
+        3.75
+    
+    ]
+},
+"craftingdead:eotech_sight": {
+    "translation": [
+        6.75,
+        10,
+        1.5
+    
+    ]
+},
+"craftingdead:suppressor": {
+    "translation": [
+        6.5,
+        5,
+        -8.25
+    
+    ]
+}
+}
+}
 }

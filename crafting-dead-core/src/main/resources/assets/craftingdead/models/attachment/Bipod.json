@@ -1,0 +1,91 @@
+{
+	"credit": "Model by Zensuyo",
+	"texture_size": [32, 32],
+	"textures": {
+		"0": "Bipod",
+		"particle": "Bipod"
+	},
+	"elements": [
+		{
+			"name": "Top1",
+			"from": [6.5, 8, 8],
+			"to": [9.5, 9, 10],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8, 9.15224, 9]},
+			"faces": {
+				"north": {"uv": [3, 6, 4.5, 6.5], "texture": "#0"},
+				"east": {"uv": [2, 6, 3, 6.5], "texture": "#0"},
+				"south": {"uv": [5.5, 6, 7, 6.5], "texture": "#0"},
+				"west": {"uv": [4.5, 6, 5.5, 6.5], "texture": "#0"},
+				"up": {"uv": [4.5, 6, 3, 5], "texture": "#0"},
+				"down": {"uv": [6, 5, 4.5, 6], "texture": "#0"}
+			}
+		},
+		{
+			"name": "Left",
+			"from": [7.01706, -0.79497, 8.5],
+			"to": [8.01706, 8.20503, 9.5],
+			"rotation": {"angle": -22.5, "axis": "z", "origin": [8, 9.15224, 9]},
+			"faces": {
+				"north": {"uv": [0.5, 5.5, 1, 10], "texture": "#0"},
+				"east": {"uv": [0, 5.5, 0.5, 10], "texture": "#0"},
+				"south": {"uv": [1.5, 5.5, 2, 10], "texture": "#0"},
+				"west": {"uv": [1, 5.5, 1.5, 10], "texture": "#0"},
+				"up": {"uv": [1, 5.5, 0.5, 5], "texture": "#0"},
+				"down": {"uv": [1.5, 5, 1, 5.5], "texture": "#0"}
+			}
+		},
+		{
+			"name": "Right",
+			"from": [7.98294, -0.79497, 8.5],
+			"to": [8.98294, 8.20503, 9.5],
+			"rotation": {"angle": 22.5, "axis": "z", "origin": [8, 9.15224, 9]},
+			"faces": {
+				"north": {"uv": [6.5, 0.5, 7, 5], "texture": "#0"},
+				"east": {"uv": [6, 0.5, 6.5, 5], "texture": "#0"},
+				"south": {"uv": [7.5, 0.5, 8, 5], "texture": "#0"},
+				"west": {"uv": [7, 0.5, 7.5, 5], "texture": "#0"},
+				"up": {"uv": [7, 0.5, 6.5, 0], "texture": "#0"},
+				"down": {"uv": [7.5, 0, 7, 0.5], "texture": "#0"}
+			}
+		}
+	],
+	"display": {
+		"thirdperson_righthand": {
+			"translation": [0, 1.75, -1],
+			"scale": [0.6, 0.6, 0.6]
+		},
+		"thirdperson_lefthand": {
+			"translation": [0, 2, -1],
+			"scale": [0.6, 0.7, 0.7]
+		},
+		"firstperson_righthand": {
+			"rotation": [9.25, 13.25, 0],
+			"translation": [5.5, 5, -3.5]
+		},
+		"firstperson_lefthand": {
+			"rotation": [11, -1.75, 0],
+			"translation": [6.25, 5, -3.25]
+		},
+		"ground": {
+			"rotation": [89.25, 0, 0],
+			"translation": [0, -2, 0]
+		},
+		"gui": {
+			"rotation": [26.5, 39, 0],
+			"translation": [-0.5, 5.25, 0],
+			"scale": [1.60156, 1.60156, 1.60156]
+		},
+		"fixed": {
+			"translation": [0, 5.75, -5.25],
+			"scale": [2, 2, 2]
+		}
+	},
+	"groups": [
+		{
+			"name": "Bipod",
+			"origin": [8, 8, 8],
+			"color": 0,
+			"children": [0, 1, 2]
+		}
+	]
+}

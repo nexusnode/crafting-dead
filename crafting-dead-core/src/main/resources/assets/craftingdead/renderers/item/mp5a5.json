@@ -78,5 +78,63 @@
         "scale": [0.5, 0.5, 0.5],
         "rotation": [0, 0, 180],
         "translation": [2, 0, -0.1]
+    },
+"magazine_transforms": {
+    "craftingdead:mp5a5_magazine": {
+        "translation": [
+            5,
+            0,
+            4
+        ]
     }
+},
+"attachment_transforms": {
+"craftingdead:red_dot_sight": {
+    "translation": [
+        7.5,
+        13,
+        3
+    ]
+},
+"craftingdead:acog_sight": {
+    "translation": [
+        8,
+        13.25,
+        4.25
+    
+    ]
+},
+"craftingdead:bipod": {
+    "translation": [
+        7,
+        6.75,
+        -4.75
+    
+    ]
+},
+"craftingdead:eotech_sight": {
+    "translation": [
+        7,
+        12,
+        1.25
+    
+    ]
+},
+"craftingdead:suppressor": {
+    "translation": [
+        7,
+        7.75,
+        -16
+    
+    ]
+},
+"craftingdead:tactical_grip": {
+    "translation": [
+        7,
+        6.5,
+        -4.5
+    
+    ]
+}
+}
 }

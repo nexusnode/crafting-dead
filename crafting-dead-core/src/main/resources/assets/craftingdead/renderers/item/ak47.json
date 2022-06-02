@@ -67,14 +67,27 @@
                     0.25
                 ]
             }
-        }
-    },
+        },
     "magazine_transforms": {
         "craftingdead:ak47_30_round_magazine": {
             "translation": [
-                0,
-                -0.5,
-                0
+                7.5,
+                5.5,
+                8.5
+            ]
+        },
+        "craftingdead:rpk_drum_magazine": {
+            "translation": [
+                7.5,
+                6.5,
+                8.5
+            ]
+        },
+        "craftingdead:rpk_magazine": {
+            "translation": [
+                7.5,
+                6.5,
+                8.5
             ]
         }
     },
@@ -82,5 +95,87 @@
         "scale": [0.5, 0.5, 0.5],
         "rotation": [0, 0, 180],
         "translation": [2, 0, -0.1]
+    },
+    "attachment_transforms": {
+        "craftingdead:red_dot_sight": {
+            "translation": [
+                -0.5,
+                -2,
+                -2
+            ]
+        },
+        "craftingdead:acog_sight": {
+            "translation": [
+                8,
+                1,
+                11
+            
+            ]
     }
+    },
+        "craftingdead:bipod": {
+            "translation": [
+                7,
+                5.5,
+                -3.25
+            
+            ]
+    },
+        "craftingdead:eotech_sight": {
+            "translation": [
+                7.25,
+                11.75,
+                9
+            
+            ]
+    },
+        "craftingdead:iron_sight": {
+            "translation": [
+                7.25,
+                11.75,
+                9
+            
+            ]
+    },
+        "craftingdead:lp_sight": {
+            "translation": [
+                7,
+                14.2678,
+                8.1464
+            
+            ]
+    },
+        "craftingdead:Red_Dot_Sight": {
+            "translation": [
+                7.75,
+                12.5,
+                10
+            
+            ]
+    },
+        "craftingdead:suppressor": {
+            "translation": [
+                7,
+                7,
+                -16
+            
+            ]
+    },
+        "craftingdead:tactical_grip": {
+            "translation": [
+                7,
+                6,
+                -0.5
+            
+            ]
+    },
+        "craftingdead:hp_sight": {
+            "translation": [
+                9.5,
+                13,
+                2
+            
+            ]
+    }
+}
 }
