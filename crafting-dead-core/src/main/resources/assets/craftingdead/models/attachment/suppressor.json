@@ -1,0 +1,91 @@
+{
+	"credit": "Model by Zensuyo",
+	"texture_size": [32, 32],
+	"textures": {
+		"0": "craftingdead:attachment/suppressor",
+		"particle": "#0"
+	},
+	"elements": [
+		{
+			"from": [6.5, 6, 2],
+			"to": [9.5, 9, 11],
+			"rotation": {"angle": 0, "axis": "y", "origin": [7.5, 7.5, 6]},
+			"faces": {
+				"north": {"uv": [4.5, 5, 6, 6.5], "texture": "#0"},
+				"east": {"uv": [0, 5, 4.5, 6.5], "texture": "#0"},
+				"south": {"uv": [10.5, 5, 12, 6.5], "texture": "#0"},
+				"west": {"uv": [6, 5, 10.5, 6.5], "texture": "#0"},
+				"up": {"uv": [6, 5, 4.5, 0.5], "texture": "#0"},
+				"down": {"uv": [7.5, 0.5, 6, 5], "texture": "#0"}
+			}
+		},
+		{
+			"from": [7, 6.5, 3],
+			"to": [9, 8.5, 11],
+			"rotation": {"angle": 0, "axis": "y", "origin": [7.5, 7.5, 6]},
+			"faces": {
+				"north": {"uv": [4, 12, 5, 13], "texture": "#0"},
+				"east": {"uv": [0, 12, 4, 13], "texture": "#0"},
+				"south": {"uv": [9, 12, 10, 13], "texture": "#0"},
+				"west": {"uv": [5, 12, 9, 13], "texture": "#0"},
+				"up": {"uv": [5, 12, 4, 8], "texture": "#0"},
+				"down": {"uv": [6, 8, 5, 12], "texture": "#0"}
+			}
+		}
+	],
+	"display": {
+		"thirdperson_righthand": {
+			"translation": [0, 1.25, 1],
+			"scale": [0.6, 0.6, 0.6]
+		},
+		"thirdperson_lefthand": {
+			"translation": [-0.5, 1.25, 1],
+			"scale": [0.6, 0.6, 0.6]
+		},
+		"firstperson_righthand": {
+			"rotation": [70, 0, 0],
+			"translation": [6.75, 0, -4.75]
+		},
+		"firstperson_lefthand": {
+			"rotation": [70, 0, 0],
+			"translation": [6.25, 0, -5]
+		},
+		"ground": {
+			"translation": [-0.75, -1.75, 0.75]
+		},
+		"gui": {
+			"rotation": [119, -28, -180],
+			"translation": [-0.75, -1.25, 0],
+			"scale": [1.23242, 1.23242, 1.23242]
+		},
+		"head": {
+			"translation": [3.5, -1.75, -9.75]
+		},
+		"fixed": {
+			"rotation": [0, -90, 0],
+			"translation": [-2.25, 0.75, -3.25],
+			"scale": [1.5, 1.5, 1.5]
+		}
+	},
+	"groups": [
+		{
+			"name": "Anchor",
+			"origin": [8, 8, 8],
+			"color": 0,
+			"children": [
+				{
+					"name": "Rifle Suppressor",
+					"origin": [8, 8, 8],
+					"color": 0,
+					"children": [0]
+				},
+				{
+					"name": "Pistol Suppressor",
+					"origin": [8, 8, 8],
+					"color": 0,
+					"children": [1]
+				}
+			]
+		}
+	]
+}
