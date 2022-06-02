@@ -2,8 +2,8 @@
 	"credit": "Model by Zensuyo",
 	"texture_size": [32, 32],
 	"textures": {
-		"0": "Bipod",
-		"particle": "Bipod"
+		"0": "craftingdead:attachment/bipod",
+		"particle": "#0"
 	},
 	"elements": [
 		{
@@ -82,7 +82,7 @@
 	},
 	"groups": [
 		{
-			"name": "Bipod",
+			"name": "bipod",
 			"origin": [8, 8, 8],
 			"color": 0,
 			"children": [0, 1, 2]

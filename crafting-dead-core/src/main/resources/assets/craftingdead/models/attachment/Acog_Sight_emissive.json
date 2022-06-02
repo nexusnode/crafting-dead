@@ -2,10 +2,10 @@
 	"credit": "Model by Zensuyo",
 	"texture_size": [8, 8],
 	"textures": {
-		"0": "block/Acog_Sight",
-		"1": "block/Acog_Sight_reddot",
-		"2": "block/Acog_Sight_cross",
-		"particle": "block/Acog_Sight"
+		"0": "craftingdead:attachment/acog_sight",
+		"1": "craftingdead:attachment/acog_sight_reddot",
+		"2": "craftingdead:attachment/acog_sight_cross",
+		"particle": "#0"
 	},
 	"elements": [
 		{
@@ -335,7 +335,7 @@
 	},
 	"groups": [
 		{
-			"name": "Acog_Sight",
+			"name": "acog_sight",
 			"origin": [8, 8, 8],
 			"color": 0,
 			"children": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]

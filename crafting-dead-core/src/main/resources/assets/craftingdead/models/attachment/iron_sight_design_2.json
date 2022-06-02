@@ -2,8 +2,8 @@
 	"credit": "Made with Blockbench",
 	"texture_size": [32, 32],
 	"textures": {
-		"0": "block/Iron Sight Design 2",
-		"particle": "block/Iron Sight Design 2"
+		"0": "craftingdead:attachment/iron_sight_design_2",
+		"particle": "#0"
 	},
 	"elements": [
 		{

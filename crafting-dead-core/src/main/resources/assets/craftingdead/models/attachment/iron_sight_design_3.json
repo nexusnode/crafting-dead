@@ -1,8 +1,8 @@
 {
 	"credit": "Made with Blockbench",
 	"textures": {
-		"0": "block/Iron Sight Design 3",
-		"particle": "block/Iron Sight Design 3"
+		"0": "craftingdead:attachment/iron_sight_design_3",
+		"particle": "#0"
 	},
 	"elements": [
 		{

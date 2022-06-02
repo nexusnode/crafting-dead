@@ -2,8 +2,8 @@
 	"credit": "Model by Zensuyo",
 	"texture_size": [32, 32],
 	"textures": {
-		"0": "block/Suppressor",
-		"particle": "block/Suppressor"
+		"0": "craftingdead:attachment/suppressor",
+		"particle": "#0"
 	},
 	"elements": [
 		{

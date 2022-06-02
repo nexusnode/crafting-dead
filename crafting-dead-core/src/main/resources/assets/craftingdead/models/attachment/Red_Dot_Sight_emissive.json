@@ -2,9 +2,9 @@
 	"credit": "Model by Zensuyo",
 	"texture_size": [4, 4],
 	"textures": {
-		"0": "block/Red Dot Sight",
-		"1": "block/Red Dot Sight_reddot",
-		"particle": "block/Red Dot Sight"
+		"0": "craftingdead:attachment/red_dot_sight",
+		"1": "craftingdead:attachment/red_dot_sight_reddot",
+		"particle": "#0"
 	},
 	"elements": [
 		{
@@ -178,7 +178,7 @@
 	},
 	"groups": [
 		{
-			"name": "Red Dot Sight",
+			"name": "red_dot_sight",
 			"origin": [8, 8, 8],
 			"color": 0,
 			"nbt": "{}",

@@ -2,7 +2,7 @@
 	"credit": "Model by Zensuyo",
 	"texture_size": [32, 32],
 	"textures": {
-		"1": "block/Tactical Grip"
+		"1": "craftingdead:attachment/tactical_grip"
 	},
 	"elements": [
 		{
@@ -68,7 +68,7 @@
 	},
 	"groups": [
 		{
-			"name": "Tactical Grip",
+			"name": "tactical_grip",
 			"origin": [8, 8, 8],
 			"color": 0,
 			"nbt": "{}",

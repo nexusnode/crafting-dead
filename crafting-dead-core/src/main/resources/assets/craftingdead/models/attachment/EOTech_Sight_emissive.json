@@ -2,9 +2,9 @@
 	"credit": "Model by Zensuyo",
 	"texture_size": [4, 4],
 	"textures": {
-		"0": "EOTech Sight",
-		"1": "EOTeach reddot",
-		"particle": "EOTech Sight"
+		"0": "craftingdead:attachment/eotech_sight",
+		"1": "craftingdead:attachment/eotech_reddot",
+		"particle": "#0"
 	},
 	"elements": [
 		{
@@ -167,7 +167,7 @@
 	},
 	"groups": [
 		{
-			"name": "EOTech Sight",
+			"name": "eotech_sight",
 			"origin": [8, 8, 8],
 			"color": 0,
 			"nbt": "{}",
