@@ -16,7 +16,7 @@
  * https://craftingdead.net/terms.php
  */
 
-package com.craftingdead.immerse.client.gui.view.style.state;
+package com.craftingdead.immerse.client.gui.view.style;
 
 import java.util.OptionalInt;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
@@ -25,6 +25,11 @@ import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.minecraft.Util;
 
+/**
+ * Holds all state representing pseudo-classes and maps them to a bit value.
+ * 
+ * @author Sm0keySa1m0n
+ */
 public class States {
 
   private static final int NILL = -1;

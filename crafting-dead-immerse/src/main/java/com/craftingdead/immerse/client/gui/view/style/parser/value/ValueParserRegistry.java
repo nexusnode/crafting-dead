@@ -21,11 +21,14 @@ package com.craftingdead.immerse.client.gui.view.style.parser.value;
 import java.util.IdentityHashMap;
 import java.util.Map;
 import org.jdesktop.core.animation.timing.Interpolator;
+import com.craftingdead.immerse.client.gui.view.BoxSizing;
 import com.craftingdead.immerse.client.gui.view.Color;
 import com.craftingdead.immerse.client.gui.view.Display;
 import com.craftingdead.immerse.client.gui.view.Filter;
 import com.craftingdead.immerse.client.gui.view.Overflow;
-import com.craftingdead.immerse.client.gui.view.Point;
+import com.craftingdead.immerse.client.gui.view.Length;
+import com.craftingdead.immerse.client.gui.view.PointerEvents;
+import com.craftingdead.immerse.client.gui.view.Visibility;
 import com.craftingdead.immerse.client.gui.view.layout.Align;
 import com.craftingdead.immerse.client.gui.view.layout.FlexDirection;
 import com.craftingdead.immerse.client.gui.view.layout.Justify;
@@ -95,7 +98,7 @@ public class ValueParserRegistry {
     this.registerParser(Double.class, DOUBLE_PARSER);
 
     this.registerParser(Percentage.class, PercentageParser.INSTANCE);
-    this.registerParser(Point.class, PointParser.INSTANCE);
+    this.registerParser(Length.class, LengthParser.INSTANCE);
     this.registerParser(Color.class, ColorParser.INSTANCE);
     this.registerParser(ResourceLocation.class, ResourceLocationParser.INSTANCE);
     this.registerParser(Interpolator.class, InterpolatorParser.INSTANCE);
@@ -109,5 +112,8 @@ public class ValueParserRegistry {
     this.registerParser(FitType.class, new EnumParser<>(FitType.class));
     this.registerParser(Wrap.class, new EnumParser<>(Wrap.class));
     this.registerParser(Alignment.class, new EnumParser<>(Alignment.class));
+    this.registerParser(Visibility.class, new EnumParser<>(Visibility.class));
+    this.registerParser(BoxSizing.class, new EnumParser<>(BoxSizing.class));
+    this.registerParser(PointerEvents.class, new EnumParser<>(PointerEvents.class));
   }
 }

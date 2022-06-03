@@ -24,6 +24,7 @@ import com.craftingdead.immerse.client.gui.view.Color;
 import com.craftingdead.immerse.client.gui.view.ParentView;
 import com.craftingdead.immerse.client.gui.view.TextView;
 import com.mojang.authlib.GameProfile;
+import io.github.humbleui.skija.FontMgr;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.TextComponent;
 import net.rocketpowered.api.Rocket;
@@ -56,7 +57,6 @@ public class MemberView extends ParentView {
 
     this.avatarView = new AvatarView(new Properties(),
         new GameProfile(member.user().minecraftProfile().id(), null));
-    this.avatarView.getStyle().defineBorderColorState(Theme.OFFLINE);
     this.addChild(this.avatarView);
 
     var textView = new ParentView(new Properties().id("text"));
@@ -65,13 +65,18 @@ public class MemberView extends ParentView {
     this.nameView = new TextView(new Properties())
         .setWrap(false)
         .setText(member.user().minecraftProfile().name());
-    this.nameView.getStyle().color.defineState(Theme.OFFLINE);
     textView.addChild(this.nameView);
 
     this.rankView = new TextView(new Properties()).setWrap(false);
     textView.addChild(this.rankView);
 
     this.updateMember(member);
+  }
+
+  @Override
+  public void styleRefreshed(FontMgr fontManager) {
+    this.avatarView.getStyle().defineBorderColorState(Theme.OFFLINE);
+    this.nameView.getStyle().color.defineState(Theme.OFFLINE);
   }
 
   public GuildMemberPayload getMember() {

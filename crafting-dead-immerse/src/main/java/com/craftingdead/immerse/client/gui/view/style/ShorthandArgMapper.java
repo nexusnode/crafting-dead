@@ -45,12 +45,11 @@ public interface ShorthandArgMapper {
   };
 
   /**
-   * Map a shorthand syntax to child properties indexes
+   * Map a single argument index to multiple properties.
    *
-   * @param index of the current argument (0 ... n)
-   * @param count numbers of specified arguments (1 ... n)
-   * @return an array containing the indexes of the child properties to which apply the current
-   *         argument
+   * @param index - index of the argument (0 ... n)
+   * @param count - total number of arguments (1 ... n)
+   * @return an array of property indices in which to apply the specified argument to
    */
   int[] map(int index, int count);
 }

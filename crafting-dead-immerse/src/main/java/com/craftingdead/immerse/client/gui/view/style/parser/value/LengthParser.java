@@ -18,14 +18,15 @@
 
 package com.craftingdead.immerse.client.gui.view.style.parser.value;
 
-import com.craftingdead.immerse.client.gui.view.Point;
+import com.craftingdead.immerse.client.gui.view.Length;
+import com.craftingdead.immerse.client.gui.view.calc.CalcParser;
 import com.craftingdead.immerse.util.StringCountUtil;
 
-public class PointParser implements ValueParser<Point> {
+public class LengthParser implements ValueParser<Length> {
 
-  public static final PointParser INSTANCE = new PointParser();
+  public static final LengthParser INSTANCE = new LengthParser();
 
-  private PointParser() {}
+  private LengthParser() {}
 
   @Override
   public int validate(String style) {
@@ -42,13 +43,18 @@ public class PointParser implements ValueParser<Point> {
   }
 
   @Override
-  public Point parse(String style) {
+  public Length parse(String style) {
+    if (style.startsWith("calc(")) {
+      return Length.calculated(
+          CalcParser.parse(style.substring(style.indexOf('(') + 1, style.lastIndexOf(')'))));
+    }
+
     if (style.contains("%")) {
-      return Point.percentage(Float.parseFloat(style.replace('%', '\0')));
+      return Length.percentage(Float.parseFloat(style.replace('%', '\0')));
     } else if (style.equals("auto")) {
-      return Point.AUTO;
+      return Length.AUTO;
     } else {
-      return Point.fixed(Float.parseFloat(style.replace("px", "")));
+      return Length.fixed(Float.parseFloat(style.replace("px", "")));
     }
   }
 }

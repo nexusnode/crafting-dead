@@ -36,6 +36,16 @@ public interface LayoutParent {
     public void layout(float width, float height) {}
 
     @Override
+    public float getContentWidth() {
+      return 0.0F;
+    }
+
+    @Override
+    public float getContentHeight() {
+      return 0.0F;
+    }
+
+    @Override
     public void close() {}
   };
 
@@ -55,7 +65,17 @@ public interface LayoutParent {
 
   void removeChild(Layout layout);
 
+  /**
+   * Calculate the layout.
+   * 
+   * @param width - width of container or {@link Float#NaN} to let layout decide.
+   * @param height - height of container or {@link Float#NaN} to let layout decide.
+   */
   void layout(float width, float height);
+
+  float getContentWidth();
+
+  float getContentHeight();
 
   void close();
 }

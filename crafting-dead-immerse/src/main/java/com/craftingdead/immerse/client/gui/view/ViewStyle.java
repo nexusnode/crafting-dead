@@ -30,30 +30,30 @@ public class ViewStyle {
   public final StyleableProperty<Align> alignSelf;
   public final StyleableProperty<Float> flexGrow;
   public final StyleableProperty<Float> flexShrink;
-  public final StyleableProperty<Point> flexBasis;
+  public final StyleableProperty<Length> flexBasis;
   public final StyleableProperty<Float> flex;
   public final StyleableProperty<Float> borderTopWidth;
   public final StyleableProperty<Float> borderRightWidth;
   public final StyleableProperty<Float> borderBottomWidth;
   public final StyleableProperty<Float> borderLeftWidth;
-  public final StyleableProperty<Point> top;
-  public final StyleableProperty<Point> right;
-  public final StyleableProperty<Point> bottom;
-  public final StyleableProperty<Point> left;
-  public final StyleableProperty<Point> paddingTop;
-  public final StyleableProperty<Point> paddingRight;
-  public final StyleableProperty<Point> paddingBottom;
-  public final StyleableProperty<Point> paddingLeft;
-  public final StyleableProperty<Point> marginTop;
-  public final StyleableProperty<Point> marginRight;
-  public final StyleableProperty<Point> marginBottom;
-  public final StyleableProperty<Point> marginLeft;
+  public final StyleableProperty<Length> top;
+  public final StyleableProperty<Length> right;
+  public final StyleableProperty<Length> bottom;
+  public final StyleableProperty<Length> left;
+  public final StyleableProperty<Length> paddingTop;
+  public final StyleableProperty<Length> paddingRight;
+  public final StyleableProperty<Length> paddingBottom;
+  public final StyleableProperty<Length> paddingLeft;
+  public final StyleableProperty<Length> marginTop;
+  public final StyleableProperty<Length> marginRight;
+  public final StyleableProperty<Length> marginBottom;
+  public final StyleableProperty<Length> marginLeft;
   public final StyleableProperty<PositionType> position;
   public final StyleableProperty<Float> aspectRatio;
-  public final StyleableProperty<Point> width;
-  public final StyleableProperty<Point> height;
-  public final StyleableProperty<Point> minWidth;
-  public final StyleableProperty<Point> minHeight;
+  public final StyleableProperty<Length> width;
+  public final StyleableProperty<Length> height;
+  public final StyleableProperty<Length> minWidth;
+  public final StyleableProperty<Length> minHeight;
   public final StyleableProperty<Overflow> overflow;
   public final StyleableProperty<Integer> zIndex;
   public final StyleableProperty<Float> xScale;
@@ -79,6 +79,9 @@ public class ViewStyle {
   public final StyleableProperty<Alignment> textAlign;
   public final StyleableProperty<Shadow[]> textShadow;
   public final StyleableProperty<Filter[]> backdropFilter;
+  public final StyleableProperty<Visibility> visibility;
+  public final StyleableProperty<BoxSizing> boxSizing;
+  public final StyleableProperty<PointerEvents> pointerEvents;
 
   private final View view;
 
@@ -115,7 +118,7 @@ public class ViewStyle {
         new StyleableProperty<>(view, "flex-shrink", Float.class,
             1.0F, this.forLayout(Layout::setFlexShrink)));
     this.registerProperty(this.flexBasis =
-        new StyleableProperty<>(view, "flex-basis", Point.class, Point.AUTO,
+        new StyleableProperty<>(view, "flex-basis", Length.class, Length.AUTO,
             value -> value.dispatch(
                 view.getLayout()::setFlexBasis,
                 view.getLayout()::setFlexBasisPercent,
@@ -141,79 +144,67 @@ public class ViewStyle {
         this.borderBottomWidth, this.borderLeftWidth));
 
     this.registerProperty(this.top =
-        new StyleableProperty<>(view, "top", Point.class, Point.UNDEFINED,
-            value -> value.dispatch(
-                view.getLayout()::setTop,
-                view.getLayout()::setTopPercent)));
+        new StyleableProperty<>(view, "top", Length.class, Length.AUTO));
     this.registerProperty(this.right =
-        new StyleableProperty<>(view, "right", Point.class, Point.UNDEFINED,
-            value -> value.dispatch(
-                view.getLayout()::setRight,
-                view.getLayout()::setRightPercent)));
+        new StyleableProperty<>(view, "right", Length.class, Length.AUTO));
     this.registerProperty(this.bottom =
-        new StyleableProperty<>(view, "bottom", Point.class, Point.UNDEFINED,
-            value -> value.dispatch(
-                view.getLayout()::setBottom,
-                view.getLayout()::setBottomPercent)));
+        new StyleableProperty<>(view, "bottom", Length.class, Length.AUTO));
     this.registerProperty(this.left =
-        new StyleableProperty<>(view, "left", Point.class, Point.UNDEFINED,
-            value -> value.dispatch(
-                view.getLayout()::setLeft,
-                view.getLayout()::setLeftPercent)));
+        new StyleableProperty<>(view, "left", Length.class, Length.AUTO));
     this.styleManager.registerProperty(
-        ShorthandDispatcher.create("inset", Point.class, ShorthandArgMapper.BOX_MAPPER,
+        ShorthandDispatcher.create("inset", Length.class, ShorthandArgMapper.BOX_MAPPER,
             this.top, this.right, this.bottom, this.left));
 
     this.registerProperty(this.paddingTop =
-        new StyleableProperty<>(view, "padding-top", Point.class, Point.ZERO,
+        new StyleableProperty<>(view, "padding-top", Length.class, Length.ZERO,
             value -> value.dispatch(
                 view.getLayout()::setTopPadding,
                 view.getLayout()::setTopPaddingPercent)));
     this.registerProperty(this.paddingRight =
-        new StyleableProperty<>(view, "padding-right", Point.class, Point.ZERO,
+        new StyleableProperty<>(view, "padding-right", Length.class, Length.ZERO,
             value -> value.dispatch(
                 view.getLayout()::setRightPadding,
                 view.getLayout()::setRightPaddingPercent)));
     this.registerProperty(this.paddingBottom =
-        new StyleableProperty<>(view, "padding-bottom", Point.class, Point.ZERO,
+        new StyleableProperty<>(view, "padding-bottom", Length.class, Length.ZERO,
             value -> value.dispatch(
                 view.getLayout()::setBottomPadding,
                 view.getLayout()::setBottomPaddingPercent)));
     this.registerProperty(this.paddingLeft =
-        new StyleableProperty<>(view, "padding-left", Point.class, Point.ZERO,
+        new StyleableProperty<>(view, "padding-left", Length.class, Length.ZERO,
             value -> value.dispatch(
                 view.getLayout()::setLeftPadding,
                 view.getLayout()::setLeftPaddingPercent)));
     this.styleManager.registerProperty(
-        ShorthandDispatcher.create("padding", Point.class, ShorthandArgMapper.BOX_MAPPER,
+        ShorthandDispatcher.create("padding", Length.class, ShorthandArgMapper.BOX_MAPPER,
             this.paddingTop, this.paddingRight, this.paddingBottom, this.paddingLeft));
 
     this.registerProperty(this.marginTop =
-        new StyleableProperty<>(view, "margin-top", Point.class, Point.ZERO,
+        new StyleableProperty<>(view, "margin-top", Length.class, Length.ZERO,
             value -> value.dispatch(
                 view.getLayout()::setTopMargin,
                 view.getLayout()::setTopMarginPercent,
                 view.getLayout()::setTopMarginAuto)));
     this.registerProperty(this.marginRight =
-        new StyleableProperty<>(view, "margin-right", Point.class, Point.ZERO,
+        new StyleableProperty<>(view, "margin-right", Length.class, Length.ZERO,
             value -> value.dispatch(
                 view.getLayout()::setRightMargin,
                 view.getLayout()::setRightMarginPercent,
                 view.getLayout()::setRightMarginAuto)));
     this.registerProperty(this.marginBottom =
-        new StyleableProperty<>(view, "margin-bottom", Point.class, Point.ZERO,
+        new StyleableProperty<>(view, "margin-bottom", Length.class, Length.ZERO,
             value -> value.dispatch(
                 view.getLayout()::setBottomMargin,
                 view.getLayout()::setBottomMarginPercent,
                 view.getLayout()::setBottomMarginAuto)));
     this.registerProperty(this.marginLeft =
-        new StyleableProperty<>(view, "margin-left", Point.class, Point.ZERO,
+        new StyleableProperty<>(view, "margin-left", Length.class, Length.ZERO,
             value -> value.dispatch(
                 view.getLayout()::setLeftMargin,
                 view.getLayout()::setLeftMarginPercent,
                 view.getLayout()::setLeftMarginAuto)));
     this.styleManager.registerProperty(
-        ShorthandDispatcher.create("margin", Point.class, ShorthandArgMapper.BOX_MAPPER,
+        ShorthandDispatcher.create("margin", Length.class, ShorthandArgMapper.BOX_MAPPER,
             this.marginTop, this.marginRight, this.marginBottom, this.marginLeft));
 
     this.registerProperty(this.position =
@@ -224,24 +215,24 @@ public class ViewStyle {
         new StyleableProperty<>(view, "aspect-ratio", Float.class, Float.NaN,
             this.forLayout(Layout::setAspectRatio)));
     this.registerProperty(this.width =
-        new StyleableProperty<>(view, "width", Point.class, Point.AUTO,
+        new StyleableProperty<>(view, "width", Length.class, Length.AUTO,
             value -> value.dispatch(
                 view.getLayout()::setWidth,
                 view.getLayout()::setWidthPercent,
                 view.getLayout()::setWidthAuto)));
     this.registerProperty(this.height =
-        new StyleableProperty<>(view, "height", Point.class, Point.AUTO,
+        new StyleableProperty<>(view, "height", Length.class, Length.AUTO,
             value -> value.dispatch(
                 view.getLayout()::setHeight,
                 view.getLayout()::setHeightPercent,
                 view.getLayout()::setHeightAuto)));
     this.registerProperty(this.minWidth =
-        new StyleableProperty<>(view, "min-width", Point.class, Point.ZERO,
+        new StyleableProperty<>(view, "min-width", Length.class, Length.ZERO,
             value -> value.dispatch(
                 view.getLayout()::setMinWidth,
                 view.getLayout()::setMinWidthPercent)));
     this.registerProperty(this.minHeight =
-        new StyleableProperty<>(view, "min-height", Point.class, Point.ZERO,
+        new StyleableProperty<>(view, "min-height", Length.class, Length.ZERO,
             value -> value.dispatch(
                 view.getLayout()::setMinHeight,
                 view.getLayout()::setMinHeightPercent)));
@@ -267,7 +258,7 @@ public class ViewStyle {
     this.registerProperty(this.yTranslation =
         new StyleableProperty<>(view, "y-translation", Float.class, 0.0F));
     this.registerProperty(this.opacity =
-        new StyleableProperty<>(view, "alpha", Percentage.class, Percentage.ONE_HUNDRED));
+        new StyleableProperty<>(view, "opacity", Percentage.class, Percentage.ONE_HUNDRED));
     this.registerProperty(this.backgroundColor =
         new StyleableProperty<>(view, "background-color", Color.class, Color.TRANSPARENT));
     this.registerProperty(this.outlineWidth =
@@ -313,9 +304,15 @@ public class ViewStyle {
         new StyleableProperty<>(view, "text-shadow", Shadow[].class, new Shadow[0]));
     this.registerProperty(this.backdropFilter =
         new StyleableProperty<>(view, "backdrop-filter", Filter[].class, new Filter[0]));
+    this.registerProperty(this.visibility =
+        new StyleableProperty<>(view, "visibility", Visibility.class, Visibility.VISIBLE));
+    this.registerProperty(this.boxSizing =
+        new StyleableProperty<>(view, "box-sizing", BoxSizing.class, BoxSizing.CONTENT_BOX));
+    this.registerProperty(this.pointerEvents =
+        new StyleableProperty<>(view, "pointer-events", PointerEvents.class, PointerEvents.AUTO));
   }
 
-  public StyleManager getStyleHolder() {
+  public StyleManager getStyleManager() {
     return this.styleManager;
   }
 

@@ -59,11 +59,6 @@ public final class YogaLayout implements Layout {
     this.setBottomBorderWidth(style.borderBottomWidth.get());
     this.setLeftBorderWidth(style.borderLeftWidth.get());
 
-    style.top.get().dispatch(this::setTop, this::setTopPercent);
-    style.right.get().dispatch(this::setRight, this::setRightPercent);
-    style.bottom.get().dispatch(this::setBottom, this::setBottomPercent);
-    style.left.get().dispatch(this::setLeft, this::setLeftPercent);
-
     style.paddingTop.get().dispatch(this::setTopPadding, this::setTopPaddingPercent);
     style.paddingRight.get().dispatch(this::setRightPadding, this::setRightPaddingPercent);
     style.paddingBottom.get().dispatch(this::setBottomPadding, this::setBottomPaddingPercent);
@@ -151,54 +146,6 @@ public final class YogaLayout implements Layout {
   public void setBottomBorderWidth(float width) {
     this.checkClosed();
     Yoga.YGNodeStyleSetBorder(this.node, Yoga.YGEdgeBottom, width);
-  }
-
-  @Override
-  public void setLeft(float left) {
-    this.checkClosed();
-    Yoga.YGNodeStyleSetPosition(this.node, Yoga.YGEdgeLeft, left);
-  }
-
-  @Override
-  public void setLeftPercent(float leftPercent) {
-    this.checkClosed();
-    Yoga.YGNodeStyleSetPositionPercent(this.node, Yoga.YGEdgeLeft, leftPercent);
-  }
-
-  @Override
-  public void setRight(float right) {
-    this.checkClosed();
-    Yoga.YGNodeStyleSetPosition(this.node, Yoga.YGEdgeRight, right);
-  }
-
-  @Override
-  public void setRightPercent(float rightPercent) {
-    this.checkClosed();
-    Yoga.YGNodeStyleSetPositionPercent(this.node, Yoga.YGEdgeRight, rightPercent);
-  }
-
-  @Override
-  public void setTop(float top) {
-    this.checkClosed();
-    Yoga.YGNodeStyleSetPosition(this.node, Yoga.YGEdgeTop, top);
-  }
-
-  @Override
-  public void setTopPercent(float topPercent) {
-    this.checkClosed();
-    Yoga.YGNodeStyleSetPositionPercent(this.node, Yoga.YGEdgeTop, topPercent);
-  }
-
-  @Override
-  public void setBottom(float bottom) {
-    this.checkClosed();
-    Yoga.YGNodeStyleSetPosition(this.node, Yoga.YGEdgeBottom, bottom);
-  }
-
-  @Override
-  public void setBottomPercent(float bottomPercent) {
-    this.checkClosed();
-    Yoga.YGNodeStyleSetPositionPercent(this.node, Yoga.YGEdgeBottom, bottomPercent);
   }
 
   @Override

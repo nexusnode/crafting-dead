@@ -18,9 +18,10 @@
 
 package com.craftingdead.immerse.client.gui.view.style;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 import org.jetbrains.annotations.Nullable;
-import com.craftingdead.immerse.client.gui.view.style.state.StateManager;
 import io.github.humbleui.skija.FontMgr;
 
 public interface StyleNode {
@@ -34,7 +35,7 @@ public interface StyleNode {
 
   Set<String> getStyleClasses();
 
-  StateManager getStateManager();
+  StyleManager getStyleManager();
 
   boolean isVisible();
 
@@ -42,4 +43,10 @@ public interface StyleNode {
   StyleNode getParent();
 
   StyleList getStyleList();
+
+  int getIndex();
+
+  default List<? extends StyleNode> getChildStyles() {
+    return Collections.emptyList();
+  }
 }

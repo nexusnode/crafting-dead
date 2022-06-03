@@ -19,7 +19,7 @@
 package com.craftingdead.immerse.client.gui.screen.game;
 
 import com.craftingdead.immerse.client.gui.screen.game.shop.GameButton;
-import com.craftingdead.immerse.client.gui.view.Blur;
+import com.craftingdead.immerse.client.util.Blur;
 import com.craftingdead.immerse.game.network.GameNetworkChannel;
 import com.craftingdead.immerse.game.tdm.TdmTeam;
 import com.craftingdead.immerse.game.tdm.message.RequestJoinTeamMessage;

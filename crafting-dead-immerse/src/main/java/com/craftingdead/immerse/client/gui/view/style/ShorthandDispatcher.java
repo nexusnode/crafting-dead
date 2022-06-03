@@ -19,8 +19,7 @@
 package com.craftingdead.immerse.client.gui.view.style;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.function.Predicate;
+import java.util.Set;
 import com.craftingdead.immerse.client.gui.view.property.Transition;
 import com.craftingdead.immerse.client.gui.view.style.parser.value.ValueParser;
 import com.craftingdead.immerse.client.gui.view.style.parser.value.ValueParserRegistry;
@@ -43,10 +42,9 @@ public class ShorthandDispatcher<T> implements PropertyDispatcher<T> {
   }
 
   @Override
-  public boolean defineState(StyleSource source, String rawValue,
-      Collection<StyleNodeState> states) {
+  public void defineState(String value, int specificity, Set<StyleNodeState> nodeStates) {
     var values = new ArrayList<String>();
-    var current = rawValue;
+    var current = value;
     while (!current.isEmpty()) {
       var validated = this.parser.validate(current);
       if (validated == 0) {
@@ -59,15 +57,16 @@ public class ShorthandDispatcher<T> implements PropertyDispatcher<T> {
 
     for (int i = 0; i < values.size(); i++) {
       for (int childIndex : this.argMapper.map(i, values.size())) {
-        this.dispatchers[childIndex].defineState(source, values.get(i), states);
+        this.dispatchers[childIndex].defineState(values.get(i), specificity, nodeStates);
       }
     }
-
-    return true;
   }
 
   @Override
-  public void reset(Predicate<StyleSource> filter) {}
+  public void refreshState() {}
+
+  @Override
+  public void reset() {}
 
   @Override
   public String getName() {
@@ -78,13 +77,6 @@ public class ShorthandDispatcher<T> implements PropertyDispatcher<T> {
   public void setTransition(Transition transition) {
     for (var dispatcher : this.dispatchers) {
       dispatcher.setTransition(transition);
-    }
-  }
-
-  @Override
-  public void clearTrackedNodes() {
-    for (var dispatcher : this.dispatchers) {
-      dispatcher.clearTrackedNodes();
     }
   }
 

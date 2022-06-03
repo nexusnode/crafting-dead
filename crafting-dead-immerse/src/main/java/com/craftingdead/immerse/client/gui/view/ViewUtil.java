@@ -108,7 +108,7 @@ public class ViewUtil {
               view.getStyle().setStyle(styleNode.getNodeValue());
             }
 
-            view.getStyle().width.set(Point.percentage(100.0F));
+            view.getStyle().width.set(Length.percentage(100.0F));
             parentView.addChild(view);
           }
           break;

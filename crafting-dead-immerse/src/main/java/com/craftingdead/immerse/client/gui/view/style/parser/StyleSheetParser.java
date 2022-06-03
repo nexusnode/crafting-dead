@@ -24,8 +24,8 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import com.craftingdead.immerse.client.gui.view.style.StyleList;
@@ -90,9 +90,9 @@ public class StyleSheetParser {
 
 
         var selectors = StyleSelectorParser.readSelectors(line, iterator);
-        var rules = readBlock(iterator);
+        var properties = readBlock(iterator);
         for (var selector : selectors) {
-          list.addRule(selector, rules);
+          list.addRule(selector, properties);
         }
       }
 
@@ -146,26 +146,29 @@ public class StyleSheetParser {
     styleList.addFont(fontFamily, fontLoader.load(location));
   }
 
-  private static List<StyleProperty> readBlock(NumberedLineIterator content) {
+  private static Set<StyleProperty> readBlock(NumberedLineIterator content) {
     if (!content.hasNext()) {
-      return Collections.emptyList();
+      return Set.of();
     }
     var currentLine = content.nextLine();
-    var elements = new ArrayList<StyleProperty>();
+    var elements = new LinkedHashSet<StyleProperty>();
     while (!StringUtils.contains(currentLine, "}")) {
       if (StringUtils.contains(currentLine, "{")) {
         logger.error(
             "Found opening bracket at line " + content.getLineNumber() + " while inside a block");
-        return Collections.emptyList();
+        return Set.of();
       }
       if (currentLine.isBlank()) {
         currentLine = content.nextLine();
         continue;
       }
-      var rule = currentLine.replace(';', ' ').strip().split(":", 2);
-      elements.add(new StyleProperty(rule[0].strip(), rule[1].strip()));
+      var propertyParts = currentLine.replace(';', ' ').strip().split(":", 2);
+      var property = new StyleProperty(propertyParts[0].strip(), propertyParts[1].strip());
+      // Replace existing.
+      elements.remove(property);
+      elements.add(property);
       if (!content.hasNext()) {
-        return Collections.emptyList();
+        return Set.of();
       }
       currentLine = content.nextLine();
     }

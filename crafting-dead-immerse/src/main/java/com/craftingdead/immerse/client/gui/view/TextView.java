@@ -174,8 +174,10 @@ public class TextView extends View {
         this.getStyle().fontSize.get() * (float) this.window.getGuiScale());
     switch (widthMode) {
       case UNDEFINED:
-        this.paragraph.layout(Float.MAX_VALUE);
-        width = this.paragraph.getMaxIntrinsicWidth() / (float) this.window.getGuiScale();
+      case AT_MOST:
+        this.paragraph.layout(widthMode == MeasureMode.UNDEFINED ? Float.MAX_VALUE
+            : width * (float) this.window.getGuiScale());
+        width = (this.paragraph.getMaxIntrinsicWidth()) / (float) this.window.getGuiScale();
         break;
       default:
         this.paragraph.layout(width * (float) this.window.getGuiScale());

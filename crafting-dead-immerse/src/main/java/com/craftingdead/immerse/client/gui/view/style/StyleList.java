@@ -20,11 +20,12 @@ package com.craftingdead.immerse.client.gui.view.style;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Stream;
+import java.util.Set;
+import com.craftingdead.immerse.client.gui.view.style.selector.Selector;
 import com.craftingdead.immerse.client.gui.view.style.selector.StyleNodeState;
-import com.craftingdead.immerse.client.gui.view.style.selector.StyleSelector;
 import io.github.humbleui.skija.FontMgr;
 import io.github.humbleui.skija.Typeface;
 import io.github.humbleui.skija.paragraph.TypefaceFontProvider;
@@ -41,7 +42,7 @@ public class StyleList {
   }
 
   public StyleList merge(StyleList source) {
-    source.rules.forEach(rule -> this.addRule(rule.selectorList(), rule.properties()));
+    source.rules.forEach(rule -> this.addRule(rule.selector(), rule.properties()));
     this.fonts.putAll(source.fonts);
     return this;
   }
@@ -56,26 +57,13 @@ public class StyleList {
     this.fonts.put(name, typeface);
   }
 
-  public void addRule(StyleSelector selectorList, List<StyleProperty> properties) {
-    var match = this.rules.stream()
-        .filter(styleEntry -> styleEntry.selectorList().equals(selectorList))
-        .findFirst();
-
-    StyleRule lastAdded;
-    if (!match.isPresent()) {
-      var newEntry = new StyleRule(selectorList);
-      this.rules.add(newEntry);
-      lastAdded = newEntry;
-    } else {
-      lastAdded = match.get();
-    }
-    lastAdded.mergeProperties(properties);
+  public void addRule(Selector selector, Set<StyleProperty> properties) {
+    this.rules.add(new StyleRule(selector, properties));
   }
 
-  public Map<StyleRule, List<StyleNodeState>> getRulesMatching(StyleNode node) {
-    var rules = new HashMap<StyleRule, List<StyleNodeState>>();
-    this.rules.stream().forEach(rule -> rule.selectorList().match(node)
-        .map(Stream::toList)
+  public Map<StyleRule, Set<StyleNodeState>> getRulesMatching(StyleNode node) {
+    var rules = new LinkedHashMap<StyleRule, Set<StyleNodeState>>();
+    this.rules.forEach(rule -> rule.selector().match(node)
         .ifPresent(nodeState -> rules.put(rule, nodeState)));
     return rules;
   }

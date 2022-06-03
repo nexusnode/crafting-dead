@@ -91,6 +91,16 @@ public final class YogaLayoutParent implements LayoutParent {
   }
 
   @Override
+  public float getContentWidth() {
+    return Yoga.YGNodeLayoutGetWidth(this.node);
+  }
+
+  @Override
+  public float getContentHeight() {
+    return Yoga.YGNodeLayoutGetHeight(this.node);
+  }
+
+  @Override
   public void close() {
     Yoga.YGNodeFree(this.node);
   }

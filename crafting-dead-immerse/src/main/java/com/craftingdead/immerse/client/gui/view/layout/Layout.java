@@ -41,22 +41,6 @@ public interface Layout {
 
   default void setBottomBorderWidth(float width) {}
 
-  default void setLeft(float left) {}
-
-  default void setLeftPercent(float leftPercent) {}
-
-  default void setRight(float right) {}
-
-  default void setRightPercent(float rightPercent) {}
-
-  default void setTop(float top) {}
-
-  default void setTopPercent(float topPercent) {}
-
-  default void setBottom(float bottom) {}
-
-  default void setBottomPercent(float bottomPercent) {}
-
   default void setLeftPadding(float leftPadding) {}
 
   default void setLeftPaddingPercent(float leftPaddingPercent) {}

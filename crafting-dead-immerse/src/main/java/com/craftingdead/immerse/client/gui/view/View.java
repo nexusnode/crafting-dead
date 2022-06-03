@@ -24,7 +24,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import org.jdesktop.core.animation.timing.Animator;
 import org.jdesktop.core.animation.timing.PropertySetter;
-import org.jdesktop.core.animation.timing.interpolators.LinearInterpolator;
 import org.jdesktop.core.animation.timing.interpolators.SplineInterpolator;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
@@ -38,10 +37,11 @@ import com.craftingdead.immerse.client.gui.view.event.MouseEvent;
 import com.craftingdead.immerse.client.gui.view.event.MouseLeaveEvent;
 import com.craftingdead.immerse.client.gui.view.event.RemovedEvent;
 import com.craftingdead.immerse.client.gui.view.layout.Layout;
+import com.craftingdead.immerse.client.gui.view.layout.PositionType;
+import com.craftingdead.immerse.client.gui.view.style.States;
 import com.craftingdead.immerse.client.gui.view.style.StyleList;
+import com.craftingdead.immerse.client.gui.view.style.StyleManager;
 import com.craftingdead.immerse.client.gui.view.style.StyleNode;
-import com.craftingdead.immerse.client.gui.view.style.state.StateManager;
-import com.craftingdead.immerse.client.gui.view.style.state.States;
 import com.craftingdead.immerse.client.util.RenderUtil;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableSet;
@@ -88,8 +88,6 @@ public class View extends GuiComponent
 
   private final IEventBus eventBus = BusBuilder.builder().build();
 
-  protected final StateManager stateManager = new StateManager(this);
-
   private final ViewStyle style;
 
   /*
@@ -117,8 +115,6 @@ public class View extends GuiComponent
   @Nullable
   private final String id;
   private final Set<String> styleClasses;
-  @Nullable
-  private final Tooltip tooltip;
   private final boolean doubleClick;
   private final boolean unscaleWidth;
   private final boolean unscaleHeight;
@@ -129,7 +125,6 @@ public class View extends GuiComponent
   public View(Properties properties) {
     this.id = properties.id;
     this.styleClasses = properties.styleClasses.build();
-    this.tooltip = properties.tooltip;
     this.doubleClick = properties.doubleClick;
     this.unscaleWidth = properties.unscaleWidth;
     this.unscaleHeight = properties.unscaleHeight;
@@ -140,7 +135,7 @@ public class View extends GuiComponent
     this.style = new ViewStyle(this);
 
     this.eventBus.start();
-    this.stateManager.addState(States.ENABLED);
+    this.getStyleManager().addState(States.ENABLED);
   }
 
   protected float computeFullHeight() {
@@ -148,8 +143,7 @@ public class View extends GuiComponent
   }
 
   protected void added() {
-    this.style.getStyleHolder().refresh();
-    this.stateManager.notifyListeners();
+    this.style.getStyleManager().refresh();
     this.added = true;
     this.post(new AddedEvent());
   }
@@ -193,14 +187,11 @@ public class View extends GuiComponent
 
   @Override
   public final void render(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
-    this.drawBox();
-
-    if (this.tooltip != null && this.isHovered()) {
-      // this.tooltip.render(this.minecraft.font, poseStack,
-      // 10.0F + this.getX() + this.getWidth(), this.getY());
+    if (!this.isVisible()) {
+      return;
     }
 
-    // ---- Render Content----
+    this.drawBox();
 
     final var scale = (float) this.window.getGuiScale();
     final var scissor = this.layout.getOverflow().shouldScissor();
@@ -323,14 +314,26 @@ public class View extends GuiComponent
           radii);
 
       try (var paint = new Paint()) {
-        paint.setColor(this.style.borderTopColor.get().valueHex());
-        this.drawBorderEdge(canvas, rect, innerRect, BoxSide.TOP, paint);
-        paint.setColor(this.style.borderRightColor.get().valueHex());
-        this.drawBorderEdge(canvas, rect, innerRect, BoxSide.RIGHT, paint);
-        paint.setColor(this.style.borderBottomColor.get().valueHex());
-        this.drawBorderEdge(canvas, rect, innerRect, BoxSide.BOTTOM, paint);
-        paint.setColor(this.style.borderLeftColor.get().valueHex());
-        this.drawBorderEdge(canvas, rect, innerRect, BoxSide.LEFT, paint);
+        if (topBorderWidth > 0.0F) {
+          paint.setColor(RenderUtil.multiplyAlpha(
+              this.style.borderTopColor.get().valueHex(), this.getAlpha()));
+          this.drawBorderEdge(canvas, rect, innerRect, BoxSide.TOP, paint);
+        }
+        if (rightBorderWidth > 0.0F) {
+          paint.setColor(RenderUtil.multiplyAlpha(
+              this.style.borderRightColor.get().valueHex(), this.getAlpha()));
+          this.drawBorderEdge(canvas, rect, innerRect, BoxSide.RIGHT, paint);
+        }
+        if (bottomBorderWidth > 0.0F) {
+          paint.setColor(RenderUtil.multiplyAlpha(
+              this.style.borderBottomColor.get().valueHex(), this.getAlpha()));
+          this.drawBorderEdge(canvas, rect, innerRect, BoxSide.BOTTOM, paint);
+        }
+        if (leftBorderWidth > 0.0F) {
+          paint.setColor(RenderUtil.multiplyAlpha(
+              this.style.borderLeftColor.get().valueHex(), this.getAlpha()));
+          this.drawBorderEdge(canvas, rect, innerRect, BoxSide.LEFT, paint);
+        }
       }
 
       try (var paint = new Paint()) {
@@ -680,50 +683,15 @@ public class View extends GuiComponent
   }
 
   public void mouseEntered(double mouseX, double mouseY) {
-    if (this.tooltip != null) {
-      new Animator.Builder()
-          .addTarget(Animation.forProperty(this.tooltip.getOpacityProperty())
-              .to(255)
-              .build())
-          .setInterpolator(LinearInterpolator.getInstance())
-          .setDuration(150L, TimeUnit.MILLISECONDS)
-          .build()
-          .start();
-
-      new Animator.Builder()
-          .addTarget(Animation.forProperty(this.tooltip.getTextOpacityProperty())
-              .to(255)
-              .build())
-          .setInterpolator(LinearInterpolator.getInstance())
-          .setStartDelay(75L, TimeUnit.MILLISECONDS)
-          .setDuration(150L, TimeUnit.MILLISECONDS)
-          .build()
-          .start();
-    }
-
-    this.stateManager.addState(States.HOVER);
-    this.stateManager.notifyListeners();
+    this.getStyleManager().addState(States.HOVER);
+    this.getStyleManager().notifyListeners();
 
     this.post(new MouseEnterEvent());
   }
 
   public void mouseLeft(double mouseX, double mouseY) {
-    if (this.tooltip != null) {
-      new Animator.Builder()
-          .addTarget(Animation.forProperty(this.tooltip.getOpacityProperty())
-              .to(0)
-              .build())
-          .addTarget(Animation.forProperty(this.tooltip.getTextOpacityProperty())
-              .to(0)
-              .build())
-          .setInterpolator(LinearInterpolator.getInstance())
-          .setDuration(250L, TimeUnit.MILLISECONDS)
-          .build()
-          .start();
-    }
-
-    this.stateManager.removeState(States.HOVER);
-    this.stateManager.notifyListeners();
+    this.getStyleManager().removeState(States.HOVER);
+    this.getStyleManager().notifyListeners();
 
     this.post(new MouseLeaveEvent());
   }
@@ -738,15 +706,15 @@ public class View extends GuiComponent
       return true;
     }
 
-    if (!this.focusable || this.stateManager.hasState(States.DISABLED)) {
+    if (!this.focusable || this.getStyleManager().hasState(States.DISABLED)) {
       return false;
     }
 
     if (visible) {
-      this.stateManager.addState(States.FOCUS_VISIBLE);
+      this.getStyleManager().addState(States.FOCUS_VISIBLE);
     }
-    this.stateManager.addState(States.FOCUS);
-    this.stateManager.notifyListeners();
+    this.getStyleManager().addState(States.FOCUS);
+    this.getStyleManager().notifyListeners();
     this.focusChanged();
 
     return true;
@@ -754,9 +722,9 @@ public class View extends GuiComponent
 
   public void removeFocus() {
     if (this.isFocused()) {
-      this.stateManager.removeState(States.FOCUS);
-      this.stateManager.removeState(States.FOCUS_VISIBLE);
-      this.stateManager.notifyListeners();
+      this.getStyleManager().removeState(States.FOCUS);
+      this.getStyleManager().removeState(States.FOCUS_VISIBLE);
+      this.getStyleManager().notifyListeners();
       this.focusChanged();
     }
   }
@@ -857,14 +825,14 @@ public class View extends GuiComponent
 
   @Override
   public boolean changeFocus(boolean forward) {
-    if (this.focusable && this.stateManager.hasState(States.ENABLED)) {
-      var focused = this.stateManager.toggleState(States.FOCUS);
+    if (this.focusable && this.getStyleManager().hasState(States.ENABLED)) {
+      var focused = this.getStyleManager().toggleState(States.FOCUS);
       if (focused) {
-        this.stateManager.addState(States.FOCUS_VISIBLE);
+        this.getStyleManager().addState(States.FOCUS_VISIBLE);
       } else {
-        this.stateManager.removeState(States.FOCUS_VISIBLE);
+        this.getStyleManager().removeState(States.FOCUS_VISIBLE);
       }
-      this.stateManager.notifyListeners();
+      this.getStyleManager().notifyListeners();
       this.focusChanged();
       return focused;
     }
@@ -881,7 +849,8 @@ public class View extends GuiComponent
    */
   @Override
   public boolean isMouseOver(double mouseX, double mouseY) {
-    return mouseX > this.getScaledX() && mouseX < this.getScaledX() + this.getScaledWidth()
+    return this.style.pointerEvents.get() != PointerEvents.NONE
+        && mouseX > this.getScaledX() && mouseX < this.getScaledX() + this.getScaledWidth()
         && mouseY > this.getScaledY() && mouseY < this.getScaledY() + this.getScaledHeight();
   }
 
@@ -954,13 +923,27 @@ public class View extends GuiComponent
   }
 
   public final float getX() {
-    final float left = this.layout.getX();
-    return left
-        + (left * this.getXScale()) - (left * this.style.xScale.get())
+    var x = this.layout.getX();
+    x += (x * this.getXScale()) - (x * this.style.xScale.get());
+    x += this.parent == null ? 0.0F : this.parent.getScaledContentX();
+
+    var left = this.style.left.get();
+    var right = this.style.right.get();
+    var parentWidth = this.parent == null ? this.screen.width : this.parent.getWidth();
+    if (left != Length.AUTO) {
+      x += left.valueForLength(parentWidth);
+    } else if (right != Length.AUTO) {
+      if (this.style.position.get() == PositionType.ABSOLUTE) {
+        var parentRight = this.parent == null ? this.screen.width
+            : this.parent.getScaledContentX() + this.parent.getScaledContentWidth();
+        x = parentRight - right.valueForLength(parentWidth) - this.getWidth();
+      } else {
+        x -= right.valueForLength(parentWidth);
+      }
+    }
+
+    return x
         + this.style.xTranslation.get()
-        + (this.parent == null
-            ? 0.0F
-            : this.parent.getScaledContentX())
         + this.unscaleOffset(this.getWidth(), this.unscaleWidth);
   }
 
@@ -991,13 +974,27 @@ public class View extends GuiComponent
   }
 
   public final float getY() {
-    final float top = this.layout.getY();
-    return top
-        + (top * this.getYScale()) - (top * this.style.yScale.get())
+    var y = this.layout.getY();
+    y += (y * this.getYScale()) - (y * this.style.yScale.get());
+    y += this.parent == null ? 0.0F : this.parent.getScaledContentY();
+
+    var top = this.style.top.get();
+    var bottom = this.style.bottom.get();
+    var parentHeight = this.parent == null ? this.screen.height : this.parent.getHeight();
+    if (top != Length.AUTO) {
+      y += top.valueForLength(parentHeight);
+    } else if (bottom != Length.AUTO) {
+      if (this.style.position.get() == PositionType.ABSOLUTE) {
+        var parentRight = this.parent == null ? this.screen.height
+            : this.parent.getScaledContentY() + this.parent.getScaledContentHeight();
+        y = parentRight - bottom.valueForLength(parentHeight) - this.getHeight();
+      } else {
+        y -= bottom.valueForLength(parentHeight);
+      }
+    }
+
+    return y
         + this.style.yTranslation.get()
-        + (this.parent == null
-            ? 0.0F
-            : this.parent.getScaledContentY())
         + (this.unscaleHeight
             ? this.getHeight() * (float) this.window.getGuiScale() - this.getHeight()
             : 0.0F);
@@ -1021,7 +1018,24 @@ public class View extends GuiComponent
   }
 
   public final float getWidth() {
-    return this.unscale(this.layout.getWidth(), this.unscaleWidth);
+    var width = this.unscale(this.layout.getWidth(), this.unscaleWidth);
+
+    var right = this.style.right.get();
+    if (right != Length.AUTO &&
+        this.style.position.get() == PositionType.ABSOLUTE && width == 0) {
+      var parentWidth = this.parent == null ? this.screen.width : this.parent.getWidth();
+      var parentRight = this.parent == null ? parentWidth : this.parent.getX() + parentWidth;
+      width = parentRight - right.valueForLength(parentWidth) - this.getX();
+    }
+
+    if (this.style.boxSizing.get() == BoxSizing.CONTENT_BOX) {
+      width += this.layout.getRightPadding()
+          + this.layout.getLeftPadding()
+          + this.unscale(this.layout.getRightBorder(), this.unscaleBorder)
+          + this.unscale(this.layout.getLeftBorder(), this.unscaleBorder);
+    }
+
+    return width;
   }
 
   public final float getScaledContentHeight() {
@@ -1041,7 +1055,23 @@ public class View extends GuiComponent
   }
 
   public final float getHeight() {
-    return this.unscale(this.layout.getHeight(), this.unscaleHeight);
+    var height = this.unscale(this.layout.getHeight(), this.unscaleHeight);
+
+    var bottom = this.style.bottom.get();
+    if (bottom != Length.AUTO &&
+        this.style.position.get() == PositionType.ABSOLUTE && height == 0) {
+      var parentHeight = this.parent == null ? this.screen.height : this.parent.getHeight();
+      var parentBottom = this.parent == null ? parentHeight : this.parent.getY() + parentHeight;
+      height = parentBottom - bottom.valueForLength(parentHeight) - this.getY();
+    }
+
+    if (this.style.boxSizing.get() == BoxSizing.CONTENT_BOX) {
+      height += this.layout.getBottomPadding()
+          + this.layout.getTopPadding()
+          + this.unscale(this.layout.getBottomBorder(), this.unscaleBorder)
+          + this.unscale(this.layout.getTopBorder(), this.unscaleBorder);
+    }
+    return height;
   }
 
   public float getZOffset() {
@@ -1062,24 +1092,24 @@ public class View extends GuiComponent
 
   public final void setEnabled(boolean enabled) {
     if (enabled) {
-      this.stateManager.addState(States.ENABLED);
-      this.stateManager.removeState(States.DISABLED);
+      this.getStyleManager().addState(States.ENABLED);
+      this.getStyleManager().removeState(States.DISABLED);
     } else {
-      this.stateManager.removeState(States.ENABLED);
-      this.stateManager.addState(States.DISABLED);
-      if (this.stateManager.hasState(States.FOCUS)) {
-        this.stateManager.removeState(States.FOCUS);
+      this.getStyleManager().removeState(States.ENABLED);
+      this.getStyleManager().addState(States.DISABLED);
+      if (this.getStyleManager().hasState(States.FOCUS)) {
+        this.getStyleManager().removeState(States.FOCUS);
       }
     }
-    this.stateManager.notifyListeners();
+    this.getStyleManager().notifyListeners();
   }
 
   public final boolean isHovered() {
-    return this.stateManager.hasState(States.HOVER);
+    return this.getStyleManager().hasState(States.HOVER);
   }
 
   public final boolean isFocused() {
-    return this.stateManager.hasState(States.FOCUS);
+    return this.getStyleManager().hasState(States.FOCUS);
   }
 
   public final ViewScreen getScreen() {
@@ -1150,13 +1180,13 @@ public class View extends GuiComponent
   }
 
   @Override
-  public StateManager getStateManager() {
-    return this.stateManager;
+  public StyleManager getStyleManager() {
+    return this.style.getStyleManager();
   }
 
   @Override
   public boolean isVisible() {
-    return this.added;
+    return this.added && this.style.visibility.get() == Visibility.VISIBLE;
   }
 
   @Override
@@ -1164,8 +1194,13 @@ public class View extends GuiComponent
     return this.getScreen().getStyleList();
   }
 
+  @Override
+  public int getIndex() {
+    return this.index;
+  }
+
   public void refreshStyle() {
-    this.style.getStyleHolder().refresh();
+    this.style.getStyleManager().refresh();
   }
 
   public ViewStyle getStyle() {
@@ -1177,8 +1212,6 @@ public class View extends GuiComponent
     @Nullable
     private String id;
     private final ImmutableSet.Builder<String> styleClasses = ImmutableSet.builder();
-    @Nullable
-    private Tooltip tooltip;
     private boolean doubleClick;
     private boolean unscaleWidth;
     private boolean unscaleHeight;
@@ -1198,11 +1231,6 @@ public class View extends GuiComponent
 
     public Properties styleClasses(Iterable<String> styleClasses) {
       this.styleClasses.addAll(styleClasses);
-      return this;
-    }
-
-    public final Properties tooltip(@Nullable Tooltip tooltip) {
-      this.tooltip = tooltip;
       return this;
     }
 

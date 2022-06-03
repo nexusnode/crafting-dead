@@ -21,18 +21,20 @@ package com.craftingdead.immerse.client.gui.view;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
+import java.util.function.BooleanSupplier;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 import org.jetbrains.annotations.Nullable;
+import org.lwjgl.glfw.GLFW;
 import com.craftingdead.immerse.client.gui.view.layout.Layout;
 import com.craftingdead.immerse.client.gui.view.layout.LayoutParent;
+import com.craftingdead.immerse.client.gui.view.layout.MeasureMode;
 import com.craftingdead.immerse.client.gui.view.style.StyleNode;
-import com.craftingdead.immerse.client.gui.view.style.StyleParentNode;
 import com.craftingdead.immerse.util.ThreadSafe;
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.gui.components.events.ContainerEventHandler;
-import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.world.phys.Vec2;
 
-public class ParentView extends View implements ContainerEventHandler, StyleParentNode {
+public class ParentView extends View {
 
   private final List<View> children = new ArrayList<>();
   // Bottom to top order
@@ -41,7 +43,7 @@ public class ParentView extends View implements ContainerEventHandler, StylePare
   private LayoutParent layoutParent = LayoutParent.NILL;
 
   @Nullable
-  private GuiEventListener focusedListener;
+  private View focusedView;
   private boolean dragging;
 
   public ParentView(Properties properties) {
@@ -49,6 +51,28 @@ public class ParentView extends View implements ContainerEventHandler, StylePare
 
     this.getStyle().display.addListener(this::setDisplay);
     this.setDisplay(this.getStyle().display.get());
+  }
+
+  @Override
+  protected void setLayout(Layout layout) {
+    super.setLayout(layout);
+    layout.setMeasureFunction(this::measure);
+  }
+
+  private Vec2 measure(MeasureMode widthMode, float width, MeasureMode heightMode, float height) {
+    this.layoutParent.layout(
+        widthMode == MeasureMode.UNDEFINED || widthMode == MeasureMode.AT_MOST
+            ? Float.NaN
+            : width,
+        heightMode == MeasureMode.UNDEFINED || heightMode == MeasureMode.AT_MOST
+            ? Float.NaN
+            : height);
+
+    var measuredWidth = this.layoutParent.getContentWidth();
+    var measuredHeight = this.layoutParent.getContentHeight();
+    return new Vec2(
+        widthMode == MeasureMode.AT_MOST ? Math.min(measuredWidth, width) : measuredWidth,
+        heightMode == MeasureMode.AT_MOST ? Math.min(measuredHeight, height) : measuredHeight);
   }
 
   private void setDisplay(Display display) {
@@ -202,7 +226,7 @@ public class ParentView extends View implements ContainerEventHandler, StylePare
       this.clearLayout(view);
     }
     view.parent = null;
-    if (this.focusedListener == view) {
+    if (this.focusedView == view) {
       this.setFocused(null);
     }
   }
@@ -257,11 +281,10 @@ public class ParentView extends View implements ContainerEventHandler, StylePare
   }
 
   @Override
-  protected void renderContent(PoseStack matrixStack, int mouseX, int mouseY,
-      float partialTicks) {
-    super.renderContent(matrixStack, mouseX, mouseY, partialTicks);
+  protected void renderContent(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
+    super.renderContent(poseStack, mouseX, mouseY, partialTick);
     for (var view : this.sortedChildren) {
-      view.render(matrixStack, mouseX, mouseY, partialTicks);
+      view.render(poseStack, mouseX, mouseY, partialTick);
     }
   }
 
@@ -276,42 +299,41 @@ public class ParentView extends View implements ContainerEventHandler, StylePare
     Arrays.sort(this.sortedChildren);
   }
 
-  @Override
-  public List<? extends GuiEventListener> children() {
-    return Arrays.asList(this.sortedChildren);
-  }
-
-  @Override
-  public Optional<GuiEventListener> getChildAt(double mouseX, double mouseY) {
+  public View hover(double mouseX, double mouseY, Consumer<View> hoveredConsumer) {
     for (int i = this.sortedChildren.length; i-- > 0;) {
-      var eventListener = this.sortedChildren[i];
-      if (eventListener.isMouseOver(mouseX, mouseY)) {
-        return Optional.of(eventListener);
+      var view = this.sortedChildren[i];
+      if (view instanceof ParentView parent) {
+        var hovered = parent.hover(mouseX, mouseY, hoveredConsumer);
+        if (hovered != null) {
+          hoveredConsumer.accept(view);
+          return hovered;
+        }
+      }
+
+      if (view.isMouseOver(mouseX, mouseY)) {
+        hoveredConsumer.accept(view);
+        return view;
       }
     }
-    return Optional.empty();
+    return null;
   }
 
   @Override
   public void mouseMoved(double mouseX, double mouseY) {
-    this.children().forEach(listener -> listener.mouseMoved(mouseX, mouseY));
+    this.getChildViews().forEach(listener -> listener.mouseMoved(mouseX, mouseY));
     super.mouseMoved(mouseX, mouseY);
   }
 
   @Override
-  public boolean isMouseOver(double mouseX, double mouseY) {
-    for (int i = this.sortedChildren.length; i-- > 0;) {
-      if (this.sortedChildren[i].isMouseOver(mouseX, mouseY)) {
+  public boolean mouseClicked(double mouseX, double mouseY, int button) {
+    for (var view : this.sortedChildren) {
+      if (view.mouseClicked(mouseX, mouseY, button)) {
+        this.setFocused(view);
+        if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
+          this.setDragging(true);
+        }
         return true;
       }
-    }
-    return super.isMouseOver(mouseX, mouseY);
-  }
-
-  @Override
-  public boolean mouseClicked(double mouseX, double mouseY, int button) {
-    if (ContainerEventHandler.super.mouseClicked(mouseX, mouseY, button)) {
-      return true;
     }
     this.setFocused(null);
     return super.mouseClicked(mouseX, mouseY, button);
@@ -320,53 +342,73 @@ public class ParentView extends View implements ContainerEventHandler, StylePare
   @Override
   public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX,
       double deltaY) {
-    return ContainerEventHandler.super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY)
+    return this.focusedView != null
+        && this.isDragging()
+        && button == GLFW.GLFW_MOUSE_BUTTON_LEFT
+        && this.focusedView.mouseDragged(mouseX, mouseY, button, deltaX, deltaY)
         || super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
   }
 
   @Override
-  public boolean mouseScrolled(double mouseX, double mouseY, double scrollDelta) {
-    return ContainerEventHandler.super.mouseScrolled(mouseX, mouseY, scrollDelta)
-        || super.mouseScrolled(mouseX, mouseY, scrollDelta);
-  }
-
-  @Override
   public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-    return ContainerEventHandler.super.keyPressed(keyCode, scanCode, modifiers)
+    return this.focusedView != null && this.focusedView.keyPressed(keyCode, scanCode, modifiers)
         || super.keyPressed(keyCode, scanCode, modifiers);
   }
 
   @Override
   public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
-    return ContainerEventHandler.super.keyReleased(keyCode, scanCode, modifiers)
+    return this.focusedView != null && this.focusedView.keyReleased(keyCode, scanCode, modifiers)
         || super.keyReleased(keyCode, scanCode, modifiers);
   }
 
   @Override
   public boolean charTyped(char codePoint, int modifiers) {
-    return ContainerEventHandler.super.charTyped(codePoint, modifiers)
+    return this.focusedView != null && this.focusedView.charTyped(codePoint, modifiers)
         || super.charTyped(codePoint, modifiers);
   }
 
-  @Override
-  public boolean isDragging() {
+  private boolean isDragging() {
     return this.dragging;
   }
 
-  @Override
-  public void setDragging(boolean dragging) {
+  private void setDragging(boolean dragging) {
     this.dragging = dragging;
   }
 
-  @Nullable
   @Override
-  public GuiEventListener getFocused() {
-    return this.focusedListener;
-  }
+  public boolean changeFocus(boolean forward) {
+    if (super.changeFocus(forward)) {
+      return true;
+    }
 
-  @Override
-  public boolean changeFocus(boolean focus) {
-    return super.changeFocus(focus) || ContainerEventHandler.super.changeFocus(focus);
+    if (this.focusedView != null && this.focusedView.changeFocus(forward)) {
+      return true;
+    }
+
+    int focusedIndex = this.children.indexOf(this.focusedView);
+    int fromIndex;
+    if (this.focusedView != null && focusedIndex >= 0) {
+      fromIndex = focusedIndex + (forward ? 1 : 0);
+    } else if (forward) {
+      fromIndex = 0;
+    } else {
+      fromIndex = this.children.size();
+    }
+
+    var iterator = this.children.listIterator(fromIndex);
+    BooleanSupplier hasNext = forward ? iterator::hasNext : iterator::hasPrevious;
+    Supplier<View> next = forward ? iterator::next : iterator::previous;
+
+    while (hasNext.getAsBoolean()) {
+      var nextView = next.get();
+      if (nextView.changeFocus(forward)) {
+        this.setFocused(nextView);
+        return true;
+      }
+    }
+
+    this.setFocused(null);
+    return false;
   }
 
   @Override
@@ -375,37 +417,33 @@ public class ParentView extends View implements ContainerEventHandler, StylePare
     this.setFocused(null);
   }
 
-  @Override
-  public void setFocused(@Nullable GuiEventListener focusedListener) {
-    if (this.focusedListener == focusedListener) {
+  private void setFocused(@Nullable View view) {
+    if (this.focusedView == view) {
       return;
     }
 
-    if (focusedListener instanceof View view && view.parent != this) {
-      return;
+    if (view != null) {
+      if (view.parent != this) {
+        return;
+      }
     }
 
-    if (this.focusedListener instanceof View view && view.isAdded()) {
-      view.removeFocus();
+    if (this.focusedView != null && this.focusedView.isAdded()) {
+      this.focusedView.removeFocus();
     }
 
-    this.focusedListener = focusedListener;
+    this.focusedView = view;
   }
 
   @Override
   public boolean mouseReleased(double mouseX, double mouseY, int button) {
     this.setDragging(false);
-    return this.getFocused() != null && this.getFocused().mouseReleased(mouseX, mouseY, button);
+    return this.focusedView != null && this.focusedView.mouseReleased(mouseX, mouseY, button);
   }
 
   @Override
   public List<? extends StyleNode> getChildStyles() {
     return this.children;
-  }
-
-  @Override
-  public int getChildCount() {
-    return this.children.size();
   }
 
   @Override

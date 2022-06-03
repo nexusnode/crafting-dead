@@ -19,40 +19,139 @@
 package com.craftingdead.immerse.client.gui.view.style.parser;
 
 import org.apache.commons.lang3.StringUtils;
-import com.craftingdead.immerse.client.gui.view.style.selector.ElementMatcher;
-import com.craftingdead.immerse.client.gui.view.style.selector.SimpleStyleSelector;
-import com.craftingdead.immerse.client.gui.view.style.selector.StyleSelector;
-import com.craftingdead.immerse.client.gui.view.style.selector.StyleSelectorHierarchic;
-import com.craftingdead.immerse.client.gui.view.style.state.States;
+import org.jetbrains.annotations.Nullable;
+import com.craftingdead.immerse.client.gui.view.style.selector.CompoundSelector;
+import com.craftingdead.immerse.client.gui.view.style.selector.Selector;
+import com.craftingdead.immerse.client.gui.view.style.selector.SingleSelector;
+import com.craftingdead.immerse.client.gui.view.style.selector.combinator.Combinator;
+import com.craftingdead.immerse.client.gui.view.style.selector.combinator.DescendantCombinator;
+import com.craftingdead.immerse.client.gui.view.style.selector.combinator.SiblingCombinator;
 import com.craftingdead.immerse.util.NumberedLineIterator;
 
 class StyleSelectorParser {
 
   private StyleSelectorParser() {}
 
-  static StyleSelector[] readSelectors(String currentLine, NumberedLineIterator iterator) {
+  static Selector[] readSelectors(String currentLine, NumberedLineIterator iterator) {
     var selectorBuilder = new StringBuilder(currentLine.trim());
     while (!currentLine.endsWith("{")) {
       currentLine = iterator.nextLine().trim();
       selectorBuilder.append(currentLine);
     }
+    var test = readSelectorList(selectorBuilder.toString().replace("{", "").trim());
+    return test;
+  }
 
-    var selector = selectorBuilder.toString().replace("{", "").trim();
+  static Selector[] readSelectorList(String selector) {
     if (selector.contains(",")) {
-      var selectors = new StyleSelector[StringUtils.countMatches(selector, ",") + 1];
+      var selectors = new Selector[StringUtils.countMatches(selector, ",") + 1];
       int i = 0;
       for (var subSelector : selector.split(",")) {
         selectors[i] = readSingleSelector(cleanSelector(subSelector.trim()));
         i++;
       }
+
       return selectors;
     }
 
-    return new StyleSelector[] {readSingleSelector(cleanSelector(selector))};
+    return new Selector[] {readSingleSelector(cleanSelector(selector))};
   }
 
-  static StyleSelector readSingleSelector(String selector) {
-    return selector.contains(">") ? parseHierarchic(selector) : parseSimple(selector);
+  static Selector readSingleSelector(String selectorStr) {
+    var bracketLevel = 0;
+    var chars = selectorStr.toCharArray();
+
+    var selectorStack = new CompoundSelector();
+    var combinator = Combinator.AND;
+    StringBuilder currentElement = null;
+    for (int i = 0; i < chars.length; i++) {
+      var ch = chars[i];
+
+      if (ch == '(') {
+        bracketLevel++;
+        if (currentElement != null) {
+          currentElement.append(ch);
+        }
+        continue;
+      } else if (ch == ')') {
+        bracketLevel--;
+        if (currentElement != null) {
+          currentElement.append(ch);
+        }
+        continue;
+      } else if (bracketLevel != 0) {
+        if (bracketLevel < 0) {
+          throw new IllegalStateException("Uneven amount of brackets in: " + selectorStr);
+        }
+        if (currentElement != null) {
+          currentElement.append(ch);
+        }
+        continue;
+      }
+
+      var nextCombinator = tryParseCombinator(ch);
+      if (nextCombinator != null) {
+        selectorStack.push(parseElement(currentElement.toString()), combinator);
+        currentElement = null;
+        combinator = nextCombinator;
+        continue;
+      }
+
+      if (ch == ':' || ch == '.' || ch == '*' || ch == '#') {
+        if (currentElement != null) {
+          selectorStack.push(parseElement(currentElement.toString()), combinator);
+          combinator = Combinator.AND;
+        }
+        currentElement = new StringBuilder();
+        currentElement.append(ch);
+        continue;
+      }
+
+      // Type selectors
+      if (currentElement == null) {
+        currentElement = new StringBuilder();
+      }
+
+      currentElement.append(ch);
+    }
+
+    if (currentElement != null) {
+      selectorStack.push(parseElement(currentElement.toString()), combinator);
+    }
+
+    return selectorStack;
+  }
+
+  @Nullable
+  static Combinator tryParseCombinator(char ch) {
+    return switch (ch) {
+      case '>' -> new DescendantCombinator(true);
+      case ' ' -> new DescendantCombinator(false);
+      case '+' -> new SiblingCombinator(true);
+      case '~' -> new SiblingCombinator(false);
+      default -> null;
+    };
+  }
+
+  static SingleSelector parseElement(String part) {
+    if (part.startsWith(":")) {
+      var pseudoClass = part.substring(1);
+      var structural =
+          SingleSelector.parseStructural(pseudoClass, StyleSelectorParser::readSelectorList);
+      if (structural != null) {
+        return structural;
+      } else {
+        return SingleSelector.ofState(pseudoClass);
+      }
+    } else if (part.startsWith("*")) {
+      return SingleSelector.WILDCARD;
+    } else if (part.startsWith("#")) {
+      return SingleSelector.ofId(part.substring(1));
+    } else if (part.startsWith(".")) {
+      return SingleSelector.ofClass(part.substring(1));
+    } else {
+      return SingleSelector.ofType(part);
+    }
   }
 
   static String cleanSelector(String selector) {
@@ -68,7 +167,7 @@ class StyleSelectorParser {
 
         if (!isToken(cleanSelector.charAt(i + count))
             && !isToken(cleanSelector.charAt(i - 1))) {
-          cleanSelector.replace(i, i + count, ">>");
+          cleanSelector.replace(i, i + count, " ");
         } else {
           cleanSelector.delete(i, i + count);
         }
@@ -78,40 +177,9 @@ class StyleSelectorParser {
     return cleanSelector.toString();
   }
 
-  static StyleSelector parseHierarchic(String selector) {
-    var direct = selector.charAt(selector.lastIndexOf('>') - 1) != '>';
-    var split = selector.split("[>]+(?=[^>]*$)");
-    if (split.length != 2) {
-      throw new IllegalStateException("Invalid selector: " + selector);
-    }
-    return new StyleSelectorHierarchic(readSingleSelector(split[0]),
-        parseSimple(split[1]), direct);
-  }
-
-  static StyleSelector parseSimple(String selectorStr) {
-    var selector = new SimpleStyleSelector();
-    for (var part : selectorStr.split("(?=[.#:])")) {
-      if (part.startsWith(":")) {
-        var pseudoClass = part.substring(1);
-        if (ElementMatcher.isStructural(pseudoClass)) {
-          selector.addMatcher(ElementMatcher.parseStructural(pseudoClass));
-        } else {
-          selector.addSingleState(States.get(pseudoClass).getAsInt());
-        }
-      } else if (part.startsWith("*")) {
-        selector.addMatcher(ElementMatcher.WILDCARD);
-      } else if (part.startsWith("#")) {
-        selector.addMatcher(ElementMatcher.ofId(part.substring(1)));
-      } else if (part.startsWith(".")) {
-        selector.addMatcher(ElementMatcher.ofClass(part.substring(1)));
-      } else {
-        selector.addMatcher(ElementMatcher.ofType(part));
-      }
-    }
-    return selector;
-  }
-
   static boolean isToken(char c) {
-    return StringUtils.contains(">", c);
+    return c == '>'
+        || c == '+'
+        || c == '~';
   }
 }

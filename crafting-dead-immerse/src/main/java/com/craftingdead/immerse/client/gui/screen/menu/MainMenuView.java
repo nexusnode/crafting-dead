@@ -16,24 +16,11 @@
  * https://craftingdead.net/terms.php
  */
 
-/**
- * Crafting Dead Copyright (C) 2020 Nexus Node
- *
- * This program is free software: you can redistribute it and/or modify it under the terms of the
- * GNU General Public License as published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License along with this program. If
- * not, see <http://www.gnu.org/licenses/>.
- */
 package com.craftingdead.immerse.client.gui.screen.menu;
 
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
+import org.jetbrains.annotations.Nullable;
 import com.craftingdead.core.tags.ModItemTags;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.inventory.ModEquipmentSlot;
@@ -44,12 +31,13 @@ import com.craftingdead.immerse.client.gui.screen.menu.play.PlayView;
 import com.craftingdead.immerse.client.gui.view.EntityView;
 import com.craftingdead.immerse.client.gui.view.FogView;
 import com.craftingdead.immerse.client.gui.view.ParentView;
-import com.craftingdead.immerse.client.gui.view.Tooltip;
+import com.craftingdead.immerse.client.gui.view.TextView;
 import com.craftingdead.immerse.client.gui.view.View;
 import com.craftingdead.immerse.client.gui.view.ViewScreen;
 import net.minecraft.client.gui.screens.OptionsScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
@@ -74,42 +62,32 @@ public class MainMenuView extends ParentView {
 
     var sideBar = new ParentView(new Properties().id("side-bar").styleClasses("blur"));
 
-    var homeButton = Theme.createImageButton(
+    sideBar.addChild(this.createButton(
         new ResourceLocation(CraftingDeadImmerse.ID, "textures/gui/logo.svg"),
-        () -> this.transitionTo(homeView),
-        new Properties()
-            .id("home")
-            .tooltip(new Tooltip(new TranslatableComponent("menu.home_button"))));
-    sideBar.addChild(homeButton);
+        new Properties().id("home"),
+        new TranslatableComponent("menu.home_button"),
+        () -> this.transitionTo(homeView)));
 
     sideBar.addChild(Theme.newSeparator());
 
-    var playButton = Theme.createImageButton(
+    sideBar.addChild(this.createButton(
         new ResourceLocation(CraftingDeadImmerse.ID, "textures/gui/play.svg"),
-        () -> this.transitionTo(playView),
-        new Properties()
-            .id("play")
-            .styleClasses("grow-button")
-            .tooltip(new Tooltip(new TranslatableComponent("menu.play_button"))));
-    sideBar.addChild(playButton);
+        new Properties().id("play").styleClasses("grow-button"),
+        new TranslatableComponent("menu.play_button"),
+        () -> this.transitionTo(playView)));
 
-    var settingsButton = Theme.createImageButton(
+    sideBar.addChild(this.createButton(
         new ResourceLocation(CraftingDeadImmerse.ID, "textures/gui/settings.svg"),
+        new Properties().id("settings").styleClasses("grow-button"),
+        new TranslatableComponent("menu.options"),
         () -> this.getScreen().keepOpenAndSetScreen(
-            new OptionsScreen(this.getScreen(), this.minecraft.options)),
-        new Properties()
-            .id("settings")
-            .styleClasses("grow-button")
-            .tooltip(new Tooltip(new TranslatableComponent("menu.options"))));
-    sideBar.addChild(settingsButton);
+            new OptionsScreen(this.getScreen(), this.minecraft.options))));
 
-    var quitButton = Theme.createImageButton(
+    sideBar.addChild(this.createButton("quit-container",
         new ResourceLocation(CraftingDeadImmerse.ID, "textures/gui/power.svg"),
-        this.minecraft::stop,
-        new Properties()
-            .id("quit")
-            .styleClasses("grow-button"));
-    sideBar.addChild(quitButton);
+        new Properties().id("quit").styleClasses("grow-button"),
+        new TranslatableComponent("menu.quit"),
+        this.minecraft::stop));
 
     var fakePlayerEntity = new FakePlayer(this.minecraft.getUser().getGameProfile());
 
@@ -131,6 +109,23 @@ public class MainMenuView extends ParentView {
     this.addChild(sideBar);
 
     this.contentContainer.addChild(homeView);
+  }
+
+  private View createButton(ResourceLocation imageLocation, Properties properties,
+      FormattedText tooltip, Runnable actionListener) {
+    return this.createButton(null, imageLocation, properties, tooltip, actionListener);
+  }
+
+  private View createButton(@Nullable String containerId, ResourceLocation imageLocation,
+      Properties properties, FormattedText tooltip, Runnable actionListener) {
+    var buttonContainer =
+        new ParentView(new Properties().id(containerId).styleClasses("tooltip-container"));
+    buttonContainer.addChild(Theme.createImageButton(imageLocation,
+        actionListener, properties));
+    var tooltipView = new ParentView(new Properties().styleClasses("tooltip"));
+    tooltipView.addChild(new TextView(new Properties()).setText(tooltip));
+    buttonContainer.addChild(tooltipView);
+    return buttonContainer;
   }
 
   private void transitionTo(View view) {

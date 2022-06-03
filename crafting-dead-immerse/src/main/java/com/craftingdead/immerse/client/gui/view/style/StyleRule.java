@@ -18,28 +18,7 @@
 
 package com.craftingdead.immerse.client.gui.view.style;
 
-import java.util.ArrayList;
-import java.util.List;
-import com.craftingdead.immerse.client.gui.view.style.selector.StyleSelector;
+import java.util.Set;
+import com.craftingdead.immerse.client.gui.view.style.selector.Selector;
 
-public record StyleRule(StyleSelector selectorList, List<StyleProperty> properties) {
-
-  public StyleRule(StyleSelector selectorList) {
-    this(selectorList, new ArrayList<>());
-  }
-
-  public void mergeProperties(Iterable<StyleProperty> properties) {
-    properties.forEach(rule -> {
-      if (this.properties.stream().noneMatch(other -> other.name().equals(rule.name()))) {
-        this.addProperty(rule);
-      }
-    });
-  }
-
-  public StyleRule addProperty(StyleProperty rule) {
-    if (!this.properties.contains(rule)) {
-      this.properties.add(rule);
-    }
-    return this;
-  }
-}
+public record StyleRule(Selector selector, Set<StyleProperty> properties) {}

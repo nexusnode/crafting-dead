@@ -20,6 +20,7 @@ package com.craftingdead.immerse.client.gui.view;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import com.craftingdead.immerse.client.gui.view.layout.Layout;
 import com.craftingdead.immerse.client.gui.view.style.StyleList;
 import com.craftingdead.immerse.client.gui.view.style.StyleSheetManager;
@@ -37,7 +38,7 @@ public final class ViewScreen extends Screen {
 
   private StyleList styleList;
 
-  private View lastHovered;
+  private View hovered;
 
   private boolean keepOpen;
 
@@ -113,41 +114,28 @@ public final class ViewScreen extends Screen {
   }
 
   private void updateHovered(double mouseX, double mouseY) {
-    var keepLastHovered = false;
-    View hovered = this.root.isMouseOver(mouseX, mouseY) ? this.root : null;
-    while (hovered instanceof ParentView parent) {
-      var nextHovered = parent
-          .getChildAt(mouseX, mouseY)
-          .filter(View.class::isInstance)
-          .map(View.class::cast)
-          .orElse(null);
-
-      if (nextHovered == null) {
-        break;
+    var keepLastHovered = new AtomicBoolean();
+    var hovered = this.root.hover(mouseX, mouseY, view -> {
+      if (view == this.hovered) {
+        keepLastHovered.setPlain(true);
       }
 
-      hovered = nextHovered;
-
-      if (hovered == this.lastHovered) {
-        keepLastHovered = true;
+      if (!view.isHovered()) {
+        view.mouseEntered(mouseX, mouseY);
       }
+    });
 
-      if (!hovered.isHovered()) {
-        hovered.mouseEntered(mouseX, mouseY);
+    if (!keepLastHovered.getPlain()) {
+      while (this.hovered != null
+          && (!this.hovered.isAdded()
+              || !this.hovered.isMouseOver(mouseX, mouseY)
+              || (hovered != null && hovered.compareTo(this.hovered) > 0))) {
+        this.hovered.mouseLeft(mouseX, mouseY);
+        this.hovered = this.hovered.getParent();
       }
     }
 
-    if (!keepLastHovered) {
-      while (this.lastHovered != null
-          && (!this.lastHovered.isAdded()
-              || !this.lastHovered.isMouseOver(mouseX, mouseY)
-              || (hovered != null && hovered.compareTo(this.lastHovered) > 0))) {
-        this.lastHovered.mouseLeft(mouseX, mouseY);
-        this.lastHovered = this.lastHovered.getParent();
-      }
-    }
-
-    this.lastHovered = hovered;
+    this.hovered = hovered;
   }
 
   @Override
@@ -158,9 +146,15 @@ public final class ViewScreen extends Screen {
 
   @Override
   public boolean mouseScrolled(double mouseX, double mouseY, double scrollDelta) {
-    var result = this.root.mouseScrolled(mouseX, mouseY, scrollDelta);
+    var view = this.hovered;
+    while (view != null) {
+      if (view.mouseScrolled(mouseX, mouseY, scrollDelta)) {
+        break;
+      }
+      view = view.getParent();
+    }
     this.updateHovered(mouseX, mouseY);
-    return result;
+    return true;
   }
 
   @Override
@@ -178,6 +172,7 @@ public final class ViewScreen extends Screen {
     }
     this.root.tick();
   }
+
 
   @Override
   public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTicks) {

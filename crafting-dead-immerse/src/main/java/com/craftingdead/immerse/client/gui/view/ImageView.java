@@ -25,7 +25,6 @@ import org.slf4j.Logger;
 import com.craftingdead.immerse.client.gui.view.layout.Layout;
 import com.craftingdead.immerse.client.gui.view.layout.MeasureMode;
 import com.craftingdead.immerse.client.util.RenderUtil;
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.logging.LogUtils;
 import io.github.humbleui.skija.BlendMode;
@@ -33,8 +32,9 @@ import io.github.humbleui.skija.ColorFilter;
 import io.github.humbleui.skija.Data;
 import io.github.humbleui.skija.Image;
 import io.github.humbleui.skija.Paint;
+import io.github.humbleui.skija.PaintMode;
 import io.github.humbleui.skija.svg.SVGDOM;
-import net.minecraft.client.renderer.GameRenderer;
+import io.github.humbleui.types.Rect;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.phys.Vec2;
 
@@ -125,33 +125,42 @@ public class ImageView extends View {
   public void renderContent(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
     super.renderContent(matrixStack, mouseX, mouseY, partialTicks);
 
-    if (this.image != null) {
+    if (this.image == null) {
       this.skia.begin();
       {
-        var canvas = this.skia.canvas();
-        canvas.translate(
-            this.getScaledContentX() * (float) this.window.getGuiScale(),
-            this.getScaledContentY() * (float) this.window.getGuiScale());
-        canvas.scale(this.getXScale(), this.getYScale());
-
         try (var paint = new Paint()) {
-          paint.setColorFilter(
-              ColorFilter.makeBlend(this.getStyle().color.get().valueHex(),
-                  BlendMode.MODULATE));
-          this.image.draw(canvas, paint);
-
+          paint.setAlphaf(this.getAlpha()).setColor(0xFFFFFF).setMode(PaintMode.FILL);
+          var scale = (float) this.window.getGuiScale();
+          this.skia.canvas().drawRect(Rect.makeXYWH(
+              this.getScaledContentX() * scale,
+              this.getScaledContentY() * scale,
+              this.getScaledContentWidth() * scale,
+              this.getScaledContentHeight() * scale), paint);
         }
-        canvas.resetMatrix();
-
       }
       this.skia.end();
-    } else {
-      RenderSystem.setShader(GameRenderer::getPositionColorShader);
-      RenderUtil.fill(matrixStack, this.getScaledContentX(), this.getScaledContentY(),
-          this.getScaledX() + this.getScaledContentWidth(),
-          this.getScaledContentY() + this.getScaledContentHeight(),
-          0xFFFFFFFF);
+      return;
     }
+
+    this.skia.begin();
+    {
+      var canvas = this.skia.canvas();
+
+      canvas.translate(
+          this.getScaledContentX() * (float) this.window.getGuiScale(),
+          this.getScaledContentY() * (float) this.window.getGuiScale());
+      canvas.scale(this.getXScale(), this.getYScale());
+
+      try (var paint = new Paint()) {
+        paint.setColorFilter(ColorFilter.makeBlend(
+            RenderUtil.multiplyAlpha(this.getStyle().color.get().valueHex(), this.getAlpha()),
+            BlendMode.MODULATE));
+        this.image.draw(canvas, paint);
+      }
+      canvas.resetMatrix();
+
+    }
+    this.skia.end();
   }
 
   @Override

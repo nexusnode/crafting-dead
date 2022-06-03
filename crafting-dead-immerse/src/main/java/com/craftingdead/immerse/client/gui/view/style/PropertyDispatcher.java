@@ -18,25 +18,26 @@
 
 package com.craftingdead.immerse.client.gui.view.style;
 
-import java.util.Collection;
-import java.util.function.Predicate;
+import java.util.Set;
 import com.craftingdead.immerse.client.gui.view.property.Transition;
 import com.craftingdead.immerse.client.gui.view.style.selector.StyleNodeState;
-import com.google.common.base.Predicates;
 
+/**
+ * An abstract style property which may dispatch to multiple properties or just a single property.
+ * 
+ * @author Sm0keySa1m0n
+ *
+ * @param <T> - proeprty type
+ */
 public interface PropertyDispatcher<T> {
 
   void setTransition(Transition transition);
 
-  void clearTrackedNodes();
+  void defineState(String value, int specificity, Set<StyleNodeState> nodeStates);
 
-  boolean defineState(StyleSource source, String style, Collection<StyleNodeState> states);
+  void refreshState();
 
-  default void reset() {
-    this.reset(Predicates.alwaysTrue());
-  }
-
-  void reset(Predicate<StyleSource> filter);
+  void reset();
 
   default int validate(String style) {
     return style.length();

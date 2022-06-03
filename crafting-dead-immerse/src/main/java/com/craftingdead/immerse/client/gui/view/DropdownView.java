@@ -25,6 +25,7 @@ import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 import com.craftingdead.immerse.client.gui.view.event.ActionEvent;
 import com.craftingdead.immerse.client.gui.view.layout.MeasureMode;
+import com.craftingdead.immerse.client.gui.view.style.States;
 import com.craftingdead.immerse.client.util.RenderUtil;
 import com.mojang.blaze3d.vertex.PoseStack;
 import io.github.humbleui.skija.Font;
@@ -219,6 +220,17 @@ public class DropdownView extends View implements ContainerEventHandler {
       }
     }
     return super.mouseClicked(mouseX, mouseY, button);
+  }
+
+  @Override
+  public boolean changeFocus(boolean forward) {
+    if (this.isFocused() && this.expanded) {
+      this.getStyleManager().addState(States.FOCUS_VISIBLE);
+      this.getStyleManager().notifyListeners();
+      this.toggleExpanded();
+      return true;
+    }
+    return super.changeFocus(forward);
   }
 
   @Override

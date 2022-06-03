@@ -18,45 +18,40 @@
 
 package com.craftingdead.immerse.client.gui.view.property;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
+import java.util.NavigableSet;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.function.Consumer;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
-import java.util.stream.Stream;
-import org.apache.commons.lang3.mutable.MutableInt;
 import org.jetbrains.annotations.Nullable;
-import com.craftingdead.immerse.client.gui.view.style.StyleNode;
 import com.craftingdead.immerse.client.gui.view.style.PropertyDispatcher;
-import com.craftingdead.immerse.client.gui.view.style.StyleSource;
+import com.craftingdead.immerse.client.gui.view.style.StyleNode;
 import com.craftingdead.immerse.client.gui.view.style.parser.value.ValueParser;
 import com.craftingdead.immerse.client.gui.view.style.parser.value.ValueParserRegistry;
 import com.craftingdead.immerse.client.gui.view.style.selector.StyleNodeState;
-import com.craftingdead.immerse.client.gui.view.style.state.StateListener;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
 
-public class StyleableProperty<T> extends BaseProperty<T>
-    implements StateListener, PropertyDispatcher<T> {
+public class StyleableProperty<T> extends BaseProperty<T> implements PropertyDispatcher<T> {
+
+  private final StateDefinition<T> baseDefinition;
 
   private final StyleNode owner;
-
-  private final Int2ObjectMap<StyleSource> sources = new Int2ObjectOpenHashMap<>();
 
   private final Map<String, T> styleCache = new HashMap<>();
 
   private final ValueParser<T> parser;
 
-  private final Int2ObjectMap<T> stateValues = new Int2ObjectOpenHashMap<>();
+  private final Set<StyleNode> trackedNodes = new ReferenceOpenHashSet<>();
 
-  private final Map<StyleNode, MutableInt> trackedStates = new HashMap<>();
+  private final NavigableSet<StateDefinition<T>> definitions = new TreeSet<>();
 
   private Transition transition = Transition.INSTANT;
 
   @Nullable
   private Runnable transitionStopListener;
+
+  private int order;
 
   @SafeVarargs
   public StyleableProperty(StyleNode owner, String name, Class<T> type, T defaultValue,
@@ -64,20 +59,15 @@ public class StyleableProperty<T> extends BaseProperty<T>
     super(name, type, defaultValue, listeners);
     this.owner = owner;
     this.parser = ValueParserRegistry.getInstance().getParser(type);
-    this.stateValues.put(0, defaultValue);
-  }
-
-  @Override
-  public final void clearTrackedNodes() {
-    this.trackedStates.keySet().forEach(node -> node.getStateManager().removeListener(this));
-    this.trackedStates.clear();
+    this.baseDefinition = new StateDefinition<>(0, 0, defaultValue, Set.of());
+    this.addOrReplace(this.baseDefinition);
   }
 
   /**
-   * Varargs version of {@link #defineState(Object, Stream)}.
+   * Varargs version of {@link #defineState(Object, Set)}.
    */
   public final void defineState(T value, StyleNodeState... states) {
-    this.defineState(value, Stream.of(states));
+    this.defineState(value, Set.of(states));
   }
 
   /**
@@ -86,38 +76,17 @@ public class StyleableProperty<T> extends BaseProperty<T>
    * @param value - the value to associate the state with
    * @param states - the state
    */
-  public void defineState(T value, Stream<StyleNodeState> states) {
-    this.defineState(StyleSource.CODE, () -> value, states);
+  public void defineState(T value, Set<StyleNodeState> states) {
+    this.defineState(1000, value, states);
   }
 
-  /**
-   * Internal method used to associate a value with a given state.
-   * 
-   * @param state - the state
-   * @param value - the value to associate the state with
-   */
-  protected final void setState(int state, T value) {
-    if (state == 0) {
-      this.set(value);
-    }
-    this.stateValues.put(state, value);
+  private void defineState(int specificity, T value, Set<StyleNodeState> nodeStates) {
+    this.addOrReplace(new StateDefinition<>(this.order++, specificity, value, nodeStates));
   }
 
-  /**
-   * Internal method used to reset a specific state.
-   * 
-   * @param state - the state to reset
-   */
-  protected final void resetState(int state) {
-    if (state == 0) {
-      this.setState(state, this.getDefaultValue());
-    } else {
-      this.stateValues.remove(state);
-    }
-  }
-
-  public final Transition getTransition() {
-    return this.transition;
+  private void addOrReplace(StateDefinition<T> definition) {
+    this.definitions.remove(definition);
+    this.definitions.add(definition);
   }
 
   @Override
@@ -126,80 +95,76 @@ public class StyleableProperty<T> extends BaseProperty<T>
   }
 
   @Override
-  public boolean transition(StyleNodeState state) {
-    var trackedState = this.trackedStates.get(state.node());
-    if (trackedState == null) {
-      throw new IllegalStateException("Invalid node: " + state.node());
-    }
-
-    trackedState.setValue(state.getCombinedState());
-
-    int combinedState = 0;
-    for (var otherState : this.trackedStates.entrySet()) {
-      combinedState += otherState.getValue().intValue();
-    }
-
-    T newValue = this.stateValues.get(combinedState);
-    if (newValue == null) {
-      return false;
-    }
-
-    if (this.transitionStopListener != null) {
-      this.transitionStopListener.run();
-    }
-
-    if (!Objects.equals(newValue, this.getDirect())) {
-      if (this.owner.isVisible()) {
-        this.transitionStopListener = this.transition.transition(this, newValue);
-      } else {
-        this.set(newValue);
-      }
-    }
-
-    return true;
+  public void defineState(String value, int specificity, Set<StyleNodeState> nodeStates) {
+    nodeStates.stream()
+        .map(StyleNodeState::node)
+        .filter(this.trackedNodes::add)
+        .forEach(node -> node.getStyleManager().addListener(this));
+    this.defineState(specificity,
+        this.styleCache.computeIfAbsent(value, this.parser::parse), nodeStates);
   }
 
   @Override
-  public boolean defineState(StyleSource source, String style, Collection<StyleNodeState> states) {
-    return this.defineState(source,
-        () -> this.styleCache.computeIfAbsent(style, this.parser::parse), states.stream());
-  }
+  public final void refreshState() {
+    for (var definition : this.definitions) {
+      if (!definition.nodeStates().stream().allMatch(StyleNodeState::check)) {
+        continue;
+      }
 
-  private boolean defineState(StyleSource source, Supplier<T> style,
-      Stream<StyleNodeState> states) {
-    var state = states
-        .peek(nodeState -> this.trackNode(nodeState.node()))
-        .mapToInt(StyleNodeState::getCombinedState)
-        .sum();
-    var current = this.sources.get(state);
-    if (current == null || source.compareTo(current) > -1) {
-      this.sources.put(state, source);
-      this.setState(state, style.get());
-      return true;
-    }
-    return false;
-  }
+      if (this.transitionStopListener != null) {
+        this.transitionStopListener.run();
+      }
 
-  private void trackNode(StyleNode node) {
-    var v = this.trackedStates.putIfAbsent(node, new MutableInt());
-    if (v != node) {
-      node.getStateManager().addListener(this);
+      var newValue = definition.value();
+      if (!newValue.equals(this.getDirect())) {
+        if (this.owner.isVisible()) {
+          this.transitionStopListener = this.transition.transition(this, newValue);
+        } else {
+          this.set(newValue);
+        }
+      }
+      return;
     }
   }
 
   @Override
-  public void reset(Predicate<StyleSource> filter) {
-    this.sources.int2ObjectEntrySet().removeIf(entry -> {
-      if (filter.test(entry.getValue())) {
-        this.resetState(entry.getIntKey());
-        return true;
-      }
-      return false;
-    });
+  public final void reset() {
+    this.trackedNodes.forEach(node -> node.getStyleManager().removeListener(this));
+    this.trackedNodes.clear();
+    this.definitions.clear();
+    this.order = 0;
+    this.addOrReplace(this.baseDefinition);
   }
 
   @Override
   public int validate(String style) {
     return this.parser.validate(style);
+  }
+
+  public record StateDefinition<T> (int order, int specificity, T value,
+      Set<StyleNodeState> nodeStates) implements Comparable<StateDefinition<T>> {
+
+    @Override
+    public int compareTo(StateDefinition<T> o) {
+      /*
+       * Order of comparison: State count -> specificity -> node states -> order
+       */
+
+      var result = Integer.compare(o.nodeStates.size(), this.nodeStates.size());
+      if (result != 0) {
+        return result;
+      }
+
+      result = Integer.compare(o.specificity, this.specificity);
+      if (result != 0) {
+        return result;
+      }
+
+      if (!this.nodeStates.equals(o.nodeStates)) {
+        return -1;
+      }
+
+      return Integer.compare(o.order, this.order);
+    }
   }
 }

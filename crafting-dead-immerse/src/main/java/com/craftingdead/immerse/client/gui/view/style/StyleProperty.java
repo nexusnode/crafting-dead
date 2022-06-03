@@ -18,4 +18,15 @@
 
 package com.craftingdead.immerse.client.gui.view.style;
 
-public record StyleProperty(String name, String value) {}
+public record StyleProperty(String name, String value) {
+
+  @Override
+  public boolean equals(Object obj) {
+    return obj == this || obj instanceof StyleProperty that && this.name.equals(that.name);
+  }
+
+  @Override
+  public int hashCode() {
+    return this.name.hashCode();
+  }
+}

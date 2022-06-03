@@ -24,14 +24,15 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
-import org.jetbrains.annotations.Nullable;
 import org.bson.types.ObjectId;
+import org.jetbrains.annotations.Nullable;
 import com.craftingdead.immerse.client.gui.screen.Theme;
 import com.craftingdead.immerse.client.gui.view.Color;
 import com.craftingdead.immerse.client.gui.view.ParentView;
 import com.craftingdead.immerse.client.gui.view.TextView;
 import com.craftingdead.immerse.client.gui.view.View;
 import com.google.common.collect.Sets;
+import io.github.humbleui.skija.FontMgr;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
@@ -185,9 +186,7 @@ public class InvitesView extends ParentView {
 
       this.totalMembersView = new TextView(new Properties());
       this.onlineMemebrsView = new TextView(new Properties());
-      this.onlineMemebrsView.getStyle().color.defineState(Theme.ONLINE);
       this.offlineMemebrsView = new TextView(new Properties());
-      this.offlineMemebrsView.getStyle().color.defineState(Color.GRAY);
 
       this.addChild(new TextView(new Properties())
           .setText(new TextComponent(this.invite.guild().name())
@@ -209,6 +208,12 @@ public class InvitesView extends ParentView {
                 new TextComponent("Invited by " + this.invite.sender().minecraftProfile().name())
                     .withStyle(ChatFormatting.ITALIC)));
       }
+    }
+
+    @Override
+    public void styleRefreshed(FontMgr fontManager) {
+      this.onlineMemebrsView.getStyle().color.defineState(Theme.ONLINE);
+      this.offlineMemebrsView.getStyle().color.defineState(Color.GRAY);
     }
 
     @Override

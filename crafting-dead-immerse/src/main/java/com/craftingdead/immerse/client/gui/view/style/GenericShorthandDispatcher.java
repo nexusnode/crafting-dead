@@ -19,8 +19,7 @@
 package com.craftingdead.immerse.client.gui.view.style;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.function.Predicate;
+import java.util.Set;
 import com.craftingdead.immerse.client.gui.view.property.Transition;
 import com.craftingdead.immerse.client.gui.view.style.selector.StyleNodeState;
 
@@ -35,9 +34,8 @@ public class GenericShorthandDispatcher implements PropertyDispatcher<String> {
   }
 
   @Override
-  public boolean defineState(StyleSource source, String rawValue,
-      Collection<StyleNodeState> states) {
-    var current = rawValue;
+  public void defineState(String value, int specificity, Set<StyleNodeState> nodeStates) {
+    var current = value;
     var alreadySet = new ArrayList<PropertyDispatcher<?>>();
 
     while (!current.isEmpty()) {
@@ -50,7 +48,7 @@ public class GenericShorthandDispatcher implements PropertyDispatcher<String> {
         var validated = child.validate(current);
 
         if (validated != 0) {
-          child.defineState(source, current.substring(0, validated), states);
+          child.defineState(current.substring(0, validated), specificity, nodeStates);
           current = current.substring(validated).trim();
 
           alreadySet.add(child);
@@ -60,14 +58,16 @@ public class GenericShorthandDispatcher implements PropertyDispatcher<String> {
       }
 
       if (!anySet) {
-        return false;
+        return;
       }
     }
-    return true;
   }
 
   @Override
-  public void reset(Predicate<StyleSource> filter) {}
+  public void refreshState() {}
+
+  @Override
+  public void reset() {}
 
   @Override
   public String getName() {
@@ -78,13 +78,6 @@ public class GenericShorthandDispatcher implements PropertyDispatcher<String> {
   public void setTransition(Transition transition) {
     for (var dispatcher : this.dispatchers) {
       dispatcher.setTransition(transition);
-    }
-  }
-
-  @Override
-  public void clearTrackedNodes() {
-    for (var dispatcher : this.dispatchers) {
-      dispatcher.clearTrackedNodes();
     }
   }
 }

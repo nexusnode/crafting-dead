@@ -24,9 +24,12 @@
 
 #quit {
     margin: 5;
-    margin-top: auto;
     width: 12;
     aspect-ratio: 1;
+}
+
+#quit-container {
+    margin-top: auto;
 }
 
 MainMenuView {
@@ -50,7 +53,6 @@ MainMenuView>#side-bar {
     height: 100%;
     width: 32;
     position: absolute;
-    align-items: center;
     background-color: rgba(119, 119, 119, 0.35);
     border-right-color: rgba(181, 181, 181, 0.5);
 }
@@ -109,8 +111,6 @@ PlayView>#content>* {
 
 PlayView>#content>#official>TabsView {
     height: 20;
-    z-index: 5;
-    flex-shrink: 0;
 }
 
 PlayView>#content>#official>#official-content {
@@ -123,6 +123,7 @@ PlayView>#title {
     padding-bottom: 6;
     margin-left: 10;
     font-size: 14;
+    font-family: 'Stratum2 Regular';
 }
 
 PlayView>DropdownView {
@@ -154,8 +155,6 @@ WorldListView>#controls {
 ServerListView>#controls>*,
 MutableServerListView>#controls>*,
 WorldListView>#controls>* {
-    flex-grow: 1;
-    flex-shrink: 0;
     width: 220;
     flex-direction: row;
     align-items: center;
@@ -166,6 +165,7 @@ ServerListView>#controls>ParentView>*,
 MutableServerListView>#controls>ParentView>*,
 WorldListView>#controls>ParentView>* {
     margin: 3;
+    flex-basis: 0;
 }
 
 ServerListView>#content,
@@ -189,6 +189,7 @@ ServerItemView {
     justify-content: flex-end;
     align-items: center;
     flex-shrink: 0;
+    box-sizing: border-box;
 }
 
 ServerItemView>TextView {
@@ -228,6 +229,7 @@ WorldItemView {
     padding: 4;
     flex-direction: row;
     flex-shrink: 0;
+    box-sizing: border-box;
 }
 
 WorldItemView>#icon {

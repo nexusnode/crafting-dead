@@ -35,6 +35,7 @@ import com.craftingdead.immerse.client.fake.FakePlayer;
 import com.craftingdead.immerse.client.gui.IngameGui;
 import com.craftingdead.immerse.client.gui.screen.menu.MainMenuView;
 import com.craftingdead.immerse.client.gui.view.Skia;
+import com.craftingdead.immerse.client.gui.view.ViewScreen;
 import com.craftingdead.immerse.client.gui.view.style.StyleSheetManager;
 import com.craftingdead.immerse.client.renderer.BlueprintOutlineRenderer;
 import com.craftingdead.immerse.client.renderer.SpectatorRenderer;
@@ -331,11 +332,11 @@ public class ClientDist implements ModDist {
 
     if (event.getScreen() instanceof TitleScreen
         || event.getScreen() instanceof JoinMultiplayerScreen) {
-      // if (this.minecraft.screen instanceof ViewScreen screen
-      // && screen.getRoot() instanceof MainMenuView) {
-      // event.setCanceled(true);
-      // return;
-      // }
+      if (this.minecraft.screen instanceof ViewScreen screen
+          && screen.getRoot() instanceof MainMenuView) {
+        event.setCanceled(true);
+        return;
+      }
       event.setScreen(MainMenuView.createScreen());
     }
   }
