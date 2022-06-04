@@ -21,7 +21,6 @@ package com.craftingdead.immerse.client.gui.view;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL14;
-import org.lwjgl.opengl.GL30;
 import org.lwjgl.opengl.GL33;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -37,7 +36,6 @@ import io.github.humbleui.skija.SurfaceColorFormat;
 import io.github.humbleui.skija.SurfaceOrigin;
 import io.github.humbleui.skija.SurfaceProps;
 import io.github.humbleui.types.Rect;
-import net.minecraft.client.Minecraft;
 
 public class Skia implements AutoCloseable {
 
@@ -48,10 +46,6 @@ public class Skia implements AutoCloseable {
 
   private Canvas canvas;
 
-  public int framebufferId = -1;
-  public int colorBuffer = -1;
-  public int depthBufferId = -1;
-
   public void init(RenderTarget renderTarget) {
     RenderSystem.assertOnRenderThread();
 
@@ -61,36 +55,12 @@ public class Skia implements AutoCloseable {
     }
     renderTarget.enableStencil();
 
-
-    if (this.framebufferId != -1) {
-      GL30.glDeleteFramebuffers(this.framebufferId);
-      GL30.glDeleteRenderbuffers(this.colorBuffer);
-      GL30.glDeleteRenderbuffers(this.depthBufferId);
-    }
-    this.framebufferId = GL30.glGenFramebuffers();
-    GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, framebufferId);
-
-    this.colorBuffer = GL30.glGenRenderbuffers();
-    GL30.glBindRenderbuffer(GL30.GL_RENDERBUFFER, colorBuffer);
-    GL30.glRenderbufferStorage(GL30.GL_RENDERBUFFER, GL30.GL_RGBA8, renderTarget.width,
-        renderTarget.height);
-    GL30.glFramebufferRenderbuffer(GL30.GL_FRAMEBUFFER, GL30.GL_COLOR_ATTACHMENT0,
-        GL30.GL_RENDERBUFFER, this.colorBuffer);
-
-    this.depthBufferId = GL30.glGenRenderbuffers();
-    GL30.glBindRenderbuffer(GL30.GL_RENDERBUFFER, depthBufferId);
-    GL30.glRenderbufferStorage(GL30.GL_RENDERBUFFER, GL30.GL_DEPTH24_STENCIL8, renderTarget.width,
-        renderTarget.height);
-    GL30.glFramebufferRenderbuffer(GL30.GL_FRAMEBUFFER, GL30.GL_DEPTH_STENCIL_ATTACHMENT,
-        GL30.GL_RENDERBUFFER, this.depthBufferId);
-
     this.closeRenderTarget();
     this.backendRenderTarget = BackendRenderTarget.makeGL(
-        Minecraft.getInstance().getWindow().getWidth(),
-        Minecraft.getInstance().getWindow().getHeight(),
-        /* samples */0,
-        /* stencil */8,
-        /* fbId */1,
+        renderTarget.width, renderTarget.height,
+        /* samples */ 0,
+        /* stencil */ 8,
+        renderTarget.frameBufferId,
         FramebufferFormat.GR_GL_RGBA8);
     this.surface = Surface.makeFromBackendRenderTarget(
         this.context,
