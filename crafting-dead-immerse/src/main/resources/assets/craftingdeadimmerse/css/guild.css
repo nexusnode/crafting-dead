@@ -72,6 +72,7 @@ GuildView>#side-bar>* {
     padding: 5;
     transition: 250ms color;
     text-align: center;
+    box-sizing: border-box;
 }
 
 GuildView>#side-bar>*:hover {

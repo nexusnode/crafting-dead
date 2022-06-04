@@ -1,146 +1,366 @@
-/*
- * Crafting Dead
- * Copyright (C) 2022  NexusNode LTD
- *
- * This Non-Commercial Software License Agreement (the "Agreement") is made between
- * you (the "Licensee") and NEXUSNODE (BRAD HUNTER). (the "Licensor").
- * By installing or otherwise using Crafting Dead (the "Software"), you agree to be
- * bound by the terms and conditions of this Agreement as may be revised from time
- * to time at Licensor's sole discretion.
- *
- * If you do not agree to the terms and conditions of this Agreement do not download,
- * copy, reproduce or otherwise use any of the source code available online at any time.
- *
- * https://github.com/nexusnode/crafting-dead/blob/1.18.x/LICENSE.txt
- *
- * https://craftingdead.net/terms.php
- */
-
 package com.craftingdead.immerse.client.gui.view;
 
-import java.util.Objects;
-import java.util.function.BiFunction;
+import java.lang.ref.Reference;
+import java.util.Arrays;
+import java.util.Optional;
 import java.util.function.Consumer;
-import java.util.function.Predicate;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
+import org.lwjgl.system.MemoryUtil;
 import com.craftingdead.immerse.client.util.RenderUtil;
-import com.mojang.blaze3d.platform.GlStateManager;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.Tesselator;
-import com.mojang.blaze3d.vertex.VertexFormat;
+import io.github.humbleui.skija.Canvas;
+import io.github.humbleui.skija.Font;
+import io.github.humbleui.skija.FontMgr;
+import io.github.humbleui.skija.FontStyle;
+import io.github.humbleui.skija.Paint;
+import io.github.humbleui.skija.PaintMode;
+import io.github.humbleui.skija.TextBlob;
+import io.github.humbleui.skija.TextLine;
+import io.github.humbleui.skija.Typeface;
+import io.github.humbleui.skija.impl.Native;
+import io.github.humbleui.skija.impl.Stats;
+import io.github.humbleui.skija.shaper.Shaper;
+import io.github.humbleui.types.Rect;
 import net.minecraft.SharedConstants;
-import net.minecraft.Util;
-import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.renderer.GameRenderer;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.Style;
-import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
 
 public class TextFieldView extends View {
 
-  private final Font font;
+  private static final int CARET_WIDTH = 1;
 
-  private String value = "";
-  private int maxLength = 32;
-  private int frame;
-  private boolean editable = true;
-  private boolean shiftPressed;
-  private int displayIndex;
-  private int cursorIndex;
-  private int highlightIndex;
+  private static long textSelectCursor = MemoryUtil.NULL;
+
+  private FontMgr fontManager = FontMgr.getDefault();
+  @Nullable
+  private Typeface typeface;
+
+  private String text = "";
+
+  private Font font;
+  private TextLine textLine;
+
+  private int selectionOffset;
+
+  private int caretIndex;
+
+  private int caretBlinkTicks;
+
+  private float xOffset = CARET_WIDTH;
+
+  private int maxLength;
 
   @Nullable
-  private Component placeholder;
-  private String suggestion;
   private Consumer<String> responder;
-  private Predicate<String> filter = Objects::nonNull;
-  private BiFunction<String, Integer, FormattedCharSequence> formatter =
-      (value, p_195610_1_) -> FormattedCharSequence.forward(value, Style.EMPTY);
+
+  @Nullable
+  private String placeholder;
 
   public TextFieldView(Properties properties) {
     super(properties.focusable(true));
-    this.font = this.minecraft.font;
   }
 
-  public TextFieldView setResponder(Consumer<String> responder) {
+  public String getText() {
+    return this.text;
+  }
+
+  public TextFieldView setMaxLength(int maxLength) {
+    this.maxLength = maxLength;
+    if (maxLength != 0 && this.text.length() > maxLength) {
+      this.setText(this.text);
+    }
+    return this;
+  }
+
+  public TextFieldView setResponder(@Nullable Consumer<String> responder) {
     this.responder = responder;
     return this;
   }
 
-  public TextFieldView setFormatter(BiFunction<String, Integer, FormattedCharSequence> formatter) {
-    this.formatter = formatter;
+  public TextFieldView setPlaceholder(@Nullable String placeholder) {
+    this.placeholder = placeholder;
     return this;
+  }
+
+  @Override
+  public void styleRefreshed(FontMgr fontManager) {
+    if (this.fontManager != FontMgr.getDefault()) {
+      this.fontManager.close();
+    }
+    this.fontManager = fontManager;
+
+    this.typeface = null;
+    for (var family : this.getStyle().fontFamily.get()) {
+      var fontSet = this.fontManager.matchFamily(family);
+      if (fontSet.count() > 0) {
+        this.typeface = fontSet.matchStyle(FontStyle.NORMAL);
+        break;
+      }
+    }
+
+    this.refreshTextLine();
   }
 
   @Override
   public void tick() {
     super.tick();
-    ++this.frame;
+    if (this.caretBlinkTicks++ >= SharedConstants.TICKS_PER_SECOND) {
+      this.caretBlinkTicks = 0;
+    }
   }
 
-  public void setValue(String value) {
-    if (this.filter.test(value)) {
-      if (value.length() > this.maxLength) {
-        this.value = value.substring(0, this.maxLength);
-      } else {
-        this.value = value;
+  @Override
+  public boolean changeFocus(boolean forward) {
+    if (super.changeFocus(forward)) {
+      this.selectAll();
+      return true;
+    }
+    return false;
+  }
+
+  @Override
+  protected void renderContent(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
+    super.renderContent(poseStack, mouseX, mouseY, partialTick);
+    this.skia.begin();
+    {
+      var canvas = this.skia.canvas();
+      var scale = (float) this.window.getGuiScale();
+
+      canvas.clipRect(Rect.makeXYWH(
+          this.getScaledContentX() * scale,
+          this.getScaledContentY() * scale,
+          this.getScaledContentWidth() * scale,
+          this.getScaledContentHeight() * scale));
+
+      var textColor = RenderUtil.multiplyAlpha(
+          this.getStyle().color.get().valueHex(), this.getAlpha());
+
+      canvas.translate((this.getScaledContentX() * scale) + this.xOffset, 0);
+
+      this.drawCaretOrSelection(canvas, textColor);
+
+      canvas.translate(0, this.getScaledContentY() * scale + this.textLine.getHeight()
+          + (this.getScaledContentHeight() * scale) / 2.0F
+          - this.textLine.getXHeight() * 2.0F);
+
+      if (this.text.length() > 0) {
+        try (var paint = new Paint()) {
+          paint.setColor(textColor);
+
+          if (this.selectionOffset == 0) {
+            canvas.drawTextLine(this.textLine, 0, 0, paint);
+          } else {
+            var glyphs = this.textLine.getGlyphs();
+            var positions = this.textLine.getPositions();
+
+            var startIndex = Math.min(this.caretIndex, this.getOffsetCaretIndex());
+            if (startIndex != 0) {
+              var headGlyphs = Arrays.copyOfRange(glyphs, 0, startIndex);
+              var headPositions = Arrays.copyOfRange(positions, 0, startIndex * 2);
+              try (var blob = makeBlobFromPos(headGlyphs, headPositions, this.font)) {
+                canvas.drawTextBlob(blob, 0, 0, paint);
+              }
+            }
+
+            var endIndex = Math.max(this.caretIndex, this.getOffsetCaretIndex());
+            if (endIndex != this.text.length()) {
+              var tailGlyphs = Arrays.copyOfRange(glyphs, endIndex, glyphs.length);
+              var tailPositions = Arrays.copyOfRange(positions, endIndex * 2, positions.length * 2);
+              try (var blob = makeBlobFromPos(tailGlyphs, tailPositions, this.font)) {
+                canvas.drawTextBlob(blob, 0, 0, paint);
+              }
+            }
+
+            var selectedGlyphs = Arrays.copyOfRange(glyphs, startIndex, endIndex);
+            var selectedPositions = Arrays.copyOfRange(positions, startIndex * 2, endIndex * 2);
+            try (var blob = makeBlobFromPos(selectedGlyphs, selectedPositions, this.font);
+                var selectedPaint = new Paint()) {
+              selectedPaint.setColor(0xFFFFFF).setAlphaf(this.getAlpha());
+              canvas.drawTextBlob(blob, 0, 0, selectedPaint);
+            }
+          }
+
+        }
+      } else if (this.placeholder != null) {
+        try (var paint = new Paint()) {
+          paint.setColor(0x808080).setAlphaf(this.getAlpha());
+          canvas.drawString(this.placeholder, 0, 0, this.font, paint);
+        }
       }
 
-      this.moveCursorToEnd();
-      this.setHighlightIndex(this.cursorIndex);
-      this.onValueChange(value);
+      canvas.resetMatrix();
+
+    }
+    this.skia.end();
+  }
+
+  private void drawCaretOrSelection(Canvas canvas, int textColor) {
+    if (!this.isFocused()) {
+      return;
+    }
+
+    var glyphs = this.textLine.getGlyphs();
+
+    var scale = (float) this.window.getGuiScale();
+    var caretX = 0.0F;
+    var lineHeight = this.textLine.getHeight() - this.textLine.getXHeight() / 2.0F;
+
+    if (glyphs.length != 0) {
+      var positions = this.textLine.getPositions();
+      var widths = this.font.getWidths(glyphs);
+      caretX = positions[Math.min(this.caretIndex, glyphs.length - 1) * 2];
+      if (this.caretIndex == glyphs.length) {
+        caretX += widths[glyphs.length - 1];
+      }
+
+      if (this.selectionOffset != 0) {
+        var selectLeft = 0.0F;
+        var selectRight = 0.0F;
+
+        var offsetIndex = this.getOffsetCaretIndex();
+
+        if (this.caretIndex < offsetIndex) {
+          selectLeft = caretX;
+          selectRight = positions[Math.min(offsetIndex, glyphs.length - 1) * 2];
+          if (offsetIndex == glyphs.length) {
+            selectRight += widths[glyphs.length - 1];
+          }
+        } else {
+          selectLeft = positions[offsetIndex * 2];
+          selectRight = caretX;
+        }
+
+        try (var paint = new Paint()) {
+          paint.setColor(0x3297FD).setAlphaf(this.getAlpha());
+          paint.setMode(PaintMode.FILL);
+          canvas.drawRect(Rect.makeLTRB(
+              selectLeft,
+              (this.getScaledContentY() * scale)
+                  + ((this.getScaledContentHeight() * scale) - lineHeight) / 2.0F,
+              selectRight, (this.getScaledContentY() * scale)
+                  + ((this.getScaledContentHeight() * scale) - lineHeight) / 2.0F + lineHeight),
+              paint);
+        }
+        return;
+      }
+    }
+
+    if (this.caretBlinkTicks >= 10) {
+      return;
+    }
+
+    // Draw caret
+    try (var paint = new Paint()) {
+      paint.setColor(textColor);
+      paint.setMode(PaintMode.FILL);
+      var caretWidth = CARET_WIDTH * scale;
+      canvas.drawRect(Rect.makeXYWH(
+          caretX - caretWidth / 2.0F,
+          (this.getScaledContentY() * scale)
+              + ((this.getScaledContentHeight() * scale) - lineHeight) / 2.0F,
+          caretWidth, lineHeight), paint);
     }
   }
 
-  public String getValue() {
-    return this.value;
-  }
-
-  public String getHighlighted() {
-    int startIndex =
-        this.cursorIndex < this.highlightIndex ? this.cursorIndex : this.highlightIndex;
-    int endIndex =
-        this.cursorIndex < this.highlightIndex ? this.highlightIndex : this.cursorIndex;
-    return this.value.substring(startIndex, endIndex);
-  }
-
-  public TextFieldView setFilter(Predicate<String> filter) {
-    this.filter = filter;
-    return this;
-  }
-
-  public void insertText(String text) {
-    int startIndex =
-        this.cursorIndex < this.highlightIndex ? this.cursorIndex : this.highlightIndex;
-    int endIndex =
-        this.cursorIndex < this.highlightIndex ? this.highlightIndex : this.cursorIndex;
-    int maxLength = this.maxLength - this.value.length() - (startIndex - endIndex);
-    String filteredText = SharedConstants.filterText(text);
-    int filteredLength = filteredText.length();
-    if (maxLength < filteredLength) {
-      filteredText = filteredText.substring(0, maxLength);
-      filteredLength = maxLength;
+  @Override
+  public boolean charTyped(char ch, int mods) {
+    if (!SharedConstants.isAllowedChatCharacter(ch)) {
+      return false;
     }
 
-    String newValue =
-        new StringBuilder(this.value).replace(startIndex, endIndex, filteredText).toString();
-    if (this.filter.test(newValue)) {
-      this.value = newValue;
-      this.setCursorIndex(startIndex + filteredLength);
-      this.setHighlightIndex(this.cursorIndex);
-      this.onValueChange(this.value);
+    if (this.selectionOffset != 0) {
+      this.deleteChars(this.selectionOffset);
+    }
+    this.insertText(Character.toString(ch));
+
+    return true;
+  }
+
+  @Override
+  public boolean keyPressed(int key, int scancode, int mods) {
+    if (Screen.isSelectAll(key)) {
+      this.selectAll();
+      return true;
+    } else if (Screen.isCopy(key)) {
+      this.getSelectedText().ifPresent(this.minecraft.keyboardHandler::setClipboard);
+      return true;
+    } else if (Screen.isPaste(key)) {
+      if (this.selectionOffset != 0) {
+        this.deleteChars(this.selectionOffset);
+      }
+      this.insertText(this.minecraft.keyboardHandler.getClipboard());
+      return true;
+    } else if (Screen.isCut(key)) {
+      this.getSelectedText().ifPresent(selected -> {
+        this.minecraft.keyboardHandler.setClipboard(selected);
+        this.deleteChars(this.selectionOffset);
+      });
+      return true;
+    }
+
+    switch (key) {
+      case GLFW.GLFW_KEY_BACKSPACE:
+        this.deleteText(this.selectionOffset == 0 ? -1 : this.selectionOffset);
+        return true;
+      case GLFW.GLFW_KEY_DELETE:
+        this.deleteText(this.selectionOffset == 0 ? 1 : this.selectionOffset);
+        return true;
+      case GLFW.GLFW_KEY_RIGHT: {
+        var select = Screen.hasShiftDown();
+        var word = Screen.hasControlDown();
+        if (select) {
+          this.setSelectionOffset(
+              word ? this.getRightWordIndex(1) - this.caretIndex : this.selectionOffset + 1);
+        } else {
+          this.setCaretIndex(
+              word ? this.getRightWordIndex(1)
+                  : this.selectionOffset != 0
+                      ? Math.max(this.getOffsetCaretIndex(), this.caretIndex)
+                      : this.caretIndex + 1);
+        }
+        return true;
+      }
+      case GLFW.GLFW_KEY_LEFT: {
+        var select = Screen.hasShiftDown();
+        var word = Screen.hasControlDown();
+        if (select) {
+          this.setSelectionOffset(
+              word ? this.getLeftWordIndex(1) - this.caretIndex : this.selectionOffset - 1);
+        } else {
+          this.setCaretIndex(
+              word ? this.getLeftWordIndex(1)
+                  : this.selectionOffset != 0
+                      ? Math.min(this.getOffsetCaretIndex(), this.caretIndex)
+                      : this.caretIndex - 1);
+        }
+        return true;
+      }
+      case GLFW.GLFW_KEY_HOME:
+        this.setCaretIndex(0);
+        return true;
+      case GLFW.GLFW_KEY_END:
+        this.setCaretIndex(this.text.length());
+        return true;
+      default:
+        return false;
     }
   }
 
-  private void onValueChange(String value) {
-    if (this.responder != null) {
-      this.responder.accept(value);
+  private Optional<String> getSelectedText() {
+    if (this.selectionOffset == 0) {
+      return Optional.empty();
     }
+    return Optional.of(this.selectionOffset < 0
+        ? this.text.substring(this.getOffsetCaretIndex(), this.caretIndex)
+        : this.text.substring(this.caretIndex, this.getOffsetCaretIndex()));
+  }
+
+  private void insertText(String text) {
+    var head = this.text.substring(0, this.caretIndex);
+    var tail = this.text.substring(this.caretIndex);
+    this.caretIndex += text.length();
+    this.setText(head + text + tail);
   }
 
   private void deleteText(int count) {
@@ -152,383 +372,275 @@ public class TextFieldView extends View {
   }
 
   public void deleteWords(int offset) {
-    if (!this.value.isEmpty()) {
-      if (this.highlightIndex != this.cursorIndex) {
-        this.insertText("");
-      } else {
-        this.deleteChars(this.getWordPosition(offset) - this.cursorIndex);
-      }
+    if (this.text.isEmpty()) {
+      return;
+    }
+
+    if (offset < 0) {
+      int wordIndex = this.getLeftWordIndex(offset);
+      var head = this.text.substring(0, wordIndex);
+      var tail = this.text.substring(this.caretIndex);
+      this.caretIndex = wordIndex;
+      this.setText(head + tail);
+      return;
+    }
+
+    if (offset > 0) {
+      var wordIndex = this.getRightWordIndex(offset);
+      var head = this.text.substring(0, this.caretIndex);
+      var tail = this.text.substring(wordIndex);
+      this.setText(head + tail);
     }
   }
 
-  public void deleteChars(int offset) {
-    if (!this.value.isEmpty()) {
-      if (this.highlightIndex != this.cursorIndex) {
-        this.insertText("");
-      } else {
-        int index = this.getCursorIndex(offset);
-        int minIndex = Math.min(index, this.cursorIndex);
-        int maxIndex = Math.max(index, this.cursorIndex);
-        if (minIndex != maxIndex) {
-          String newValue = new StringBuilder(this.value).delete(minIndex, maxIndex).toString();
-          if (this.filter.test(newValue)) {
-            this.value = newValue;
-            this.moveCursorTo(minIndex);
-          }
-        }
+  private int getRightWordIndex(int count) {
+    var wordCount = 0;
+    var lastSpace = false;
+    var startIndex = this.getOffsetCaretIndex();
+    for (int i = startIndex; i < this.text.length(); i++) {
+      var space = Character.isSpaceChar(this.text.charAt(i));
+      if (!space && lastSpace && ++wordCount >= count) {
+        return i;
+      }
+      lastSpace = space;
+
+      if (space) {
+        continue;
       }
     }
+
+    return this.text.length();
   }
 
-  public int getWordPosition(int offset) {
-    return this.getWordPosition(offset, this.getCursorPosition());
-  }
-
-  private int getWordPosition(int offset, int index) {
-    return this.getWordPosition(offset, index, true);
-  }
-
-  private int getWordPosition(int offset, int fromIndex, boolean p_146197_3_) {
-    int index = fromIndex;
-    boolean backward = offset < 0;
-    int count = Math.abs(offset);
-
-    for (int i = 0; i < count; ++i) {
-      if (!backward) {
-        int length = this.value.length();
-        index = this.value.indexOf(' ', index);
-        if (index == -1) {
-          index = length;
-        } else {
-          while (p_146197_3_ && index < length && this.value.charAt(index) == ' ') {
-            ++index;
-          }
+  private int getLeftWordIndex(int count) {
+    int index = 0;
+    var wordCount = 0;
+    var lastSpace = true;
+    var fromIndex = this.getOffsetCaretIndex();
+    for (int i = fromIndex - 1; i >= 0; i--) {
+      if (Character.isSpaceChar(this.text.charAt(i))) {
+        if (!lastSpace && ++wordCount >= count) {
+          break;
         }
+        lastSpace = true;
+        continue;
       } else {
-        while (p_146197_3_ && index > 0 && this.value.charAt(index - 1) == ' ') {
-          --index;
-        }
-
-        while (index > 0 && this.value.charAt(index - 1) != ' ') {
-          --index;
-        }
+        lastSpace = false;
       }
+
+      index = i;
     }
 
     return index;
   }
 
-  public void moveCursor(int offset) {
-    this.moveCursorTo(this.getCursorIndex(offset));
-  }
-
-  private int getCursorIndex(int offset) {
-    return Util.offsetByCodepoints(this.value, this.cursorIndex, offset);
-  }
-
-  public void moveCursorTo(int cursorIndex) {
-    this.setCursorIndex(cursorIndex);
-    if (!this.shiftPressed) {
-      this.setHighlightIndex(this.cursorIndex);
+  public void deleteChars(int offset) {
+    if (this.text.isEmpty()) {
+      return;
     }
 
-    this.onValueChange(this.value);
+    if (offset < 0) {
+      var endIndex = Math.max(0, this.caretIndex + offset);
+      var head = this.text.substring(0, endIndex);
+      var tail = this.text.substring(this.caretIndex);
+      this.caretIndex = endIndex;
+      this.setText(head + tail);
+      return;
+    }
+
+    if (offset > 0) {
+      var endIndex = Math.min(this.caretIndex + offset, this.text.length());
+      var head = this.text.substring(0, this.caretIndex);
+      if (endIndex == this.text.length()) {
+        this.setText(head);
+        return;
+      }
+      var tail = this.text.substring(endIndex);
+      this.setText(head + tail);
+    }
   }
 
-  public void setCursorIndex(int cursorIndex) {
-    this.cursorIndex = Mth.clamp(cursorIndex, 0, this.value.length());
+  private void setText(String text) {
+    this.text = this.maxLength > 0 && text.length() > this.maxLength
+        ? text.substring(0, this.maxLength)
+        : text;
+    this.refreshTextLine();
+    this.setCaretIndex(this.caretIndex);
+    this.clearSelection();
+    if (this.responder != null) {
+      this.responder.accept(this.text);
+    }
   }
 
-  public void moveCursorToStart() {
-    this.moveCursorTo(0);
-  }
-
-  public void moveCursorToEnd() {
-    this.moveCursorTo(this.value.length());
+  private void refreshTextLine() {
+    this.font = new Font(
+        this.typeface, this.getStyle().fontSize.get() * (float) this.window.getGuiScale());
+    this.textLine = Shaper.makeShapeDontWrapOrReorder(this.fontManager)
+        .shapeLine(this.text, this.font);
   }
 
   @Override
-  public boolean keyPressed(int key, int scancode, int mods) {
-    if (!this.canConsumeInput()) {
-      return false;
-    }
-
-    this.shiftPressed = Screen.hasShiftDown();
-    if (Screen.isSelectAll(key)) {
-      this.moveCursorToEnd();
-      this.setHighlightIndex(0);
-      return true;
-    } else if (Screen.isCopy(key)) {
-      this.minecraft.keyboardHandler.setClipboard(this.getHighlighted());
-      return true;
-    } else if (Screen.isPaste(key)) {
-      if (this.editable) {
-        this.insertText(this.minecraft.keyboardHandler.getClipboard());
-      }
-
-      return true;
-    } else if (Screen.isCut(key)) {
-      this.minecraft.keyboardHandler.setClipboard(this.getHighlighted());
-      if (this.editable) {
-        this.insertText("");
-      }
-
-      return true;
-    }
-
-    switch (key) {
-      case GLFW.GLFW_KEY_BACKSPACE:
-        if (this.editable) {
-          this.shiftPressed = false;
-          this.deleteText(-1);
-          this.shiftPressed = Screen.hasShiftDown();
-        }
-
-        return true;
-      case GLFW.GLFW_KEY_INSERT:
-      case GLFW.GLFW_KEY_DOWN:
-      case GLFW.GLFW_KEY_UP:
-      case GLFW.GLFW_KEY_PAGE_UP:
-      case GLFW.GLFW_KEY_PAGE_DOWN:
-      default:
-        return false;
-      case GLFW.GLFW_KEY_DELETE:
-        if (this.editable) {
-          this.shiftPressed = false;
-          this.deleteText(1);
-          this.shiftPressed = Screen.hasShiftDown();
-        }
-
-        return true;
-      case GLFW.GLFW_KEY_RIGHT:
-        if (Screen.hasControlDown()) {
-          this.moveCursorTo(this.getWordPosition(1));
-        } else {
-          this.moveCursor(1);
-        }
-
-        return true;
-      case GLFW.GLFW_KEY_LEFT:
-        if (Screen.hasControlDown()) {
-          this.moveCursorTo(this.getWordPosition(-1));
-        } else {
-          this.moveCursor(-1);
-        }
-
-        return true;
-      case GLFW.GLFW_KEY_HOME:
-        this.moveCursorToStart();
-        return true;
-      case GLFW.GLFW_KEY_END:
-        this.moveCursorToEnd();
-        return true;
-    }
-  }
-
-  public boolean canConsumeInput() {
-    return this.isFocused();
+  protected void layout() {
+    this.refreshTextLine();
+    super.layout();
   }
 
   @Override
-  public boolean charTyped(char ch, int mods) {
-    if (!this.canConsumeInput()) {
-      return false;
-    } else if (SharedConstants.isAllowedChatCharacter(ch)) {
-      if (this.editable) {
-        this.insertText(Character.toString(ch));
-      }
+  public void mouseEntered(double mouseX, double mouseY) {
+    super.mouseEntered(mouseX, mouseY);
+    this.updateCursor();
+  }
 
-      return true;
-    } else {
-      return false;
-    }
+  @Override
+  public void mouseLeft(double mouseX, double mouseY) {
+    super.mouseLeft(mouseX, mouseY);
+    this.updateCursor();
   }
 
   @Override
   public boolean mouseClicked(double mouseX, double mouseY, int button) {
-    if (super.mouseClicked(mouseX, mouseY, button)) {
-      return true;
+    if (!super.mouseClicked(mouseX, mouseY, button)) {
+      return false;
     }
 
-    if (this.isFocused() && this.isHovered() && button == GLFW.GLFW_MOUSE_BUTTON_1) {
-      int i = Mth.ceil(mouseX) - Mth.ceil(this.getScaledContentX());
-      String s = this.font.plainSubstrByWidth(this.value.substring(this.displayIndex),
-          Mth.floor(this.getScaledContentWidth()));
-      this.moveCursorTo(this.font.plainSubstrByWidth(s, i).length() + this.displayIndex);
-      return true;
+    if (button != GLFW.GLFW_MOUSE_BUTTON_LEFT) {
+      return false;
     }
 
-    return false;
+    if (Screen.hasShiftDown()) {
+      this.setSelectionOffset(this.getCharIndexAt((float) mouseX) - this.caretIndex);
+    } else {
+      this.clearSelection();
+      this.setCaretIndex(this.getCharIndexAt((float) mouseX));
+    }
+
+    return true;
+  }
+
+  private void setCaretIndex(int index) {
+    this.caretBlinkTicks = 0;
+    this.caretIndex = Mth.clamp(index, 0, this.text.length());
+    if (this.selectionOffset == 0) {
+      this.updateScrollOffset();
+    } else {
+      // This also calls updateScrollOffset.
+      this.clearSelection();
+    }
+  }
+
+  private int getOffsetCaretIndex() {
+    return this.caretIndex + this.selectionOffset;
+  }
+
+  private void updateScrollOffset() {
+    var positions = this.textLine.getPositions();
+    if (positions.length == 0) {
+      this.xOffset = CARET_WIDTH;
+      return;
+    }
+
+    var offsetIndex = this.getOffsetCaretIndex();
+    var widths = this.font.getWidths(this.textLine.getGlyphs());
+    var scale = (float) this.window.getGuiScale();
+    var glyphIndex = Math.min(offsetIndex, this.text.length() - 1);
+    var glyphWidth = widths[glyphIndex];
+    var glyphX = positions[glyphIndex * 2];
+    if (offsetIndex == this.text.length()) {
+      glyphX += glyphWidth;
+    }
+    if (glyphX + this.xOffset > this.getScaledContentWidth() * scale) {
+      this.xOffset = (this.getScaledContentWidth() * scale) - glyphX - CARET_WIDTH;
+    } else if (glyphX + this.xOffset < 0) {
+      this.xOffset = -glyphX + CARET_WIDTH;
+    }
+  }
+
+  private void selectAll() {
+    this.setCaretIndex(0);
+    this.setSelectionOffset(this.text.length());
+  }
+
+  private void clearSelection() {
+    this.setSelectionOffset(0);
+  }
+
+  private void setSelectionOffset(int offset) {
+    this.selectionOffset = offset;
+
+    if (this.selectionOffset != 0) {
+      var offsetIndex = this.getOffsetCaretIndex();
+      if (offsetIndex > this.text.length()) {
+        this.selectionOffset = this.text.length() - this.caretIndex;
+      } else if (offsetIndex < 0) {
+        this.selectionOffset = -this.caretIndex;
+      }
+    }
+
+    this.updateScrollOffset();
   }
 
   @Override
-  protected void renderContent(PoseStack poseStack, int mouseX, int mouseY, float partialTicks) {
-    super.renderContent(poseStack, mouseX, mouseY, partialTicks);
-    int textColor = this.getStyle().color.get().valueHex();
-    int cursorIndex = this.cursorIndex - this.displayIndex;
-    int highlightMaxIndex = this.highlightIndex - this.displayIndex;
-    var text = this.font.plainSubstrByWidth(this.value.substring(this.displayIndex),
-        Mth.floor(this.getScaledContentX()));
-    var cursorVisisble = cursorIndex >= 0 && cursorIndex <= text.length();
-    var cursorBlink = this.isFocused() && this.frame / 6 % 2 == 0 && cursorVisisble;
-
-    var textX = this.getScaledContentX() + 2;
-    var textY = this.getScaledContentY()
-        + this.getScaledContentHeight() / 2.0F
-        - this.font.lineHeight / 2.0F;
-    var remainingX = textX;
-    if (highlightMaxIndex > text.length()) {
-      highlightMaxIndex = text.length();
-    }
-
-    if (!text.isEmpty()) {
-      var highlightedText = cursorVisisble ? text.substring(0, cursorIndex) : text;
-      remainingX = this.font.drawShadow(poseStack,
-          this.formatter.apply(highlightedText, this.displayIndex), textX,
-          textY, textColor);
-    }
-
-    var pipeCursor =
-        this.cursorIndex < this.value.length() || this.value.length() >= this.getMaxLength();
-    var highlightX = remainingX;
-    if (!cursorVisisble) {
-      highlightX = cursorIndex > 0 ? textX + this.getScaledContentWidth() : textX;
-    } else if (pipeCursor) {
-      highlightX = remainingX - 1;
-      --remainingX;
-    }
-
-    if (!text.isEmpty() && cursorVisisble && cursorIndex < text.length()) {
-      this.font.drawShadow(poseStack,
-          this.formatter.apply(text.substring(cursorIndex), this.cursorIndex), remainingX, textY,
-          textColor);
-    }
-
-    if (!pipeCursor && this.suggestion != null) {
-      this.font.drawShadow(poseStack, this.suggestion, highlightX - 1.0F, textY, 0xFF808080);
-    }
-
-    if (!pipeCursor && this.placeholder != null && this.value.isEmpty()) {
-      this.font.drawShadow(poseStack, this.placeholder, textX, textY, 0xFF808080);
-    }
-
-    if (cursorBlink) {
-      if (pipeCursor) {
-        RenderSystem.setShader(GameRenderer::getPositionColorShader);
-        RenderUtil.fill(poseStack, highlightX, textY - 1, highlightX + 1, textY + 1 + 9,
-            0xFFD0D0D0);
-      } else {
-        this.font.drawShadow(poseStack, "_", (float) highlightX, (float) textY, textColor);
-      }
-    }
-
-    if (highlightMaxIndex != cursorIndex) {
-      float highlightX2 = textX + this.font.width(text.substring(0, highlightMaxIndex));
-      this.renderHighlight(highlightX, textY - 1, highlightX2 - 1, textY + 1 + 9);
-    }
-  }
-
-  private void renderHighlight(float x, float y, float x2, float y2) {
-    if (x < x2) {
-      float i = x;
-      x = x2;
-      x2 = i;
-    }
-
-    if (y < y2) {
-      float i = y;
-      y = y2;
-      y2 = i;
-    }
-
-    float maxX = this.getScaledContentX() + this.getScaledContentWidth();
-    if (x2 > maxX) {
-      x2 = maxX;
-    }
-
-    if (x > maxX) {
-      x = maxX;
-    }
-
-    final var tessellator = Tesselator.getInstance();
-    final var builder = tessellator.getBuilder();
-    RenderSystem.setShader(GameRenderer::getPositionShader);
-    RenderSystem.setShaderColor(0.0F, 0.0F, 1.0F, 1.0F);
-    RenderSystem.disableTexture();
-    RenderSystem.enableColorLogicOp();
-    RenderSystem.logicOp(GlStateManager.LogicOp.OR_REVERSE);
-    builder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION);
-    builder.vertex(x, y2, 0.0D).endVertex();
-    builder.vertex(x2, y2, 0.0D).endVertex();
-    builder.vertex(x2, y, 0.0D).endVertex();
-    builder.vertex(x, y, 0.0D).endVertex();
-    tessellator.end();
-    RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-    RenderSystem.disableColorLogicOp();
-    RenderSystem.enableTexture();
-  }
-
-  public TextFieldView setMaxLength(int maxLength) {
-    this.maxLength = maxLength;
-    if (this.value.length() > maxLength) {
-      this.value = this.value.substring(0, maxLength);
-      this.onValueChange(this.value);
-    }
-    return this;
-  }
-
-  private int getMaxLength() {
-    return this.maxLength;
-  }
-
-  public int getCursorPosition() {
-    return this.cursorIndex;
-  }
-
-  @Override
-  public boolean changeFocus(boolean forward) {
-    if (super.changeFocus(forward)) {
-      if (forward) {
-        this.frame = 0;
-      }
+  public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX,
+      double deltaY) {
+    if (super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY)) {
       return true;
     }
 
-    return false;
+    this.setSelectionOffset(this.getCharIndexAt((float) (mouseX + deltaX)) - this.caretIndex);
+
+    return true;
   }
 
-  public void setHighlightIndex(int highlightIndex) {
-    int length = this.value.length();
-    this.highlightIndex = Mth.clamp(highlightIndex, 0, length);
-    if (this.font != null) {
-      if (this.displayIndex > length) {
-        this.displayIndex = length;
-      }
-
-      int width = Mth.floor(this.getScaledContentWidth());
-      String s = this.font.plainSubstrByWidth(this.value.substring(this.displayIndex), width);
-      int k = s.length() + this.displayIndex;
-      if (this.highlightIndex == this.displayIndex) {
-        this.displayIndex -= this.font.plainSubstrByWidth(this.value, width, true).length();
-      }
-
-      if (this.highlightIndex > k) {
-        this.displayIndex += this.highlightIndex - k;
-      } else if (this.highlightIndex <= this.displayIndex) {
-        this.displayIndex -= this.displayIndex - this.highlightIndex;
-      }
-
-      this.displayIndex = Mth.clamp(this.displayIndex, 0, length);
+  private int getCharIndexAt(float x) {
+    var scale = (float) this.window.getGuiScale();
+    var glyphs = this.textLine.getGlyphs();
+    if (glyphs.length == 0) {
+      return 0;
     }
+
+    var positions = this.textLine.getPositions();
+    var widths = this.font.getWidths(glyphs);
+
+    for (int i = 0; i < glyphs.length; i++) {
+      var width = widths[i] / scale;
+      var position = (positions[i * 2] / scale) + this.getScaledContentX() + this.xOffset / scale;
+
+      if (x >= position) {
+        if (x <= position + (width / 2.0F)) {
+          return i;
+        }
+
+        if (x <= position + width) {
+          return i + 1;
+        }
+      } else if (i == 0) {
+        return 0;
+      }
+    }
+
+    return glyphs.length;
   }
 
-  public TextFieldView setPlaceholder(@Nullable Component placeholder) {
-    this.placeholder = placeholder;
-    return this;
+  private void updateCursor() {
+    if (!this.isHovered()) {
+      GLFW.glfwSetCursor(this.window.getWindow(), MemoryUtil.NULL);
+      return;
+    }
+
+    if (textSelectCursor == MemoryUtil.NULL) {
+      textSelectCursor = GLFW.glfwCreateStandardCursor(GLFW.GLFW_IBEAM_CURSOR);
+    }
+
+    GLFW.glfwSetCursor(this.window.getWindow(), textSelectCursor);
   }
 
-  public TextFieldView setSuggestion(@Nullable String suggestion) {
-    this.suggestion = suggestion;
-    return this;
+  private static TextBlob makeBlobFromPos(short[] glyphs, float[] floatPos, Font font) {
+    try {
+      Stats.onNativeCall();
+      var ptr = TextBlob._nMakeFromPos(glyphs, floatPos, Native.getPtr(font));
+      return ptr == 0 ? null : new TextBlob(ptr);
+    } finally {
+      Reference.reachabilityFence(font);
+    }
   }
 }

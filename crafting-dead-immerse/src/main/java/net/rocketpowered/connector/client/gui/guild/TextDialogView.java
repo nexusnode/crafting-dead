@@ -28,7 +28,7 @@ import net.minecraft.network.chat.Component;
 
 public class TextDialogView extends ParentView {
 
-  public TextDialogView(Component message, Component placeholder, Consumer<String> resultConsumer,
+  public TextDialogView(Component message, String placeholder, Consumer<String> resultConsumer,
       Runnable cancelListener) {
     super(new Properties().styleClasses("dialog", "blur"));
 
@@ -37,7 +37,7 @@ public class TextDialogView extends ParentView {
     var usernameFieldView = new TextFieldView(new Properties());
     usernameFieldView.setPlaceholder(placeholder);
     var sendButtonView = Theme.createGreenButton(CommonComponents.GUI_PROCEED,
-        () -> resultConsumer.accept(usernameFieldView.getValue()));
+        () -> resultConsumer.accept(usernameFieldView.getText()));
     sendButtonView.setEnabled(false);
     usernameFieldView.setResponder(value -> sendButtonView.setEnabled(!value.isBlank()));
     this.addChild(usernameFieldView);

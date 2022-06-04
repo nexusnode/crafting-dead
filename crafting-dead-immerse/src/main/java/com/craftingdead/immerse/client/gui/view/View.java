@@ -296,10 +296,6 @@ public class View extends GuiComponent
         this.getScaledHeight() * scale,
         radii);
 
-    if (rect.getRight() <= 0 || rect.getBottom() <= 0) {
-      return;
-    }
-
     this.skia.begin();
     {
       var canvas = this.skia.canvas();
@@ -1186,7 +1182,11 @@ public class View extends GuiComponent
 
   @Override
   public boolean isVisible() {
-    return this.added && this.style.visibility.get() == Visibility.VISIBLE;
+    return this.added && this.style.visibility.get() == Visibility.VISIBLE
+        && this.getX() < this.window.getGuiScaledWidth()
+        && this.getY() < this.window.getGuiScaledHeight()
+        && this.getX() + this.getWidth() > 0.0F
+        && this.getY() + this.getHeight() > 0.0F;
   }
 
   @Override

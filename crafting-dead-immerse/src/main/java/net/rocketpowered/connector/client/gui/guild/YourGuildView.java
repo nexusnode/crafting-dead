@@ -29,6 +29,7 @@ import com.craftingdead.immerse.client.gui.view.TextView;
 import com.craftingdead.immerse.client.gui.view.View;
 import com.craftingdead.immerse.client.gui.view.event.RemovedEvent;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
@@ -88,7 +89,7 @@ public class YourGuildView extends ParentView {
     this.transferButton = Theme.createRedButton(new TextComponent("Transfer"),
         () -> this.contentConsumer.accept(new TextDialogView(
             new TranslatableComponent("view.guild.your_guild.transfer.message"),
-            new TranslatableComponent("view.guild.text_dialog.username"),
+            I18n.get("view.guild.text_dialog.username"),
             result -> {
               Rocket.getGameClientGateway().ifPresent(gateway -> gateway.getUserId(result)
                   .flatMap(gateway::transferGuildOwnership)
@@ -122,7 +123,7 @@ public class YourGuildView extends ParentView {
     this.renameButton = Theme.createBlueButton(new TextComponent("Rename"),
         () -> this.contentConsumer.accept(new TextDialogView(
             new TranslatableComponent("view.guild.your_guild.rename.message"),
-            new TranslatableComponent("view.guild.text_dialog.name"),
+            I18n.get("view.guild.text_dialog.name"),
             result -> {
               Rocket.getGameClientGateway().ifPresent(gateway -> gateway.renameGuild(result)
                   .doOnSubscribe(__ -> RocketToast.info(this.minecraft,

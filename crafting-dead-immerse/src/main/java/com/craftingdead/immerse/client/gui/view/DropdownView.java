@@ -380,7 +380,7 @@ public class DropdownView extends View implements ContainerEventHandler {
                   ? FontStyle.ITALIC
                   : FontStyle.NORMAL;
 
-      FontStyleSet fontSet = FontStyleSet.makeEmpty();
+      var fontSet = FontStyleSet.makeEmpty();
       for (var family : DropdownView.this.getStyle().fontFamily.get()) {
         fontSet = DropdownView.this.fontManager.matchFamily(family);
         if (fontSet.count() > 0) {
@@ -425,7 +425,6 @@ public class DropdownView extends View implements ContainerEventHandler {
           backgroundColor, textColor, alpha);
     }
 
-    @SuppressWarnings("resource")
     private void render(PoseStack poseStack, float x, float y, float width, float height,
         int backgroundColor, int textColor, float alpha) {
       DropdownView.this.skia.begin();
@@ -438,18 +437,18 @@ public class DropdownView extends View implements ContainerEventHandler {
         canvas.translate(x * scale, y * scale);
         canvas.scale(DropdownView.this.getXScale(), DropdownView.this.getYScale());
 
-        try (var paint = new Paint()
-            .setMode(PaintMode.FILL)
-            .setColor(RenderUtil.multiplyAlpha(backgroundColor, alpha))) {
+        try (var paint = new Paint()) {
+          paint.setMode(PaintMode.FILL);
+          paint.setColor(RenderUtil.multiplyAlpha(backgroundColor, alpha));
           canvas.drawRect(Rect.makeWH(width * scale, height * scale), paint);
         }
 
-        try (var paint = new Paint()
-            .setColor(RenderUtil.multiplyAlpha(style.getColor() == null
-                ? DropdownView.this.getStyle().color.get().valueHex()
-                : style.getColor().getValue() + (255 << 24), alpha))) {
+        try (var paint = new Paint()) {
+          paint.setColor(RenderUtil.multiplyAlpha(style.getColor() == null
+              ? DropdownView.this.getStyle().color.get().valueHex()
+              : style.getColor().getValue() + (255 << 24), alpha));
           canvas.translate(4 * scale,
-              this.textLine.getHeight() + ((height * scale)) / 2.0F
+              this.textLine.getHeight() + (height * scale) / 2.0F
                   - this.textLine.getXHeight() * 2.0F);
           canvas.drawTextLine(this.textLine, 0, 0, paint);
         }

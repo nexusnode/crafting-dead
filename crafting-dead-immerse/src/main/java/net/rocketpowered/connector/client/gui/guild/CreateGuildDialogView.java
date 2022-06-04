@@ -39,12 +39,12 @@ public class CreateGuildDialogView extends ParentView {
     this.addChild(new TextView(new Properties()).setText(TITLE));
 
     var nameFieldView = new TextFieldView(new Properties());
-    nameFieldView.setPlaceholder(new TextComponent("Name"));
+    nameFieldView.setPlaceholder("Name");
     nameFieldView.setMaxLength(GuildConstants.GUILD_NAME_MAX_LENGTH);
     this.addChild(nameFieldView);
 
     var tagFieldView = new TextFieldView(new Properties());
-    tagFieldView.setPlaceholder(new TextComponent("Tag"));
+    tagFieldView.setPlaceholder("Tag");
     tagFieldView.setMaxLength(GuildConstants.GUILD_TAG_MAX_LENGTH);
     this.addChild(tagFieldView);
 
@@ -52,14 +52,14 @@ public class CreateGuildDialogView extends ParentView {
     this.addChild(controlsView);
 
     var createButtonView = Theme.createGreenButton(new TextComponent("Create"),
-        () -> resultConsumer.accept(nameFieldView.getValue(), tagFieldView.getValue()));
+        () -> resultConsumer.accept(nameFieldView.getText(), tagFieldView.getText()));
     createButtonView.setEnabled(false);
     nameFieldView.setResponder(
         value -> createButtonView.setEnabled(value.length() >= GuildConstants.GUILD_NAME_MIN_LENGTH
-            && tagFieldView.getValue().length() >= GuildConstants.GUILD_TAG_MIN_LENGTH));
+            && tagFieldView.getText().length() >= GuildConstants.GUILD_TAG_MIN_LENGTH));
     tagFieldView.setResponder(
         value -> createButtonView.setEnabled(value.length() >= GuildConstants.GUILD_TAG_MIN_LENGTH
-            && nameFieldView.getValue().length() >= GuildConstants.GUILD_NAME_MIN_LENGTH));
+            && nameFieldView.getText().length() >= GuildConstants.GUILD_NAME_MIN_LENGTH));
     controlsView.addChild(createButtonView);
 
     controlsView.addChild(Theme.createRedButton(CommonComponents.GUI_CANCEL, cancelListener));

@@ -28,6 +28,7 @@ import com.craftingdead.immerse.client.gui.view.ParentView;
 import com.craftingdead.immerse.client.gui.view.TextView;
 import com.craftingdead.immerse.client.gui.view.View;
 import com.craftingdead.immerse.client.gui.view.event.RemovedEvent;
+import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
@@ -105,7 +106,7 @@ public class ManageMembersView extends ParentView {
         .addChild(this.inviteButton = Theme.createBlueButton(new TextComponent("Invite"),
             () -> viewConsumer.accept(new TextDialogView(
                 new TranslatableComponent("view.guild.manage_members.send_invite.message"),
-                new TranslatableComponent("view.guild.text_dialog.username"),
+                I18n.get("view.guild.text_dialog.username"),
                 result -> {
                   if (result.equalsIgnoreCase(this.minecraft.getUser().getName())) {
                     RocketToast.error(this.minecraft, "Cannot invite yourself");
