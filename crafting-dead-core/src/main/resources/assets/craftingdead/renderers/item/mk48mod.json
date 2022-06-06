@@ -83,58 +83,68 @@
             ]
         }
     },
+    "attachment_transforms": {
+        "craftingdead:red_dot_sight": {
+            "translation": [
+                0.5,
+                6.8,
+                4
+            ]
+        },
+        "craftingdead:acog_sight": {
+            "translation": [
+                0.5,
+                4.5,
+                5
+            ]
+        },
+        "craftingdead:bipod": {
+            "translation": [
+                0.5,
+                1,
+                -18
+            ]
+        },
+        "craftingdead:eotech_sight": {
+            "translation": [
+                0.5,
+                4,
+                1
+            ]
+        },
+        "craftingdead:lp_scope": {
+            "translation": [
+                0.5,
+                6,
+                -1
+            ]
+        },
+        "craftingdead:suppressor": {
+            "translation": [
+                0.5,
+                1,
+                -23
+        
+            ]
+        },
+        "craftingdead:tactical_grip": {
+            "translation": [
+                -0.5,
+                -1,
+                -8
+            ]
+        },
+        "craftingdead:hp_scope": {
+            "translation": [
+                0.5,
+                5,
+                0
+            ]
+        }        
+    },
     "back_transform": {
         "scale": [0.5, 0.5, 0.5],
         "rotation": [0, 0, 180],
         "translation": [2, 0, -0.1]
-    },
-"attachment_transforms": {
-    "craftingdead:red_dot_sight": {
-        "translation": [
-            7.5,
-            12,
-            8
-        ]
-    },
-    "craftingdead:acog_sight": {
-        "translation": [
-            8,
-            12.5,
-            10.25
-        
-        ]
-},
-    "craftingdead:bipod": {
-        "translation": [
-            7,
-            6.25,
-            -2.75
-        
-        ]
-},
-    "craftingdead:eotech_sight": {
-        "translation": [
-            7,
-            11,
-            7.75
-        
-        ]
-},
-    "craftingdead:suppressor": {
-        "translation": [
-            7,
-            7.75,
-            -16
-        
-        ]
-},
-    "craftingdead:tactical_grip": {
-        "translation": [
-            7,
-            6,
-            -1.75
-        
-        ]
     }
-}
 }

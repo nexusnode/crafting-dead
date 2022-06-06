@@ -16,7 +16,7 @@
     "aiming_transform": {
         "translation": [
             -9.5,
-            2.25,
+            0,
             -1
         ]
     },
@@ -72,78 +72,88 @@
     "magazine_transforms": {
         "craftingdead:ak47_30_round_magazine": {
             "translation": [
-                7.5,
-                5.5,
-                8.5
+                -0.5,
+                -0.5,
+                0
             ]
         },
         "craftingdead:rpk_drum_magazine": {
             "translation": [
-                7.5,
-                6.5,
-                8.5
+                -0.5,
+                -0.5,
+                0
             ]
         },
         "craftingdead:rpk_magazine": {
             "translation": [
-                7.5,
-                6.5,
-                8.5
+                -0.5,
+                -0.5,
+                0
             ]
         }
+    },
+    "attachment_transforms": {
+        "craftingdead:red_dot_sight": {
+            "translation": [
+                0.5,
+                6.8,
+                4
+            ]
+        },
+        "craftingdead:acog_sight": {
+            "translation": [
+                0.5,
+                4.5,
+                5
+            ]
+        },
+        "craftingdead:bipod": {
+            "translation": [
+                0.5,
+                1,
+                -18
+            ]
+        },
+        "craftingdead:eotech_sight": {
+            "translation": [
+                0.5,
+                7,
+                3
+            ]
+        },
+        "craftingdead:lp_scope": {
+            "translation": [
+                0.5,
+                6,
+                -1
+            ]
+        },
+        "craftingdead:suppressor": {
+            "translation": [
+                0.5,
+                3,
+                -23
+        
+            ]
+        },
+        "craftingdead:tactical_grip": {
+            "translation": [
+                -0.5,
+                -1,
+                -8
+            ]
+        },
+        "craftingdead:hp_scope": {
+            "translation": [
+                0.5,
+                5,
+                0
+            ]
+        }        
     },
     "back_transform": {
         "scale": [0.5, 0.5, 0.5],
         "rotation": [0, 0, 180],
         "translation": [2, 0, -0.1]
-    },
-"attachment_transforms": {
-    "craftingdead:red_dot_sight": {
-        "translation": [
-            7.5,
-            14.5,
-            11.25
-        ]
-    },
-    "craftingdead:acog_sight": {
-        "translation": [
-            7.5,
-            14,
-            13.75
-        
-        ]
-},
-    "craftingdead:eotech_sight": {
-        "translation": [
-            7,
-            13,
-            12.5
-        
-        ]
-},
-    "craftingdead:lp_sight": {
-        "translation": [
-            6.75,
-            15.2678,
-            7.1464
-        
-        ]
-},
-    "craftingdead:suppressor": {
-        "translation": [
-            7,
-            8.5,
-            -15.25
-        
-        ]
-},
-    "craftingdead:hp_sight": {
-        "translation": [
-            10,
-            14.5,
-            1.5
-        
-        ]
-}
-}
+    }
 }

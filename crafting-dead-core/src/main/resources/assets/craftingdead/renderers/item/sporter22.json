@@ -95,21 +95,21 @@
         },
         "craftingdead:bipod": {
             "translation": [
-                0,
-                -2,
+                -0.5,
+                -1,
                 -18
             ]
         },
         "craftingdead:eotech_sight": {
             "translation": [
-                0,
+                -0.5,
                 -1,
                 1
             ]
         },
         "craftingdead:lp_scope": {
             "translation": [
-                0,
+                -0.5,
                 2,
                 -3
             ]
@@ -124,15 +124,15 @@
         },
         "craftingdead:tactical_grip": {
             "translation": [
-                0,
-                -9,
+                -0.5,
+                -2,
                 -7
             ]
         },
         "craftingdead:hp_scope": {
             "translation": [
-                0,
-                2,
+                -0.5,
+                1,
                 -1
             ]
         }        
