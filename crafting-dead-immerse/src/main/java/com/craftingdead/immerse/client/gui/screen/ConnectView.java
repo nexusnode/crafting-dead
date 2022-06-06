@@ -26,11 +26,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import org.slf4j.Logger;
 import com.craftingdead.immerse.CraftingDeadImmerse;
-import com.craftingdead.immerse.client.gui.view.FogView;
-import com.craftingdead.immerse.client.gui.view.ParentView;
-import com.craftingdead.immerse.client.gui.view.TextView;
-import com.craftingdead.immerse.client.gui.view.ViewScreen;
-import com.craftingdead.immerse.client.gui.view.event.ActionEvent;
 import com.craftingdead.immerse.sounds.ImmerseSoundEvents;
 import com.google.common.collect.Iterators;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
@@ -55,6 +50,11 @@ import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.network.protocol.handshake.ClientIntentionPacket;
 import net.minecraft.network.protocol.login.ServerboundHelloPacket;
 import net.minecraft.resources.ResourceLocation;
+import sm0keysa1m0n.bliss.view.FogView;
+import sm0keysa1m0n.bliss.view.ParentView;
+import sm0keysa1m0n.bliss.view.TextView;
+import sm0keysa1m0n.bliss.view.ViewScreen;
+import sm0keysa1m0n.bliss.view.event.ActionEvent;
 
 public class ConnectView extends ParentView {
 

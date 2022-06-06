@@ -22,9 +22,9 @@ import java.io.File;
 import java.util.concurrent.TimeUnit;
 import org.jdesktop.core.animation.timing.Animator;
 import org.jdesktop.core.animation.timing.TimingTargetAdapter;
-import com.craftingdead.immerse.client.gui.view.Animation;
-import com.craftingdead.immerse.client.gui.view.ParentView;
-import com.craftingdead.immerse.client.gui.view.ViewUtil;
+import sm0keysa1m0n.bliss.Animation;
+import sm0keysa1m0n.bliss.view.ParentView;
+import sm0keysa1m0n.bliss.view.ViewUtil;
 
 public class HomeView extends ParentView implements TransitionView {
 

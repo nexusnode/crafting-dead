@@ -20,14 +20,14 @@ package net.rocketpowered.connector.client.gui.guild;
 
 import java.util.function.BiConsumer;
 import com.craftingdead.immerse.client.gui.screen.Theme;
-import com.craftingdead.immerse.client.gui.view.ParentView;
-import com.craftingdead.immerse.client.gui.view.TextFieldView;
-import com.craftingdead.immerse.client.gui.view.TextView;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.rocketpowered.common.GuildConstants;
+import sm0keysa1m0n.bliss.view.ParentView;
+import sm0keysa1m0n.bliss.view.TextFieldView;
+import sm0keysa1m0n.bliss.view.TextView;
 
 public class CreateGuildDialogView extends ParentView {
 

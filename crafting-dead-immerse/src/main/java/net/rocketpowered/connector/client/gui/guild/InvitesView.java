@@ -27,10 +27,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.bson.types.ObjectId;
 import org.jetbrains.annotations.Nullable;
 import com.craftingdead.immerse.client.gui.screen.Theme;
-import com.craftingdead.immerse.client.gui.view.Color;
-import com.craftingdead.immerse.client.gui.view.ParentView;
-import com.craftingdead.immerse.client.gui.view.TextView;
-import com.craftingdead.immerse.client.gui.view.View;
 import com.google.common.collect.Sets;
 import io.github.humbleui.skija.FontMgr;
 import net.minecraft.ChatFormatting;
@@ -48,6 +44,10 @@ import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
+import sm0keysa1m0n.bliss.Color;
+import sm0keysa1m0n.bliss.view.ParentView;
+import sm0keysa1m0n.bliss.view.TextView;
+import sm0keysa1m0n.bliss.view.View;
 
 public class InvitesView extends ParentView {
 

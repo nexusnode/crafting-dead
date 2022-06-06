@@ -20,11 +20,6 @@ package net.rocketpowered.connector.client.gui.guild;
 
 import java.util.Set;
 import org.jetbrains.annotations.Nullable;
-import com.craftingdead.immerse.client.gui.view.PanoramaView;
-import com.craftingdead.immerse.client.gui.view.ParentView;
-import com.craftingdead.immerse.client.gui.view.TextView;
-import com.craftingdead.immerse.client.gui.view.View;
-import com.craftingdead.immerse.client.gui.view.event.ActionEvent;
 import com.google.common.base.Objects;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.TitleScreen;
@@ -40,6 +35,11 @@ import net.rocketpowered.common.payload.SocialProfilePayload;
 import net.rocketpowered.connector.client.gui.RocketToast;
 import reactor.core.Disposable;
 import reactor.core.scheduler.Schedulers;
+import sm0keysa1m0n.bliss.view.PanoramaView;
+import sm0keysa1m0n.bliss.view.ParentView;
+import sm0keysa1m0n.bliss.view.TextView;
+import sm0keysa1m0n.bliss.view.View;
+import sm0keysa1m0n.bliss.view.event.ActionEvent;
 
 public class GuildView extends ParentView {
 

@@ -19,10 +19,6 @@
 package net.rocketpowered.connector.client.gui.guild;
 
 import com.craftingdead.immerse.client.gui.screen.Theme;
-import com.craftingdead.immerse.client.gui.view.AvatarView;
-import com.craftingdead.immerse.client.gui.view.Color;
-import com.craftingdead.immerse.client.gui.view.ParentView;
-import com.craftingdead.immerse.client.gui.view.TextView;
 import com.mojang.authlib.GameProfile;
 import io.github.humbleui.skija.FontMgr;
 import net.minecraft.ChatFormatting;
@@ -36,6 +32,10 @@ import net.rocketpowered.common.payload.GuildPayload;
 import net.rocketpowered.common.payload.UserPresencePayload;
 import reactor.core.Disposable;
 import reactor.core.scheduler.Schedulers;
+import sm0keysa1m0n.bliss.Color;
+import sm0keysa1m0n.bliss.view.AvatarView;
+import sm0keysa1m0n.bliss.view.ParentView;
+import sm0keysa1m0n.bliss.view.TextView;
 
 public class MemberView extends ParentView {
 

@@ -32,15 +32,15 @@ import com.craftingdead.immerse.client.gui.screen.menu.play.list.server.MutableS
 import com.craftingdead.immerse.client.gui.screen.menu.play.list.server.NbtServerList;
 import com.craftingdead.immerse.client.gui.screen.menu.play.list.server.ServerListView;
 import com.craftingdead.immerse.client.gui.screen.menu.play.list.world.WorldListView;
-import com.craftingdead.immerse.client.gui.view.Animation;
-import com.craftingdead.immerse.client.gui.view.DropdownView;
-import com.craftingdead.immerse.client.gui.view.ParentView;
-import com.craftingdead.immerse.client.gui.view.TabsView;
-import com.craftingdead.immerse.client.gui.view.TextView;
-import com.craftingdead.immerse.client.gui.view.View;
 import com.craftingdead.immerse.sounds.ImmerseSoundEvents;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.TranslatableComponent;
+import sm0keysa1m0n.bliss.Animation;
+import sm0keysa1m0n.bliss.view.DropdownView;
+import sm0keysa1m0n.bliss.view.ParentView;
+import sm0keysa1m0n.bliss.view.TabsView;
+import sm0keysa1m0n.bliss.view.TextView;
+import sm0keysa1m0n.bliss.view.View;
 
 public class PlayView extends ParentView implements TransitionView {
 

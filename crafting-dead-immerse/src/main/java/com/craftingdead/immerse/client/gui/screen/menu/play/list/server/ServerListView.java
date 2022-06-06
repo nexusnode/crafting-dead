@@ -25,11 +25,11 @@ import org.jetbrains.annotations.Nullable;
 import org.jdesktop.core.animation.timing.Animator;
 import org.jdesktop.core.animation.timing.KeyFrames;
 import com.craftingdead.immerse.client.gui.screen.Theme;
-import com.craftingdead.immerse.client.gui.view.Animation;
-import com.craftingdead.immerse.client.gui.view.ParentView;
-import com.craftingdead.immerse.client.gui.view.View;
-import com.craftingdead.immerse.client.gui.view.style.Percentage;
 import net.minecraft.network.chat.TranslatableComponent;
+import sm0keysa1m0n.bliss.Animation;
+import sm0keysa1m0n.bliss.style.Percentage;
+import sm0keysa1m0n.bliss.view.ParentView;
+import sm0keysa1m0n.bliss.view.View;
 
 public class ServerListView extends ParentView {
 

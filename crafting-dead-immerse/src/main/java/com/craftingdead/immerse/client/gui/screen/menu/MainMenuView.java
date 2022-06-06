@@ -28,12 +28,6 @@ import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.client.fake.FakePlayer;
 import com.craftingdead.immerse.client.gui.screen.Theme;
 import com.craftingdead.immerse.client.gui.screen.menu.play.PlayView;
-import com.craftingdead.immerse.client.gui.view.EntityView;
-import com.craftingdead.immerse.client.gui.view.FogView;
-import com.craftingdead.immerse.client.gui.view.ParentView;
-import com.craftingdead.immerse.client.gui.view.TextView;
-import com.craftingdead.immerse.client.gui.view.View;
-import com.craftingdead.immerse.client.gui.view.ViewScreen;
 import net.minecraft.client.gui.screens.OptionsScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -43,6 +37,12 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.registries.ForgeRegistries;
+import sm0keysa1m0n.bliss.view.EntityView;
+import sm0keysa1m0n.bliss.view.FogView;
+import sm0keysa1m0n.bliss.view.ParentView;
+import sm0keysa1m0n.bliss.view.TextView;
+import sm0keysa1m0n.bliss.view.View;
+import sm0keysa1m0n.bliss.view.ViewScreen;
 
 public class MainMenuView extends ParentView {
 

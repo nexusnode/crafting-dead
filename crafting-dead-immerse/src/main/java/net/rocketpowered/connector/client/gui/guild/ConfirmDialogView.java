@@ -19,10 +19,10 @@
 package net.rocketpowered.connector.client.gui.guild;
 
 import com.craftingdead.immerse.client.gui.screen.Theme;
-import com.craftingdead.immerse.client.gui.view.ParentView;
-import com.craftingdead.immerse.client.gui.view.TextView;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
+import sm0keysa1m0n.bliss.view.ParentView;
+import sm0keysa1m0n.bliss.view.TextView;
 
 public class ConfirmDialogView extends ParentView {
 

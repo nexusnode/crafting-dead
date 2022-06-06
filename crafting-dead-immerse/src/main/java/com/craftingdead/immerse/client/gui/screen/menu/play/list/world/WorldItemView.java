@@ -28,11 +28,6 @@ import java.util.Date;
 import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
-import com.craftingdead.immerse.client.gui.view.ImageView;
-import com.craftingdead.immerse.client.gui.view.ParentView;
-import com.craftingdead.immerse.client.gui.view.TextView;
-import com.craftingdead.immerse.client.gui.view.ViewScreen;
-import com.craftingdead.immerse.client.gui.view.event.ActionEvent;
 import com.mojang.logging.LogUtils;
 import io.github.humbleui.skija.Image;
 import net.minecraft.ChatFormatting;
@@ -53,6 +48,11 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.storage.LevelResource;
 import net.minecraft.world.level.storage.LevelStorageSource;
 import net.minecraft.world.level.storage.LevelSummary;
+import sm0keysa1m0n.bliss.view.ImageView;
+import sm0keysa1m0n.bliss.view.ParentView;
+import sm0keysa1m0n.bliss.view.TextView;
+import sm0keysa1m0n.bliss.view.ViewScreen;
+import sm0keysa1m0n.bliss.view.event.ActionEvent;
 
 class WorldItemView extends ParentView {
 

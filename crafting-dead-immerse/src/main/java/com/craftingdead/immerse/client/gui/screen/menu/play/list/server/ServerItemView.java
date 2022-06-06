@@ -20,14 +20,14 @@ package com.craftingdead.immerse.client.gui.screen.menu.play.list.server;
 
 import java.util.Iterator;
 import com.craftingdead.immerse.client.gui.screen.ConnectView;
-import com.craftingdead.immerse.client.gui.view.ParentView;
-import com.craftingdead.immerse.client.gui.view.TextView;
-import com.craftingdead.immerse.client.gui.view.event.ActionEvent;
 import com.craftingdead.immerse.client.util.ServerPinger;
 import com.google.common.collect.Iterators;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
 import net.minecraft.network.chat.TextComponent;
+import sm0keysa1m0n.bliss.view.ParentView;
+import sm0keysa1m0n.bliss.view.TextView;
+import sm0keysa1m0n.bliss.view.event.ActionEvent;
 
 class ServerItemView extends ParentView {
 

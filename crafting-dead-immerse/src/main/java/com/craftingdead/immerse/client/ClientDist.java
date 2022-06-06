@@ -34,9 +34,6 @@ import com.craftingdead.immerse.ModDist;
 import com.craftingdead.immerse.client.fake.FakePlayer;
 import com.craftingdead.immerse.client.gui.IngameGui;
 import com.craftingdead.immerse.client.gui.screen.menu.MainMenuView;
-import com.craftingdead.immerse.client.gui.view.Skia;
-import com.craftingdead.immerse.client.gui.view.ViewScreen;
-import com.craftingdead.immerse.client.gui.view.style.StyleSheetManager;
 import com.craftingdead.immerse.client.renderer.BlueprintOutlineRenderer;
 import com.craftingdead.immerse.client.renderer.SpectatorRenderer;
 import com.craftingdead.immerse.client.renderer.entity.layer.TeamClothingLayer;
@@ -85,6 +82,9 @@ import net.minecraftforge.fml.loading.progress.StartupMessageManager;
 import net.rocketpowered.api.Rocket;
 import net.rocketpowered.connector.client.gui.RocketToast;
 import reactor.core.scheduler.Schedulers;
+import sm0keysa1m0n.bliss.Skia;
+import sm0keysa1m0n.bliss.style.StyleSheetManager;
+import sm0keysa1m0n.bliss.view.ViewScreen;
 
 public class ClientDist implements ModDist {
 

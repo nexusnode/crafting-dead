@@ -25,19 +25,19 @@ import org.jdesktop.core.animation.timing.KeyFrames;
 import org.jdesktop.core.animation.timing.interpolators.SplineInterpolator;
 import org.jetbrains.annotations.Nullable;
 import com.craftingdead.immerse.CraftingDeadImmerse;
-import com.craftingdead.immerse.client.gui.view.Animation;
-import com.craftingdead.immerse.client.gui.view.Color;
-import com.craftingdead.immerse.client.gui.view.ImageView;
-import com.craftingdead.immerse.client.gui.view.ParentView;
-import com.craftingdead.immerse.client.gui.view.TextView;
-import com.craftingdead.immerse.client.gui.view.View;
-import com.craftingdead.immerse.client.gui.view.View.Properties;
-import com.craftingdead.immerse.client.gui.view.event.ActionEvent;
-import com.craftingdead.immerse.client.gui.view.event.AddedEvent;
-import com.craftingdead.immerse.client.gui.view.event.RemovedEvent;
 import com.craftingdead.immerse.sounds.ImmerseSoundEvents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import sm0keysa1m0n.bliss.Animation;
+import sm0keysa1m0n.bliss.Color;
+import sm0keysa1m0n.bliss.view.ImageView;
+import sm0keysa1m0n.bliss.view.ParentView;
+import sm0keysa1m0n.bliss.view.TextView;
+import sm0keysa1m0n.bliss.view.View;
+import sm0keysa1m0n.bliss.view.View.Properties;
+import sm0keysa1m0n.bliss.view.event.ActionEvent;
+import sm0keysa1m0n.bliss.view.event.AddedEvent;
+import sm0keysa1m0n.bliss.view.event.RemovedEvent;
 
 public class Theme {
 
