@@ -18,12 +18,12 @@
 
 package com.craftingdead.core.world.inventory;
 
-import java.util.function.BiPredicate;
 import com.craftingdead.core.tags.ModItemTags;
 import com.craftingdead.core.world.inventory.storage.Storage;
 import com.craftingdead.core.world.item.gun.Gun;
 import com.craftingdead.core.world.item.gun.attachment.AttachmentLike;
 import com.craftingdead.core.world.item.gun.skin.Paint;
+import java.util.function.BiPredicate;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -60,33 +60,15 @@ public class EquipmentMenu extends AbstractContainerMenu {
     }
 
     for (int x = 0; x < 9; ++x) {
-      this.addSlot(new Slot(playerInventory, x, 8 + x * slotSize, 142));
+      this.addSlot(new Slot(playerInventory, x, 8 + x * slotSize, 141));
     }
 
-    int equipmentColumnX = 8 + (slotSize * 3);
+    int equipmentColumnX = 77;
     int equipmentColumnY = 8;
 
     this.addSlot(new PredicateItemHandlerSlot(this.equipment,
-        ModEquipmentSlot.GUN.getIndex(),
-        equipmentColumnX, equipmentColumnY,
-        (slot, itemStack) -> itemStack.getCapability(Gun.CAPABILITY).isPresent()));
-
-    this.addSlot(new PredicateItemHandlerSlot(this.equipment,
-        ModEquipmentSlot.BACKPACK.getIndex(),
-        equipmentColumnX + slotSize, equipmentColumnY,
-        (slot, itemStack) -> itemStack
-            .getCapability(Storage.CAPABILITY)
-            .map(storage -> storage.isValidForSlot(ModEquipmentSlot.BACKPACK))
-            .orElse(false)));
-
-    this.addSlot(new PredicateItemHandlerSlot(this.equipment,
-        ModEquipmentSlot.MELEE.getIndex(),
-        equipmentColumnX, equipmentColumnY += slotSize,
-        (slot, itemStack) -> itemStack.is(ModItemTags.MELEES)));
-
-    this.addSlot(new PredicateItemHandlerSlot(this.equipment,
         ModEquipmentSlot.HAT.getIndex(),
-        equipmentColumnX, equipmentColumnY += slotSize,
+        equipmentColumnX, equipmentColumnY,
         (slot, itemStack) -> itemStack.is(ModItemTags.HATS)));
 
     this.addSlot(new PredicateItemHandlerSlot(this.equipment,
@@ -96,15 +78,36 @@ public class EquipmentMenu extends AbstractContainerMenu {
 
     this.addSlot(new PredicateItemHandlerSlot(this.equipment,
         ModEquipmentSlot.VEST.getIndex(),
-        equipmentColumnX + slotSize, equipmentColumnY,
+        equipmentColumnX, equipmentColumnY += slotSize,
         (slot, itemStack) -> itemStack
             .getCapability(Storage.CAPABILITY)
             .map(storage -> storage.isValidForSlot(ModEquipmentSlot.VEST))
             .orElse(false)));
 
-    final int gunCraftSlotGap = 3;
-    final int gunCraftY = 14;
-    final int gunCraftX = 106;
+    this.addSlot(new PredicateItemHandlerSlot(this.equipment,
+        ModEquipmentSlot.BACKPACK.getIndex(),
+        equipmentColumnX, equipmentColumnY + slotSize,
+        (slot, itemStack) -> itemStack
+            .getCapability(Storage.CAPABILITY)
+            .map(storage -> storage.isValidForSlot(ModEquipmentSlot.BACKPACK))
+            .orElse(false)));
+
+    int weaponColumnX = 8;
+    int weaponColumnY = 8;
+
+    this.addSlot(new PredicateItemHandlerSlot(this.equipment,
+        ModEquipmentSlot.GUN.getIndex(),
+        weaponColumnX, weaponColumnY,
+        (slot, itemStack) -> itemStack.getCapability(Gun.CAPABILITY).isPresent()));
+
+    this.addSlot(new PredicateItemHandlerSlot(this.equipment,
+        ModEquipmentSlot.MELEE.getIndex(),
+        weaponColumnX, weaponColumnY + slotSize,
+        (slot, itemStack) -> itemStack.is(ModItemTags.MELEES)));
+
+    final int gunCraftSlotGap = 2;
+    final int gunCraftY = 6;
+    final int gunCraftX = 115;
 
     this.addSlot(new GunCraftSlot(this.outputContainer, 0,
         gunCraftX + slotSize + gunCraftSlotGap,
