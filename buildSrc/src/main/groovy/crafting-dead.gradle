@@ -73,7 +73,7 @@ jar {
 }
 
 license {
-    include '**/*.java'
+    include 'com/craftingdead/**/*.java'
     header = rootProject.file('HEADER.txt')
     ext {
         organization = 'NexusNode LTD'
