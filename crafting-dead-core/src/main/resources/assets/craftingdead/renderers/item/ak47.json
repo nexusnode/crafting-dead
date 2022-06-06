@@ -16,7 +16,7 @@
     "aiming_transform": {
         "translation": [
             -9.5,
-            4.25,
+            3.25,
             1.5
         ]
     },
@@ -67,13 +67,14 @@
                     0.25
                 ]
             }
-        },
+        }
+    },
     "magazine_transforms": {
         "craftingdead:ak47_30_round_magazine": {
             "translation": [
-                7.5,
-                5.5,
-                8.5
+                0,
+                -0.5,
+                0
             ]
         },
         "craftingdead:rpk_drum_magazine": {
@@ -91,16 +92,11 @@
             ]
         }
     },
-    "back_transform": {
-        "scale": [0.5, 0.5, 0.5],
-        "rotation": [0, 0, 180],
-        "translation": [2, 0, -0.1]
-    },
     "attachment_transforms": {
         "craftingdead:red_dot_sight": {
             "translation": [
-                -0.5,
-                -2,
+                0.5,
+                10,
                 -2
             ]
         },
@@ -145,14 +141,6 @@
             
             ]
     },
-        "craftingdead:Red_Dot_Sight": {
-            "translation": [
-                7.75,
-                12.5,
-                10
-            
-            ]
-    },
         "craftingdead:suppressor": {
             "translation": [
                 7,
@@ -176,6 +164,10 @@
                 2
             
             ]
+    },
+    "back_transform": {
+        "scale": [0.5, 0.5, 0.5],
+        "rotation": [0, 0, 180],
+        "translation": [2, 0, -0.1]
     }
-}
 }
