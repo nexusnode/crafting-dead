@@ -3,6 +3,10 @@
     outline-color: rgb(170, 220, 240);
 }
 
+DropdownView {
+    z-index: 50;
+}
+
 TabsView {
     flex-direction: row;
     flex-wrap: wrap;

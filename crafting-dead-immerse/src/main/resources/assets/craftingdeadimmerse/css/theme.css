@@ -28,7 +28,8 @@ DropdownView {
     font-size: 7;
 }
 
-TextView {
+TextView,
+TextFieldView {
     font-family: 'Source Sans Pro Regular';
     font-size: 7;
 }

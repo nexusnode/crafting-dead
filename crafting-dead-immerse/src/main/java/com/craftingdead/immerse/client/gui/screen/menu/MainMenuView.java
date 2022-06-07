@@ -129,7 +129,7 @@ public class MainMenuView extends ParentView {
   }
 
   private void transitionTo(View view) {
-    var views = this.contentContainer.getChildViews();
+    var views = this.contentContainer.getChildren();
     if (views.contains(view)) {
       return;
     }

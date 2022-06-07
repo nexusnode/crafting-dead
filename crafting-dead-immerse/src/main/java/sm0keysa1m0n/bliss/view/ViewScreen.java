@@ -1,11 +1,9 @@
 package sm0keysa1m0n.bliss.view;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -16,7 +14,6 @@ import sm0keysa1m0n.bliss.style.StyleSheetManager;
 public final class ViewScreen extends Screen {
 
   private final ParentView root;
-  private final List<? extends GuiEventListener> children;
 
   private StyleList styleList;
 
@@ -55,8 +52,6 @@ public final class ViewScreen extends Screen {
       }
     });
     this.root.screen = this;
-    // Don't use List::of as it does not permit null values.
-    this.children = Collections.singletonList(this.root);
   }
 
   public ParentView getRoot() {
@@ -96,25 +91,26 @@ public final class ViewScreen extends Screen {
   }
 
   private void updateHovered(double mouseX, double mouseY) {
-    var keepLastHovered = new AtomicBoolean();
-    var hovered = this.root.hover(mouseX, mouseY, view -> {
-      if (view == this.hovered) {
-        keepLastHovered.setPlain(true);
+    var lowestCommonAncestor = new AtomicReference<View>();
+    var hovered = this.root.traverseDepthFirst(view -> view.isMouseOver(mouseX, mouseY), view -> {
+      if (view.isHovered()) {
+        lowestCommonAncestor.compareAndExchange(null, view);
       }
+    }).orElse(null);
 
-      if (!view.isHovered()) {
+    while (this.hovered != null && this.hovered != lowestCommonAncestor.getPlain()) {
+      this.hovered.mouseLeft(mouseX, mouseY);
+      this.hovered = this.hovered.getParent();
+    }
+
+    if (hovered != null) {
+      hovered.traverseUpward(view -> {
+        if (view == lowestCommonAncestor.getPlain()) {
+          return true;
+        }
         view.mouseEntered(mouseX, mouseY);
-      }
-    });
-
-    if (!keepLastHovered.getPlain()) {
-      while (this.hovered != null
-          && (!this.hovered.isAdded()
-              || !this.hovered.isMouseOver(mouseX, mouseY)
-              || (hovered != null && hovered.compareTo(this.hovered) > 0))) {
-        this.hovered.mouseLeft(mouseX, mouseY);
-        this.hovered = this.hovered.getParent();
-      }
+        return false;
+      });
     }
 
     this.hovered = hovered;
@@ -127,16 +123,48 @@ public final class ViewScreen extends Screen {
   }
 
   @Override
+  public boolean mouseClicked(double mouseX, double mouseY, int button) {
+    return this.root.mouseClicked(mouseX, mouseY, button);
+  }
+
+  @Override
+  public boolean mouseReleased(double mouseX, double mouseY, int button) {
+    return this.root.mouseReleased(mouseX, mouseY, button);
+  }
+
+  @Override
+  public boolean mouseDragged(double mouseX, double mouseY, int button,
+      double deltaX, double deltaY) {
+    return this.root.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
+  }
+
+  @Override
   public boolean mouseScrolled(double mouseX, double mouseY, double scrollDelta) {
-    var view = this.hovered;
-    while (view != null) {
-      if (view.mouseScrolled(mouseX, mouseY, scrollDelta)) {
-        break;
-      }
-      view = view.getParent();
+    if (this.hovered != null) {
+      this.hovered.traverseUpward(view -> view.mouseScrolled(mouseX, mouseY, scrollDelta));
+      this.updateHovered(mouseX, mouseY);
     }
-    this.updateHovered(mouseX, mouseY);
     return true;
+  }
+
+  @Override
+  public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+    return this.root.keyReleased(keyCode, scanCode, modifiers);
+  }
+
+  @Override
+  public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
+    return this.root.keyReleased(keyCode, scanCode, modifiers);
+  }
+
+  @Override
+  public boolean charTyped(char codePoint, int modifiers) {
+    return this.root.charTyped(codePoint, modifiers);
+  }
+
+  @Override
+  public boolean changeFocus(boolean forward) {
+    return this.root.changeFocus(forward);
   }
 
   @Override
@@ -159,11 +187,6 @@ public final class ViewScreen extends Screen {
   @Override
   public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTicks) {
     this.root.render(poseStack, mouseX, mouseY, partialTicks);
-  }
-
-  @Override
-  public List<? extends GuiEventListener> children() {
-    return this.root.isAdded() ? this.children : Collections.emptyList();
   }
 
   public void setStylesheets(List<ResourceLocation> stylesheets) {

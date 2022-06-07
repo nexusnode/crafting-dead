@@ -96,7 +96,7 @@ public class InvitesView extends ParentView {
   }
 
   protected void updateSelected() {
-    this.selectedInviteView = this.invitesListView.getChildViews().stream()
+    this.selectedInviteView = this.invitesListView.getChildren().stream()
         .filter(InviteView.class::isInstance)
         .map(InviteView.class::cast)
         .filter(View::isFocused)

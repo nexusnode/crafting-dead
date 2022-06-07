@@ -1,9 +1,11 @@
 package sm0keysa1m0n.bliss.view;
 
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 import org.jdesktop.core.animation.timing.Animator;
 import org.jdesktop.core.animation.timing.PropertySetter;
 import org.jdesktop.core.animation.timing.interpolators.SplineInterpolator;
@@ -25,8 +27,6 @@ import io.github.humbleui.types.Rect;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiComponent;
-import net.minecraft.client.gui.components.Widget;
-import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.Mth;
@@ -57,8 +57,7 @@ import sm0keysa1m0n.bliss.view.event.MouseEvent;
 import sm0keysa1m0n.bliss.view.event.MouseLeaveEvent;
 import sm0keysa1m0n.bliss.view.event.RemovedEvent;
 
-public class View extends GuiComponent
-    implements GuiEventListener, Widget, Comparable<View>, StyleNode {
+public class View extends GuiComponent implements Comparable<View>, StyleNode {
 
   public static final boolean DEBUG = false;
 
@@ -175,7 +174,6 @@ public class View extends GuiComponent
     this.scrollOffset = this.clampScrollOffset(this.scrollOffset);
   }
 
-  @Override
   public final void render(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
     if (!this.isVisible()) {
       return;
@@ -682,7 +680,6 @@ public class View extends GuiComponent
     this.post(new MouseLeaveEvent());
   }
 
-  @Override
   public void mouseMoved(double mouseX, double mouseY) {
     this.post(new MouseEvent.MoveEvent(mouseX, mouseY));
   }
@@ -715,7 +712,6 @@ public class View extends GuiComponent
     }
   }
 
-  @Override
   public boolean mouseClicked(double mouseX, double mouseY, int button) {
     if (this.post(new MouseEvent.ButtonEvent(mouseX, mouseY, button,
         GLFW.GLFW_PRESS)) == Event.Result.ALLOW) {
@@ -756,13 +752,11 @@ public class View extends GuiComponent
     return true;
   }
 
-  @Override
   public boolean mouseReleased(double mouseX, double mouseY, int button) {
     return this.post(new MouseEvent.ButtonEvent(mouseX, mouseY, button,
         GLFW.GLFW_RELEASE)) == Event.Result.ALLOW;
   }
 
-  @Override
   public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX,
       double deltaY) {
     if (this.isScrollbarEnabled() &&
@@ -775,7 +769,6 @@ public class View extends GuiComponent
         new MouseEvent.DragEvent(mouseX, mouseY, button, deltaX, deltaY)) == Event.Result.ALLOW;
   }
 
-  @Override
   public boolean mouseScrolled(double mouseX, double mouseY, double scrollDelta) {
     if (this.isScrollbarEnabled()) {
       this.scrollVelocity += (float) (-scrollDelta * SCROLL_CHUNK);
@@ -784,7 +777,6 @@ public class View extends GuiComponent
         new MouseEvent.ScrollEvent(mouseX, mouseY, scrollDelta)) == Event.Result.ALLOW;
   }
 
-  @Override
   public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
     if (this.post(
         new KeyEvent(keyCode, scanCode, GLFW.GLFW_PRESS, modifiers)) == Event.Result.ALLOW) {
@@ -798,31 +790,29 @@ public class View extends GuiComponent
     return false;
   }
 
-  @Override
   public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
     return this.post(
         new KeyEvent(keyCode, scanCode, GLFW.GLFW_RELEASE, modifiers)) == Event.Result.ALLOW;
   }
 
-  @Override
   public boolean charTyped(char codePoint, int modifiers) {
     return this.post(new CharTypeEvent(codePoint, modifiers)) == Event.Result.ALLOW;
   }
 
-  @Override
   public boolean changeFocus(boolean forward) {
-    if (this.focusable && this.getStyleManager().hasState(States.ENABLED)) {
-      var focused = this.getStyleManager().toggleState(States.FOCUS);
-      if (focused) {
-        this.getStyleManager().addState(States.FOCUS_VISIBLE);
-      } else {
-        this.getStyleManager().removeState(States.FOCUS_VISIBLE);
-      }
-      this.getStyleManager().notifyListeners();
-      this.focusChanged();
-      return focused;
+    if (!this.focusable || this.getStyleManager().hasState(States.DISABLED)) {
+      return false;
     }
-    return false;
+
+    var focused = this.getStyleManager().toggleState(States.FOCUS);
+    if (focused) {
+      this.getStyleManager().addState(States.FOCUS_VISIBLE);
+    } else {
+      this.getStyleManager().removeState(States.FOCUS_VISIBLE);
+    }
+    this.getStyleManager().notifyListeners();
+    this.focusChanged();
+    return focused;
   }
 
   protected void focusChanged() {}
@@ -833,7 +823,6 @@ public class View extends GuiComponent
    * 
    * @see #isHovered()
    */
-  @Override
   public boolean isMouseOver(double mouseX, double mouseY) {
     return this.style.pointerEvents.get() != PointerEvents.NONE
         && mouseX > this.getScaledX() && mouseX < this.getScaledX() + this.getScaledWidth()
@@ -1060,10 +1049,6 @@ public class View extends GuiComponent
     return height;
   }
 
-  public float getZOffset() {
-    return this.index + this.style.zIndex.get();
-  }
-
   public final float getXScale() {
     return (this.parent == null ? 1.0F : this.parent.getXScale()) * this.style.xScale.get();
   }
@@ -1142,9 +1127,26 @@ public class View extends GuiComponent
     return condition ? value / (float) this.window.getGuiScale() : value;
   }
 
+  public Optional<View> traverseUpward(Predicate<View> handler) {
+    return this.traverseUpward(handler, true);
+  }
+
+  public Optional<View> traverseUpward(Predicate<View> handler, boolean includeSelf) {
+    var view = includeSelf ? this : this.parent;
+    while (view != null) {
+      if (handler.test(view)) {
+        return Optional.of(view);
+      }
+      view = view.parent;
+    }
+    return Optional.empty();
+  }
+
   @Override
-  public final int compareTo(View another) {
-    return Float.compare(this.getZOffset(), another.getZOffset());
+  public final int compareTo(View o) {
+    return Float.compare(
+        this.index + this.style.zIndex.get(),
+        o.index + o.style.zIndex.get());
   }
 
   @Override

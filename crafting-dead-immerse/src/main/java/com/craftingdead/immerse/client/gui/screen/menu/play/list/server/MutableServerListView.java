@@ -112,7 +112,7 @@ public class MutableServerListView extends ServerListView {
 
   private void saveServerList() {
     ((MutableServerList) this.serverList)
-        .save(this.listView.getChildViews().stream()
+        .save(this.listView.getChildren().stream()
             .filter(ServerItemView.class::isInstance)
             .map(ServerItemView.class::cast)
             .map(ServerItemView::getServerEntry));

@@ -105,7 +105,7 @@ public class WorldListView extends ParentView {
   protected void added() {
     super.added();
     int delay = 0;
-    for (var view : this.listView.getChildViews()) {
+    for (var view : this.listView.getChildren()) {
       new Animator.Builder()
           .addTarget(Animation.forProperty(view.getStyle().opacity)
               .keyFrames(new KeyFrames.Builder<>(Percentage.ZERO)
@@ -131,7 +131,7 @@ public class WorldListView extends ParentView {
   }
 
   protected void updateSelected() {
-    this.selectedItem = this.listView.getChildViews().stream()
+    this.selectedItem = this.listView.getChildren().stream()
         .filter(child -> child instanceof WorldItemView)
         .map(child -> (WorldItemView) child)
         .filter(WorldItemView::isFocused)

@@ -38,7 +38,6 @@ public class DropdownView extends View implements ContainerEventHandler {
   public static final int DEFAULT_SELECTED_ITEM_BACKGROUND_COLOR = 0xFF222222;
   public static final int DEFAULT_HOVERED_ITEM_BACKGROUND_COLOR = 0xFF333333;
 
-  public static final int Z_OFFSET = 5;
   public static final float DEFAULT_ARROW_WIDTH = 6.0F;
   public static final float DEFAULT_ARROW_HEIGHT = 2.5F;
   public static final float DEFAULT_ARROW_LINE_WIDTH = 1F;
@@ -109,12 +108,7 @@ public class DropdownView extends View implements ContainerEventHandler {
       this.fontManager.close();
     }
   }
-
-  @Override
-  public float getZOffset() {
-    return super.getZOffset() + Z_OFFSET;
-  }
-
+  
   protected Vec2 measure(MeasureMode widthMode, float width, MeasureMode heightMode,
       float height) {
     return new Vec2(width, DEFAULT_HEIGHT);

@@ -92,7 +92,7 @@ public class ServerListView extends ParentView {
   protected void added() {
     super.added();
     int delay = 0;
-    for (var view : this.listView.getChildViews()) {
+    for (var view : this.listView.getChildren()) {
       new Animator.Builder()
           .addTarget(Animation.forProperty(view.getStyle().xTranslation)
               .keyFrames(new KeyFrames.Builder<>(-100.0F)
@@ -123,7 +123,7 @@ public class ServerListView extends ParentView {
   }
 
   protected void updateSelected() {
-    this.selectedItem = this.listView.getChildViews().stream()
+    this.selectedItem = this.listView.getChildren().stream()
         .filter(child -> child instanceof ServerItemView)
         .map(child -> (ServerItemView) child)
         .filter(View::isFocused)
@@ -151,7 +151,7 @@ public class ServerListView extends ParentView {
   }
 
   private void quickRefresh() {
-    for (var child : this.listView.getChildViews()) {
+    for (var child : this.listView.getChildren()) {
       if (child instanceof ServerItemView serverItem) {
         serverItem.ping();
       }

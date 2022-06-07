@@ -3,8 +3,10 @@ package sm0keysa1m0n.bliss.view;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
@@ -74,7 +76,7 @@ public class ParentView extends View {
     }
   }
 
-  public final List<? extends View> getChildViews() {
+  public final List<? extends View> getChildren() {
     return this.children;
   }
 
@@ -282,28 +284,30 @@ public class ParentView extends View {
     Arrays.sort(this.sortedChildren);
   }
 
-  public View hover(double mouseX, double mouseY, Consumer<View> hoveredConsumer) {
+  public Optional<View> traverseDepthFirst(Predicate<View> filter, Consumer<View> handler) {
     for (int i = this.sortedChildren.length; i-- > 0;) {
       var view = this.sortedChildren[i];
       if (view instanceof ParentView parent) {
-        var hovered = parent.hover(mouseX, mouseY, hoveredConsumer);
-        if (hovered != null) {
-          hoveredConsumer.accept(view);
-          return hovered;
+        var result = parent.traverseDepthFirst(filter, handler);
+        if (result.isPresent()) {
+          handler.accept(view);
+          return result;
         }
       }
 
-      if (view.isMouseOver(mouseX, mouseY)) {
-        hoveredConsumer.accept(view);
-        return view;
+      if (filter.test(view)) {
+        handler.accept(view);
+        return Optional.of(view);
       }
     }
-    return null;
+    return Optional.empty();
   }
 
   @Override
   public void mouseMoved(double mouseX, double mouseY) {
-    this.getChildViews().forEach(listener -> listener.mouseMoved(mouseX, mouseY));
+    for (var view : this.sortedChildren) {
+      view.mouseMoved(mouseX, mouseY);
+    }
     super.mouseMoved(mouseX, mouseY);
   }
 
@@ -323,8 +327,8 @@ public class ParentView extends View {
   }
 
   @Override
-  public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX,
-      double deltaY) {
+  public boolean mouseDragged(double mouseX, double mouseY, int button,
+      double deltaX, double deltaY) {
     return this.focusedView != null
         && this.isDragging()
         && button == GLFW.GLFW_MOUSE_BUTTON_LEFT
@@ -368,10 +372,9 @@ public class ParentView extends View {
       return true;
     }
 
-    int focusedIndex = this.children.indexOf(this.focusedView);
     int fromIndex;
-    if (this.focusedView != null && focusedIndex >= 0) {
-      fromIndex = focusedIndex + (forward ? 1 : 0);
+    if (this.focusedView != null) {
+      fromIndex = this.focusedView.index + (forward ? 1 : 0);
     } else if (forward) {
       fromIndex = 0;
     } else {

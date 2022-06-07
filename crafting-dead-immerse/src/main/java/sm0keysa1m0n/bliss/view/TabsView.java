@@ -39,8 +39,8 @@ public class TabsView extends ParentView {
   @Override
   protected void added() {
     super.added();
-    if (this.getChildViews().size() > 0) {
-      this.selectTab((TabView) this.getChildViews().get(0));
+    if (this.getChildren().size() > 0) {
+      this.selectTab((TabView) this.getChildren().get(0));
     }
   }
 

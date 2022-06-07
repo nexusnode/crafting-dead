@@ -112,7 +112,7 @@ public class ManageMembersView extends ParentView {
   }
 
   protected void updateSelected() {
-    this.selectedMemberView = this.membersListView.getChildViews().stream()
+    this.selectedMemberView = this.membersListView.getChildren().stream()
         .filter(MemberView.class::isInstance)
         .map(MemberView.class::cast)
         .filter(View::isFocused)
