@@ -18,27 +18,53 @@
 
 package com.craftingdead.core.client.gui.screen.inventory;
 
+import com.craftingdead.core.CraftingDead;
+import com.craftingdead.core.client.gui.widget.button.CompositeButton;
+import com.craftingdead.core.network.NetworkChannel;
+import com.craftingdead.core.network.message.play.OpenEquipmentMenuMessage;
 import com.craftingdead.core.world.inventory.AbstractMenu;
 import com.craftingdead.core.world.inventory.GenericMenu;
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
+import java.util.function.Consumer;
+import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Inventory;
+import org.jetbrains.annotations.Nullable;
 
 public class GenericContainerScreen extends AbstractContainerScreen<GenericMenu> {
 
   private static final ResourceLocation GENERIC_CONTAINER_TEXTURE =
-      new ResourceLocation("textures/gui/container/generic_54.png");
+      new ResourceLocation(CraftingDead.ID, "textures/gui/container/generic_54.png");
 
-  private static final int TITLE_TEXT_COLOUR = 0x404040;
+  private static final int TITLE_TEXT_COLOUR = 0x000000;
+  // Implementations may change this field to another action for the return button
+  @Nullable
+  protected Consumer<Button> returnButtonAction = (button) -> NetworkChannel.PLAY.getSimpleChannel()
+      .sendToServer(new OpenEquipmentMenuMessage());
+  private CompositeButton returnButton;
 
   public GenericContainerScreen(GenericMenu menu, Inventory playerInventory,
       Component title) {
     super(menu, playerInventory, title);
     this.passEvents = false;
     this.imageHeight = 114 + this.menu.getRows() * AbstractMenu.SLOT_SIZE;
+  }
+
+  @Override
+  public void init() {
+    super.init();
+    Consumer<Button> action = returnButtonAction == null ? (button) -> {} : returnButtonAction;
+    this.returnButton = CompositeButton.button(this.leftPos + 157, this.topPos - 1, 12, 16,
+            GENERIC_CONTAINER_TEXTURE)
+        .setAtlasPos(244, 0)
+        .setHoverAtlasPos(231, 0)
+        .setInactiveAtlasPos(219, 0)
+        .setAction(action::accept).build();
+    this.returnButton.active = returnButtonAction != null;
+    this.addRenderableWidget(returnButton);
   }
 
   @Override
@@ -49,7 +75,7 @@ public class GenericContainerScreen extends AbstractContainerScreen<GenericMenu>
 
   @Override
   protected void renderLabels(PoseStack poseStack, int mouseX, int mouseY) {
-    this.font.draw(poseStack, this.title, 8.0F, 6.0F, 4210752);
+    this.font.draw(poseStack, this.title, 8.0F, 6.0F, TITLE_TEXT_COLOUR);
     this.font.draw(poseStack, this.playerInventoryTitle, 8.0F,
         this.imageHeight - 96 + 2, TITLE_TEXT_COLOUR);
   }
@@ -60,11 +86,11 @@ public class GenericContainerScreen extends AbstractContainerScreen<GenericMenu>
     RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
     RenderSystem.setShaderTexture(0, GENERIC_CONTAINER_TEXTURE);
     int x = (this.width - this.imageWidth) / 2;
-    int y = (this.height - this.imageHeight) / 2;
-    this.blit(poseStack, x, y, 0, 0, this.imageWidth,
-        this.menu.getRows() * AbstractMenu.SLOT_SIZE + AbstractMenu.SLOT_SIZE - 1);
-    this.blit(poseStack, x,
-        y + (this.menu.getRows() * AbstractMenu.SLOT_SIZE) + AbstractMenu.SLOT_SIZE - 1, 0,
-        7 * AbstractMenu.SLOT_SIZE, this.imageWidth, 96);
+    int y = (this.height - this.imageHeight - 8) / 2;
+    int heightOffset = (6 * AbstractMenu.SLOT_SIZE + AbstractMenu.SLOT_SIZE)
+        - (this.menu.getRows() * AbstractMenu.SLOT_SIZE + AbstractMenu.SLOT_SIZE);
+    this.blit(poseStack, x, y, 0, 0, this.imageWidth, 21);
+    this.blit(poseStack, x, y + 21, 0, 21 + heightOffset, this.imageWidth,
+        96 + (this.menu.getRows() * AbstractMenu.SLOT_SIZE + AbstractMenu.SLOT_SIZE));
   }
 }
