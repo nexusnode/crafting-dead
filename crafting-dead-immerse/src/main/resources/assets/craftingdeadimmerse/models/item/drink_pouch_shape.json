@@ -1,0 +1,75 @@
+{
+	"credit": "Made with Blockbench",
+	"textures": {
+		"0": "Orange Juice Pouch Full",
+		"particle": "Orange Juice Pouch Full"
+	},
+	"elements": [
+		{
+			"from": [6.5, 0, 7],
+			"to": [9.5, 4, 9],
+			"faces": {
+				"north": {"uv": [2, 2, 5, 6], "texture": "#0"},
+				"east": {"uv": [0, 2, 2, 6], "texture": "#0"},
+				"south": {"uv": [7, 2, 10, 6], "texture": "#0"},
+				"west": {"uv": [5, 2, 7, 6], "texture": "#0"},
+				"up": {"uv": [5, 2, 2, 0], "texture": "#0"},
+				"down": {"uv": [8, 0, 5, 2], "texture": "#0"}
+			}
+		},
+		{
+			"from": [6.5, 4, 8],
+			"to": [9.5, 8, 8],
+			"faces": {
+				"north": {"uv": [0, 6, 3, 10], "texture": "#0"},
+				"east": {"uv": [0, 6, 0, 10], "texture": "#0"},
+				"south": {"uv": [3, 6, 6, 10], "texture": "#0"},
+				"west": {"uv": [3, 6, 3, 10], "texture": "#0"},
+				"up": {"uv": [3, 6, 0, 6], "texture": "#0"},
+				"down": {"uv": [6, 6, 3, 6], "texture": "#0"}
+			}
+		}
+	],
+	"display": {
+		"thirdperson_righthand": {
+			"translation": [0, 5, 0]
+		},
+		"thirdperson_lefthand": {
+			"translation": [0, 5, 0]
+		},
+		"firstperson_righthand": {
+			"rotation": [16, -180, 0],
+			"translation": [3.75, 8.25, 0]
+		},
+		"firstperson_lefthand": {
+			"rotation": [-165, 0, 180],
+			"translation": [3.75, 8.25, 0]
+		},
+		"ground": {
+			"translation": [0, 4.5, 0]
+		},
+		"gui": {
+			"rotation": [28, -165, 0],
+			"translation": [0, 8.75, 0],
+			"scale": [1.74609, 1.74609, 1.74609]
+		},
+		"head": {
+			"rotation": [25, -90, 0],
+			"translation": [0, 0.5, -6.25],
+			"scale": [1.8, 1.8, 1.8]
+		},
+		"fixed": {
+			"rotation": [-90, 0, 0],
+			"translation": [0, 0.5, -16],
+			"scale": [2, 2, 2]
+		}
+	},
+	"groups": [
+		{
+			"name": "Anchor",
+			"origin": [8, 8, 8],
+			"color": 0,
+			"children": [0, 1]
+		}
+	]
+}

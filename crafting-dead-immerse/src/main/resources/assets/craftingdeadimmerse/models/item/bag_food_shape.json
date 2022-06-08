@@ -1,0 +1,64 @@
+{
+	"credit": "Made with Blockbench",
+	"texture_size": [32, 32],
+	"textures": {
+		"4": "Tea",
+		"particle": "Coffee"
+	},
+	"elements": [
+		{
+			"from": [5, 0, 5],
+			"to": [11, 5, 8],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8, 3.5, 6]},
+			"faces": {
+				"north": {"uv": [1.5, 1.5, 4.5, 4], "texture": "#4"},
+				"east": {"uv": [0, 1.5, 1.5, 4], "texture": "#4"},
+				"south": {"uv": [6, 1.5, 9, 4], "texture": "#4"},
+				"west": {"uv": [4.5, 1.5, 6, 4], "texture": "#4"},
+				"up": {"uv": [4.5, 1.5, 1.5, 0], "texture": "#4"},
+				"down": {"uv": [7.5, 0, 4.5, 1.5], "texture": "#4"}
+			}
+		}
+	],
+	"display": {
+		"thirdperson_righthand": {
+			"translation": [-2, 6, 1.75]
+		},
+		"thirdperson_lefthand": {
+			"translation": [-2, 5.75, 2]
+		},
+		"firstperson_righthand": {
+			"rotation": [0, 141, 0],
+			"translation": [1.75, 8.5, -1.75]
+		},
+		"firstperson_lefthand": {
+			"rotation": [0, 141, 0],
+			"translation": [1.5, 8.5, -1.75]
+		},
+		"ground": {
+			"translation": [0, 4, 0]
+		},
+		"gui": {
+			"rotation": [-150, -20, 180],
+			"translation": [-0.75, 9, 0],
+			"scale": [1.70117, 1.70117, 1.70117]
+		},
+		"head": {
+			"rotation": [37.5, 0, 0],
+			"translation": [0, -1.75, -3.25],
+			"scale": [1.8, 1.8, 1.8]
+		},
+		"fixed": {
+			"translation": [0, 11.25, 0],
+			"scale": [2, 2, 2]
+		}
+	},
+	"groups": [
+		{
+			"name": "Anchor",
+			"origin": [8, 8, 8],
+			"color": 0,
+			"children": [0]
+		}
+	]
+}

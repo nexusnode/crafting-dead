@@ -1,0 +1,90 @@
+{
+	"credit": "Made with Blockbench",
+	"textures": {
+		"1": "Chocolate in box Full",
+		"particle": "Milk in box Full"
+	},
+	"elements": [
+		{
+			"from": [6, 0, 5],
+			"to": [10, 7, 8],
+			"faces": {
+				"north": {"uv": [3, 3, 7, 10], "texture": "#1"},
+				"east": {"uv": [0, 3, 3, 10], "texture": "#1"},
+				"south": {"uv": [10, 3, 14, 10], "texture": "#1"},
+				"west": {"uv": [7, 3, 10, 10], "texture": "#1"},
+				"up": {"uv": [7, 3, 3, 0], "texture": "#1"},
+				"down": {"uv": [11, 0, 7, 3], "texture": "#1"}
+			}
+		},
+		{
+			"from": [6, 6.25, 6],
+			"to": [8, 7.25, 7],
+			"faces": {
+				"north": {"uv": [1, 11, 3, 12], "texture": "#1"},
+				"east": {"uv": [0, 11, 1, 12], "texture": "#1"},
+				"south": {"uv": [4, 11, 6, 12], "texture": "#1"},
+				"west": {"uv": [3, 11, 4, 12], "texture": "#1"},
+				"up": {"uv": [3, 11, 1, 10], "texture": "#1"},
+				"down": {"uv": [5, 10, 3, 11], "texture": "#1"}
+			}
+		},
+		{
+			"from": [8, 7.25, 6],
+			"to": [8, 9.25, 7],
+			"rotation": {"angle": -45, "axis": "z", "origin": [8, 7.25, 6.5]},
+			"faces": {
+				"north": {"uv": [7, 11, 7, 13], "texture": "#1"},
+				"east": {"uv": [6, 11, 7, 13], "texture": "#1"},
+				"south": {"uv": [8, 11, 8, 13], "texture": "#1"},
+				"west": {"uv": [7, 11, 8, 13], "texture": "#1"},
+				"up": {"uv": [7, 11, 7, 10], "texture": "#1"},
+				"down": {"uv": [7, 10, 7, 11], "texture": "#1"}
+			}
+		}
+	],
+	"display": {
+		"thirdperson_righthand": {
+			"rotation": [0, -90, 0],
+			"translation": [-1.5, 3, 0.5]
+		},
+		"thirdperson_lefthand": {
+			"rotation": [0, 90, 0],
+			"translation": [1.5, 3, 0.5]
+		},
+		"firstperson_righthand": {
+			"rotation": [-165, 60, -180],
+			"translation": [2.5, 7.75, 0]
+		},
+		"firstperson_lefthand": {
+			"rotation": [16, 120, 0],
+			"translation": [2.75, 7.75, 0]
+		},
+		"ground": {
+			"translation": [0, 4.5, 0]
+		},
+		"gui": {
+			"rotation": [20, -140, 0],
+			"translation": [-1.25, 7.25, 0],
+			"scale": [1.66016, 1.66016, 1.66016]
+		},
+		"head": {
+			"rotation": [51.5, 90, 0],
+			"translation": [2.75, -1.75, -7.25],
+			"scale": [1.8, 1.8, 1.8]
+		},
+		"fixed": {
+			"rotation": [-90, 0, 0],
+			"translation": [0, 3.5, -16],
+			"scale": [2, 2, 2]
+		}
+	},
+	"groups": [
+		{
+			"name": "Anchor",
+			"origin": [8, 8, 8],
+			"color": 0,
+			"children": [0, 1, 2]
+		}
+	]
+}

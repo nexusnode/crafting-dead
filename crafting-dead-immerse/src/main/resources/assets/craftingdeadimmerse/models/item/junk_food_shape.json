@@ -1,0 +1,80 @@
+{
+	"credit": "Made with Blockbench",
+	"texture_size": [32, 32],
+	"textures": {
+		"1": "Potato Chips",
+		"particle": "block/Potato"
+	},
+	"elements": [
+		{
+			"from": [5.5, 0, 4],
+			"to": [10.5, 1, 10],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8.5, 0.5, 7]},
+			"faces": {
+				"north": {"uv": [3, 7, 5.5, 7.5], "texture": "#1"},
+				"east": {"uv": [0, 7, 3, 7.5], "texture": "#1"},
+				"south": {"uv": [8.5, 7, 11, 7.5], "texture": "#1"},
+				"west": {"uv": [5.5, 7, 8.5, 7.5], "texture": "#1"},
+				"up": {"uv": [5.5, 7, 3, 4], "texture": "#1"},
+				"down": {"uv": [8, 4, 5.5, 7], "texture": "#1"}
+			}
+		},
+		{
+			"from": [5, 0.5, 3],
+			"to": [11, 0.5, 11],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8.5, 0.5, 7]},
+			"faces": {
+				"north": {"uv": [4, 4, 7, 4], "texture": "#1"},
+				"east": {"uv": [0, 4, 4, 4], "texture": "#1"},
+				"south": {"uv": [11, 4, 14, 4], "texture": "#1"},
+				"west": {"uv": [7, 4, 11, 4], "texture": "#1"},
+				"up": {"uv": [7, 4, 4, 0], "texture": "#1"},
+				"down": {"uv": [10, 0, 7, 4], "texture": "#1"}
+			}
+		}
+	],
+	"display": {
+		"thirdperson_righthand": {
+			"rotation": [67, -180, 0],
+			"translation": [-1.5, 5.25, 7.25]
+		},
+		"thirdperson_lefthand": {
+			"rotation": [67, -180, 0],
+			"translation": [-1.25, 5.25, 7.25]
+		},
+		"firstperson_righthand": {
+			"rotation": [102, 177, -8],
+			"translation": [-0.5, 3, 8]
+		},
+		"firstperson_lefthand": {
+			"rotation": [-85, 0, 162],
+			"translation": [-1.25, 3.75, 7.25]
+		},
+		"ground": {
+			"translation": [0, 4, 0]
+		},
+		"gui": {
+			"rotation": [-120, -28, 180],
+			"translation": [-0.5, 7.25, 0],
+			"scale": [1.60742, 1.60742, 1.60742]
+		},
+		"head": {
+			"rotation": [-95, 0, 0],
+			"translation": [0, -15.75, -26.25],
+			"scale": [1.8, 1.8, 1.8]
+		},
+		"fixed": {
+			"rotation": [-90, 0, 0],
+			"translation": [0, 2.25, -16.25],
+			"scale": [2, 2, 2]
+		}
+	},
+	"groups": [
+		{
+			"name": "Anchor",
+			"origin": [8, 8, 8],
+			"color": 0,
+			"children": [0, 1]
+		}
+	]
+}
