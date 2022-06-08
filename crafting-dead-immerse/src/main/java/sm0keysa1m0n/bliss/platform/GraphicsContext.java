@@ -15,9 +15,9 @@ public interface GraphicsContext {
 
   Canvas canvas();
 
-  void begin();
+  void enterManaged();
 
-  void end();
+  void exitManaged();
 
   void setCursor(Cursor cursor);
 }

@@ -21,7 +21,7 @@ public class PanoramaView extends View {
   @Override
   public void renderContent(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
     super.renderContent(poseStack, mouseX, mouseY, partialTick);
-    this.graphicsContext.end();
+    this.graphicsContext.exitManaged();
     {
       if (this.minecraft.level == null) {
         this.panorama.render(partialTick, this.getAlpha());
@@ -30,6 +30,6 @@ public class PanoramaView extends View {
             this.getScaledContentHeight(), 0xA0101010, 0xB0101010);
       }
     }
-    this.graphicsContext.begin();
+    this.graphicsContext.enterManaged();
   }
 }

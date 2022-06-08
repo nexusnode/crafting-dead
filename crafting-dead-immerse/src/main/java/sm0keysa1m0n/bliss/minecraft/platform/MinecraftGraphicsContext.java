@@ -99,7 +99,7 @@ public class MinecraftGraphicsContext implements GraphicsContext, AutoCloseable 
   }
 
   @Override
-  public void begin() {
+  public void enterManaged() {
     RenderSystem.assertOnRenderThread();
 
     // Undo Minecraft's changes
@@ -112,7 +112,7 @@ public class MinecraftGraphicsContext implements GraphicsContext, AutoCloseable 
   }
 
   @Override
-  public void end() {
+  public void exitManaged() {
     RenderSystem.assertOnRenderThread();
 
     this.surface.flush();

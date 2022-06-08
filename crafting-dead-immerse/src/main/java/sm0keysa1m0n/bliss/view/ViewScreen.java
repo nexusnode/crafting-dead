@@ -270,9 +270,9 @@ public final class ViewScreen extends Screen {
 
   @Override
   public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTicks) {
-    this.root.graphicsContext.begin();
+    this.root.graphicsContext.enterManaged();
     this.root.render(poseStack, mouseX, mouseY, partialTicks);
-    this.root.graphicsContext.end();
+    this.root.graphicsContext.exitManaged();
   }
 
   public void setStylesheets(List<ResourceLocation> stylesheets) {

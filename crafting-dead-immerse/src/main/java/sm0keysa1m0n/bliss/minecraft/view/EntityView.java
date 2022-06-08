@@ -23,7 +23,7 @@ public class EntityView extends View {
   public void renderContent(PoseStack poseStack, int mouseX, int mouseY, float partialTicks) {
     super.renderContent(poseStack, mouseX, mouseY, partialTicks);
 
-    this.graphicsContext.end();
+    this.graphicsContext.exitManaged();
     {
       this.minecraft.getEntityRenderDispatcher().prepare(FakeLevel.getInstance(),
           this.minecraft.gameRenderer.getMainCamera(), null);
@@ -79,6 +79,6 @@ public class EntityView extends View {
       modelViewStack.popPose();
       RenderSystem.applyModelViewMatrix();
     }
-    this.graphicsContext.begin();
+    this.graphicsContext.enterManaged();
   }
 }

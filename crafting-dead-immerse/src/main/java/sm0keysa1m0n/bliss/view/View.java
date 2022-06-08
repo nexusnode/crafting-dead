@@ -561,7 +561,7 @@ public class View implements Comparable<View>, StyleNode {
   @SuppressWarnings("unused")
   protected void renderContent(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
     if (DEBUG && this.isHovered()) {
-      this.graphicsContext.end();
+      this.graphicsContext.exitManaged();
       RenderUtil.fillWidthHeight(poseStack, this.getScaledContentX(), this.getScaledContentY(),
           this.getScaledContentWidth(), this.getScaledContentHeight(), 0x333495eb);
 
@@ -626,7 +626,7 @@ public class View implements Comparable<View>, StyleNode {
           this.getScaledY() + this.getScaledHeight()
               - this.unscale(this.layout.getBottomBorder(), this.unscaleBorder),
           0x3384ab05);
-      this.graphicsContext.begin();
+      this.graphicsContext.enterManaged();
     }
   }
 

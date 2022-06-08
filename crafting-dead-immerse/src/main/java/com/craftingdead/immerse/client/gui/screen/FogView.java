@@ -52,7 +52,7 @@ public class FogView extends View {
       fogStartTime = Util.getMillis();
     }
 
-    this.graphicsContext.end();
+    this.graphicsContext.exitManaged();
     poseStack.pushPose();
     {
       poseStack.scale(4F, 4F, 4F);
@@ -73,6 +73,6 @@ public class FogView extends View {
       RenderSystem.disableBlend();
     }
     poseStack.popPose();
-    this.graphicsContext.begin();
+    this.graphicsContext.enterManaged();
   }
 }
