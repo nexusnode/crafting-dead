@@ -96,74 +96,60 @@
         "craftingdead:red_dot_sight": {
             "translation": [
                 0.5,
-                10,
-                -2
+                4.8,
+                4
             ]
         },
         "craftingdead:acog_sight": {
             "translation": [
-                8,
-                1,
-                11
-            
+                0.5,
+                4.5,
+                5
             ]
-    }
-    },
+        },
         "craftingdead:bipod": {
             "translation": [
-                7,
-                5.5,
-                -3.25
-            
+                0.5,
+                -0.5,
+                -16
             ]
-    },
+        },
         "craftingdead:eotech_sight": {
             "translation": [
-                7.25,
-                11.75,
-                9
-            
+                0.5,
+                5,
+                3
             ]
-    },
-        "craftingdead:iron_sight": {
+        },
+        "craftingdead:lp_scope": {
             "translation": [
-                7.25,
-                11.75,
-                9
-            
+                0.5,
+                4,
+                -1
             ]
-    },
-        "craftingdead:lp_sight": {
-            "translation": [
-                7,
-                14.2678,
-                8.1464
-            
-            ]
-    },
+        },
         "craftingdead:suppressor": {
             "translation": [
-                7,
-                7,
-                -16
-            
+                0.5,
+                0.5,
+                -21
+        
             ]
-    },
+        },
         "craftingdead:tactical_grip": {
             "translation": [
-                7,
-                6,
-                -0.5
-            
+                0.5,
+                -4.5,
+                -8
             ]
-    },
-        "craftingdead:hp_sight": {
+        },
+        "craftingdead:hp_scope": {
             "translation": [
-                9.5,
-                13,
-                2
-            
+                0.5,
+                3,
+                0
             ]
+        }        
     },
     "back_transform": {
         "scale": [0.5, 0.5, 0.5],
