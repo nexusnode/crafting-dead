@@ -16,103 +16,79 @@
  * https://craftingdead.net/terms.php
  */
 
-/**
- * Crafting Dead Copyright (C) 2020 Nexus Node
- *
- * This program is free software: you can redistribute it and/or modify it under the terms of the
- * GNU General Public License as published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License along with this program. If
- * not, see <http://www.gnu.org/licenses/>.
- */
 package com.craftingdead.immerse.client.gui.screen.menu;
 
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
+import org.jetbrains.annotations.Nullable;
 import com.craftingdead.core.tags.ModItemTags;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.inventory.ModEquipmentSlot;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.client.fake.FakePlayer;
+import com.craftingdead.immerse.client.gui.screen.FogView;
 import com.craftingdead.immerse.client.gui.screen.Theme;
 import com.craftingdead.immerse.client.gui.screen.menu.play.PlayView;
-import com.craftingdead.immerse.client.gui.view.EntityView;
-import com.craftingdead.immerse.client.gui.view.FogView;
-import com.craftingdead.immerse.client.gui.view.ParentView;
-import com.craftingdead.immerse.client.gui.view.Tooltip;
-import com.craftingdead.immerse.client.gui.view.View;
-import com.craftingdead.immerse.client.gui.view.ViewScreen;
 import net.minecraft.client.gui.screens.OptionsScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.registries.ForgeRegistries;
+import sm0keysa1m0n.bliss.minecraft.view.EntityView;
+import sm0keysa1m0n.bliss.view.ParentView;
+import sm0keysa1m0n.bliss.view.TextView;
+import sm0keysa1m0n.bliss.view.View;
+import sm0keysa1m0n.bliss.view.ViewScreen;
 
 public class MainMenuView extends ParentView {
 
   private static final Component TITLE = new TranslatableComponent("menu.home.title");
 
-  private final ParentView contentContainer = new ParentView(new Properties<>().id("content"));
+  private final ParentView contentContainer = new ParentView(new Properties().id("content"));
 
+  @SuppressWarnings("removal")
   public MainMenuView() {
-    super(new Properties<>());
+    super(new Properties());
 
     var homeView = new HomeView();
     var playView = new PlayView();
 
     this.addChild(Theme.createBackground());
 
-    this.addChild(new FogView(new Properties<>()));
+    this.addChild(new FogView(new Properties()));
 
-    var sideBar = new ParentView(new Properties<>().id("side-bar").backgroundBlur(50.0F));
+    var sideBar = new ParentView(new Properties().id("side-bar").styleClasses("blur"));
 
-    var homeButton = Theme.createImageButton(
-        new ResourceLocation(CraftingDeadImmerse.ID, "textures/gui/icon.png"),
-        () -> this.transitionTo(homeView),
-        new Properties<>()
-            .id("home")
-            .tooltip(new Tooltip(new TranslatableComponent("menu.home_button"))));
-    sideBar.addChild(homeButton);
+    sideBar.addChild(this.createButton(
+        new ResourceLocation(CraftingDeadImmerse.ID, "textures/gui/logo.svg"),
+        new Properties().id("home"),
+        new TranslatableComponent("menu.home_button"),
+        () -> this.transitionTo(homeView)));
 
     sideBar.addChild(Theme.newSeparator());
 
-    var playButton = Theme.createImageButton(
-        new ResourceLocation(CraftingDeadImmerse.ID, "textures/gui/play.png"),
-        () -> this.transitionTo(playView),
-        new Properties<>()
-            .id("play")
-            .styleClasses("grow-button")
-            .tooltip(new Tooltip(new TranslatableComponent("menu.play_button"))));
-    playButton.setBilinearFiltering(true);
-    sideBar.addChild(playButton);
+    sideBar.addChild(this.createButton(
+        new ResourceLocation(CraftingDeadImmerse.ID, "textures/gui/play.svg"),
+        new Properties().id("play").styleClasses("grow-button"),
+        new TranslatableComponent("menu.play_button"),
+        () -> this.transitionTo(playView)));
 
-    var settingsButton = Theme.createImageButton(
-        new ResourceLocation(CraftingDeadImmerse.ID, "textures/gui/settings.png"),
+    sideBar.addChild(this.createButton(
+        new ResourceLocation(CraftingDeadImmerse.ID, "textures/gui/settings.svg"),
+        new Properties().id("settings").styleClasses("grow-button"),
+        new TranslatableComponent("menu.options"),
         () -> this.getScreen().keepOpenAndSetScreen(
-            new OptionsScreen(this.getScreen(), this.minecraft.options)),
-        new Properties<>()
-            .id("settings")
-            .styleClasses("grow-button")
-            .tooltip(new Tooltip(new TranslatableComponent("menu.options"))));
-    settingsButton.setBilinearFiltering(true);
-    sideBar.addChild(settingsButton);
+            new OptionsScreen(this.getScreen(), this.minecraft.options))));
 
-    var quitButton = Theme.createImageButton(
-        new ResourceLocation(CraftingDeadImmerse.ID, "textures/gui/power.png"),
-        this.minecraft::stop,
-        new Properties<>()
-            .id("quit")
-            .styleClasses("grow-button"));
-    quitButton.setBilinearFiltering(true);
-    sideBar.addChild(quitButton);
+    sideBar.addChild(this.createButton("quit-container",
+        new ResourceLocation(CraftingDeadImmerse.ID, "textures/gui/power.svg"),
+        new Properties().id("quit").styleClasses("grow-button"),
+        new TranslatableComponent("menu.quit"),
+        this.minecraft::stop));
 
     var fakePlayerEntity = new FakePlayer(this.minecraft.getUser().getGameProfile());
 
@@ -125,8 +101,8 @@ public class MainMenuView extends ParentView {
     var livingExtension = LivingExtension.getOrThrow(fakePlayerEntity);
     livingExtension.getItemHandler().insertItem(ModEquipmentSlot.HAT.getIndex(), hatItem, false);
 
-    var entityContainer = new ParentView(new Properties<>().id("entity-container"));
-    entityContainer.addChild(new EntityView(new Properties<>(), fakePlayerEntity));
+    var entityContainer = new ParentView(new Properties().id("entity-container"));
+    entityContainer.addChild(new EntityView(new Properties(), fakePlayerEntity));
     this.addChild(entityContainer);
 
     this.addChild(this.contentContainer);
@@ -136,15 +112,32 @@ public class MainMenuView extends ParentView {
     this.contentContainer.addChild(homeView);
   }
 
+  private View createButton(ResourceLocation imageLocation, Properties properties,
+      FormattedText tooltip, Runnable actionListener) {
+    return this.createButton(null, imageLocation, properties, tooltip, actionListener);
+  }
+
+  private View createButton(@Nullable String containerId, ResourceLocation imageLocation,
+      Properties properties, FormattedText tooltip, Runnable actionListener) {
+    var buttonContainer =
+        new ParentView(new Properties().id(containerId).styleClasses("tooltip-container"));
+    buttonContainer.addChild(Theme.createImageButton(imageLocation,
+        actionListener, properties));
+    var tooltipView = new ParentView(new Properties().styleClasses("tooltip"));
+    tooltipView.addChild(new TextView(new Properties()).setText(tooltip));
+    buttonContainer.addChild(tooltipView);
+    return buttonContainer;
+  }
+
   private void transitionTo(View view) {
-    var views = this.contentContainer.getChildViews();
+    var views = this.contentContainer.getChildren();
     if (views.contains(view)) {
       return;
     }
     if (views.size() == 1) {
       var currentView = views.get(0);
-      if (currentView instanceof AnimatableView animatable) {
-        animatable.animateRemoval(() -> {
+      if (currentView instanceof TransitionView animatable) {
+        animatable.transitionOut(() -> {
           this.contentContainer.removeChild(currentView);
           this.contentContainer.layout();
         });
@@ -158,8 +151,7 @@ public class MainMenuView extends ParentView {
 
   public static Screen createScreen() {
     var screen = new ViewScreen(TITLE, new MainMenuView());
-    screen.setStylesheets(
-        List.of(new ResourceLocation(CraftingDeadImmerse.ID, "css/main-menu.css")));
+    screen.setStylesheets(List.of(new ResourceLocation(CraftingDeadImmerse.ID, "main-menu")));
     return screen;
   }
 }

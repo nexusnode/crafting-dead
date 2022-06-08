@@ -18,10 +18,8 @@
 
 package com.craftingdead.immerse.client.gui.screen.menu.play.list.server;
 
+import org.jetbrains.annotations.Nullable;
 import com.craftingdead.immerse.client.gui.screen.Theme;
-import com.craftingdead.immerse.client.gui.view.ParentView;
-import com.craftingdead.immerse.client.gui.view.View;
-import com.craftingdead.immerse.client.gui.view.ViewScreen;
 import net.minecraft.client.gui.screens.ConnectScreen;
 import net.minecraft.client.gui.screens.DirectJoinServerScreen;
 import net.minecraft.client.gui.screens.EditServerScreen;
@@ -29,6 +27,9 @@ import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.multiplayer.resolver.ServerAddress;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.TranslatableComponent;
+import sm0keysa1m0n.bliss.view.ParentView;
+import sm0keysa1m0n.bliss.view.View;
+import sm0keysa1m0n.bliss.view.ViewScreen;
 
 public class MutableServerListView extends ServerListView {
 
@@ -40,6 +41,7 @@ public class MutableServerListView extends ServerListView {
 
   @Override
   protected ParentView createTopRowControls() {
+    @SuppressWarnings("removal")
     var directConnectButton = Theme.createBlueButton(
         new TranslatableComponent("view.mutable_server_list.button.direct_connect"), () -> {
           ServerData tempServerData =
@@ -57,6 +59,7 @@ public class MutableServerListView extends ServerListView {
               tempServerData));
         });
 
+    @SuppressWarnings("removal")
     var addServerButton = Theme.createGreenButton(
         new TranslatableComponent("view.mutable_server_list.button.add"), () -> {
           ServerData tempServerData =
@@ -91,28 +94,32 @@ public class MutableServerListView extends ServerListView {
   }
 
   @Override
-  protected void updateSelected() {
-    super.updateSelected();
-    this.removeButton.setEnabled(this.getSelectedItem().isPresent());
+  public void setSelectedItem(@Nullable ServerItemView selectedItem) {
+    super.setSelectedItem(selectedItem);
+    this.removeButton.setEnabled(selectedItem != null);
   }
 
   private void addServer(String host) {
     var address = ServerAddress.parseString(host);
     var entry = new ServerEntry(null, address.getHost(), address.getPort());
-    this.listView.addChild(new ServerItemView(entry));
+    this.listView.addChild(new ServerItemView(this, entry));
     this.listView.layout();
     this.saveServerList();
   }
 
   private void removeServer(ServerItemView serverItem) {
     this.listView.removeChild(serverItem);
-    this.updateSelected();
+    this.getSelectedItem().ifPresent(item -> {
+      if (item == serverItem) {
+        this.setSelectedItem(null);
+      }
+    });
     this.saveServerList();
   }
 
   private void saveServerList() {
     ((MutableServerList) this.serverList)
-        .save(this.listView.getChildViews().stream()
+        .save(this.listView.getChildren().stream()
             .filter(ServerItemView.class::isInstance)
             .map(ServerItemView.class::cast)
             .map(ServerItemView::getServerEntry));

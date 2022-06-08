@@ -23,6 +23,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import com.craftingdead.immerse.CraftingDeadImmerse;
 import io.sentry.Sentry;
 import net.minecraft.CrashReport;
 import net.minecraft.SharedConstants;
@@ -30,6 +31,12 @@ import net.minecraft.client.Minecraft;
 
 @Mixin(Minecraft.class)
 public abstract class MinecraftMixin {
+
+  @Inject(method = "resizeDisplay", at = @At("RETURN"))
+  public void resizeDisplay(CallbackInfo callbackInfo) {
+    CraftingDeadImmerse.getInstance().getClientDist().getGraphicsContext()
+        .init((float) ((Minecraft) (Object) this).getWindow().getGuiScale());
+  }
 
   /**
    * Modifies window title.

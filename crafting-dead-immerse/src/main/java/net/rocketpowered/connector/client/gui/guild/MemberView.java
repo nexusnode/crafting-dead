@@ -1,29 +1,8 @@
-/*
- * Crafting Dead
- * Copyright (C) 2022  NexusNode LTD
- *
- * This Non-Commercial Software License Agreement (the "Agreement") is made between
- * you (the "Licensee") and NEXUSNODE (BRAD HUNTER). (the "Licensor").
- * By installing or otherwise using Crafting Dead (the "Software"), you agree to be
- * bound by the terms and conditions of this Agreement as may be revised from time
- * to time at Licensor's sole discretion.
- *
- * If you do not agree to the terms and conditions of this Agreement do not download,
- * copy, reproduce or otherwise use any of the source code available online at any time.
- *
- * https://github.com/nexusnode/crafting-dead/blob/1.18.x/LICENSE.txt
- *
- * https://craftingdead.net/terms.php
- */
-
 package net.rocketpowered.connector.client.gui.guild;
 
 import com.craftingdead.immerse.client.gui.screen.Theme;
-import com.craftingdead.immerse.client.gui.view.AvatarView;
-import com.craftingdead.immerse.client.gui.view.Color;
-import com.craftingdead.immerse.client.gui.view.ParentView;
-import com.craftingdead.immerse.client.gui.view.TextView;
 import com.mojang.authlib.GameProfile;
+import io.github.humbleui.skija.FontMgr;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.TextComponent;
 import net.rocketpowered.api.Rocket;
@@ -35,6 +14,10 @@ import net.rocketpowered.common.payload.GuildPayload;
 import net.rocketpowered.common.payload.UserPresencePayload;
 import reactor.core.Disposable;
 import reactor.core.scheduler.Schedulers;
+import sm0keysa1m0n.bliss.Color;
+import sm0keysa1m0n.bliss.minecraft.view.AvatarView;
+import sm0keysa1m0n.bliss.view.ParentView;
+import sm0keysa1m0n.bliss.view.TextView;
 
 public class MemberView extends ParentView {
 
@@ -50,28 +33,32 @@ public class MemberView extends ParentView {
   private final TextView rankView;
 
   public MemberView(GuildPayload guild, GuildMemberPayload member) {
-    super(new Properties<>().styleClasses("item").unscaleBorder(false).focusable(true));
+    super(new Properties().styleClasses("item").unscaleBorder(false).focusable(true));
 
     this.guild = guild;
 
-    this.avatarView = new AvatarView(new Properties<>(),
+    this.avatarView = new AvatarView(new Properties(),
         new GameProfile(member.user().minecraftProfile().id(), null));
-    this.avatarView.defineBorderColorState(Theme.OFFLINE);
     this.addChild(this.avatarView);
 
-    var textView = new ParentView(new Properties<>().id("text"));
+    var textView = new ParentView(new Properties().id("text"));
     this.addChild(textView);
 
-    this.nameView = new TextView(new Properties<>())
+    this.nameView = new TextView(new Properties())
         .setWrap(false)
         .setText(member.user().minecraftProfile().name());
-    this.nameView.getColorProperty().defineState(Theme.OFFLINE);
     textView.addChild(this.nameView);
 
-    this.rankView = new TextView(new Properties<>()).setWrap(false);
+    this.rankView = new TextView(new Properties()).setWrap(false);
     textView.addChild(this.rankView);
 
     this.updateMember(member);
+  }
+
+  @Override
+  public void styleRefreshed(FontMgr fontManager) {
+    this.avatarView.getStyle().defineBorderColorState(Theme.OFFLINE);
+    this.nameView.getStyle().color.defineState(Theme.OFFLINE);
   }
 
   public GuildMemberPayload getMember() {
@@ -99,17 +86,18 @@ public class MemberView extends ParentView {
 
     this.rankView.setText(new TextComponent(owner ? "Owner" : rank.getDisplayName().orElse(""))
         .withStyle(ChatFormatting.ITALIC));
-    this.rankView.getColorProperty().defineState(color);
+    this.rankView.getStyle().color.defineState(color);
 
-    this.getLeftBorderColorProperty().defineState(color);
+    this.getStyle().borderLeftColor.defineState(color);
   }
 
   private void updatePresence(UserPresencePayload presence) {
     var color = presence.online() ? Theme.ONLINE : Theme.OFFLINE;
-    this.avatarView.defineBorderColorState(color);
-    this.nameView.getColorProperty().defineState(color);
+    this.avatarView.getStyle().defineBorderColorState(color);
+    this.nameView.getStyle().color.defineState(color);
   }
 
+  @SuppressWarnings("removal")
   @Override
   protected void added() {
     super.added();

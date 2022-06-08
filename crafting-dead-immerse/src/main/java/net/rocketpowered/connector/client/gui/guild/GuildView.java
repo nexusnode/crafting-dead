@@ -1,30 +1,7 @@
-/*
- * Crafting Dead
- * Copyright (C) 2022  NexusNode LTD
- *
- * This Non-Commercial Software License Agreement (the "Agreement") is made between
- * you (the "Licensee") and NEXUSNODE (BRAD HUNTER). (the "Licensor").
- * By installing or otherwise using Crafting Dead (the "Software"), you agree to be
- * bound by the terms and conditions of this Agreement as may be revised from time
- * to time at Licensor's sole discretion.
- *
- * If you do not agree to the terms and conditions of this Agreement do not download,
- * copy, reproduce or otherwise use any of the source code available online at any time.
- *
- * https://github.com/nexusnode/crafting-dead/blob/1.18.x/LICENSE.txt
- *
- * https://craftingdead.net/terms.php
- */
-
 package net.rocketpowered.connector.client.gui.guild;
 
 import java.util.Set;
 import org.jetbrains.annotations.Nullable;
-import com.craftingdead.immerse.client.gui.view.PanoramaView;
-import com.craftingdead.immerse.client.gui.view.ParentView;
-import com.craftingdead.immerse.client.gui.view.TextView;
-import com.craftingdead.immerse.client.gui.view.View;
-import com.craftingdead.immerse.client.gui.view.event.ActionEvent;
 import com.google.common.base.Objects;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.TitleScreen;
@@ -40,10 +17,15 @@ import net.rocketpowered.common.payload.SocialProfilePayload;
 import net.rocketpowered.connector.client.gui.RocketToast;
 import reactor.core.Disposable;
 import reactor.core.scheduler.Schedulers;
+import sm0keysa1m0n.bliss.minecraft.view.PanoramaView;
+import sm0keysa1m0n.bliss.view.ParentView;
+import sm0keysa1m0n.bliss.view.TextView;
+import sm0keysa1m0n.bliss.view.View;
+import sm0keysa1m0n.bliss.view.event.ActionEvent;
 
 public class GuildView extends ParentView {
 
-  private final ParentView contentView = new ParentView(new Properties<>().id("content"));
+  private final ParentView contentView = new ParentView(new Properties().id("content"));
 
   private final ParentView sideBarView;
 
@@ -65,40 +47,37 @@ public class GuildView extends ParentView {
   @Nullable
   private Disposable guildMemberListener;
 
+  @SuppressWarnings("removal")
   public GuildView() {
-    super(new Properties<>());
+    super(new Properties());
 
     this.yourGuildView = new YourGuildView(this::setContentView);
     var manageMembersView = new ManageMembersView(this::setContentView);
     this.invitesView = new InvitesView();
 
-    this.addChild(new PanoramaView(new Properties<>(), TitleScreen.CUBE_MAP));
+    this.addChild(new PanoramaView(new Properties(), TitleScreen.CUBE_MAP));
 
     this.addChild(
-        this.sideBarView = new ParentView(new Properties<>().id("side-bar").backgroundBlur(50.0F)));
+        this.sideBarView = new ParentView(new Properties().id("side-bar").styleClasses("blur")));
 
-    this.manageMembersButtonView = new TextView(new Properties<>().focusable(true))
-        .setText(ManageMembersView.TITLE)
-        .setCentered(true);
+    this.manageMembersButtonView = new TextView(new Properties().focusable(true))
+        .setText(ManageMembersView.TITLE);
     this.manageMembersButtonView.addListener(ActionEvent.class,
         event -> this.setContentView(manageMembersView));
 
-    this.yourGuildButtonView = new TextView(new Properties<>().focusable(true))
-        .setText(YourGuildView.TITLE)
-        .setCentered(true);
+    this.yourGuildButtonView = new TextView(new Properties().focusable(true))
+        .setText(YourGuildView.TITLE);
     this.yourGuildButtonView.addListener(ActionEvent.class,
         event -> this.setContentView(this.yourGuildView));
 
-    this.invitesButtonView = new TextView(new Properties<>().focusable(true))
-        .setText(InvitesView.TITLE)
-        .setCentered(true);
+    this.invitesButtonView = new TextView(new Properties().focusable(true))
+        .setText(InvitesView.TITLE);
     this.invitesButtonView.addListener(ActionEvent.class,
         event -> this.setContentView(this.invitesView));
     this.sideBarView.addChild(this.invitesButtonView);
 
-    this.createGuildButtonView = new TextView(new Properties<>().focusable(true))
-        .setText(CreateGuildDialogView.TITLE)
-        .setCentered(true);
+    this.createGuildButtonView = new TextView(new Properties().focusable(true))
+        .setText(CreateGuildDialogView.TITLE);
     this.createGuildButtonView.addListener(ActionEvent.class,
         event -> this.setContentView(new CreateGuildDialogView((name, tag) -> {
           Rocket.getGameClientGateway()
@@ -127,6 +106,7 @@ public class GuildView extends ParentView {
             new TextComponent(" (" + invites.size() + ")").withStyle(ChatFormatting.LIGHT_PURPLE));
   }
 
+  @SuppressWarnings("removal")
   private void handleProfile(SocialProfilePayload profile, GameClientGateway gateway) {
     this.invitesButtonView.setText(this.makeInvitesText(profile.guildInvites()));
 
@@ -183,6 +163,7 @@ public class GuildView extends ParentView {
     }
   }
 
+  @SuppressWarnings("removal")
   @Override
   protected void added() {
     super.added();

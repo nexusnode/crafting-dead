@@ -18,27 +18,21 @@
 
 package com.craftingdead.immerse.client.gui.screen.menu.play.list.world;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UncheckedIOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import org.jetbrains.annotations.Nullable;
 import org.apache.commons.lang3.Validate;
-import com.mojang.logging.LogUtils;
+import org.jetbrains.annotations.Nullable;
+import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
-import com.craftingdead.immerse.client.gui.view.ImageView;
-import com.craftingdead.immerse.client.gui.view.ParentView;
-import com.craftingdead.immerse.client.gui.view.TextView;
-import com.craftingdead.immerse.client.gui.view.ViewScreen;
-import com.craftingdead.immerse.client.gui.view.event.ActionEvent;
-import com.google.common.hash.Hashing;
-import com.mojang.blaze3d.platform.NativeImage;
+import com.mojang.logging.LogUtils;
+import io.github.humbleui.skija.Image;
 import net.minecraft.ChatFormatting;
 import net.minecraft.SharedConstants;
-import net.minecraft.Util;
 import net.minecraft.client.gui.components.toasts.SystemToast;
 import net.minecraft.client.gui.screens.AlertScreen;
 import net.minecraft.client.gui.screens.BackupConfirmScreen;
@@ -48,7 +42,6 @@ import net.minecraft.client.gui.screens.ProgressScreen;
 import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
 import net.minecraft.client.gui.screens.worldselection.EditWorldScreen;
 import net.minecraft.client.gui.screens.worldselection.WorldSelectionList;
-import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
@@ -56,6 +49,12 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.storage.LevelResource;
 import net.minecraft.world.level.storage.LevelStorageSource;
 import net.minecraft.world.level.storage.LevelSummary;
+import sm0keysa1m0n.bliss.view.ImageAccess;
+import sm0keysa1m0n.bliss.view.ImageView;
+import sm0keysa1m0n.bliss.view.ParentView;
+import sm0keysa1m0n.bliss.view.TextView;
+import sm0keysa1m0n.bliss.view.ViewScreen;
+import sm0keysa1m0n.bliss.view.event.ActionEvent;
 
 class WorldItemView extends ParentView {
 
@@ -68,63 +67,72 @@ class WorldItemView extends ParentView {
   private final LevelSummary worldSummary;
   private final WorldListView parentWorldList;
 
-  WorldItemView(LevelSummary worldSummary, WorldListView parentWorldList) {
-    super(new Properties<>().styleClasses("item").doubleClick(true).focusable(true));
-    this.worldSummary = worldSummary;
+  private Image iconImage;
+
+  WorldItemView(LevelSummary levelSummary, WorldListView parentWorldList) {
+    super(new Properties().styleClasses("item").doubleClick(true).focusable(true));
+    this.worldSummary = levelSummary;
     this.parentWorldList = parentWorldList;
-    var displayName = worldSummary.getLevelName();
-    var info = worldSummary.getLevelId() + " (" + dateFormat.format(
-        new Date(worldSummary.getLastPlayed())) + ")";
-    var description = worldSummary.getInfo().getString();
-    var levelId = worldSummary.getLevelId();
-    @SuppressWarnings("deprecation")
-    var dynamicWorldIcon =
-        new ResourceLocation("worlds/" + Util.sanitizeName(levelId,
-            ResourceLocation::validPathChar) + "/" + Hashing.sha1().hashUnencodedChars(levelId)
-            + "/icon");
-    ResourceLocation worldIcon;
-    if (this.loadIconTexture(worldSummary, dynamicWorldIcon) != null) {
-      worldIcon = dynamicWorldIcon;
-    } else {
-      worldIcon = UNKOWN_SERVER_ICON;
+
+    this.iconImage = this.loadIconTexture(levelSummary);
+    if (this.iconImage == null) {
+      try (@SuppressWarnings("removal")
+      var inputStream =
+          this.minecraft.getResourceManager().getResource(UNKOWN_SERVER_ICON).getInputStream()) {
+        this.iconImage = Image.makeFromEncoded(inputStream.readAllBytes());
+      } catch (IOException e) {
+        // This shouldn't happen, if it does we'll crash the game.
+        throw new UncheckedIOException(e);
+      }
     }
 
     this.addListener(ActionEvent.class, event -> this.joinWorld(), true);
-    this.addChild(new ImageView(new Properties<>().id("icon")).setImage(worldIcon));
+    this.addChild(new ImageView(new Properties().id("icon"))
+        .setImage(ImageAccess.forImage(this.iconImage)));
 
-    var texts = new ParentView(new Properties<>().id("texts"));
-    texts.addChild(new TextView(new Properties<>())
-        .setText(displayName)
-        .setShadow(false));
-    texts.addChild(new TextView(new Properties<>().id("info"))
-        .setText(new TextComponent(info)
-            .withStyle(ChatFormatting.GRAY))
-        .setShadow(false));
-    texts.addChild(new TextView(new Properties<>())
-        .setText(new TextComponent(description)
-            .withStyle(ChatFormatting.GRAY))
-        .setShadow(false));
+    var texts = new ParentView(new Properties().id("texts"));
+    texts.addChild(new TextView(new Properties())
+        .setText(levelSummary.getLevelName()));
+    texts.addChild(new TextView(new Properties().id("details"))
+        .setText(new TextComponent(levelSummary.getLevelId() + " (" + dateFormat.format(
+            new Date(levelSummary.getLastPlayed())) + ")")
+                .withStyle(ChatFormatting.GRAY)));
+    texts.addChild(new TextView(new Properties())
+        .setText(levelSummary.getInfo().copy()
+            .withStyle(ChatFormatting.GRAY)));
     this.addChild(texts);
   }
 
+  @Override
+  public void keyPressed(int keyCode, int scanCode, int modifiers) {
+    super.keyPressed(keyCode, scanCode, modifiers);
+    if (keyCode == GLFW.GLFW_KEY_SPACE && this.isFocused()) {
+      this.parentWorldList.setSelectedItem(this);
+    }
+  }
+
+  @Override
+  public boolean mousePressed(double mouseX, double mouseY, int button) {
+    if (this.isFocused()) {
+      this.parentWorldList.setSelectedItem(this);
+    }
+    return super.mousePressed(mouseX, mouseY, button);
+  }
+
   @Nullable
-  private DynamicTexture loadIconTexture(LevelSummary worldSummary,
-      ResourceLocation textureLocation) {
-    File iconFile = worldSummary.getIcon();
-    if (iconFile.isFile()) {
-      try (InputStream inputStream = new FileInputStream(iconFile)) {
-        NativeImage image = NativeImage.read(inputStream);
-        Validate.validState(image.getWidth() == 64, "Must be 64 pixels wide");
-        Validate.validState(image.getHeight() == 64, "Must be 64 pixels high");
-        DynamicTexture texture = new DynamicTexture(image);
-        this.minecraft.getTextureManager().register(textureLocation, texture);
-        return texture;
-      } catch (Throwable throwable) {
-        logger.error("Invalid icon for world {}", worldSummary.getLevelId(), throwable);
-        return null;
-      }
-    } else {
-      this.minecraft.getTextureManager().release(textureLocation);
+  private Image loadIconTexture(LevelSummary levelSummary) {
+    var iconFile = levelSummary.getIcon();
+    if (!iconFile.isFile()) {
+      return null;
+    }
+
+    try (InputStream inputStream = new FileInputStream(iconFile)) {
+      var image = Image.makeFromEncoded(inputStream.readAllBytes());
+      Validate.validState(image.getWidth() == 64, "Must be 64 pixels wide");
+      Validate.validState(image.getHeight() == 64, "Must be 64 pixels high");
+      return image;
+    } catch (Throwable throwable) {
+      logger.error("Invalid icon for world {}", levelSummary.getLevelId(), throwable);
       return null;
     }
   }
@@ -132,6 +140,7 @@ class WorldItemView extends ParentView {
   /**
    * A slightly edited copy of {@link WorldSelectionList.Entry#joinWorld}
    */
+  @SuppressWarnings("removal")
   public void joinWorld() {
     if (this.worldSummary.isDisabled()) {
       return;
@@ -194,6 +203,7 @@ class WorldItemView extends ParentView {
 
   }
 
+  @SuppressWarnings("removal")
   private void loadWorld() {
     if (this.minecraft.getLevelSource().levelExists(this.worldSummary.getLevelName())) {
       this.minecraft.forceSetScreen(
@@ -205,6 +215,7 @@ class WorldItemView extends ParentView {
   /**
    * A slightly edited copy of {@link WorldSelectionList.Entry#editWorld}
    */
+  @SuppressWarnings("removal")
   public void editWorld() {
     var fileName = this.worldSummary.getLevelName();
     try {
@@ -231,6 +242,7 @@ class WorldItemView extends ParentView {
   /**
    * A slightly edited copy of {@link WorldSelectionList.Entry#deleteWorld}
    */
+  @SuppressWarnings("removal")
   public void deleteWorld() {
     ViewScreen screen = this.getScreen();
     screen.keepOpenAndSetScreen(new ConfirmScreen(confirmed -> {
@@ -257,6 +269,7 @@ class WorldItemView extends ParentView {
   /**
    * A slightly edited copy of {@link WorldSelectionList.Entry#recreateWorld}
    */
+  @SuppressWarnings("removal")
   public void recreateWorld() {
     ViewScreen screen = this.getScreen();
     screen.keepOpen();

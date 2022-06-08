@@ -1,21 +1,3 @@
-/*
- * Crafting Dead
- * Copyright (C) 2022  NexusNode LTD
- *
- * This Non-Commercial Software License Agreement (the "Agreement") is made between
- * you (the "Licensee") and NEXUSNODE (BRAD HUNTER). (the "Licensor").
- * By installing or otherwise using Crafting Dead (the "Software"), you agree to be
- * bound by the terms and conditions of this Agreement as may be revised from time
- * to time at Licensor's sole discretion.
- *
- * If you do not agree to the terms and conditions of this Agreement do not download,
- * copy, reproduce or otherwise use any of the source code available online at any time.
- *
- * https://github.com/nexusnode/crafting-dead/blob/1.18.x/LICENSE.txt
- *
- * https://craftingdead.net/terms.php
- */
-
 package net.rocketpowered.connector.client.gui.guild;
 
 import java.util.HashMap;
@@ -24,11 +6,8 @@ import java.util.function.Consumer;
 import org.jetbrains.annotations.Nullable;
 import org.bson.types.ObjectId;
 import com.craftingdead.immerse.client.gui.screen.Theme;
-import com.craftingdead.immerse.client.gui.view.ParentView;
-import com.craftingdead.immerse.client.gui.view.TextView;
-import com.craftingdead.immerse.client.gui.view.View;
-import com.craftingdead.immerse.client.gui.view.event.RemovedEvent;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
@@ -43,6 +22,10 @@ import net.rocketpowered.connector.client.gui.RocketToast;
 import reactor.core.Disposable;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
+import sm0keysa1m0n.bliss.view.ParentView;
+import sm0keysa1m0n.bliss.view.TextView;
+import sm0keysa1m0n.bliss.view.View;
+import sm0keysa1m0n.bliss.view.event.RemovedEvent;
 
 public class YourGuildView extends ParentView {
 
@@ -69,28 +52,27 @@ public class YourGuildView extends ParentView {
   @Nullable
   private GuildMemberPayload selfMember;
 
+  @SuppressWarnings("removal")
   public YourGuildView(Consumer<View> contentConsumer) {
-    super(new Properties<>().styleClasses("page").backgroundBlur(50));
+    super(new Properties().styleClasses("page", "blur"));
 
     this.contentConsumer = contentConsumer;
 
-    this.addChild(new TextView(new Properties<>().id("title"))
-        .setText(TITLE)
-        .setCentered(true));
+    this.addChild(new TextView(new Properties().id("title")).setText(TITLE));
 
-    var guildView = new ParentView(new Properties<>().id("guild"));
+    var guildView = new ParentView(new Properties().id("guild"));
     this.addChild(guildView);
 
     guildView.addChild(
-        this.informationView = new ParentView(new Properties<>().id("information")));
+        this.informationView = new ParentView(new Properties().id("information")));
 
     guildView.addChild(
-        this.membersView = new ParentView(new Properties<>().id("members")));
+        this.membersView = new ParentView(new Properties().id("members")));
 
     this.transferButton = Theme.createRedButton(new TextComponent("Transfer"),
         () -> this.contentConsumer.accept(new TextDialogView(
             new TranslatableComponent("view.guild.your_guild.transfer.message"),
-            new TranslatableComponent("view.guild.text_dialog.username"),
+            I18n.get("view.guild.text_dialog.username"),
             result -> {
               Rocket.getGameClientGateway().ifPresent(gateway -> gateway.getUserId(result)
                   .flatMap(gateway::transferGuildOwnership)
@@ -124,7 +106,7 @@ public class YourGuildView extends ParentView {
     this.renameButton = Theme.createBlueButton(new TextComponent("Rename"),
         () -> this.contentConsumer.accept(new TextDialogView(
             new TranslatableComponent("view.guild.your_guild.rename.message"),
-            new TranslatableComponent("view.guild.text_dialog.name"),
+            I18n.get("view.guild.text_dialog.name"),
             result -> {
               Rocket.getGameClientGateway().ifPresent(gateway -> gateway.renameGuild(result)
                   .doOnSubscribe(__ -> RocketToast.info(this.minecraft,
@@ -155,6 +137,7 @@ public class YourGuildView extends ParentView {
             () -> this.contentConsumer.accept(this))));
   }
 
+  @SuppressWarnings("removal")
   private void updateGuild(GameClientGateway gateway, GuildPayload guild) {
     if (guild == null) {
       return;
@@ -182,26 +165,23 @@ public class YourGuildView extends ParentView {
   private void updateInformation(GameClientGateway gateway) {
     this.informationView.clearChildren();
 
-    this.informationView.addChild(new TextView(new Properties<>())
+    this.informationView.addChild(new TextView(new Properties())
         .setText(new TextComponent("")
             .append(new TextComponent("Name: ")
                 .withStyle(ChatFormatting.GRAY))
-            .append(this.guild.name()))
-        .setShadow(false));
-    this.informationView.addChild(new TextView(new Properties<>())
+            .append(this.guild.name())));
+    this.informationView.addChild(new TextView(new Properties())
         .setText(new TextComponent("")
             .append(new TextComponent("Tag: ")
                 .withStyle(ChatFormatting.GRAY))
-            .append(this.guild.tag()))
-        .setShadow(false));
-    this.informationView.addChild(new TextView(new Properties<>())
+            .append(this.guild.tag())));
+    this.informationView.addChild(new TextView(new Properties())
         .setText(new TextComponent("")
             .append(new TextComponent("Owner: ")
                 .withStyle(ChatFormatting.GRAY))
-            .append(this.guild.owner().minecraftProfile().name()))
-        .setShadow(false));
+            .append(this.guild.owner().minecraftProfile().name())));
 
-    var controlsView = new ParentView(new Properties<>().id("controls"));
+    var controlsView = new ParentView(new Properties().id("controls"));
     this.informationView.addChild(controlsView);
 
     var permissions = this.guild.getPermissions(this.selfMember);
@@ -236,6 +216,7 @@ public class YourGuildView extends ParentView {
     }
   }
 
+  @SuppressWarnings("removal")
   @Override
   protected void added() {
     super.added();

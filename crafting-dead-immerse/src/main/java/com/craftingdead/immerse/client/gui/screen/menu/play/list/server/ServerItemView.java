@@ -19,19 +19,22 @@
 package com.craftingdead.immerse.client.gui.screen.menu.play.list.server;
 
 import java.util.Iterator;
+import org.lwjgl.glfw.GLFW;
 import com.craftingdead.immerse.client.gui.screen.ConnectView;
-import com.craftingdead.immerse.client.gui.view.ParentView;
-import com.craftingdead.immerse.client.gui.view.TextView;
-import com.craftingdead.immerse.client.gui.view.event.ActionEvent;
 import com.craftingdead.immerse.client.util.ServerPinger;
 import com.google.common.collect.Iterators;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
 import net.minecraft.network.chat.TextComponent;
+import sm0keysa1m0n.bliss.view.ParentView;
+import sm0keysa1m0n.bliss.view.TextView;
+import sm0keysa1m0n.bliss.view.event.ActionEvent;
 
 class ServerItemView extends ParentView {
 
   private final Iterator<String> animation = Iterators.cycle("O o o", "o O o", "o o O");
+
+  private final ServerListView list;
 
   private final ServerEntry serverEntry;
 
@@ -41,32 +44,27 @@ class ServerItemView extends ParentView {
 
   private long lastAnimationUpdateMs;
 
-  ServerItemView(ServerEntry serverEntry) {
-    super(new Properties<>().styleClasses("item").doubleClick(true).focusable(true));
+  ServerItemView(ServerListView list, ServerEntry serverEntry) {
+    super(new Properties().styleClasses("item").doubleClick(true).focusable(true));
+
+    this.list = list;
     this.serverEntry = serverEntry;
 
-    this.motdComponent = new TextView(new Properties<>().id("motd"))
+    this.motdComponent = new TextView(new Properties().id("motd"))
         .setText("...")
-        .setShadow(false)
-        .setCentered(true)
         .setWrap(false);
 
-    this.pingComponent = new TextView(new Properties<>().id("ping"))
-        .setText("...")
-        .setShadow(false)
-        .setCentered(true);
-    this.playersAmountComponent = new TextView(new Properties<>().id("players"))
-        .setText("...")
-        .setShadow(false)
-        .setCentered(true);
+    this.pingComponent = new TextView(new Properties().id("ping"))
+        .setText("...");
+    this.playersAmountComponent = new TextView(new Properties().id("players"))
+        .setText("...");
 
     this.addListener(ActionEvent.class, event -> this.connect());
     this.addChild(this.motdComponent);
-    this.addChild(new TextView(new Properties<>().id("map"))
+    this.addChild(new TextView(new Properties().id("map"))
         .setText(new TextComponent(this.serverEntry.getMap().orElse("-"))
             .withStyle(ChatFormatting.GRAY))
-        .setShadow(false)
-        .setCentered(true));
+        .setWrap(false));
     this.addChild(this.pingComponent);
     this.addChild(this.playersAmountComponent);
 
@@ -83,6 +81,23 @@ class ServerItemView extends ParentView {
     }
   }
 
+  @Override
+  public void keyPressed(int keyCode, int scanCode, int modifiers) {
+    super.keyPressed(keyCode, scanCode, modifiers);
+    if (keyCode == GLFW.GLFW_KEY_SPACE && this.isFocused()) {
+      this.list.setSelectedItem(this);
+    }
+  }
+
+  @Override
+  public boolean mousePressed(double mouseX, double mouseY, int button) {
+    if (this.isFocused()) {
+      this.list.setSelectedItem(this);
+    }
+    return super.mousePressed(mouseX, mouseY, button);
+  }
+
+  @SuppressWarnings("removal")
   public void connect() {
     // Call this before creating a ConnectView instance.
     this.getScreen().keepOpen();
@@ -94,6 +109,7 @@ class ServerItemView extends ParentView {
     return this.serverEntry;
   }
 
+  @SuppressWarnings("removal")
   public void ping() {
     this.motdComponent.setText("...");
     this.pingComponent.setText("...");
@@ -107,18 +123,18 @@ class ServerItemView extends ParentView {
   private void updateServerInfo(ServerPinger.PingData pingData) {
     this.motdComponent.setText(pingData.getMotd());
     if (pingData.getPing() >= 0) {
-      long ping = pingData.getPing();
-      String pingText = ping + "ms";
+      var ping = pingData.getPing();
+      ChatFormatting pingColor;
       if (ping < 200) {
-        pingText = ChatFormatting.GREEN + pingText;
+        pingColor = ChatFormatting.GREEN;
       } else if (ping < 400) {
-        pingText = ChatFormatting.YELLOW + pingText;
+        pingColor = ChatFormatting.YELLOW;
       } else if (ping < 1200) {
-        pingText = ChatFormatting.RED + pingText;
+        pingColor = ChatFormatting.RED;
       } else {
-        pingText = ChatFormatting.DARK_RED + pingText;
+        pingColor = ChatFormatting.DARK_RED;
       }
-      this.pingComponent.setText(new TextComponent(pingText));
+      this.pingComponent.setText(new TextComponent(ping + "ms").withStyle(pingColor));
     } else {
       this.pingComponent.setText(new TextComponent("?"));
     }

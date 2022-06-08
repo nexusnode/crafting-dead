@@ -1,21 +1,3 @@
-/*
- * Crafting Dead
- * Copyright (C) 2022  NexusNode LTD
- *
- * This Non-Commercial Software License Agreement (the "Agreement") is made between
- * you (the "Licensee") and NEXUSNODE (BRAD HUNTER). (the "Licensor").
- * By installing or otherwise using Crafting Dead (the "Software"), you agree to be
- * bound by the terms and conditions of this Agreement as may be revised from time
- * to time at Licensor's sole discretion.
- *
- * If you do not agree to the terms and conditions of this Agreement do not download,
- * copy, reproduce or otherwise use any of the source code available online at any time.
- *
- * https://github.com/nexusnode/crafting-dead/blob/1.18.x/LICENSE.txt
- *
- * https://craftingdead.net/terms.php
- */
-
 package net.rocketpowered.connector.client.gui.guild;
 
 import java.time.Duration;
@@ -24,14 +6,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
-import org.jetbrains.annotations.Nullable;
 import org.bson.types.ObjectId;
+import org.jetbrains.annotations.Nullable;
 import com.craftingdead.immerse.client.gui.screen.Theme;
-import com.craftingdead.immerse.client.gui.view.Color;
-import com.craftingdead.immerse.client.gui.view.ParentView;
-import com.craftingdead.immerse.client.gui.view.TextView;
-import com.craftingdead.immerse.client.gui.view.View;
 import com.google.common.collect.Sets;
+import io.github.humbleui.skija.FontMgr;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
@@ -47,6 +26,10 @@ import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
+import sm0keysa1m0n.bliss.Color;
+import sm0keysa1m0n.bliss.view.ParentView;
+import sm0keysa1m0n.bliss.view.TextView;
+import sm0keysa1m0n.bliss.view.View;
 
 public class InvitesView extends ParentView {
 
@@ -71,18 +54,17 @@ public class InvitesView extends ParentView {
 
   private Set<GuildInvitePayload> lastInvites = Collections.emptySet();
 
+  @SuppressWarnings("removal")
   public InvitesView() {
-    super(new Properties<>().styleClasses("page").backgroundBlur(50));
+    super(new Properties().styleClasses("page", "blur"));
 
-    this.addChild(new TextView(new Properties<>().id("title"))
-        .setText(TITLE)
-        .setCentered(true));
+    this.addChild(new TextView(new Properties().id("title")).setText(TITLE));
 
-    this.invitesListView = new ParentView(new Properties<>().id("list"));
+    this.invitesListView = new ParentView(new Properties().id("list"));
 
     this.addChild(this.invitesListView);
 
-    this.controlsView = new ParentView(new Properties<>().id("controls"));
+    this.controlsView = new ParentView(new Properties().id("controls"));
     this.controlsView.addChild(
         this.acceptButton = Theme.createBlueButton(
             new TextComponent("Accept"),
@@ -115,7 +97,7 @@ public class InvitesView extends ParentView {
   }
 
   protected void updateSelected() {
-    this.selectedInviteView = this.invitesListView.getChildViews().stream()
+    this.selectedInviteView = this.invitesListView.getChildren().stream()
         .filter(InviteView.class::isInstance)
         .map(InviteView.class::cast)
         .filter(View::isFocused)
@@ -126,6 +108,7 @@ public class InvitesView extends ParentView {
     this.declineButton.setEnabled(this.selectedInviteView != null);
   }
 
+  @SuppressWarnings("removal")
   @Override
   protected void added() {
     super.added();
@@ -164,10 +147,9 @@ public class InvitesView extends ParentView {
   }
 
   @Override
-  public boolean mouseClicked(double mouseX, double mouseY, int button) {
-    boolean result = super.mouseClicked(mouseX, mouseY, button);
+  public boolean mousePressed(double mouseX, double mouseY, int button) {
     this.updateSelected();
-    return result;
+    return super.mousePressed(mouseX, mouseY, button);
   }
 
   private static class InviteView extends ParentView {
@@ -181,38 +163,43 @@ public class InvitesView extends ParentView {
     private Disposable memberListener;
 
     public InviteView(GuildInvitePayload invite) {
-      super(new Properties<>().styleClasses("item").unscaleBorder(false).focusable(true));
+      super(new Properties().styleClasses("item").unscaleBorder(false).focusable(true));
 
       this.invite = invite;
 
-      this.totalMembersView = new TextView(new Properties<>());
-      this.onlineMemebrsView = new TextView(new Properties<>());
-      this.onlineMemebrsView.getColorProperty().defineState(Theme.ONLINE);
-      this.offlineMemebrsView = new TextView(new Properties<>());
-      this.offlineMemebrsView.getColorProperty().defineState(Color.GRAY);
+      this.totalMembersView = new TextView(new Properties());
+      this.onlineMemebrsView = new TextView(new Properties());
+      this.offlineMemebrsView = new TextView(new Properties());
 
-      this.addChild(new TextView(new Properties<>())
+      this.addChild(new TextView(new Properties())
           .setText(new TextComponent(this.invite.guild().name())
               .withStyle(ChatFormatting.BOLD)));
 
-      var playerCountsView = new ParentView(new Properties<>().id("player-counts"));
+      var playerCountsView = new ParentView(new Properties().id("player-counts"));
 
       this.addChild(playerCountsView);
       playerCountsView.addChild(this.totalMembersView);
-      playerCountsView.addChild(new TextView(new Properties<>())
+      playerCountsView.addChild(new TextView(new Properties())
           .setText(new TextComponent(" | ")));
       playerCountsView.addChild(this.onlineMemebrsView);
-      playerCountsView.addChild(new TextView(new Properties<>())
+      playerCountsView.addChild(new TextView(new Properties())
           .setText(new TextComponent(" | ")));
       playerCountsView.addChild(this.offlineMemebrsView);
       if (this.invite.sender() != null) {
-        this.addChild(new TextView(new Properties<>())
+        this.addChild(new TextView(new Properties())
             .setText(
                 new TextComponent("Invited by " + this.invite.sender().minecraftProfile().name())
                     .withStyle(ChatFormatting.ITALIC)));
       }
     }
 
+    @Override
+    public void styleRefreshed(FontMgr fontManager) {
+      this.onlineMemebrsView.getStyle().color.defineState(Theme.ONLINE);
+      this.offlineMemebrsView.getStyle().color.defineState(Color.GRAY);
+    }
+
+    @SuppressWarnings("removal")
     @Override
     protected void added() {
       super.added();

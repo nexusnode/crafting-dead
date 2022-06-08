@@ -1,4 +1,4 @@
-@import url("craftingdeadimmerse:css/theme.css");
+@import "craftingdeadimmerse:theme";
 
 .page {
     width: 90%;
@@ -18,25 +18,30 @@
     border-radius: 7.5;
 }
 
-.dialog > * {
+.dialog>TextView {
+    text-align: center;
+}
+
+.dialog>* {
     margin: 3.5;
 }
 
-.dialog > TextFieldView {
+.dialog>TextFieldView {
     width: 80%;
     height: 20;
     padding: 4;
     background-color: rgba(18, 18, 18, 0.25);
+    box-sizing: border-box;
 }
 
-.dialog > #controls {
+.dialog>#controls {
     width: 80%;
     height: 20;
     flex-direction: row;
     justify-content: space-around;
 }
 
-.dialog > #controls > * {
+.dialog>#controls>* {
     flex-grow: 0;
     width: 45%;
 }
@@ -45,39 +50,42 @@ GuildView {
     flex-direction: row;
 }
 
-GuildView > #content {
+GuildView>#content {
     flex-grow: 1;
     align-items: center;
     justify-content: center;
 }
 
-GuildView > PanoramaView {
+GuildView>PanoramaView {
     position: absolute;
     width: 100%;
     height: 100%;
 }
 
-GuildView > #side-bar {
+GuildView>#side-bar {
     width: 100;
     align-items: center;
     justify-content: center;
     background-color: rgba(54, 54, 54, 0.625);
 }
 
-GuildView > #side-bar > * {
+GuildView>#side-bar>* {
     padding: 5;
     transition: 250ms color;
+    text-align: center;
+    box-sizing: border-box;
 }
 
-GuildView > #side-bar > *:hover {
+GuildView>#side-bar>*:hover {
     color: rgb(255, 255, 85);
 }
 
-ManageMembersView > #title {
+ManageMembersView>#title {
     padding: 7;
+    text-align: center;
 }
 
-ManageMembersView > #list {
+ManageMembersView>#list {
     flex-grow: 1;
     padding-bottom: 5;
     width: 100%;
@@ -88,7 +96,7 @@ ManageMembersView > #list {
     background-color: rgba(18, 18, 18, 0.25);
 }
 
-ManageMembersView > #controls {
+ManageMembersView>#controls {
     width: 100%;
     max-width: 250;
     height: 45;
@@ -97,21 +105,22 @@ ManageMembersView > #controls {
     flex-direction: row;
 }
 
-ManageMembersView > #controls > * {
+ManageMembersView>#controls>* {
     margin: 3;
 }
 
-YourGuildView > #title {
+YourGuildView>#title {
     padding: 7;
+    text-align: center;
 }
 
-YourGuildView > #guild {
+YourGuildView>#guild {
     width: 100%;
     flex-grow: 1;
     flex-direction: row;
 }
 
-YourGuildView > #guild > #information {
+YourGuildView>#guild>#information {
     height: 100%;
     width: 33%;
     border-right-width: 1;
@@ -119,24 +128,24 @@ YourGuildView > #guild > #information {
     background-color: rgba(18, 18, 18, 0.25);
 }
 
-YourGuildView > #guild > #information > TextView {
+YourGuildView>#guild>#information>TextView {
     padding: 5;
 }
 
-YourGuildView > #guild > #information > #controls {
+YourGuildView>#guild>#information>#controls {
     margin-top: auto;
     justify-content: flex-end;
     flex-grow: 1;
 }
 
-YourGuildView > #guild > #information > #controls > * {
+YourGuildView>#guild>#information>#controls>* {
     flex-grow: 0;
     width: 100%;
     border-top-width: 1;
     border-top-color: rgba(125, 125, 125, 0.48);
 }
 
-YourGuildView > #guild > #members {
+YourGuildView>#guild>#members {
     flex-grow: 1;
     height: 100%;
     padding-bottom: 5;
@@ -158,23 +167,24 @@ MemberView {
     background-color: rgba(51, 51, 51, 0.625);
 }
 
-MemberView > #text {
+MemberView>#text {
     width: 100%;
     height: 100%;
 }
 
-MemberView > AvatarView {
+MemberView>AvatarView {
     height: 25;
     border-width: 1;
     margin-right: 3;
     aspect-ratio: 1;
 }
 
-InvitesView > #title {
+InvitesView>#title {
     padding: 7;
+    text-align: center;
 }
 
-InvitesView > #list {
+InvitesView>#list {
     flex-grow: 1;
     width: 100%;
     padding-bottom: 5;
@@ -185,7 +195,7 @@ InvitesView > #list {
     background-color: rgba(18, 18, 18, 0.25);
 }
 
-InvitesView > #list > * {
+InvitesView>#list>* {
     width: 300;
     height: 46;
     padding: 3;
@@ -194,21 +204,21 @@ InvitesView > #list > * {
     background-color: rgba(51, 51, 51, 0.625);
 }
 
-InvitesView > #list > *:focus-visible {
+InvitesView>#list>*:focus-visible {
     outline-color: white;
 }
 
-InvitesView > #list > *:hover {
+InvitesView>#list>*:hover {
     outline-color: rgb(170, 170, 170);
     outline-width: 1;
 }
 
-InvitesView > #list > * > #player-counts {
+InvitesView>#list>*>#player-counts {
     flex-grow: 1;
     flex-direction: row;
 }
 
-InvitesView > #controls {
+InvitesView>#controls {
     width: 200;
     height: 45;
     justify-content: center;
@@ -216,6 +226,6 @@ InvitesView > #controls {
     flex-direction: row;
 }
 
-InvitesView > #controls > * {
+InvitesView>#controls>* {
     margin: 3;
 }

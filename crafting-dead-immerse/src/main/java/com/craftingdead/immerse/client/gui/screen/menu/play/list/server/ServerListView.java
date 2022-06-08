@@ -21,14 +21,16 @@ package com.craftingdead.immerse.client.gui.screen.menu.play.list.server;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
-import org.jetbrains.annotations.Nullable;
 import org.jdesktop.core.animation.timing.Animator;
 import org.jdesktop.core.animation.timing.KeyFrames;
+import org.jetbrains.annotations.Nullable;
 import com.craftingdead.immerse.client.gui.screen.Theme;
-import com.craftingdead.immerse.client.gui.view.Animation;
-import com.craftingdead.immerse.client.gui.view.ParentView;
-import com.craftingdead.immerse.client.gui.view.View;
 import net.minecraft.network.chat.TranslatableComponent;
+import sm0keysa1m0n.bliss.Animation;
+import sm0keysa1m0n.bliss.style.Percentage;
+import sm0keysa1m0n.bliss.style.States;
+import sm0keysa1m0n.bliss.view.ParentView;
+import sm0keysa1m0n.bliss.view.View;
 
 public class ServerListView extends ParentView {
 
@@ -47,10 +49,10 @@ public class ServerListView extends ParentView {
   private CompletableFuture<Void> refreshFuture;
 
   public ServerListView(ServerList serverList) {
-    super(new Properties<>());
+    super(new Properties());
     this.serverList = serverList;
 
-    this.listView = new ParentView(new Properties<>().id("content"));
+    this.listView = new ParentView(new Properties().id("content"));
     this.addChild(this.listView);
 
     this.playButton = Theme.createGreenButton(
@@ -58,7 +60,7 @@ public class ServerListView extends ParentView {
         () -> this.getSelectedItem().ifPresent(ServerItemView::connect));
     this.playButton.setEnabled(false);
 
-    this.controlsView = new ParentView(new ParentView.Properties<>().id("controls"));
+    this.controlsView = new ParentView(new ParentView.Properties().id("controls"));
     this.controlsView.addChild(this.createTopRowControls());
     this.controlsView.addChild(this.createBottomRowControls());
 
@@ -68,13 +70,13 @@ public class ServerListView extends ParentView {
   }
 
   protected ParentView createTopRowControls() {
-    var view = new ParentView(new ParentView.Properties<>());
+    var view = new ParentView(new Properties());
     view.addChild(this.playButton);
     return view;
   }
 
   protected ParentView createBottomRowControls() {
-    var view = new ParentView(new ParentView.Properties<>());
+    var view = new ParentView(new Properties());
 
     var quickRefreshButton = Theme.createBlueButton(
         new TranslatableComponent("view.server_list.button.quick_refresh"), this::quickRefresh);
@@ -91,16 +93,16 @@ public class ServerListView extends ParentView {
   protected void added() {
     super.added();
     int delay = 0;
-    for (var view : this.listView.getChildViews()) {
+    for (var view : this.listView.getChildren()) {
       new Animator.Builder()
-          .addTarget(Animation.forProperty(view.getXTranslationProperty())
+          .addTarget(Animation.forProperty(view.getStyle().xTranslation)
               .keyFrames(new KeyFrames.Builder<>(-100.0F)
                   .addFrame(0.0F)
                   .build())
               .build())
-          .addTarget(Animation.forProperty(view.getAlphaProperty())
-              .keyFrames(new KeyFrames.Builder<>(0.0F)
-                  .addFrame(1.0F)
+          .addTarget(Animation.forProperty(view.getStyle().opacity)
+              .keyFrames(new KeyFrames.Builder<>(Percentage.ZERO)
+                  .addFrame(Percentage.ONE_HUNDRED)
                   .build())
               .build())
           .setStartDelay(delay, TimeUnit.MILLISECONDS)
@@ -111,46 +113,43 @@ public class ServerListView extends ParentView {
     }
   }
 
-  @Override
-  public boolean mouseClicked(double mouseX, double mouseY, int button) {
-    var result = super.mouseClicked(mouseX, mouseY, button);
-    // Might have joined a world/server so we are removed
-    if (this.isAdded()) {
-      this.updateSelected();
+  public void setSelectedItem(@Nullable ServerItemView selectedItem) {
+    if (this.selectedItem == selectedItem) {
+      return;
     }
-    return result;
-  }
-
-  protected void updateSelected() {
-    this.selectedItem = this.listView.getChildViews().stream()
-        .filter(child -> child instanceof ServerItemView)
-        .map(child -> (ServerItemView) child)
-        .filter(View::isFocused)
-        .findAny()
-        .orElse(null);
-
-    this.playButton.setEnabled(this.selectedItem != null);
+    if (this.selectedItem != null) {
+      this.selectedItem.getStyleManager().removeState(States.CHECKED);
+      this.selectedItem.getStyleManager().notifyListeners();
+    }
+    this.selectedItem = selectedItem;
+    if (selectedItem != null) {
+      this.selectedItem.getStyleManager().addState(States.CHECKED);
+      this.selectedItem.getStyleManager().notifyListeners();
+    }
+    this.playButton.setEnabled(selectedItem != null);
   }
 
   public Optional<ServerItemView> getSelectedItem() {
     return Optional.ofNullable(this.selectedItem);
   }
 
+  @SuppressWarnings("removal")
   private void refresh() {
     if (this.refreshFuture == null || this.refreshFuture.isDone()) {
       this.listView.clearChildren();
-      this.selectedItem = null;
-      this.updateSelected();
+      this.setSelectedItem(null);
       this.refreshFuture = this.serverList.load()
           .thenAcceptAsync(servers -> {
-            servers.map(ServerItemView::new).forEach(this.listView::addChild);
+            servers
+                .map(server -> new ServerItemView(this, server))
+                .forEach(this.listView::addChild);
             this.listView.layout();
           }, this.minecraft);
     }
   }
 
   private void quickRefresh() {
-    for (var child : this.listView.getChildViews()) {
+    for (var child : this.listView.getChildren()) {
       if (child instanceof ServerItemView serverItem) {
         serverItem.ping();
       }

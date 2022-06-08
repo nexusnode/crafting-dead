@@ -1,21 +1,3 @@
-/*
- * Crafting Dead
- * Copyright (C) 2022  NexusNode LTD
- *
- * This Non-Commercial Software License Agreement (the "Agreement") is made between
- * you (the "Licensee") and NEXUSNODE (BRAD HUNTER). (the "Licensor").
- * By installing or otherwise using Crafting Dead (the "Software"), you agree to be
- * bound by the terms and conditions of this Agreement as may be revised from time
- * to time at Licensor's sole discretion.
- *
- * If you do not agree to the terms and conditions of this Agreement do not download,
- * copy, reproduce or otherwise use any of the source code available online at any time.
- *
- * https://github.com/nexusnode/crafting-dead/blob/1.18.x/LICENSE.txt
- *
- * https://craftingdead.net/terms.php
- */
-
 package net.rocketpowered.connector.client.gui.guild;
 
 import java.util.HashMap;
@@ -24,10 +6,7 @@ import java.util.function.Consumer;
 import org.jetbrains.annotations.Nullable;
 import org.bson.types.ObjectId;
 import com.craftingdead.immerse.client.gui.screen.Theme;
-import com.craftingdead.immerse.client.gui.view.ParentView;
-import com.craftingdead.immerse.client.gui.view.TextView;
-import com.craftingdead.immerse.client.gui.view.View;
-import com.craftingdead.immerse.client.gui.view.event.RemovedEvent;
+import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
@@ -41,6 +20,10 @@ import net.rocketpowered.connector.client.gui.RocketToast;
 import reactor.core.Disposable;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
+import sm0keysa1m0n.bliss.view.ParentView;
+import sm0keysa1m0n.bliss.view.TextView;
+import sm0keysa1m0n.bliss.view.View;
+import sm0keysa1m0n.bliss.view.event.RemovedEvent;
 
 public class ManageMembersView extends ParentView {
 
@@ -69,17 +52,16 @@ public class ManageMembersView extends ParentView {
 
   private Disposable listener;
 
+  @SuppressWarnings("removal")
   public ManageMembersView(Consumer<View> viewConsumer) {
-    super(new Properties<>().styleClasses("page").backgroundBlur(50));
+    super(new Properties().styleClasses("page", "blur"));
 
-    this.addChild(new TextView(new Properties<>().id("title"))
-        .setText(TITLE)
-        .setCentered(true));
+    this.addChild(new TextView(new Properties().id("title")).setText(TITLE));
 
     this.addChild(
-        this.membersListView = new ParentView(new Properties<>().id("list")));
+        this.membersListView = new ParentView(new Properties().id("list")));
 
-    this.controlsView = new ParentView(new Properties<>().id("controls"));
+    this.controlsView = new ParentView(new Properties().id("controls"));
 
     this.controlsView.addChild(
         this.promoteButton = Theme.createBlueButton(
@@ -107,7 +89,7 @@ public class ManageMembersView extends ParentView {
         .addChild(this.inviteButton = Theme.createBlueButton(new TextComponent("Invite"),
             () -> viewConsumer.accept(new TextDialogView(
                 new TranslatableComponent("view.guild.manage_members.send_invite.message"),
-                new TranslatableComponent("view.guild.text_dialog.username"),
+                I18n.get("view.guild.text_dialog.username"),
                 result -> {
                   if (result.equalsIgnoreCase(this.minecraft.getUser().getName())) {
                     RocketToast.error(this.minecraft, "Cannot invite yourself");
@@ -131,7 +113,7 @@ public class ManageMembersView extends ParentView {
   }
 
   protected void updateSelected() {
-    this.selectedMemberView = this.membersListView.getChildViews().stream()
+    this.selectedMemberView = this.membersListView.getChildren().stream()
         .filter(MemberView.class::isInstance)
         .map(MemberView.class::cast)
         .filter(View::isFocused)
@@ -165,6 +147,7 @@ public class ManageMembersView extends ParentView {
         && GuildPermission.KICK.hasPermission(permissions));
   }
 
+  @SuppressWarnings("removal")
   private void updateGuild(GameClientGateway gateway, GuildPayload guild) {
     if (guild == null) {
       return;
@@ -219,6 +202,7 @@ public class ManageMembersView extends ParentView {
     }
   }
 
+  @SuppressWarnings("removal")
   @Override
   protected void added() {
     super.added();
@@ -250,9 +234,8 @@ public class ManageMembersView extends ParentView {
   }
 
   @Override
-  public boolean mouseClicked(double mouseX, double mouseY, int button) {
-    boolean result = super.mouseClicked(mouseX, mouseY, button);
+  public boolean mousePressed(double mouseX, double mouseY, int button) {
     this.updateSelected();
-    return result;
+    return super.mousePressed(mouseX, mouseY, button);
   }
 }

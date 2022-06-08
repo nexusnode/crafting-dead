@@ -25,13 +25,13 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import com.craftingdead.immerse.CraftingDeadImmerse;
-import com.craftingdead.immerse.client.gui.view.ViewScreen;
 import net.minecraft.client.KeyboardHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.rocketpowered.api.Rocket;
 import net.rocketpowered.connector.client.gui.guild.GuildView;
+import sm0keysa1m0n.bliss.view.ViewScreen;
 
 @Mixin(KeyboardHandler.class)
 public class KeyboardHandlerMixin {
@@ -45,8 +45,7 @@ public class KeyboardHandlerMixin {
           && Rocket.getGameClientGateway().isPresent()) {
         callbackInfo.cancel();
         var screen = new ViewScreen(TextComponent.EMPTY, new GuildView());
-        screen.setStylesheets(
-            List.of(new ResourceLocation(CraftingDeadImmerse.ID, "css/guild.css")));
+        screen.setStylesheets(List.of(new ResourceLocation(CraftingDeadImmerse.ID, "guild")));
         Minecraft.getInstance().setScreen(screen);
       }
     }

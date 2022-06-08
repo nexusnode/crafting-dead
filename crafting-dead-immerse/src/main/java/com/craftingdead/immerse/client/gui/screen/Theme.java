@@ -19,23 +19,26 @@
 package com.craftingdead.immerse.client.gui.screen;
 
 import java.util.concurrent.TimeUnit;
-import org.jetbrains.annotations.Nullable;
 import org.jdesktop.core.animation.timing.Animator;
 import org.jdesktop.core.animation.timing.Animator.RepeatBehavior;
 import org.jdesktop.core.animation.timing.KeyFrames;
 import org.jdesktop.core.animation.timing.interpolators.SplineInterpolator;
+import org.jetbrains.annotations.Nullable;
 import com.craftingdead.immerse.CraftingDeadImmerse;
-import com.craftingdead.immerse.client.gui.view.Animation;
-import com.craftingdead.immerse.client.gui.view.Color;
-import com.craftingdead.immerse.client.gui.view.ImageView;
-import com.craftingdead.immerse.client.gui.view.ParentView;
-import com.craftingdead.immerse.client.gui.view.TextView;
-import com.craftingdead.immerse.client.gui.view.View;
-import com.craftingdead.immerse.client.gui.view.View.Properties;
-import com.craftingdead.immerse.client.gui.view.event.ActionEvent;
 import com.craftingdead.immerse.sounds.ImmerseSoundEvents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import sm0keysa1m0n.bliss.Animation;
+import sm0keysa1m0n.bliss.Color;
+import sm0keysa1m0n.bliss.minecraft.MinecraftUtil;
+import sm0keysa1m0n.bliss.view.ImageView;
+import sm0keysa1m0n.bliss.view.ParentView;
+import sm0keysa1m0n.bliss.view.TextView;
+import sm0keysa1m0n.bliss.view.View;
+import sm0keysa1m0n.bliss.view.View.Properties;
+import sm0keysa1m0n.bliss.view.event.ActionEvent;
+import sm0keysa1m0n.bliss.view.event.AddedEvent;
+import sm0keysa1m0n.bliss.view.event.RemovedEvent;
 
 public class Theme {
 
@@ -43,11 +46,11 @@ public class Theme {
   public static final String GREEN_BUTTON_CLASS = "green-button";
   public static final String BLUE_BUTTON_CLASS = "blue-button";
 
-  public static final Color ONLINE = new Color(0xFF90ba3c);
+  public static final Color ONLINE = Color.create(0xFF90BA3C);
   public static final Color OFFLINE = Color.GRAY;
 
   public static View newSeparator() {
-    return new View(new Properties<>().styleClasses("seperator").unscaleHeight(true));
+    return new View(new Properties().styleClasses("seperator").unscaleHeight(true));
   }
 
   public static View createRedButton(Component text, Runnable actionListener) {
@@ -56,7 +59,7 @@ public class Theme {
 
   public static View createRedButton(Component text, Runnable actionListener, @Nullable String id) {
     return createButton(text, actionListener,
-        new ParentView.Properties<>().id(id).styleClasses(RED_BUTTON_CLASS));
+        new ParentView.Properties().id(id).styleClasses(RED_BUTTON_CLASS));
   }
 
   public static View createGreenButton(Component text, Runnable actionListener) {
@@ -66,7 +69,7 @@ public class Theme {
   public static View createGreenButton(Component text, Runnable actionListener,
       @Nullable String id) {
     return createButton(text, actionListener,
-        new ParentView.Properties<>().id(id).styleClasses(GREEN_BUTTON_CLASS));
+        new ParentView.Properties().id(id).styleClasses(GREEN_BUTTON_CLASS));
   }
 
   public static View createBlueButton(Component text, Runnable actionListener) {
@@ -76,17 +79,14 @@ public class Theme {
   public static View createBlueButton(Component text, Runnable actionListener,
       @Nullable String id) {
     return createButton(text, actionListener,
-        new ParentView.Properties<>().id(id).styleClasses(BLUE_BUTTON_CLASS));
+        new ParentView.Properties().id(id).styleClasses(BLUE_BUTTON_CLASS));
   }
 
   public static View createButton(Component text, Runnable actionListener,
-      ParentView.Properties<?> properties) {
+      View.Properties properties) {
     var view = new ParentView(properties.styleClasses("button").focusable(true));
 
-    view.addChild(new TextView(new TextView.Properties<>().id("label"))
-        .setText(text)
-        .setShadow(false)
-        .setCentered(true));
+    view.addChild(new TextView(new View.Properties().id("label")).setText(text));
 
     view.addActionSound(ImmerseSoundEvents.BUTTON_CLICK.get());
     view.addListener(ActionEvent.class, event -> actionListener.run());
@@ -95,9 +95,9 @@ public class Theme {
   }
 
   public static ImageView createImageButton(ResourceLocation image, Runnable actionListener,
-      ParentView.Properties<?> properties) {
+      View.Properties properties) {
     var view = new ImageView(properties.styleClasses("image-button").focusable(true));
-    view.setImage(image);
+    view.setImage(MinecraftUtil.createImageAccess(image));
     view.addActionSound(ImmerseSoundEvents.BUTTON_CLICK.get());
     view.addHoverSound(ImmerseSoundEvents.MAIN_MENU_HOVER.get());
     view.addListener(ActionEvent.class, event -> actionListener.run());
@@ -105,27 +105,27 @@ public class Theme {
   }
 
   public static View createBackground() {
-    var view = new ImageView(new View.Properties<>().styleClasses("background"))
-        .setImage(new ResourceLocation(CraftingDeadImmerse.ID, "textures/gui/background.png"))
-        .setBilinearFiltering(true);
+    var view = new ImageView(new View.Properties().styleClasses("background"))
+        .setImage(MinecraftUtil.createImageAccess(
+            new ResourceLocation(CraftingDeadImmerse.ID, "textures/gui/background.png")));
 
-    new Animator.Builder()
-        .addTarget(Animation.forProperty(view.getXTranslationProperty())
+    var animator = new Animator.Builder()
+        .addTarget(Animation.forProperty(view.getStyle().xTranslation)
             .keyFrames(new KeyFrames.Builder<Float>()
                 .addFrames(1.0F, -3.0F, 5.0F, 15.0F)
                 .build())
             .build())
-        .addTarget(Animation.forProperty(view.getYTranslationProperty())
+        .addTarget(Animation.forProperty(view.getStyle().yTranslation)
             .keyFrames(new KeyFrames.Builder<Float>()
                 .addFrames(10.0F, 5.0F, 1.0F, 3.0F, 5.0F, 1.0F, -10.0F, -7.0F, -5.0F)
                 .build())
             .build())
-        .addTarget(Animation.forProperty(view.getXScaleProperty())
+        .addTarget(Animation.forProperty(view.getStyle().xScale)
             .keyFrames(new KeyFrames.Builder<Float>()
                 .addFrames(1.3F, 1.2F, 1.25F, 1.15F)
                 .build())
             .build())
-        .addTarget(Animation.forProperty(view.getYScaleProperty())
+        .addTarget(Animation.forProperty(view.getStyle().yScale)
             .keyFrames(new KeyFrames.Builder<Float>()
                 .addFrames(1.3F, 1.2F, 1.25F, 1.15F)
                 .build())
@@ -134,8 +134,11 @@ public class Theme {
         .setDuration(20L, TimeUnit.SECONDS)
         .setRepeatCount(Animator.INFINITE)
         .setRepeatBehavior(RepeatBehavior.REVERSE)
-        .build()
-        .start();
+        .build();
+
+    view.addListener(AddedEvent.class, __ -> animator.start());
+    view.addListener(RemovedEvent.class, __ -> animator.stop());
+
     return view;
   }
 }

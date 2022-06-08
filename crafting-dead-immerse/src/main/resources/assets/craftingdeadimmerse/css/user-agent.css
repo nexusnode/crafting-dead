@@ -3,15 +3,23 @@
     outline-color: rgb(170, 220, 240);
 }
 
+DropdownView {
+    z-index: 50;
+}
+
 TabsView {
     flex-direction: row;
     flex-wrap: wrap;
 }
 
-TabsView > * {
+TabsView>* {
     width: 60;
-    padding-top: 5.5;
-    padding-bottom: 5.5
+    height: 100%;
+    justify-content: center;
+}
+
+TabsView>*>TextView {
+    text-align: center;
 }
 
 FogView {

@@ -18,6 +18,7 @@
 
 package com.craftingdead.immerse.client.util;
 
+import java.io.IOException;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -30,11 +31,19 @@ import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.Mth;
 
 public class RenderUtil {
 
   private static final Minecraft minecraft = Minecraft.getInstance();
+
+  public static void registerSvgTexture(ResourceLocation resourceLocation) {
+    try (var inputStream =
+        minecraft.getResourceManager().getResource(resourceLocation).getInputStream()) {
+
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
 
   public static void renderTextRight(Font fontRenderer, PoseStack poseStack, float x,
       float y, Component text, int colour, boolean shadow) {
@@ -153,58 +162,6 @@ public class RenderUtil {
         (spriteY + spriteHeight) / textureHeight,
         (spriteX + spriteWidth) / textureWidth,
         spriteY / textureHeight);
-  }
-
-  public static long lerp(int colour1, int colour2, float pct) {
-    return getColour(lerp(getColour4i(colour1), getColour4i(colour2), pct));
-  }
-
-  public static int[] lerp(int[] colour1, int[] colour2, float pct) {
-    int[] rgba = new int[4];
-    for (int i = 0; i < 4; i++) {
-      rgba[i] = Mth.ceil(Mth.lerp(pct, colour1[i], colour2[i]));
-    }
-    return rgba;
-  }
-
-  public static float[] lerp(float[] colour1, float[] colour2, float pct) {
-    float[] rgba = new float[4];
-    for (int i = 0; i < 4; i++) {
-      rgba[i] = Mth.lerp(pct, colour1[i], colour2[i]);
-    }
-    return rgba;
-  }
-
-  public static float[] getColour4f(int[] colour4i) {
-    return new float[] {
-        colour4i[0] / 255.0F,
-        colour4i[1] / 255.0F,
-        colour4i[2] / 255.0F,
-        colour4i[3] / 255.0F};
-  }
-
-  public static int[] getColour4i(int colour) {
-    int[] rgba = new int[4];
-    rgba[0] = (colour >> 16) & 0xFF;
-    rgba[1] = (colour >> 8) & 0xFF;
-    rgba[2] = (colour >> 0) & 0xFF;
-    rgba[3] = (colour >> 24) & 0xFF;
-    return rgba;
-  }
-
-  public static int[] getColour4i(float[] colour4f) {
-    return new int[] {
-        Mth.ceil(colour4f[0] * 255),
-        Mth.ceil(colour4f[1] * 255),
-        Mth.ceil(colour4f[2] * 255),
-        Mth.ceil(colour4f[3] * 255)};
-  }
-
-  public static int getColour(int[] colour4i) {
-    return ((colour4i[3] & 0xFF) << 24)
-        | ((colour4i[0] & 0xFF) << 16)
-        | ((colour4i[1] & 0xFF) << 8)
-        | ((colour4i[2] & 0xFF) << 0);
   }
 
   public static void renderPlayerListRow(PoseStack poseStack, int x, int y, int width,

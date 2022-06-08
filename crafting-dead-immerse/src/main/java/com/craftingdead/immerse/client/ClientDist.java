@@ -21,12 +21,11 @@ package com.craftingdead.immerse.client;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
-import org.jetbrains.annotations.Nullable;
-import com.mojang.logging.LogUtils;
-import org.slf4j.Logger;
 import org.jdesktop.core.animation.timing.Animator;
 import org.jdesktop.core.animation.timing.sources.ManualTimingSource;
+import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
+import org.slf4j.Logger;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
@@ -35,8 +34,6 @@ import com.craftingdead.immerse.ModDist;
 import com.craftingdead.immerse.client.fake.FakePlayer;
 import com.craftingdead.immerse.client.gui.IngameGui;
 import com.craftingdead.immerse.client.gui.screen.menu.MainMenuView;
-import com.craftingdead.immerse.client.gui.view.ViewScreen;
-import com.craftingdead.immerse.client.gui.view.style.StyleSheetManager;
 import com.craftingdead.immerse.client.renderer.BlueprintOutlineRenderer;
 import com.craftingdead.immerse.client.renderer.SpectatorRenderer;
 import com.craftingdead.immerse.client.renderer.entity.layer.TeamClothingLayer;
@@ -48,10 +45,10 @@ import com.craftingdead.immerse.game.ClientGameWrapper;
 import com.craftingdead.immerse.game.GameClient;
 import com.craftingdead.immerse.game.GameType;
 import com.craftingdead.immerse.server.LogicalServer;
-import com.craftingdead.immerse.util.LwjglNativeUtil;
 import com.craftingdead.immerse.world.item.BlueprintItem;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import com.mojang.logging.LogUtils;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.TitleScreen;
@@ -79,15 +76,19 @@ import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.fml.loading.FMLLoader;
 import net.minecraftforge.fml.loading.progress.StartupMessageManager;
 import net.rocketpowered.api.Rocket;
 import net.rocketpowered.connector.client.gui.RocketToast;
 import reactor.core.scheduler.Schedulers;
+import sm0keysa1m0n.bliss.Bliss;
+import sm0keysa1m0n.bliss.minecraft.platform.MinecraftGraphicsContext;
+import sm0keysa1m0n.bliss.minecraft.platform.MinecraftPlatform;
+import sm0keysa1m0n.bliss.style.StyleSheetManager;
+import sm0keysa1m0n.bliss.view.ViewScreen;
 
 public class ClientDist implements ModDist {
 
-  private static final ManualTimingSource TIMING_SOURCE = new ManualTimingSource();
+  private static final ManualTimingSource timingSource = new ManualTimingSource();
 
   public static final KeyMapping SWITCH_TEAMS =
       new KeyMapping("key.switch_teams", KeyConflictContext.UNIVERSAL, KeyModifier.NONE,
@@ -99,10 +100,12 @@ public class ClientDist implements ModDist {
   private static final Logger logger = LogUtils.getLogger();
 
   static {
-    Animator.setDefaultTimingSource(TIMING_SOURCE);
+    Animator.setDefaultTimingSource(timingSource);
   }
 
   private final Minecraft minecraft;
+
+  private MinecraftGraphicsContext graphicsContext;
 
   @Nullable
   private LogicalServer logicalServer;
@@ -125,10 +128,6 @@ public class ClientDist implements ModDist {
   private static RoundedTexShader roundedTexShader;
 
   public ClientDist() {
-    if (FMLLoader.isProduction()) {
-      LwjglNativeUtil.load("lwjgl_yoga");
-    }
-
     final var modBus = FMLJavaModLoadingContext.get().getModEventBus();
     modBus.addListener(this::handleClientSetup);
     modBus.addListener(this::handleEntityRenderersAddLayers);
@@ -139,6 +138,15 @@ public class ClientDist implements ModDist {
     this.spectatorRenderer = new SpectatorRenderer();
     this.blueprintOutlineRenderer = new BlueprintOutlineRenderer();
     this.ingameGui = new IngameGui();
+  }
+
+  public MinecraftGraphicsContext getGraphicsContext() {
+    // Lazy-init this as there's no good time/place to create it.
+    if (this.graphicsContext == null) {
+      this.graphicsContext = new MinecraftGraphicsContext(
+          this.minecraft.getWindow().getWindow(), this.minecraft.getMainRenderTarget());
+    }
+    return this.graphicsContext;
   }
 
   @Nullable
@@ -209,6 +217,8 @@ public class ClientDist implements ModDist {
   }
 
   private void handleClientSetup(FMLClientSetupEvent event) {
+    Bliss.initialize(this.graphicsContext, new MinecraftPlatform(this.minecraft));
+
     ClientRegistry.registerKeyBinding(SWITCH_TEAMS);
 
     this.blueprintOutlineRenderer.register();
@@ -310,7 +320,7 @@ public class ClientDist implements ModDist {
   }
 
   @SubscribeEvent
-  public void handleGuiOpen(ScreenOpenEvent event) {
+  public void handleScreenOpen(ScreenOpenEvent event) {
     if (event.getScreen() instanceof TitleScreen && this.firstLoad) {
       // Do this here to make sure font is loaded for toasts
       Rocket.getGameClientGatewayFeed()
@@ -370,7 +380,7 @@ public class ClientDist implements ModDist {
   public void handleRenderTick(TickEvent.RenderTickEvent event) {
     switch (event.phase) {
       case START:
-        TIMING_SOURCE.tick();
+        timingSource.tick();
         break;
       default:
         break;
