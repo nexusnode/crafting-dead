@@ -27,6 +27,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.Nullable;
+import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
 import com.mojang.logging.LogUtils;
 import io.github.humbleui.skija.Image;
@@ -48,6 +49,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.storage.LevelResource;
 import net.minecraft.world.level.storage.LevelStorageSource;
 import net.minecraft.world.level.storage.LevelSummary;
+import sm0keysa1m0n.bliss.view.ImageAccess;
 import sm0keysa1m0n.bliss.view.ImageView;
 import sm0keysa1m0n.bliss.view.ParentView;
 import sm0keysa1m0n.bliss.view.TextView;
@@ -74,7 +76,8 @@ class WorldItemView extends ParentView {
 
     this.iconImage = this.loadIconTexture(levelSummary);
     if (this.iconImage == null) {
-      try (var inputStream =
+      try (@SuppressWarnings("removal")
+      var inputStream =
           this.minecraft.getResourceManager().getResource(UNKOWN_SERVER_ICON).getInputStream()) {
         this.iconImage = Image.makeFromEncoded(inputStream.readAllBytes());
       } catch (IOException e) {
@@ -84,7 +87,8 @@ class WorldItemView extends ParentView {
     }
 
     this.addListener(ActionEvent.class, event -> this.joinWorld(), true);
-    this.addChild(new ImageView(new Properties().id("icon")).setImage(this.iconImage));
+    this.addChild(new ImageView(new Properties().id("icon"))
+        .setImage(ImageAccess.forImage(this.iconImage)));
 
     var texts = new ParentView(new Properties().id("texts"));
     texts.addChild(new TextView(new Properties())
@@ -97,6 +101,22 @@ class WorldItemView extends ParentView {
         .setText(levelSummary.getInfo().copy()
             .withStyle(ChatFormatting.GRAY)));
     this.addChild(texts);
+  }
+
+  @Override
+  public void keyPressed(int keyCode, int scanCode, int modifiers) {
+    super.keyPressed(keyCode, scanCode, modifiers);
+    if (keyCode == GLFW.GLFW_KEY_SPACE && this.isFocused()) {
+      this.parentWorldList.setSelectedItem(this);
+    }
+  }
+
+  @Override
+  public boolean mousePressed(double mouseX, double mouseY, int button) {
+    if (this.isFocused()) {
+      this.parentWorldList.setSelectedItem(this);
+    }
+    return super.mousePressed(mouseX, mouseY, button);
   }
 
   @Nullable
@@ -120,6 +140,7 @@ class WorldItemView extends ParentView {
   /**
    * A slightly edited copy of {@link WorldSelectionList.Entry#joinWorld}
    */
+  @SuppressWarnings("removal")
   public void joinWorld() {
     if (this.worldSummary.isDisabled()) {
       return;
@@ -182,6 +203,7 @@ class WorldItemView extends ParentView {
 
   }
 
+  @SuppressWarnings("removal")
   private void loadWorld() {
     if (this.minecraft.getLevelSource().levelExists(this.worldSummary.getLevelName())) {
       this.minecraft.forceSetScreen(
@@ -193,6 +215,7 @@ class WorldItemView extends ParentView {
   /**
    * A slightly edited copy of {@link WorldSelectionList.Entry#editWorld}
    */
+  @SuppressWarnings("removal")
   public void editWorld() {
     var fileName = this.worldSummary.getLevelName();
     try {
@@ -219,6 +242,7 @@ class WorldItemView extends ParentView {
   /**
    * A slightly edited copy of {@link WorldSelectionList.Entry#deleteWorld}
    */
+  @SuppressWarnings("removal")
   public void deleteWorld() {
     ViewScreen screen = this.getScreen();
     screen.keepOpenAndSetScreen(new ConfirmScreen(confirmed -> {
@@ -245,6 +269,7 @@ class WorldItemView extends ParentView {
   /**
    * A slightly edited copy of {@link WorldSelectionList.Entry#recreateWorld}
    */
+  @SuppressWarnings("removal")
   public void recreateWorld() {
     ViewScreen screen = this.getScreen();
     screen.keepOpen();

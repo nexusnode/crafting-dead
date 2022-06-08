@@ -1,11 +1,10 @@
 package sm0keysa1m0n.bliss.view;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
-import com.craftingdead.immerse.client.util.RenderUtil;
 import com.mojang.blaze3d.vertex.PoseStack;
 import io.github.humbleui.skija.Font;
 import io.github.humbleui.skija.FontMgr;
@@ -20,18 +19,17 @@ import io.github.humbleui.skija.shaper.ShapingOptions;
 import io.github.humbleui.types.Rect;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
-import net.minecraft.client.gui.components.events.ContainerEventHandler;
-import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec2;
+import sm0keysa1m0n.bliss.Color;
 import sm0keysa1m0n.bliss.layout.MeasureMode;
 import sm0keysa1m0n.bliss.style.States;
 import sm0keysa1m0n.bliss.view.event.ActionEvent;
 
-public class DropdownView extends View implements ContainerEventHandler {
+public class DropdownView extends View {
 
   public static final int DEFAULT_HEIGHT = 14;
   public static final int DEFAULT_ITEM_BACKGROUND_COLOR = 0xFF444444;
@@ -58,8 +56,6 @@ public class DropdownView extends View implements ContainerEventHandler {
   private float arrowLineWidth;
   private float xArrowOffset;
 
-  private boolean dragging;
-
   private long fadeStartTimeMs;
 
   @Nullable
@@ -68,7 +64,7 @@ public class DropdownView extends View implements ContainerEventHandler {
   private SoundEvent itemHoverSound;
 
   @Nullable
-  private GuiEventListener lastHoveredListener;
+  private Item lastHoveredListener;
 
   private FontMgr fontManager = FontMgr.getDefault();
 
@@ -108,7 +104,7 @@ public class DropdownView extends View implements ContainerEventHandler {
       this.fontManager.close();
     }
   }
-  
+
   protected Vec2 measure(MeasureMode widthMode, float width, MeasureMode heightMode,
       float height) {
     return new Vec2(width, DEFAULT_HEIGHT);
@@ -179,7 +175,10 @@ public class DropdownView extends View implements ContainerEventHandler {
   @Override
   public void mouseMoved(double mouseX, double mouseY) {
     super.mouseMoved(mouseX, mouseY);
-    var hoveredListener = this.getChildAt(mouseX, mouseY).orElse(null);
+    var hoveredListener = this.items.stream()
+        .filter(item -> item.isMouseOver(mouseX, mouseY))
+        .findFirst()
+        .orElse(null);
     if (hoveredListener instanceof DropdownView.Item
         && hoveredListener != this.lastHoveredListener
         && this.itemHoverSound != null) {
@@ -189,22 +188,32 @@ public class DropdownView extends View implements ContainerEventHandler {
   }
 
   @Override
-  public boolean mouseClicked(double mouseX, double mouseY, int button) {
+  public boolean mousePressed(double mouseX, double mouseY, int button) {
     if (this.expanded) {
-      if (!ContainerEventHandler.super.mouseClicked(mouseX, mouseY, button) && !this.isHovered()) {
-        this.toggleExpanded();
+      for (var item : this.items) {
+        if (item.isMouseOver(mouseX, mouseY) && !item.disabled) {
+          this.focusedItemIndex = item.index;
+          break;
+        }
       }
     }
-    return super.mouseClicked(mouseX, mouseY, button);
+    return super.mousePressed(mouseX, mouseY, button);
   }
 
   @Override
-  public boolean changeFocus(boolean forward) {
+  protected void focusChanged() {
+    if (!this.isFocused() && this.expanded) {
+      this.toggleExpanded();
+    }
+  }
+
+  @Override
+  public Optional<View> changeFocus(boolean forward) {
     if (this.isFocused() && this.expanded) {
       this.getStyleManager().addState(States.FOCUS_VISIBLE);
       this.getStyleManager().notifyListeners();
       this.toggleExpanded();
-      return true;
+      return Optional.of(this);
     }
     return super.changeFocus(forward);
   }
@@ -224,7 +233,7 @@ public class DropdownView extends View implements ContainerEventHandler {
   }
 
   @Override
-  public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+  public void keyPressed(int keyCode, int scanCode, int modifiers) {
     if (keyCode == GLFW.GLFW_KEY_DOWN) {
       this.focusedItemIndex = Math.min(this.focusedItemIndex + 1, this.items.size() - 1);
     } else if (keyCode == GLFW.GLFW_KEY_UP) {
@@ -235,12 +244,7 @@ public class DropdownView extends View implements ContainerEventHandler {
       this.getFocusedItem().select();
     }
 
-    return super.keyPressed(keyCode, scanCode, modifiers);
-  }
-
-  @Override
-  public List<? extends GuiEventListener> children() {
-    return Collections.unmodifiableList(this.items);
+    super.keyPressed(keyCode, scanCode, modifiers);
   }
 
   protected void toggleExpanded() {
@@ -301,35 +305,33 @@ public class DropdownView extends View implements ContainerEventHandler {
     var yOffset =
         (this.getScaledContentY() + (this.getScaledContentHeight() - this.arrowHeight) / 2.0F);
 
-    this.skia.begin();
-    {
-      var canvas = this.skia.canvas();
-      try (var paint = new Paint().setStrokeCap(PaintStrokeCap.ROUND)
-          .setStrokeWidth(this.arrowLineWidth * (float) this.window.getGuiScale())
-          .setColor(0xFFFFFFFF)
-          .setMode(PaintMode.FILL)) {
-        canvas.drawLine(
-            (xOffset) * (float) this.window.getGuiScale(),
-            yOffset * (float) this.window.getGuiScale(),
-            ((xOffset) + this.arrowWidth / 2.0F) * (float) this.window.getGuiScale(),
-            (yOffset + this.arrowHeight) * (float) this.window.getGuiScale(),
-            paint);
-        canvas.drawLine(
-            (xOffset + this.arrowWidth / 2.0F) * (float) this.window.getGuiScale(),
-            (yOffset + this.arrowHeight) * (float) this.window.getGuiScale(),
-            (xOffset + this.arrowWidth) * (float) this.window.getGuiScale(),
-            yOffset * (float) this.window.getGuiScale(),
-            paint);
-      }
+    var canvas = this.graphicsContext.canvas();
+    var scale = this.graphicsContext.scale();
+    try (var paint = new Paint().setStrokeCap(PaintStrokeCap.ROUND)
+        .setStrokeWidth(this.arrowLineWidth * this.graphicsContext.scale())
+        .setColor(0xFFFFFFFF)
+        .setMode(PaintMode.FILL)) {
+      canvas.drawLine(
+          xOffset * scale,
+          yOffset * scale,
+          (xOffset + this.arrowWidth / 2.0F) * scale,
+          (yOffset + this.arrowHeight) * scale,
+          paint);
+      canvas.drawLine(
+          (xOffset + this.arrowWidth / 2.0F) * scale,
+          (yOffset + this.arrowHeight) * scale,
+          (xOffset + this.arrowWidth) * scale,
+          yOffset * scale,
+          paint);
     }
-    this.skia.end();
   }
 
   private enum Type {
+
     HIGHLIGHTED, SELECTED, DISABLED, HOVERED, NONE;
   }
 
-  public class Item implements GuiEventListener {
+  public class Item {
 
     private final int index;
     private final Component text;
@@ -366,7 +368,7 @@ public class DropdownView extends View implements ContainerEventHandler {
 
       this.textLine = Shaper.make(DropdownView.this.fontManager).shapeLine(this.text.getString(),
           new Font(fontSet.matchStyle(fontStyle), DropdownView.this.getStyle().fontSize.get()
-              * (float) DropdownView.this.window.getGuiScale()),
+              * DropdownView.this.graphicsContext.scale()),
           ShapingOptions.DEFAULT);
     }
 
@@ -403,35 +405,32 @@ public class DropdownView extends View implements ContainerEventHandler {
 
     private void render(PoseStack poseStack, float x, float y, float width, float height,
         int backgroundColor, int textColor, float alpha) {
-      DropdownView.this.skia.begin();
-      {
-        var canvas = DropdownView.this.skia.canvas();
 
-        var style = this.text.getStyle();
-        var scale = (float) DropdownView.this.window.getGuiScale();
+      var canvas = DropdownView.this.graphicsContext.canvas();
 
-        canvas.translate(x * scale, y * scale);
-        canvas.scale(DropdownView.this.getXScale(), DropdownView.this.getYScale());
+      var style = this.text.getStyle();
+      var scale = DropdownView.this.graphicsContext.scale();
 
-        try (var paint = new Paint()) {
-          paint.setMode(PaintMode.FILL);
-          paint.setColor(RenderUtil.multiplyAlpha(backgroundColor, alpha));
-          canvas.drawRect(Rect.makeWH(width * scale, height * scale), paint);
-        }
+      canvas.translate(x * scale, y * scale);
+      canvas.scale(DropdownView.this.getXScale(), DropdownView.this.getYScale());
 
-        try (var paint = new Paint()) {
-          paint.setColor(RenderUtil.multiplyAlpha(style.getColor() == null
-              ? DropdownView.this.getStyle().color.get().valueHex()
-              : style.getColor().getValue() + (255 << 24), alpha));
-          canvas.translate(4 * scale,
-              this.textLine.getHeight() + (height * scale) / 2.0F
-                  - this.textLine.getXHeight() * 2.0F);
-          canvas.drawTextLine(this.textLine, 0, 0, paint);
-        }
-
-        canvas.resetMatrix();
+      try (var paint = new Paint()) {
+        paint.setMode(PaintMode.FILL);
+        paint.setColor(Color.multiplyAlpha(backgroundColor, alpha));
+        canvas.drawRect(Rect.makeWH(width * scale, height * scale), paint);
       }
-      DropdownView.this.skia.end();
+
+      try (var paint = new Paint()) {
+        paint.setColor(Color.multiplyAlpha(style.getColor() == null
+            ? DropdownView.this.getStyle().color.get().valueHex()
+            : style.getColor().getValue() + (255 << 24), alpha));
+        canvas.translate(4 * scale,
+            this.textLine.getHeight() + (height * scale) / 2.0F
+                - this.textLine.getXHeight() * 2.0F);
+        canvas.drawTextLine(this.textLine, 0, 0, paint);
+      }
+
+      canvas.resetMatrix();
     }
 
     private void select() {
@@ -439,15 +438,6 @@ public class DropdownView extends View implements ContainerEventHandler {
         this.actionListener.run();
         DropdownView.this.selectedItem = this;
       }
-    }
-
-    @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
-      if (!this.disabled && this.isMouseOver(mouseX, mouseY)) {
-        DropdownView.this.focusedItemIndex = this.index;
-        return true;
-      }
-      return false;
     }
 
     public void setDisabled(boolean disabled) {
@@ -460,30 +450,10 @@ public class DropdownView extends View implements ContainerEventHandler {
           + DropdownView.this.getItemHeight() * this.index;
     }
 
-    @Override
-    public boolean isMouseOver(double mouseX, double mouseY) {
+    private boolean isMouseOver(double mouseX, double mouseY) {
       final float y = this.getY();
       return DropdownView.this.isMouseOver(mouseX, mouseY) && mouseY >= y
           && mouseY <= y + DropdownView.this.getItemHeight();
     }
   }
-
-  @Override
-  public final boolean isDragging() {
-    return this.dragging;
-  }
-
-  @Override
-  public final void setDragging(boolean dragging) {
-    this.dragging = dragging;
-  }
-
-  @Nullable
-  @Override
-  public GuiEventListener getFocused() {
-    return null;
-  }
-
-  @Override
-  public void setFocused(@Nullable GuiEventListener focusedListener) {}
 }

@@ -1,48 +1,69 @@
-package sm0keysa1m0n.bliss;
+package sm0keysa1m0n.bliss.minecraft.platform;
 
+import java.nio.FloatBuffer;
+import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL14;
 import org.lwjgl.opengl.GL33;
+import org.lwjgl.system.MemoryUtil;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferUploader;
+import com.mojang.math.Matrix4f;
 import io.github.humbleui.skija.BackendRenderTarget;
 import io.github.humbleui.skija.Canvas;
 import io.github.humbleui.skija.ColorSpace;
 import io.github.humbleui.skija.DirectContext;
 import io.github.humbleui.skija.FramebufferFormat;
+import io.github.humbleui.skija.Matrix33;
 import io.github.humbleui.skija.PixelGeometry;
 import io.github.humbleui.skija.Surface;
 import io.github.humbleui.skija.SurfaceColorFormat;
 import io.github.humbleui.skija.SurfaceOrigin;
 import io.github.humbleui.skija.SurfaceProps;
-import io.github.humbleui.types.Rect;
+import net.minecraftforge.fml.loading.FMLLoader;
+import sm0keysa1m0n.bliss.platform.Cursor;
+import sm0keysa1m0n.bliss.platform.GraphicsContext;
+import sm0keysa1m0n.bliss.platform.ScissorStack;
 
-public class Skia implements AutoCloseable {
+public class MinecraftGraphicsContext implements GraphicsContext, AutoCloseable {
 
-  private DirectContext context;
+  private final DirectContext context;
 
-  public Surface surface;
+  private Surface surface;
   private BackendRenderTarget backendRenderTarget;
 
   private Canvas canvas;
 
-  public void init(RenderTarget renderTarget) {
+  private final long window;
+  private final RenderTarget renderTarget;
+
+  private float scale;
+
+  private long ibeamCursor = MemoryUtil.NULL;
+
+  public MinecraftGraphicsContext(long window, RenderTarget renderTarget) {
     RenderSystem.assertOnRenderThread();
+    this.window = window;
+    this.renderTarget = renderTarget;
+    this.renderTarget.enableStencil();
+    this.context = DirectContext.makeGL();
 
-    // Lazy init context.
-    if (this.context == null) {
-      this.context = DirectContext.makeGL();
+    if (FMLLoader.isProduction()) {
+      LwjglNativeUtil.load("lwjgl_yoga");
     }
-    renderTarget.enableStencil();
+  }
 
+  public void init(float scale) {
+    RenderSystem.assertOnRenderThread();
+    this.scale = scale;
     this.closeRenderTarget();
     this.backendRenderTarget = BackendRenderTarget.makeGL(
-        renderTarget.width, renderTarget.height,
+        this.renderTarget.width, this.renderTarget.height,
         /* samples */ 0,
         /* stencil */ 8,
-        renderTarget.frameBufferId,
+        this.renderTarget.frameBufferId,
         FramebufferFormat.GR_GL_RGBA8);
     this.surface = Surface.makeFromBackendRenderTarget(
         this.context,
@@ -67,10 +88,17 @@ public class Skia implements AutoCloseable {
     }
   }
 
+  @Override
+  public Surface surface() {
+    return this.surface;
+  }
+
+  @Override
   public Canvas canvas() {
     return this.canvas;
   }
 
+  @Override
   public void begin() {
     RenderSystem.assertOnRenderThread();
 
@@ -81,18 +109,11 @@ public class Skia implements AutoCloseable {
     RenderSystem.pixelStore(GL11.GL_UNPACK_ALIGNMENT, 4);
 
     this.context.resetAll();
-
-    this.canvas.save();
-    var scissor = ScissorStack.peek();
-    if (scissor != null) {
-      this.canvas.clipRect(
-          Rect.makeXYWH(scissor.getX(), scissor.getY(), scissor.getWidth(), scissor.getHeight()));
-    }
   }
 
+  @Override
   public void end() {
     RenderSystem.assertOnRenderThread();
-    this.canvas.restore();
 
     this.surface.flush();
 
@@ -134,5 +155,37 @@ public class Skia implements AutoCloseable {
     RenderSystem.assertOnRenderThread();
     this.closeRenderTarget();
     this.context.close();
+  }
+
+  public static Matrix33 convert(Matrix4f matrix) {
+    var arr = new float[16];
+    matrix.storeTransposed(FloatBuffer.wrap(arr));
+    return new Matrix33(arr[0], arr[1], arr[3], arr[4], arr[5], arr[7], arr[12], arr[13], arr[15]);
+  }
+
+  @Override
+  public int width() {
+    return this.renderTarget.width;
+  }
+
+  @Override
+  public int height() {
+    return this.renderTarget.height;
+  }
+
+  @Override
+  public float scale() {
+    return this.scale;
+  }
+
+  @Override
+  public void setCursor(Cursor cursor) {
+    RenderSystem.assertOnRenderThread();
+    GLFW.glfwSetCursor(this.window, switch (cursor) {
+      case DEFAULT -> MemoryUtil.NULL;
+      case IBEAM -> this.ibeamCursor == MemoryUtil.NULL
+          ? this.ibeamCursor = GLFW.glfwCreateStandardCursor(GLFW.GLFW_IBEAM_CURSOR)
+          : this.ibeamCursor;
+    });
   }
 }

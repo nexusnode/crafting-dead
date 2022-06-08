@@ -24,12 +24,15 @@ public class States {
   public static final int HOVER = register("hover");
   public static final int FOCUS = register("focus");
   public static final int FOCUS_VISIBLE = register("focus-visible");
+  public static final int CHECKED = register("checked");
 
   private static int n = 0;
 
   private static int register(String name) {
     var value = 1 << n++;
-    states.put(name, value);
+    if (states.put(name, value) != NILL) {
+      throw new IllegalStateException("Duplicate state: " + name);
+    }
     return value;
   }
 

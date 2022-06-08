@@ -52,6 +52,7 @@ public class ManageMembersView extends ParentView {
 
   private Disposable listener;
 
+  @SuppressWarnings("removal")
   public ManageMembersView(Consumer<View> viewConsumer) {
     super(new Properties().styleClasses("page", "blur"));
 
@@ -146,6 +147,7 @@ public class ManageMembersView extends ParentView {
         && GuildPermission.KICK.hasPermission(permissions));
   }
 
+  @SuppressWarnings("removal")
   private void updateGuild(GameClientGateway gateway, GuildPayload guild) {
     if (guild == null) {
       return;
@@ -200,6 +202,7 @@ public class ManageMembersView extends ParentView {
     }
   }
 
+  @SuppressWarnings("removal")
   @Override
   protected void added() {
     super.added();
@@ -231,9 +234,8 @@ public class ManageMembersView extends ParentView {
   }
 
   @Override
-  public boolean mouseClicked(double mouseX, double mouseY, int button) {
-    boolean result = super.mouseClicked(mouseX, mouseY, button);
+  public boolean mousePressed(double mouseX, double mouseY, int button) {
     this.updateSelected();
-    return result;
+    return super.mousePressed(mouseX, mouseY, button);
   }
 }

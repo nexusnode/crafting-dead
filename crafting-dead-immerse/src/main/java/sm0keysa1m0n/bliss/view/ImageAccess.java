@@ -1,6 +1,7 @@
 package sm0keysa1m0n.bliss.view;
 
 import io.github.humbleui.skija.Canvas;
+import io.github.humbleui.skija.Image;
 import io.github.humbleui.skija.Paint;
 import io.github.humbleui.types.Point;
 
@@ -14,4 +15,8 @@ public interface ImageAccess extends AutoCloseable {
 
   @Override
   void close();
+
+  static ImageAccess forImage(Image image) {
+    return new SimpleImageAccess(image);
+  }
 }

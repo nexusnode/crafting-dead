@@ -1,13 +1,14 @@
-package sm0keysa1m0n.bliss.view;
+package com.craftingdead.immerse.client.gui.screen;
 
 import com.craftingdead.immerse.CraftingDeadImmerse;
-import com.craftingdead.immerse.client.util.FitType;
 import com.craftingdead.immerse.client.util.RenderUtil;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.Util;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
+import sm0keysa1m0n.bliss.ObjectFit;
+import sm0keysa1m0n.bliss.view.View;
 
 public class FogView extends View {
 
@@ -22,7 +23,7 @@ public class FogView extends View {
 
   @Override
   public void renderContent(PoseStack poseStack, int mouseX, int mouseY, float paritalTicks) {
-    var fogSize = FitType.COVER.getSize(1920, 1080, this.getScaledContentWidth(),
+    var fogSize = ObjectFit.COVER.getSize(1920, 1080, this.getScaledContentWidth(),
         this.getScaledContentHeight());
     float fogWidth = fogSize.x;
     float fogHeight = fogSize.y;
@@ -33,6 +34,7 @@ public class FogView extends View {
       fogStartTime = Util.getMillis();
     }
 
+    this.graphicsContext.end();
     poseStack.pushPose();
     {
       poseStack.scale(4F, 4F, 4F);
@@ -53,5 +55,6 @@ public class FogView extends View {
       RenderSystem.disableBlend();
     }
     poseStack.popPose();
+    this.graphicsContext.begin();
   }
 }

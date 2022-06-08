@@ -54,6 +54,7 @@ public class InvitesView extends ParentView {
 
   private Set<GuildInvitePayload> lastInvites = Collections.emptySet();
 
+  @SuppressWarnings("removal")
   public InvitesView() {
     super(new Properties().styleClasses("page", "blur"));
 
@@ -107,6 +108,7 @@ public class InvitesView extends ParentView {
     this.declineButton.setEnabled(this.selectedInviteView != null);
   }
 
+  @SuppressWarnings("removal")
   @Override
   protected void added() {
     super.added();
@@ -145,10 +147,9 @@ public class InvitesView extends ParentView {
   }
 
   @Override
-  public boolean mouseClicked(double mouseX, double mouseY, int button) {
-    boolean result = super.mouseClicked(mouseX, mouseY, button);
+  public boolean mousePressed(double mouseX, double mouseY, int button) {
     this.updateSelected();
-    return result;
+    return super.mousePressed(mouseX, mouseY, button);
   }
 
   private static class InviteView extends ParentView {
@@ -198,6 +199,7 @@ public class InvitesView extends ParentView {
       this.offlineMemebrsView.getStyle().color.defineState(Color.GRAY);
     }
 
+    @SuppressWarnings("removal")
     @Override
     protected void added() {
       super.added();

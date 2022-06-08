@@ -39,20 +39,20 @@ public class TextView extends View {
       if (this.paragraph != null && this.isAdded()) {
         this.paragraph.updateForegroundPaint(0, this.textCount,
             new Paint().setColor(color.valueHex()));
-        this.paragraph.layout(this.getContentWidth() * (float) this.window.getGuiScale());
+        this.paragraph.layout(this.getContentWidth() * this.graphicsContext.scale());
       }
     });
     this.getStyle().fontFamily.addListener(__ -> this.buildParagraph());
     this.getStyle().fontSize.addListener(fontSize -> {
       if (this.paragraph != null && this.isAdded()) {
         this.paragraph.updateFontSize(0, this.textCount, fontSize);
-        this.paragraph.layout(this.getContentWidth() * (float) this.window.getGuiScale());
+        this.paragraph.layout(this.getContentWidth() * this.graphicsContext.scale());
       }
     });
     this.getStyle().textAlign.addListener(textAlign -> {
       if (this.paragraph != null && this.isAdded()) {
         this.paragraph.updateAlignment(textAlign);
-        this.paragraph.layout(this.getContentWidth() * (float) this.window.getGuiScale());
+        this.paragraph.layout(this.getContentWidth() * this.graphicsContext.scale());
       }
     });
     this.getStyle().textShadow.addListener(__ -> this.buildParagraph());
@@ -114,7 +114,7 @@ public class TextView extends View {
         var builder = new ParagraphBuilder(paragraphStyle, fontCollection)) {
       this.text.visit((style, content) -> {
         try (var textStyle = new TextStyle()
-            .setFontSize(this.getStyle().fontSize.get() * (float) this.window.getGuiScale())
+            .setFontSize(this.getStyle().fontSize.get() * this.graphicsContext.scale())
             .setFontFamilies(this.getStyle().fontFamily.get())
             .addShadows(this.getStyle().textShadow.get())
             .setColor(style.getColor() == null
@@ -145,39 +145,34 @@ public class TextView extends View {
   public void layout() {
     if (this.paragraph != null) {
       this.paragraph.updateFontSize(0, this.textCount,
-          this.getStyle().fontSize.get() * (float) this.window.getGuiScale());
-      this.paragraph.layout(this.getContentWidth() * (float) this.window.getGuiScale());
+          this.getStyle().fontSize.get() * this.graphicsContext.scale());
+      this.paragraph.layout(this.getContentWidth() * this.graphicsContext.scale());
     }
     super.layout();
   }
 
   private Vec2 measure(MeasureMode widthMode, float width, MeasureMode heightMode, float height) {
     this.paragraph.updateFontSize(0, this.textCount,
-        this.getStyle().fontSize.get() * (float) this.window.getGuiScale());
+        this.getStyle().fontSize.get() * this.graphicsContext.scale());
     switch (widthMode) {
       case UNDEFINED:
       case AT_MOST:
         this.paragraph.layout(widthMode == MeasureMode.UNDEFINED ? Float.MAX_VALUE
-            : width * (float) this.window.getGuiScale());
-        width = (this.paragraph.getMaxIntrinsicWidth()) / (float) this.window.getGuiScale();
+            : width * this.graphicsContext.scale());
+        width = (this.paragraph.getMaxIntrinsicWidth()) / this.graphicsContext.scale();
         break;
       default:
-        this.paragraph.layout(width * (float) this.window.getGuiScale());
+        this.paragraph.layout(width * this.graphicsContext.scale());
         break;
     }
-    return new Vec2(width, this.paragraph.getHeight() / (float) this.window.getGuiScale());
+    return new Vec2(width, this.paragraph.getHeight() / this.graphicsContext.scale());
   }
 
   @Override
   public float computeFullHeight() {
     return this.paragraph == null
         ? super.computeFullHeight()
-        : this.paragraph.getHeight() / (float) this.window.getGuiScale();
-  }
-
-  @Override
-  public boolean mouseClicked(double mouseX, double mouseY, int button) {
-    return super.mouseClicked(mouseX, mouseY, button);
+        : this.paragraph.getHeight() / this.graphicsContext.scale();
   }
 
   @SuppressWarnings("resource")
@@ -185,29 +180,25 @@ public class TextView extends View {
   public void renderContent(PoseStack poseStack, int mouseX, int mouseY, float partialTicks) {
     super.renderContent(poseStack, mouseX, mouseY, partialTicks);
     if (this.paragraph != null) {
-      this.skia.begin();
-      {
-        var canvas = this.skia.canvas();
+      var canvas = this.graphicsContext.canvas();
 
-        canvas.translate(
-            this.getScaledContentX() * (float) this.window.getGuiScale(),
-            this.getScaledContentY() * (float) this.window.getGuiScale());
+      canvas.translate(
+          this.getScaledContentX() * this.graphicsContext.scale(),
+          this.getScaledContentY() * this.graphicsContext.scale());
 
-        canvas.scale(this.getXScale(), this.getYScale());
+      canvas.scale(this.getXScale(), this.getYScale());
 
-        try (var recorder = new PictureRecorder()) {
-          var recordingCanvas = recorder.beginRecording(
-              Rect.makeWH(this.paragraph.getMaxWidth(), this.paragraph.getHeight()));
-          this.paragraph.paint(recordingCanvas, 0, 0);
-          var picture = recorder.finishRecordingAsPicture();
-          try (var paint = new Paint().setAlphaf(this.getAlpha())) {
-            canvas.drawPicture(picture, null, paint);
-          }
+      try (var recorder = new PictureRecorder()) {
+        var recordingCanvas = recorder.beginRecording(
+            Rect.makeWH(this.paragraph.getMaxWidth(), this.paragraph.getHeight()));
+        this.paragraph.paint(recordingCanvas, 0, 0);
+        var picture = recorder.finishRecordingAsPicture();
+        try (var paint = new Paint().setAlphaf(this.getAlpha())) {
+          canvas.drawPicture(picture, null, paint);
         }
-
-        canvas.resetMatrix();
       }
-      this.skia.end();
+
+      canvas.resetMatrix();
     }
   }
 

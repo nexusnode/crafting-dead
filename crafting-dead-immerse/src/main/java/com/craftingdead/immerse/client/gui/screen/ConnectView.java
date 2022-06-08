@@ -26,7 +26,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import org.slf4j.Logger;
 import com.craftingdead.immerse.CraftingDeadImmerse;
-import com.craftingdead.immerse.sounds.ImmerseSoundEvents;
 import com.google.common.collect.Iterators;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.mojang.logging.LogUtils;
@@ -50,11 +49,9 @@ import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.network.protocol.handshake.ClientIntentionPacket;
 import net.minecraft.network.protocol.login.ServerboundHelloPacket;
 import net.minecraft.resources.ResourceLocation;
-import sm0keysa1m0n.bliss.view.FogView;
 import sm0keysa1m0n.bliss.view.ParentView;
 import sm0keysa1m0n.bliss.view.TextView;
 import sm0keysa1m0n.bliss.view.ViewScreen;
-import sm0keysa1m0n.bliss.view.event.ActionEvent;
 
 public class ConnectView extends ParentView {
 
@@ -74,6 +71,7 @@ public class ConnectView extends ParentView {
   private final TextView statusView;
   private final TextView animationView;
 
+  @SuppressWarnings("removal")
   public ConnectView(Screen lastScreen, ServerAddress address) {
     super(new Properties());
     this.lastScreen = lastScreen;
@@ -90,23 +88,20 @@ public class ConnectView extends ParentView {
         new TextView(new Properties().id("animation"))
             .setText(this.nextAnimation()));
 
-    var cancelButton = new TextView(new Properties().id("cancel-button").focusable(true))
-        .setText(CommonComponents.GUI_CANCEL);
-    cancelButton.addActionSound(ImmerseSoundEvents.BUTTON_CLICK.get());
-    cancelButton.addListener(ActionEvent.class, event -> {
+    dialog.addChild(Theme.createRedButton(CommonComponents.GUI_CANCEL, () -> {
       this.aborted = true;
       if (this.connection != null) {
         this.connection.disconnect(
             new TranslatableComponent("connect.aborted"));
       }
       this.minecraft.setScreen(this.lastScreen);
-    }, true);
-    dialog.addChild(cancelButton);
+    }, "cancel-button"));
 
     this.minecraft.clearLevel();
     this.connect(address);
   }
 
+  @SuppressWarnings("removal")
   private void connect(ServerAddress serverAddress) {
     logger.info("Connecting to {}:{}", serverAddress.getHost(), serverAddress.getPort());
     executorService.submit(() -> {

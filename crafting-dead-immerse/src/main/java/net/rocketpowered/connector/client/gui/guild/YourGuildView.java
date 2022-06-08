@@ -52,6 +52,7 @@ public class YourGuildView extends ParentView {
   @Nullable
   private GuildMemberPayload selfMember;
 
+  @SuppressWarnings("removal")
   public YourGuildView(Consumer<View> contentConsumer) {
     super(new Properties().styleClasses("page", "blur"));
 
@@ -136,6 +137,7 @@ public class YourGuildView extends ParentView {
             () -> this.contentConsumer.accept(this))));
   }
 
+  @SuppressWarnings("removal")
   private void updateGuild(GameClientGateway gateway, GuildPayload guild) {
     if (guild == null) {
       return;
@@ -214,6 +216,7 @@ public class YourGuildView extends ParentView {
     }
   }
 
+  @SuppressWarnings("removal")
   @Override
   protected void added() {
     super.added();

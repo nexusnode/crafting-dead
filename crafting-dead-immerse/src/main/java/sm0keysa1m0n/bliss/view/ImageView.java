@@ -1,28 +1,18 @@
 package sm0keysa1m0n.bliss.view;
 
-import java.io.IOException;
 import java.util.Optional;
 import org.jetbrains.annotations.Nullable;
-import org.slf4j.Logger;
-import com.craftingdead.immerse.client.util.RenderUtil;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.logging.LogUtils;
 import io.github.humbleui.skija.BlendMode;
 import io.github.humbleui.skija.ColorFilter;
-import io.github.humbleui.skija.Data;
-import io.github.humbleui.skija.Image;
 import io.github.humbleui.skija.Paint;
 import io.github.humbleui.skija.PaintMode;
-import io.github.humbleui.skija.svg.SVGDOM;
 import io.github.humbleui.types.Rect;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.phys.Vec2;
 import sm0keysa1m0n.bliss.layout.Layout;
 import sm0keysa1m0n.bliss.layout.MeasureMode;
 
 public class ImageView extends View {
-
-  private static final Logger logger = LogUtils.getLogger();
 
   @Nullable
   private ImageAccess image;
@@ -39,7 +29,7 @@ public class ImageView extends View {
     layout.setMeasureFunction(this::measure);
   }
 
-  private void setImage(ImageAccess image) {
+  public ImageView setImage(@Nullable ImageAccess image) {
     if (this.image != null) {
       this.image.close();
     }
@@ -48,25 +38,6 @@ public class ImageView extends View {
 
     if (this.hasLayout()) {
       this.getLayout().markDirty();
-    }
-  }
-
-  public final ImageView setImage(Image image) {
-    this.setImage(new SimpleImageAccess(image));
-    return this;
-  }
-
-  public final ImageView setImage(ResourceLocation imageLocation) {
-    try (var inputStream =
-        this.minecraft.getResourceManager().getResource(imageLocation).getInputStream()) {
-      var bytes = inputStream.readAllBytes();
-      if (imageLocation.getPath().endsWith(".svg")) {
-        this.setImage(new SvgImageAccess(new SVGDOM(Data.makeFromBytes(bytes))));
-      } else {
-        this.setImage(new SimpleImageAccess(Image.makeFromEncoded(bytes)));
-      }
-    } catch (IOException e) {
-      logger.warn("Failed to load image: {}", imageLocation, e);
     }
 
     return this;
@@ -91,8 +62,8 @@ public class ImageView extends View {
     super.layout();
     this.fittedImageSize = this.getFittedImageSize().orElse(null);
     if (this.fittedImageSize != null) {
-      this.image.prepare(this.fittedImageSize.x * (float) this.window.getGuiScale(),
-          this.fittedImageSize.y * (float) this.window.getGuiScale());
+      this.image.prepare(this.fittedImageSize.x * this.graphicsContext.scale(),
+          this.fittedImageSize.y * this.graphicsContext.scale());
     }
   }
 
@@ -108,41 +79,33 @@ public class ImageView extends View {
     super.renderContent(matrixStack, mouseX, mouseY, partialTicks);
 
     if (this.image == null) {
-      this.skia.begin();
-      {
-        try (var paint = new Paint()) {
-          paint.setAlphaf(this.getAlpha()).setColor(0xFFFFFF).setMode(PaintMode.FILL);
-          var scale = (float) this.window.getGuiScale();
-          this.skia.canvas().drawRect(Rect.makeXYWH(
-              this.getScaledContentX() * scale,
-              this.getScaledContentY() * scale,
-              this.getScaledContentWidth() * scale,
-              this.getScaledContentHeight() * scale), paint);
-        }
+      try (var paint = new Paint()) {
+        paint.setAlphaf(this.getAlpha()).setColor(0xFFFFFF).setMode(PaintMode.FILL);
+        var scale = this.graphicsContext.scale();
+        this.graphicsContext.canvas().drawRect(Rect.makeXYWH(
+            this.getScaledContentX() * scale,
+            this.getScaledContentY() * scale,
+            this.getScaledContentWidth() * scale,
+            this.getScaledContentHeight() * scale), paint);
       }
-      this.skia.end();
       return;
     }
 
-    this.skia.begin();
-    {
-      var canvas = this.skia.canvas();
 
-      canvas.translate(
-          this.getScaledContentX() * (float) this.window.getGuiScale(),
-          this.getScaledContentY() * (float) this.window.getGuiScale());
-      canvas.scale(this.getXScale(), this.getYScale());
+    var canvas = this.graphicsContext.canvas();
 
-      try (var paint = new Paint()) {
-        paint.setColorFilter(ColorFilter.makeBlend(
-            RenderUtil.multiplyAlpha(this.getStyle().color.get().valueHex(), this.getAlpha()),
-            BlendMode.MODULATE));
-        this.image.draw(canvas, paint);
-      }
-      canvas.resetMatrix();
+    canvas.translate(
+        this.getScaledContentX() * this.graphicsContext.scale(),
+        this.getScaledContentY() * this.graphicsContext.scale());
+    canvas.scale(this.getXScale(), this.getYScale());
 
+    try (var paint = new Paint()) {
+      paint.setColorFilter(ColorFilter.makeBlend(
+          this.getStyle().color.get().multiplied(this.getAlpha()),
+          BlendMode.MODULATE));
+      this.image.draw(canvas, paint);
     }
-    this.skia.end();
+    canvas.resetMatrix();
   }
 
   @Override

@@ -22,12 +22,5 @@ ConnectView > #dialog > #status, ConnectView > #dialog > #animation {
 ConnectView > #dialog > #cancel-button {
     width: 150;
     height: 20;
-    margin-top: 50;
-    background-color: rgba(255, 85, 85, 0.4);
-    transition: background-color 150ms;
-    text-align: center;
-}
-
-ConnectView > #dialog > #cancel-button:hover:enabled {
-    background-color: rgba(170, 0, 0, 0.4);
+    flex-grow: 0;
 }

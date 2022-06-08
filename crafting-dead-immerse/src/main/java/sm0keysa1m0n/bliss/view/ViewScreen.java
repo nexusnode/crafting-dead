@@ -2,6 +2,8 @@ package sm0keysa1m0n.bliss.view;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
+import org.jetbrains.annotations.Nullable;
+import org.lwjgl.glfw.GLFW;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
@@ -17,7 +19,12 @@ public final class ViewScreen extends Screen {
 
   private StyleList styleList;
 
+  @Nullable
   private View hovered;
+  @Nullable
+  private View focused;
+  @Nullable
+  private View dragging;
 
   private boolean keepOpen;
 
@@ -92,11 +99,12 @@ public final class ViewScreen extends Screen {
 
   private void updateHovered(double mouseX, double mouseY) {
     var lowestCommonAncestor = new AtomicReference<View>();
-    var hovered = this.root.traverseDepthFirst(view -> view.isMouseOver(mouseX, mouseY), view -> {
-      if (view.isHovered()) {
-        lowestCommonAncestor.compareAndExchange(null, view);
-      }
-    }).orElse(null);
+    var hovered =
+        this.root.traverseSortedDepthFirst(view -> view.isMouseOver(mouseX, mouseY), view -> {
+          if (view.isHovered()) {
+            lowestCommonAncestor.compareAndExchange(null, view);
+          }
+        }).orElse(null);
 
     while (this.hovered != null && this.hovered != lowestCommonAncestor.getPlain()) {
       this.hovered.mouseLeft(mouseX, mouseY);
@@ -104,7 +112,7 @@ public final class ViewScreen extends Screen {
     }
 
     if (hovered != null) {
-      hovered.traverseUpward(view -> {
+      hovered.traverseUpwardUntil(view -> {
         if (view == lowestCommonAncestor.getPlain()) {
           return true;
         }
@@ -118,53 +126,125 @@ public final class ViewScreen extends Screen {
 
   @Override
   public void mouseMoved(double mouseX, double mouseY) {
-    this.root.mouseMoved(mouseX, mouseY);
     this.updateHovered(mouseX, mouseY);
+    if (this.hovered != null) {
+      this.hovered.traverseUpward(view -> view.mouseMoved(mouseX, mouseY));
+    }
   }
 
   @Override
   public boolean mouseClicked(double mouseX, double mouseY, int button) {
-    return this.root.mouseClicked(mouseX, mouseY, button);
+    var view = this.hovered;
+    var foundFocus = false;
+    do {
+      if (this.minecraft.screen != this) {
+        break;
+      }
+      if (!foundFocus && view.tryFocus(false)) {
+        foundFocus = true;
+        this.setFocused(view);
+      }
+      if (view.mousePressed(mouseX, mouseY, button) && this.dragging == null) {
+        this.dragging = view;
+      }
+      view = view.getParent();
+    } while (view != null);
+
+    if (!foundFocus) {
+      this.setFocused((View) null);
+    }
+
+    return true;
   }
 
   @Override
   public boolean mouseReleased(double mouseX, double mouseY, int button) {
-    return this.root.mouseReleased(mouseX, mouseY, button);
+    this.dragging = null;
+
+    if (this.hovered == null) {
+      return false;
+    }
+
+    this.hovered.traverseUpward(
+        view -> view.mouseReleased(mouseX, mouseY, button));
+    return true;
   }
 
   @Override
   public boolean mouseDragged(double mouseX, double mouseY, int button,
       double deltaX, double deltaY) {
-    return this.root.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
-  }
-
-  @Override
-  public boolean mouseScrolled(double mouseX, double mouseY, double scrollDelta) {
-    if (this.hovered != null) {
-      this.hovered.traverseUpward(view -> view.mouseScrolled(mouseX, mouseY, scrollDelta));
-      this.updateHovered(mouseX, mouseY);
+    if (this.dragging != null) {
+      this.dragging.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
     }
     return true;
   }
 
   @Override
+  public boolean mouseScrolled(double mouseX, double mouseY, double scrollDelta) {
+    if (this.hovered == null) {
+      return false;
+    }
+
+    this.hovered.traverseUpward(view -> view.mouseScrolled(mouseX, mouseY, scrollDelta));
+    this.updateHovered(mouseX, mouseY);
+    return true;
+  }
+
+  @Override
   public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-    return this.root.keyReleased(keyCode, scanCode, modifiers);
+    if (keyCode == GLFW.GLFW_KEY_ESCAPE && this.shouldCloseOnEsc()) {
+      this.onClose();
+      return true;
+    }
+
+    if (keyCode == GLFW.GLFW_KEY_TAB) {
+      var forward = !hasShiftDown();
+      this.root.changeFocus(forward)
+          .or(() -> this.root.changeFocus(forward))
+          .ifPresent(this::setFocused);
+      return false;
+    }
+
+    if (this.focused == null) {
+      return false;
+    }
+
+    this.focused.traverseUpward(view -> view.keyPressed(keyCode, scanCode, modifiers));
+    return true;
   }
 
   @Override
   public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
-    return this.root.keyReleased(keyCode, scanCode, modifiers);
+    if (this.focused == null) {
+      return false;
+    }
+    this.focused.traverseUpward(view -> view.keyReleased(keyCode, scanCode, modifiers));
+    return true;
   }
 
   @Override
   public boolean charTyped(char codePoint, int modifiers) {
-    return this.root.charTyped(codePoint, modifiers);
+    if (this.focused == null) {
+      return false;
+    }
+    this.focused.traverseUpward(view -> view.charTyped(codePoint, modifiers));
+    return true;
   }
 
-  @Override
-  public boolean changeFocus(boolean forward) {
-    return this.root.changeFocus(forward);
+  public View getFocusedView() {
+    return this.focused;
+  }
+
+  public void setFocused(@Nullable View focused) {
+    if (this.focused == focused) {
+      return;
+    }
+
+    if (this.focused != null) {
+      this.focused.removeFocus();
+    }
+
+    this.focused = focused;
   }
 
   @Override
@@ -186,7 +266,9 @@ public final class ViewScreen extends Screen {
 
   @Override
   public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTicks) {
+    this.root.graphicsContext.begin();
     this.root.render(poseStack, mouseX, mouseY, partialTicks);
+    this.root.graphicsContext.end();
   }
 
   public void setStylesheets(List<ResourceLocation> stylesheets) {

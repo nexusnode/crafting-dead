@@ -1,10 +1,10 @@
 package sm0keysa1m0n.bliss.view;
 
 import java.util.function.Consumer;
-import com.craftingdead.immerse.client.util.RenderUtil;
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.renderer.GameRenderer;
+import io.github.humbleui.skija.Paint;
+import io.github.humbleui.skija.PaintMode;
+import io.github.humbleui.types.Rect;
 import net.minecraft.network.chat.FormattedText;
 import sm0keysa1m0n.bliss.Color;
 import sm0keysa1m0n.bliss.view.event.ActionEvent;
@@ -32,11 +32,6 @@ public class TabsView extends ParentView {
   }
 
   @Override
-  public boolean changeFocus(boolean forward) {
-    return super.changeFocus(forward);
-  }
-
-  @Override
   protected void added() {
     super.added();
     if (this.getChildren().size() > 0) {
@@ -54,9 +49,10 @@ public class TabsView extends ParentView {
 
   public class TabView extends ParentView {
 
-    public static final Color DEFAULT_UNDERSCORE_COLOR = Color.WHITE;
-    public static final float DEFAULT_UNDERSCORE_HEIGHT = 2.5F;
-    public static final boolean DEFAULT_DISABLED = false;
+    private static final float UNDERSCORE_HEIGHT = 2.5F;
+    private static final float HOVERED_UNDERSCORE_HEIGHT = UNDERSCORE_HEIGHT / 1.5F;
+
+    private static final Color underscoreColor = Color.WHITE;
 
     private final Runnable selectedListener;
 
@@ -66,23 +62,31 @@ public class TabsView extends ParentView {
     }
 
     @Override
-    public void renderContent(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
-      super.renderContent(matrixStack, mouseX, mouseY, partialTicks);
+    public void renderContent(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
+      super.renderContent(poseStack, mouseX, mouseY, partialTick);
 
-      RenderSystem.setShader(GameRenderer::getPositionColorShader);
+      var canvas = this.graphicsContext.canvas();
+      var scale = this.graphicsContext.scale();
       if (TabsView.this.selectedTab == this) {
-        RenderUtil.fill(matrixStack, this.getScaledContentX(),
-            this.getScaledContentY() + this.getScaledContentHeight() - DEFAULT_UNDERSCORE_HEIGHT,
-            this.getScaledContentX() + this.getScaledContentWidth(),
-            this.getScaledContentY() + this.getScaledContentHeight(),
-            DEFAULT_UNDERSCORE_COLOR.valueHex());
+        try (var paint = new Paint()) {
+          paint.setColor(underscoreColor.multiplied(this.getAlpha()));
+          paint.setMode(PaintMode.FILL);
+          canvas.drawRect(Rect.makeLTRB(this.getScaledContentX() * scale,
+              (this.getScaledContentY() + this.getScaledContentHeight()
+                  - UNDERSCORE_HEIGHT) * scale,
+              (this.getScaledContentX() + this.getScaledContentWidth()) * scale,
+              (this.getScaledContentY() + this.getScaledContentHeight()) * scale), paint);
+        }
       } else if (this.isHovered()) {
-        RenderUtil.fill(matrixStack, this.getScaledContentX(),
-            this.getScaledContentY() + this.getScaledContentHeight()
-                - DEFAULT_UNDERSCORE_HEIGHT / 1.5F,
-            this.getScaledContentX() + this.getScaledContentWidth(),
-            this.getScaledContentY() + this.getScaledContentHeight(),
-            DEFAULT_UNDERSCORE_COLOR.valueHex());
+        try (var paint = new Paint()) {
+          paint.setColor(underscoreColor.multiplied(this.getAlpha()));
+          paint.setMode(PaintMode.FILL);
+          canvas.drawRect(Rect.makeLTRB(this.getScaledContentX() * scale,
+              (this.getScaledContentY() + this.getScaledContentHeight()
+                  - HOVERED_UNDERSCORE_HEIGHT) * scale,
+              (this.getScaledContentX() + this.getScaledContentWidth()) * scale,
+              (this.getScaledContentY() + this.getScaledContentHeight()) * scale), paint);
+        }
       }
     }
   }

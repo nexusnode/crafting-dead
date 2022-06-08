@@ -15,7 +15,7 @@ import net.rocketpowered.common.payload.UserPresencePayload;
 import reactor.core.Disposable;
 import reactor.core.scheduler.Schedulers;
 import sm0keysa1m0n.bliss.Color;
-import sm0keysa1m0n.bliss.view.AvatarView;
+import sm0keysa1m0n.bliss.minecraft.view.AvatarView;
 import sm0keysa1m0n.bliss.view.ParentView;
 import sm0keysa1m0n.bliss.view.TextView;
 
@@ -97,6 +97,7 @@ public class MemberView extends ParentView {
     this.nameView.getStyle().color.defineState(color);
   }
 
+  @SuppressWarnings("removal")
   @Override
   protected void added() {
     super.added();

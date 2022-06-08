@@ -8,13 +8,11 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
-import com.craftingdead.immerse.client.util.DownloadUtil;
 import com.craftingdead.immerse.client.util.LoggingErrorHandler;
-import com.mojang.logging.LogUtils;
-import net.minecraft.Util;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
@@ -22,11 +20,12 @@ import net.minecraft.network.chat.TextComponent;
 import net.minecraft.util.FormattedCharSink;
 import net.minecraft.util.StringDecomposer;
 import net.minecraftforge.common.ForgeHooks;
+import sm0keysa1m0n.bliss.Bliss;
 import sm0keysa1m0n.bliss.Length;
 
 public class ViewUtil {
 
-  private static final Logger logger = LogUtils.getLogger();
+  private static final Logger logger = LoggerFactory.getLogger(ViewUtil.class);
 
   /**
    * Add all the {@link View}s specified in the passed {@link File}, spacing them evenly with
@@ -61,14 +60,15 @@ public class ViewUtil {
           logger.warn("Failed to parse xml {} {}", file.getAbsolutePath(), e);
           return null;
         }
-      }, Util.backgroundExecutor());
+      }, Bliss.instance().platform().backgroundExecutor());
     } catch (ParserConfigurationException e) {
       logger.warn("Failed to create document builder", e);
       return;
     }
 
     documentFuture.thenAcceptAsync(
-        document -> parseDocument(document, file, parentView, configurer), parentView.minecraft);
+        document -> parseDocument(document, file, parentView, configurer),
+        Bliss.instance().platform().mainExecutor());
   }
 
   private static void parseDocument(Document document, File file, ParentView parentView,
@@ -137,13 +137,13 @@ public class ViewUtil {
           view.getStyle().setStyle(
               "width: %s; height: %s; object-fit: %s;".formatted(width, height, fitType));
           parentView.addChild(view);
-          DownloadUtil.downloadImageAsTexture(url)
+          DownloadUtil.downloadImage(url)
               .thenAcceptAsync(result -> result.ifPresent(image -> {
-                view.setImage(image);
+                view.setImage(ImageAccess.forImage(image));
                 if (parentView.isAdded()) {
                   parentView.layout();
                 }
-              }), parentView.minecraft);
+              }), Bliss.instance().platform().mainExecutor());
           break;
         default:
           break;

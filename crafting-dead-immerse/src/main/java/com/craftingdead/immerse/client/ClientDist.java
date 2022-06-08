@@ -45,7 +45,6 @@ import com.craftingdead.immerse.game.ClientGameWrapper;
 import com.craftingdead.immerse.game.GameClient;
 import com.craftingdead.immerse.game.GameType;
 import com.craftingdead.immerse.server.LogicalServer;
-import com.craftingdead.immerse.util.LwjglNativeUtil;
 import com.craftingdead.immerse.world.item.BlueprintItem;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
@@ -77,12 +76,13 @@ import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.fml.loading.FMLLoader;
 import net.minecraftforge.fml.loading.progress.StartupMessageManager;
 import net.rocketpowered.api.Rocket;
 import net.rocketpowered.connector.client.gui.RocketToast;
 import reactor.core.scheduler.Schedulers;
-import sm0keysa1m0n.bliss.Skia;
+import sm0keysa1m0n.bliss.Bliss;
+import sm0keysa1m0n.bliss.minecraft.platform.MinecraftGraphicsContext;
+import sm0keysa1m0n.bliss.minecraft.platform.MinecraftPlatform;
 import sm0keysa1m0n.bliss.style.StyleSheetManager;
 import sm0keysa1m0n.bliss.view.ViewScreen;
 
@@ -105,7 +105,7 @@ public class ClientDist implements ModDist {
 
   private final Minecraft minecraft;
 
-  private final Skia skia;
+  private MinecraftGraphicsContext graphicsContext;
 
   @Nullable
   private LogicalServer logicalServer;
@@ -128,10 +128,6 @@ public class ClientDist implements ModDist {
   private static RoundedTexShader roundedTexShader;
 
   public ClientDist() {
-    if (FMLLoader.isProduction()) {
-      LwjglNativeUtil.load("lwjgl_yoga");
-    }
-
     final var modBus = FMLJavaModLoadingContext.get().getModEventBus();
     modBus.addListener(this::handleClientSetup);
     modBus.addListener(this::handleEntityRenderersAddLayers);
@@ -139,14 +135,18 @@ public class ClientDist implements ModDist {
     modBus.addListener(this::handleRegisterClientReloadListeners);
     MinecraftForge.EVENT_BUS.register(this);
     this.minecraft = Minecraft.getInstance();
-    this.skia = new Skia();
     this.spectatorRenderer = new SpectatorRenderer();
     this.blueprintOutlineRenderer = new BlueprintOutlineRenderer();
     this.ingameGui = new IngameGui();
   }
 
-  public Skia getSkia() {
-    return this.skia;
+  public MinecraftGraphicsContext getGraphicsContext() {
+    // Lazy-init this as there's no good time/place to create it.
+    if (this.graphicsContext == null) {
+      this.graphicsContext = new MinecraftGraphicsContext(
+          this.minecraft.getWindow().getWindow(), this.minecraft.getMainRenderTarget());
+    }
+    return this.graphicsContext;
   }
 
   @Nullable
@@ -217,6 +217,8 @@ public class ClientDist implements ModDist {
   }
 
   private void handleClientSetup(FMLClientSetupEvent event) {
+    Bliss.initialize(this.graphicsContext, new MinecraftPlatform(this.minecraft));
+
     ClientRegistry.registerKeyBinding(SWITCH_TEAMS);
 
     this.blueprintOutlineRenderer.register();
@@ -318,7 +320,7 @@ public class ClientDist implements ModDist {
   }
 
   @SubscribeEvent
-  public void handleGuiOpen(ScreenOpenEvent event) {
+  public void handleScreenOpen(ScreenOpenEvent event) {
     if (event.getScreen() instanceof TitleScreen && this.firstLoad) {
       // Do this here to make sure font is loaded for toasts
       Rocket.getGameClientGatewayFeed()

@@ -14,7 +14,7 @@ public class CalcParser {
 
     var terms = infixToRpn(expression);
 
-    Deque<CalcExpressionNode> stack = new ArrayDeque<CalcExpressionNode>();
+    var stack = new ArrayDeque<CalcExpressionNode>();
     for (String term : terms) {
       if (term.equals("+")) {
         stack.push(new CalcExpressionNode.OperationNode(
@@ -35,12 +35,12 @@ public class CalcParser {
       } else {
         if (term.endsWith("px")) {
           stack.push(new CalcExpressionNode.LengthNode(
-              Length.fixed(Integer.parseInt(term.substring(0, term.length() - 2)))));
+              Length.fixed(Float.parseFloat(term.substring(0, term.length() - 2)))));
         } else if (term.endsWith("%")) {
           stack.push(new CalcExpressionNode.LengthNode(
-              Length.percentage(Integer.parseInt(term.substring(0, term.length() - 1)))));
+              Length.percentage(Float.parseFloat(term.substring(0, term.length() - 1)))));
         } else {
-          stack.push(new CalcExpressionNode.NumberNode(Integer.parseInt(term)));
+          stack.push(new CalcExpressionNode.NumberNode(Float.parseFloat(term)));
         }
       }
     }
@@ -50,7 +50,7 @@ public class CalcParser {
 
   // Method is used to get the precedence of operators
   private static boolean isValue(char c) {
-    return Character.isLetterOrDigit(c) || c == '%';
+    return Character.isLetterOrDigit(c) || c == '%' || c == '.';
   }
 
   // Operator having higher precedence

@@ -17,7 +17,7 @@ import net.rocketpowered.common.payload.SocialProfilePayload;
 import net.rocketpowered.connector.client.gui.RocketToast;
 import reactor.core.Disposable;
 import reactor.core.scheduler.Schedulers;
-import sm0keysa1m0n.bliss.view.PanoramaView;
+import sm0keysa1m0n.bliss.minecraft.view.PanoramaView;
 import sm0keysa1m0n.bliss.view.ParentView;
 import sm0keysa1m0n.bliss.view.TextView;
 import sm0keysa1m0n.bliss.view.View;
@@ -47,6 +47,7 @@ public class GuildView extends ParentView {
   @Nullable
   private Disposable guildMemberListener;
 
+  @SuppressWarnings("removal")
   public GuildView() {
     super(new Properties());
 
@@ -105,6 +106,7 @@ public class GuildView extends ParentView {
             new TextComponent(" (" + invites.size() + ")").withStyle(ChatFormatting.LIGHT_PURPLE));
   }
 
+  @SuppressWarnings("removal")
   private void handleProfile(SocialProfilePayload profile, GameClientGateway gateway) {
     this.invitesButtonView.setText(this.makeInvitesText(profile.guildInvites()));
 
@@ -161,6 +163,7 @@ public class GuildView extends ParentView {
     }
   }
 
+  @SuppressWarnings("removal")
   @Override
   protected void added() {
     super.added();

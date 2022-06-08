@@ -2,13 +2,13 @@ package sm0keysa1m0n.bliss.view;
 
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import com.craftingdead.immerse.client.util.FitType;
 import io.github.humbleui.skija.paragraph.Alignment;
 import io.github.humbleui.skija.paragraph.Shadow;
 import sm0keysa1m0n.bliss.BoxSizing;
 import sm0keysa1m0n.bliss.Color;
 import sm0keysa1m0n.bliss.Display;
 import sm0keysa1m0n.bliss.Filter;
+import sm0keysa1m0n.bliss.ObjectFit;
 import sm0keysa1m0n.bliss.Length;
 import sm0keysa1m0n.bliss.Overflow;
 import sm0keysa1m0n.bliss.PointerEvents;
@@ -81,7 +81,7 @@ public class ViewStyle {
   public final StyleableProperty<Color> borderTopColor;
   public final StyleableProperty<Color> borderBottomColor;
   public final StyleableProperty<Color> color;
-  public final StyleableProperty<FitType> objectFit;
+  public final StyleableProperty<ObjectFit> objectFit;
   public final StyleableProperty<Integer> fontSize;
   public final StyleableProperty<String[]> fontFamily;
   public final StyleableProperty<Alignment> textAlign;
@@ -301,7 +301,7 @@ public class ViewStyle {
     this.registerProperty(
         this.color = new StyleableProperty<>(view, "color", Color.class, Color.WHITE));
     this.registerProperty(
-        this.objectFit = new StyleableProperty<>(view, "object-fit", FitType.class, FitType.FILL));
+        this.objectFit = new StyleableProperty<>(view, "object-fit", ObjectFit.class, ObjectFit.FILL));
     this.registerProperty(
         this.fontSize = new StyleableProperty<>(view, "font-size", Integer.class, 11));
     this.registerProperty(this.fontFamily =

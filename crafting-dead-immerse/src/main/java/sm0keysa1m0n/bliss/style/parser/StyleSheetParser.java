@@ -10,7 +10,6 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
-import com.craftingdead.immerse.util.NumberedLineIterator;
 import com.mojang.logging.LogUtils;
 import io.github.humbleui.skija.Typeface;
 import net.minecraft.resources.ResourceLocation;

@@ -1,8 +1,8 @@
 package sm0keysa1m0n.bliss.style.parser.value;
 
-import com.craftingdead.immerse.util.StringCountUtil;
 import sm0keysa1m0n.bliss.Length;
 import sm0keysa1m0n.bliss.calc.CalcParser;
+import sm0keysa1m0n.bliss.style.parser.StringCountUtil;
 
 public class LengthParser implements ValueParser<Length> {
 

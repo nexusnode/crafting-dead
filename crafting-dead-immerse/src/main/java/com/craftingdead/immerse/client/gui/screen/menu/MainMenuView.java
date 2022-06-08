@@ -26,6 +26,7 @@ import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.inventory.ModEquipmentSlot;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.client.fake.FakePlayer;
+import com.craftingdead.immerse.client.gui.screen.FogView;
 import com.craftingdead.immerse.client.gui.screen.Theme;
 import com.craftingdead.immerse.client.gui.screen.menu.play.PlayView;
 import net.minecraft.client.gui.screens.OptionsScreen;
@@ -37,8 +38,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.registries.ForgeRegistries;
-import sm0keysa1m0n.bliss.view.EntityView;
-import sm0keysa1m0n.bliss.view.FogView;
+import sm0keysa1m0n.bliss.minecraft.view.EntityView;
 import sm0keysa1m0n.bliss.view.ParentView;
 import sm0keysa1m0n.bliss.view.TextView;
 import sm0keysa1m0n.bliss.view.View;
@@ -50,6 +50,7 @@ public class MainMenuView extends ParentView {
 
   private final ParentView contentContainer = new ParentView(new Properties().id("content"));
 
+  @SuppressWarnings("removal")
   public MainMenuView() {
     super(new Properties());
 

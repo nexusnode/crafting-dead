@@ -9,11 +9,11 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import org.jetbrains.annotations.Nullable;
-import org.lwjgl.glfw.GLFW;
-import com.craftingdead.immerse.util.ThreadSafe;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.world.phys.Vec2;
+import sm0keysa1m0n.bliss.Bliss;
 import sm0keysa1m0n.bliss.Display;
+import sm0keysa1m0n.bliss.ThreadSafe;
 import sm0keysa1m0n.bliss.layout.Layout;
 import sm0keysa1m0n.bliss.layout.LayoutParent;
 import sm0keysa1m0n.bliss.layout.MeasureMode;
@@ -28,8 +28,7 @@ public class ParentView extends View {
   private LayoutParent layoutParent = LayoutParent.NILL;
 
   @Nullable
-  private View focusedView;
-  private boolean dragging;
+  View focusedView = null;
 
   public ParentView(Properties properties) {
     super(properties);
@@ -86,8 +85,7 @@ public class ParentView extends View {
 
   @ThreadSafe
   public final void replace(View view) {
-    if (!this.minecraft.isSameThread()) {
-      this.minecraft.submit(() -> this.replace(view)).join();
+    if (!Bliss.instance().platform().joinMainThread(() -> this.replace(view))) {
       return;
     }
 
@@ -104,8 +102,7 @@ public class ParentView extends View {
 
   @ThreadSafe
   public final void forceAddChild(View view) {
-    if (!this.minecraft.isSameThread()) {
-      this.minecraft.submit(() -> this.forceAddChild(view)).join();
+    if (!Bliss.instance().platform().joinMainThread(() -> this.forceAddChild(view))) {
       return;
     }
 
@@ -122,8 +119,7 @@ public class ParentView extends View {
       return;
     }
 
-    if (!this.minecraft.isSameThread()) {
-      this.minecraft.submit(() -> this.addChild(view)).join();
+    if (!Bliss.instance().platform().joinMainThread(() -> this.addChild(view))) {
       return;
     }
 
@@ -172,9 +168,11 @@ public class ParentView extends View {
     if (view.parent != this) {
       return false;
     }
-    if (!this.minecraft.isSameThread()) {
-      return this.minecraft.submit(() -> this.removeChild(view)).join();
+
+    if (!Bliss.instance().platform().isMainThread()) {
+      return Bliss.instance().platform().submitToMainThread(() -> this.removeChild(view)).join();
     }
+
     this.removed(view);
     if (!this.children.remove(view)) {
       throw new IllegalStateException("Expecting child view to be present");
@@ -190,8 +188,7 @@ public class ParentView extends View {
    */
   @ThreadSafe
   public final void clearChildren() {
-    if (!this.minecraft.isSameThread()) {
-      this.minecraft.submit(this::clearChildren).join();
+    if (!Bliss.instance().platform().joinMainThread(this::clearChildren)) {
       return;
     }
     this.children.forEach(this::removed);
@@ -212,7 +209,7 @@ public class ParentView extends View {
     }
     view.parent = null;
     if (this.focusedView == view) {
-      this.setFocused(null);
+      this.focusedView = null;
     }
   }
 
@@ -241,8 +238,7 @@ public class ParentView extends View {
   @ThreadSafe
   @Override
   public void layout() {
-    if (!this.minecraft.isSameThread()) {
-      this.minecraft.submit(this::layout).join();
+    if (!Bliss.instance().platform().joinMainThread(this::layout)) {
       return;
     }
 
@@ -284,92 +280,43 @@ public class ParentView extends View {
     Arrays.sort(this.sortedChildren);
   }
 
-  public Optional<View> traverseDepthFirst(Predicate<View> filter, Consumer<View> handler) {
+  public Optional<View> traverseSortedDepthFirst(Predicate<View> filter, Consumer<View> handler) {
     for (int i = this.sortedChildren.length; i-- > 0;) {
       var view = this.sortedChildren[i];
       if (view instanceof ParentView parent) {
-        var result = parent.traverseDepthFirst(filter, handler);
+        var result = parent.traverseSortedDepthFirst(filter, handler);
         if (result.isPresent()) {
-          handler.accept(view);
+          handler.accept(this);
           return result;
         }
       }
 
       if (filter.test(view)) {
         handler.accept(view);
+        handler.accept(this);
         return Optional.of(view);
       }
     }
+
+    if (filter.test(this)) {
+      handler.accept(this);
+      return Optional.of(this);
+    }
+
     return Optional.empty();
   }
 
   @Override
-  public void mouseMoved(double mouseX, double mouseY) {
-    for (var view : this.sortedChildren) {
-      view.mouseMoved(mouseX, mouseY);
-    }
-    super.mouseMoved(mouseX, mouseY);
+  public Optional<View> changeFocus(boolean forward) {
+    return super.changeFocus(forward).or(() -> this.nextFocusedChild(forward));
   }
 
-  @Override
-  public boolean mouseClicked(double mouseX, double mouseY, int button) {
-    for (var view : this.sortedChildren) {
-      if (view.mouseClicked(mouseX, mouseY, button)) {
-        this.setFocused(view);
-        if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
-          this.setDragging(true);
-        }
-        return true;
+  protected Optional<View> nextFocusedChild(boolean forward) {
+    if (this.focusedView != null) {
+      var result = this.focusedView.changeFocus(forward);
+      if (result.isPresent()) {
+        return result;
       }
-    }
-    this.setFocused(null);
-    return super.mouseClicked(mouseX, mouseY, button);
-  }
-
-  @Override
-  public boolean mouseDragged(double mouseX, double mouseY, int button,
-      double deltaX, double deltaY) {
-    return this.focusedView != null
-        && this.isDragging()
-        && button == GLFW.GLFW_MOUSE_BUTTON_LEFT
-        && this.focusedView.mouseDragged(mouseX, mouseY, button, deltaX, deltaY)
-        || super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
-  }
-
-  @Override
-  public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-    return this.focusedView != null && this.focusedView.keyPressed(keyCode, scanCode, modifiers)
-        || super.keyPressed(keyCode, scanCode, modifiers);
-  }
-
-  @Override
-  public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
-    return this.focusedView != null && this.focusedView.keyReleased(keyCode, scanCode, modifiers)
-        || super.keyReleased(keyCode, scanCode, modifiers);
-  }
-
-  @Override
-  public boolean charTyped(char codePoint, int modifiers) {
-    return this.focusedView != null && this.focusedView.charTyped(codePoint, modifiers)
-        || super.charTyped(codePoint, modifiers);
-  }
-
-  private boolean isDragging() {
-    return this.dragging;
-  }
-
-  private void setDragging(boolean dragging) {
-    this.dragging = dragging;
-  }
-
-  @Override
-  public boolean changeFocus(boolean forward) {
-    if (super.changeFocus(forward)) {
-      return true;
-    }
-
-    if (this.focusedView != null && this.focusedView.changeFocus(forward)) {
-      return true;
     }
 
     int fromIndex;
@@ -387,44 +334,16 @@ public class ParentView extends View {
 
     while (hasNext.getAsBoolean()) {
       var nextView = next.get();
-      if (nextView.changeFocus(forward)) {
-        this.setFocused(nextView);
-        return true;
+      var result = nextView.changeFocus(forward);
+      if (result.isPresent()) {
+        this.focusedView = nextView;
+        return result;
       }
     }
 
-    this.setFocused(null);
-    return false;
-  }
+    this.focusedView = null;
 
-  @Override
-  public void removeFocus() {
-    super.removeFocus();
-    this.setFocused(null);
-  }
-
-  private void setFocused(@Nullable View view) {
-    if (this.focusedView == view) {
-      return;
-    }
-
-    if (view != null) {
-      if (view.parent != this) {
-        return;
-      }
-    }
-
-    if (this.focusedView != null && this.focusedView.isAdded()) {
-      this.focusedView.removeFocus();
-    }
-
-    this.focusedView = view;
-  }
-
-  @Override
-  public boolean mouseReleased(double mouseX, double mouseY, int button) {
-    this.setDragging(false);
-    return this.focusedView != null && this.focusedView.mouseReleased(mouseX, mouseY, button);
+    return Optional.empty();
   }
 
   @Override

@@ -19,6 +19,7 @@
 package com.craftingdead.immerse.client.gui.screen.menu.play.list.server;
 
 import java.util.Iterator;
+import org.lwjgl.glfw.GLFW;
 import com.craftingdead.immerse.client.gui.screen.ConnectView;
 import com.craftingdead.immerse.client.util.ServerPinger;
 import com.google.common.collect.Iterators;
@@ -33,6 +34,8 @@ class ServerItemView extends ParentView {
 
   private final Iterator<String> animation = Iterators.cycle("O o o", "o O o", "o o O");
 
+  private final ServerListView list;
+
   private final ServerEntry serverEntry;
 
   private final TextView motdComponent;
@@ -41,8 +44,10 @@ class ServerItemView extends ParentView {
 
   private long lastAnimationUpdateMs;
 
-  ServerItemView(ServerEntry serverEntry) {
+  ServerItemView(ServerListView list, ServerEntry serverEntry) {
     super(new Properties().styleClasses("item").doubleClick(true).focusable(true));
+
+    this.list = list;
     this.serverEntry = serverEntry;
 
     this.motdComponent = new TextView(new Properties().id("motd"))
@@ -76,6 +81,23 @@ class ServerItemView extends ParentView {
     }
   }
 
+  @Override
+  public void keyPressed(int keyCode, int scanCode, int modifiers) {
+    super.keyPressed(keyCode, scanCode, modifiers);
+    if (keyCode == GLFW.GLFW_KEY_SPACE && this.isFocused()) {
+      this.list.setSelectedItem(this);
+    }
+  }
+
+  @Override
+  public boolean mousePressed(double mouseX, double mouseY, int button) {
+    if (this.isFocused()) {
+      this.list.setSelectedItem(this);
+    }
+    return super.mousePressed(mouseX, mouseY, button);
+  }
+
+  @SuppressWarnings("removal")
   public void connect() {
     // Call this before creating a ConnectView instance.
     this.getScreen().keepOpen();
@@ -87,6 +109,7 @@ class ServerItemView extends ParentView {
     return this.serverEntry;
   }
 
+  @SuppressWarnings("removal")
   public void ping() {
     this.motdComponent.setText("...");
     this.pingComponent.setText("...");

@@ -6,8 +6,6 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
-import org.lwjgl.system.MemoryUtil;
-import com.craftingdead.immerse.client.util.RenderUtil;
 import com.mojang.blaze3d.vertex.PoseStack;
 import io.github.humbleui.skija.Canvas;
 import io.github.humbleui.skija.Font;
@@ -25,12 +23,12 @@ import io.github.humbleui.types.Rect;
 import net.minecraft.SharedConstants;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.util.Mth;
+import sm0keysa1m0n.bliss.Bliss;
+import sm0keysa1m0n.bliss.platform.Cursor;
 
 public class TextFieldView extends View {
 
   private static final int CARET_WIDTH = 1;
-
-  private static long textSelectCursor = MemoryUtil.NULL;
 
   private FontMgr fontManager = FontMgr.getDefault();
   @Nullable
@@ -103,6 +101,19 @@ public class TextFieldView extends View {
   }
 
   @Override
+  public void close() {
+    super.close();
+    this.textLine.close();
+    this.font.close();
+    if (this.typeface != null) {
+      this.typeface.close();
+    }
+    if (this.fontManager != FontMgr.getDefault()) {
+      this.fontManager.close();
+    }
+  }
+
+  @Override
   public void tick() {
     super.tick();
     if (this.caretBlinkTicks++ >= SharedConstants.TICKS_PER_SECOND) {
@@ -111,30 +122,30 @@ public class TextFieldView extends View {
   }
 
   @Override
-  public boolean changeFocus(boolean forward) {
-    if (super.changeFocus(forward)) {
+  public Optional<View> changeFocus(boolean forward) {
+    var result = super.changeFocus(forward);
+    if (result.isPresent()) {
       this.selectAll();
-      return true;
     }
-    return false;
+    return result;
   }
 
   @Override
   protected void renderContent(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
     super.renderContent(poseStack, mouseX, mouseY, partialTick);
-    this.skia.begin();
-    {
-      var canvas = this.skia.canvas();
-      var scale = (float) this.window.getGuiScale();
 
+    var canvas = this.graphicsContext.canvas();
+    var scale = this.graphicsContext.scale();
+
+    canvas.save();
+    {
       canvas.clipRect(Rect.makeXYWH(
           this.getScaledContentX() * scale,
           this.getScaledContentY() * scale,
           this.getScaledContentWidth() * scale,
           this.getScaledContentHeight() * scale));
 
-      var textColor = RenderUtil.multiplyAlpha(
-          this.getStyle().color.get().valueHex(), this.getAlpha());
+      var textColor = this.getStyle().color.get().multiplied(this.getAlpha());
 
       canvas.translate((this.getScaledContentX() * scale) + this.xOffset, 0);
 
@@ -189,10 +200,8 @@ public class TextFieldView extends View {
         }
       }
 
-      canvas.resetMatrix();
-
     }
-    this.skia.end();
+    canvas.restore();
   }
 
   private void drawCaretOrSelection(Canvas canvas, int textColor) {
@@ -202,7 +211,7 @@ public class TextFieldView extends View {
 
     var glyphs = this.textLine.getGlyphs();
 
-    var scale = (float) this.window.getGuiScale();
+    var scale = this.graphicsContext.scale();
     var caretX = 0.0F;
     var lineHeight = this.textLine.getHeight() - this.textLine.getXHeight() / 2.0F;
 
@@ -264,48 +273,46 @@ public class TextFieldView extends View {
   }
 
   @Override
-  public boolean charTyped(char ch, int mods) {
+  public void charTyped(char ch, int mods) {
     if (!SharedConstants.isAllowedChatCharacter(ch)) {
-      return false;
+      return;
     }
 
     if (this.selectionOffset != 0) {
       this.deleteChars(this.selectionOffset);
     }
     this.insertText(Character.toString(ch));
-
-    return true;
   }
 
   @Override
-  public boolean keyPressed(int key, int scancode, int mods) {
+  public void keyPressed(int key, int scancode, int mods) {
     if (Screen.isSelectAll(key)) {
       this.selectAll();
-      return true;
+      return;
     } else if (Screen.isCopy(key)) {
-      this.getSelectedText().ifPresent(this.minecraft.keyboardHandler::setClipboard);
-      return true;
+      this.getSelectedText().ifPresent(Bliss.instance().platform()::setClipboard);
+      return;
     } else if (Screen.isPaste(key)) {
       if (this.selectionOffset != 0) {
         this.deleteChars(this.selectionOffset);
       }
-      this.insertText(this.minecraft.keyboardHandler.getClipboard());
-      return true;
+      this.insertText(Bliss.instance().platform().getClipboard());
+      return;
     } else if (Screen.isCut(key)) {
       this.getSelectedText().ifPresent(selected -> {
-        this.minecraft.keyboardHandler.setClipboard(selected);
+        Bliss.instance().platform().setClipboard(selected);
         this.deleteChars(this.selectionOffset);
       });
-      return true;
+      return;
     }
 
     switch (key) {
       case GLFW.GLFW_KEY_BACKSPACE:
         this.deleteText(this.selectionOffset == 0 ? -1 : this.selectionOffset);
-        return true;
+        return;
       case GLFW.GLFW_KEY_DELETE:
         this.deleteText(this.selectionOffset == 0 ? 1 : this.selectionOffset);
-        return true;
+        return;
       case GLFW.GLFW_KEY_RIGHT: {
         var select = Screen.hasShiftDown();
         var word = Screen.hasControlDown();
@@ -319,7 +326,7 @@ public class TextFieldView extends View {
                       ? Math.max(this.getOffsetCaretIndex(), this.caretIndex)
                       : this.caretIndex + 1);
         }
-        return true;
+        return;
       }
       case GLFW.GLFW_KEY_LEFT: {
         var select = Screen.hasShiftDown();
@@ -334,16 +341,16 @@ public class TextFieldView extends View {
                       ? Math.min(this.getOffsetCaretIndex(), this.caretIndex)
                       : this.caretIndex - 1);
         }
-        return true;
+        return;
       }
       case GLFW.GLFW_KEY_HOME:
         this.setCaretIndex(0);
-        return true;
+        return;
       case GLFW.GLFW_KEY_END:
         this.setCaretIndex(this.text.length());
-        return true;
+        return;
       default:
-        return false;
+        return;
     }
   }
 
@@ -474,7 +481,7 @@ public class TextFieldView extends View {
 
   private void refreshTextLine() {
     this.font = new Font(
-        this.typeface, this.getStyle().fontSize.get() * (float) this.window.getGuiScale());
+        this.typeface, this.getStyle().fontSize.get() * this.graphicsContext.scale());
     this.textLine = Shaper.makeShapeDontWrapOrReorder(this.fontManager)
         .shapeLine(this.text, this.font);
   }
@@ -498,12 +505,10 @@ public class TextFieldView extends View {
   }
 
   @Override
-  public boolean mouseClicked(double mouseX, double mouseY, int button) {
-    if (!super.mouseClicked(mouseX, mouseY, button)) {
-      return false;
-    }
+  public boolean mousePressed(double mouseX, double mouseY, int button) {
+    super.mousePressed(mouseX, mouseY, button);
 
-    if (button != GLFW.GLFW_MOUSE_BUTTON_LEFT) {
+    if (button != GLFW.GLFW_MOUSE_BUTTON_LEFT || !this.isFocused()) {
       return false;
     }
 
@@ -541,7 +546,7 @@ public class TextFieldView extends View {
 
     var offsetIndex = this.getOffsetCaretIndex();
     var widths = this.font.getWidths(this.textLine.getGlyphs());
-    var scale = (float) this.window.getGuiScale();
+    var scale = this.graphicsContext.scale();
     var glyphIndex = Math.min(offsetIndex, this.text.length() - 1);
     var glyphWidth = widths[glyphIndex];
     var glyphX = positions[glyphIndex * 2];
@@ -580,19 +585,14 @@ public class TextFieldView extends View {
   }
 
   @Override
-  public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX,
-      double deltaY) {
-    if (super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY)) {
-      return true;
-    }
-
+  public void mouseDragged(double mouseX, double mouseY, int button,
+      double deltaX, double deltaY) {
+    super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
     this.setSelectionOffset(this.getCharIndexAt((float) (mouseX + deltaX)) - this.caretIndex);
-
-    return true;
   }
 
   private int getCharIndexAt(float x) {
-    var scale = (float) this.window.getGuiScale();
+    var scale = this.graphicsContext.scale();
     var glyphs = this.textLine.getGlyphs();
     if (glyphs.length == 0) {
       return 0;
@@ -622,16 +622,7 @@ public class TextFieldView extends View {
   }
 
   private void updateCursor() {
-    if (!this.isHovered()) {
-      GLFW.glfwSetCursor(this.window.getWindow(), MemoryUtil.NULL);
-      return;
-    }
-
-    if (textSelectCursor == MemoryUtil.NULL) {
-      textSelectCursor = GLFW.glfwCreateStandardCursor(GLFW.GLFW_IBEAM_CURSOR);
-    }
-
-    GLFW.glfwSetCursor(this.window.getWindow(), textSelectCursor);
+    this.graphicsContext.setCursor(this.isHovered() ? Cursor.IBEAM : Cursor.DEFAULT);
   }
 
   private static TextBlob makeBlobFromPos(short[] glyphs, float[] floatPos, Font font) {

@@ -22,18 +22,19 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
-import org.jetbrains.annotations.Nullable;
-import com.mojang.logging.LogUtils;
-import org.slf4j.Logger;
 import org.jdesktop.core.animation.timing.Animator;
 import org.jdesktop.core.animation.timing.KeyFrames;
+import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
 import com.craftingdead.immerse.client.gui.screen.Theme;
+import com.mojang.logging.LogUtils;
 import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.level.storage.LevelStorageException;
 import net.minecraft.world.level.storage.LevelSummary;
 import sm0keysa1m0n.bliss.Animation;
 import sm0keysa1m0n.bliss.style.Percentage;
+import sm0keysa1m0n.bliss.style.States;
 import sm0keysa1m0n.bliss.view.ParentView;
 import sm0keysa1m0n.bliss.view.View;
 
@@ -120,31 +121,27 @@ public class WorldListView extends ParentView {
     }
   }
 
-  @Override
-  public boolean mouseClicked(double mouseX, double mouseY, int button) {
-    var result = super.mouseClicked(mouseX, mouseY, button);
-    // Might have joined a world/server so we are removed
-    if (this.isAdded()) {
-      this.updateSelected();
+  public void setSelectedItem(@Nullable WorldItemView selectedItem) {
+    if (this.selectedItem == selectedItem) {
+      return;
     }
-    return result;
-  }
-
-  protected void updateSelected() {
-    this.selectedItem = this.listView.getChildren().stream()
-        .filter(child -> child instanceof WorldItemView)
-        .map(child -> (WorldItemView) child)
-        .filter(WorldItemView::isFocused)
-        .findAny()
-        .orElse(null);
-
-    boolean enabled = this.selectedItem != null;
+    if (this.selectedItem != null) {
+      this.selectedItem.getStyleManager().removeState(States.CHECKED);
+      this.selectedItem.getStyleManager().notifyListeners();
+    }
+    this.selectedItem = selectedItem;
+    if (selectedItem != null) {
+      this.selectedItem.getStyleManager().addState(States.CHECKED);
+      this.selectedItem.getStyleManager().notifyListeners();
+    }
+    var enabled = this.selectedItem != null;
     this.playButton.setEnabled(enabled);
     this.editButton.setEnabled(enabled);
     this.deleteButton.setEnabled(enabled);
     this.recreateButton.setEnabled(enabled);
   }
 
+  @SuppressWarnings("removal")
   private void loadWorlds() {
     try {
       List<LevelSummary> saveList = this.minecraft.getLevelSource().getLevelList();
@@ -159,8 +156,7 @@ public class WorldListView extends ParentView {
 
   public void reloadWorlds() {
     this.listView.clearChildren();
-    this.selectedItem = null;
-    this.updateSelected();
+    this.setSelectedItem(null);
     this.loadWorlds();
   }
 

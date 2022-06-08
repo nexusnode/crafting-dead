@@ -4,13 +4,13 @@ public enum Overflow {
 
   VISIBLE(false), HIDDEN(true), SCROLL(true);
 
-  private final boolean scissor;
+  private final boolean clipped;
 
-  private Overflow(boolean scissor) {
-    this.scissor = scissor;
+  private Overflow(boolean clipped) {
+    this.clipped = clipped;
   }
 
-  public boolean shouldScissor() {
-    return this.scissor;
+  public boolean isClipped() {
+    return this.clipped;
   }
 }

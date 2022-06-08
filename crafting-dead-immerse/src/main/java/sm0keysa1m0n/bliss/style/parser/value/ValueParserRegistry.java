@@ -3,8 +3,6 @@ package sm0keysa1m0n.bliss.style.parser.value;
 import java.util.IdentityHashMap;
 import java.util.Map;
 import org.jdesktop.core.animation.timing.Interpolator;
-import com.craftingdead.immerse.client.util.FitType;
-import com.craftingdead.immerse.util.StringCountUtil;
 import io.github.humbleui.skija.paragraph.Alignment;
 import io.github.humbleui.skija.paragraph.Shadow;
 import net.minecraft.resources.ResourceLocation;
@@ -12,6 +10,7 @@ import sm0keysa1m0n.bliss.BoxSizing;
 import sm0keysa1m0n.bliss.Color;
 import sm0keysa1m0n.bliss.Display;
 import sm0keysa1m0n.bliss.Filter;
+import sm0keysa1m0n.bliss.ObjectFit;
 import sm0keysa1m0n.bliss.Length;
 import sm0keysa1m0n.bliss.Overflow;
 import sm0keysa1m0n.bliss.PointerEvents;
@@ -22,6 +21,7 @@ import sm0keysa1m0n.bliss.layout.Justify;
 import sm0keysa1m0n.bliss.layout.PositionType;
 import sm0keysa1m0n.bliss.layout.Wrap;
 import sm0keysa1m0n.bliss.style.Percentage;
+import sm0keysa1m0n.bliss.style.parser.StringCountUtil;
 
 public class ValueParserRegistry {
 
@@ -91,7 +91,7 @@ public class ValueParserRegistry {
     this.registerParser(PositionType.class, new EnumParser<>(PositionType.class));
     this.registerParser(Display.class, new EnumParser<>(Display.class));
     this.registerParser(Overflow.class, new EnumParser<>(Overflow.class));
-    this.registerParser(FitType.class, new EnumParser<>(FitType.class));
+    this.registerParser(ObjectFit.class, new EnumParser<>(ObjectFit.class));
     this.registerParser(Wrap.class, new EnumParser<>(Wrap.class));
     this.registerParser(Alignment.class, new EnumParser<>(Alignment.class));
     this.registerParser(Visibility.class, new EnumParser<>(Visibility.class));

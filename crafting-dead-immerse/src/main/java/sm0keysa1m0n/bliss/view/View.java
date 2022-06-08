@@ -11,11 +11,9 @@ import org.jdesktop.core.animation.timing.PropertySetter;
 import org.jdesktop.core.animation.timing.interpolators.SplineInterpolator;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
-import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.client.util.RenderUtil;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableSet;
-import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.vertex.PoseStack;
 import io.github.humbleui.skija.Canvas;
 import io.github.humbleui.skija.ClipMode;
@@ -26,7 +24,6 @@ import io.github.humbleui.types.RRect;
 import io.github.humbleui.types.Rect;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.Mth;
@@ -34,16 +31,18 @@ import net.minecraftforge.eventbus.api.BusBuilder;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.IEventBus;
+import sm0keysa1m0n.bliss.Bliss;
 import sm0keysa1m0n.bliss.BoxSide;
 import sm0keysa1m0n.bliss.BoxSizing;
+import sm0keysa1m0n.bliss.Color;
 import sm0keysa1m0n.bliss.Length;
 import sm0keysa1m0n.bliss.Overflow;
 import sm0keysa1m0n.bliss.PointerEvents;
-import sm0keysa1m0n.bliss.ScissorStack;
-import sm0keysa1m0n.bliss.Skia;
 import sm0keysa1m0n.bliss.Visibility;
 import sm0keysa1m0n.bliss.layout.Layout;
 import sm0keysa1m0n.bliss.layout.PositionType;
+import sm0keysa1m0n.bliss.platform.GraphicsContext;
+import sm0keysa1m0n.bliss.platform.ScissorStack;
 import sm0keysa1m0n.bliss.style.States;
 import sm0keysa1m0n.bliss.style.StyleList;
 import sm0keysa1m0n.bliss.style.StyleManager;
@@ -57,7 +56,7 @@ import sm0keysa1m0n.bliss.view.event.MouseEvent;
 import sm0keysa1m0n.bliss.view.event.MouseLeaveEvent;
 import sm0keysa1m0n.bliss.view.event.RemovedEvent;
 
-public class View extends GuiComponent implements Comparable<View>, StyleNode {
+public class View implements Comparable<View>, StyleNode {
 
   public static final boolean DEBUG = false;
 
@@ -69,12 +68,18 @@ public class View extends GuiComponent implements Comparable<View>, StyleNode {
 
   private static final int DOUBLE_CLICK_DURATION_MS = 500;
 
+  /**
+   * Coupling to Minecraft is being phased out.
+   */
+  @Deprecated(forRemoval = true)
   protected final Minecraft minecraft = Minecraft.getInstance();
 
-  protected final Window window = this.minecraft.getWindow();
+  protected final GraphicsContext graphicsContext = Bliss.instance().getGraphicsContext();
 
-  protected final Skia skia = CraftingDeadImmerse.getInstance().getClientDist().getSkia();
-
+  /**
+   * To be replaced by an alternative library.
+   */
+  @Deprecated(forRemoval = true)
   private final IEventBus eventBus = BusBuilder.builder().build();
 
   private final ViewStyle style;
@@ -179,25 +184,31 @@ public class View extends GuiComponent implements Comparable<View>, StyleNode {
       return;
     }
 
-    this.drawBox();
+    var canvas = this.graphicsContext.canvas();
+    canvas.save();
+    {
+      var clip = this.layout.getOverflow().isClipped();
 
-    final var scale = (float) this.window.getGuiScale();
-    final var scissor = this.layout.getOverflow().shouldScissor();
-    if (scissor) {
-      ScissorStack.push(
-          (int) (this.getScaledX() * scale),
-          (int) (this.getScaledY() * scale),
-          (int) (this.getScaledWidth() * scale),
-          (int) (this.getScaledHeight() * scale));
+      this.drawAndClipBox(canvas, clip);
+
+      if (clip) {
+        var scale = this.graphicsContext.scale();
+        ScissorStack.push(
+            (int) (this.getScaledX() * scale),
+            (int) (this.getScaledY() * scale),
+            (int) (this.getScaledWidth() * scale),
+            (int) (this.getScaledHeight() * scale));
+      }
+
+      this.renderContent(poseStack, mouseX, mouseY, partialTick);
+
+      if (clip) {
+        ScissorStack.pop();
+      }
+
+      this.drawScrollbar();
     }
-
-    this.renderContent(poseStack, mouseX, mouseY, partialTick);
-
-    if (scissor) {
-      ScissorStack.pop();
-    }
-
-    this.drawScrollbar();
+    canvas.restore();
   }
 
   private void drawScrollbar() {
@@ -205,7 +216,7 @@ public class View extends GuiComponent implements Comparable<View>, StyleNode {
       return;
     }
 
-    final var scale = (float) this.window.getGuiScale();
+    final var scale = this.graphicsContext.scale();
 
     final var scrollbarX = this.getScrollbarX();
     final var scaledY = this.getScaledY();
@@ -217,42 +228,38 @@ public class View extends GuiComponent implements Comparable<View>, StyleNode {
     final var scrollbarX2 = scrollbarX + scrollbarWidth;
     final var scaledY2 = scaledY + this.getScaledHeight();
 
-    this.skia.begin();
-    {
-      var canvas = this.skia.canvas();
-      try (var paint = new Paint()) {
-        paint.setMode(PaintMode.FILL);
-        paint.setColor(0x40000000);
-        canvas.drawRRect(
-            RRect.makeLTRB(
-                scrollbarX * scale,
-                scaledY * scale,
-                scrollbarX2 * scale,
-                scaledY2 * scale,
-                scrollbarRadius),
-            paint);
-      }
-
-      final var scrollbarY = this.getScrollbarY();
-      final var scrollbarY2 = scrollbarY + this.getScrollbarHeight();
-      try (var paint = new Paint()) {
-        paint.setMode(PaintMode.FILL);
-        paint.setColor(0x4CFFFFFF);
-        canvas.drawRRect(
-            RRect.makeLTRB(
-                scrollbarX * scale,
-                scrollbarY * scale,
-                scrollbarX2 * scale,
-                scrollbarY2 * scale,
-                scrollbarRadius),
-            paint);
-      }
+    var canvas = this.graphicsContext.canvas();
+    try (var paint = new Paint()) {
+      paint.setMode(PaintMode.FILL);
+      paint.setColor(0x40000000);
+      canvas.drawRRect(
+          RRect.makeLTRB(
+              scrollbarX * scale,
+              scaledY * scale,
+              scrollbarX2 * scale,
+              scaledY2 * scale,
+              scrollbarRadius),
+          paint);
     }
-    this.skia.end();
+
+    final var scrollbarY = this.getScrollbarY();
+    final var scrollbarY2 = scrollbarY + this.getScrollbarHeight();
+    try (var paint = new Paint()) {
+      paint.setMode(PaintMode.FILL);
+      paint.setColor(0x4CFFFFFF);
+      canvas.drawRRect(
+          RRect.makeLTRB(
+              scrollbarX * scale,
+              scrollbarY * scale,
+              scrollbarX2 * scale,
+              scrollbarY2 * scale,
+              scrollbarRadius),
+          paint);
+    }
   }
 
-  private void drawBox() {
-    final var scale = (float) this.window.getGuiScale();
+  private void drawAndClipBox(Canvas canvas, boolean clip) {
+    final var scale = this.graphicsContext.scale();
 
     final var topBorderWidth = this.unscale(this.layout.getTopBorder(), this.unscaleBorder);
     final var bottomBorderWidth = this.unscale(this.layout.getBottomBorder(), this.unscaleBorder);
@@ -284,91 +291,93 @@ public class View extends GuiComponent implements Comparable<View>, StyleNode {
         this.getScaledHeight() * scale,
         radii);
 
-    this.skia.begin();
-    {
-      var canvas = this.skia.canvas();
-
-      this.drawBackdrop(canvas, rect);
-
-      var innerRect = RRect.makeComplexLTRB(
-          rect.getLeft() + leftBorderWidth * scale,
-          rect.getTop() + topBorderWidth * scale,
-          rect.getRight() - rightBorderWidth * scale,
-          rect.getBottom() - bottomBorderWidth * scale,
-          radii);
-
+    if (outlineWidth > 0.0F) {
       try (var paint = new Paint()) {
-        if (topBorderWidth > 0.0F) {
-          paint.setColor(RenderUtil.multiplyAlpha(
-              this.style.borderTopColor.get().valueHex(), this.getAlpha()));
-          this.drawBorderEdge(canvas, rect, innerRect, BoxSide.TOP, paint);
-        }
-        if (rightBorderWidth > 0.0F) {
-          paint.setColor(RenderUtil.multiplyAlpha(
-              this.style.borderRightColor.get().valueHex(), this.getAlpha()));
-          this.drawBorderEdge(canvas, rect, innerRect, BoxSide.RIGHT, paint);
-        }
-        if (bottomBorderWidth > 0.0F) {
-          paint.setColor(RenderUtil.multiplyAlpha(
-              this.style.borderBottomColor.get().valueHex(), this.getAlpha()));
-          this.drawBorderEdge(canvas, rect, innerRect, BoxSide.BOTTOM, paint);
-        }
-        if (leftBorderWidth > 0.0F) {
-          paint.setColor(RenderUtil.multiplyAlpha(
-              this.style.borderLeftColor.get().valueHex(), this.getAlpha()));
-          this.drawBorderEdge(canvas, rect, innerRect, BoxSide.LEFT, paint);
-        }
-      }
-
-      try (var paint = new Paint()) {
-        paint.setMode(PaintMode.FILL);
-        paint.setColor(RenderUtil.multiplyAlpha(this.style.backgroundColor.get().valueHex(),
-            this.getAlpha()));
-        canvas.drawRRect(rect, paint);
-      }
-
-      if (outlineWidth > 0.0F) {
-        try (var paint = new Paint()) {
-          paint.setMode(PaintMode.STROKE);
-          paint.setStrokeWidth(outlineWidth * scale);
-          paint.setColor(RenderUtil.multiplyAlpha(this.style.outlineColor.get().valueHex(),
-              this.getAlpha()));
-          paint.setAntiAlias(false);
-          canvas.drawRRect(rect.inflate(outlineWidth).withRadii(radii), paint);
-        }
+        paint.setMode(PaintMode.STROKE);
+        paint.setStrokeWidth(outlineWidth * scale);
+        paint.setColor(this.style.outlineColor.get().multiplied(this.getAlpha()));
+        paint.setAntiAlias(false);
+        canvas.drawRRect(rect.inflate(outlineWidth).withRadii(radii), paint);
       }
     }
-    this.skia.end();
+
+    if (clip) {
+      canvas.clipRRect(rect, true);
+      this.drawBackdrop(canvas, rect);
+    } else {
+      canvas.save();
+      {
+        canvas.clipRRect(rect, true);
+        this.drawBackdrop(canvas, rect);
+      }
+      canvas.restore();
+    }
+
+    var innerRect = RRect.makeComplexLTRB(
+        rect.getLeft() + leftBorderWidth * scale,
+        rect.getTop() + topBorderWidth * scale,
+        rect.getRight() - rightBorderWidth * scale,
+        rect.getBottom() - bottomBorderWidth * scale,
+        radii);
+
+    try (var paint = new Paint()) {
+      if (topBorderWidth > 0.0F) {
+        paint.setColor(Color.multiplyAlpha(
+            this.style.borderTopColor.get().valueHex(), this.getAlpha()));
+        this.drawBorderEdge(canvas, rect, innerRect, BoxSide.TOP, paint);
+      }
+      if (rightBorderWidth > 0.0F) {
+        paint.setColor(Color.multiplyAlpha(
+            this.style.borderRightColor.get().valueHex(), this.getAlpha()));
+        this.drawBorderEdge(canvas, rect, innerRect, BoxSide.RIGHT, paint);
+      }
+      if (bottomBorderWidth > 0.0F) {
+        paint.setColor(Color.multiplyAlpha(
+            this.style.borderBottomColor.get().valueHex(), this.getAlpha()));
+        this.drawBorderEdge(canvas, rect, innerRect, BoxSide.BOTTOM, paint);
+      }
+      if (leftBorderWidth > 0.0F) {
+        paint.setColor(Color.multiplyAlpha(
+            this.style.borderLeftColor.get().valueHex(), this.getAlpha()));
+        this.drawBorderEdge(canvas, rect, innerRect, BoxSide.LEFT, paint);
+      }
+    }
+
+    try (var paint = new Paint()) {
+      paint.setMode(PaintMode.FILL);
+      paint.setColor(Color.multiplyAlpha(this.style.backgroundColor.get().valueHex(),
+          this.getAlpha()));
+      canvas.drawRRect(rect, paint);
+    }
   }
 
-  private void drawBackdrop(Canvas canvas, RRect rect) {
+  private void drawBackdrop(Canvas canvas, Rect rect) {
     var backdropFilters = this.style.backdropFilter.get();
     if (backdropFilters.length == 0) {
       return;
     }
 
-    try (var image = this.skia.surface.makeImageSnapshot(rect.toIRect());
+    try (var image = this.graphicsContext.surface().makeImageSnapshot(rect.toIRect());
         var paint = new Paint()) {
       for (var filter : backdropFilters) {
         filter.apply(paint);
       }
 
-      canvas.save();
-      canvas.clipRRect(rect);
       canvas.drawImageRect(image,
-          Rect.makeXYWH(0, 0, this.getScaledWidth() * (float) this.window.getGuiScale(),
-              this.getScaledHeight() * (float) this.window.getGuiScale()),
-          rect,
-          paint);
-      canvas.restore();
+          Rect.makeWH(rect.getWidth(), rect.getHeight()),
+          rect, paint);
+    } catch (RuntimeException e) {
+      // TODO consume this until makeImageSnapshot can return null.
     }
   }
 
   private void drawBorderEdge(Canvas canvas, RRect rect, RRect innerRect, BoxSide side,
       Paint paint) {
     canvas.save();
-    this.clipBorderSidePolygon(canvas, rect, innerRect, side, false, false);
-    canvas.drawDRRect(rect, innerRect, paint);
+    {
+      this.clipBorderSidePolygon(canvas, rect, innerRect, side, false, false);
+      canvas.drawDRRect(rect, innerRect, paint);
+    }
     canvas.restore();
   }
 
@@ -552,6 +561,7 @@ public class View extends GuiComponent implements Comparable<View>, StyleNode {
   @SuppressWarnings("unused")
   protected void renderContent(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
     if (DEBUG && this.isHovered()) {
+      this.graphicsContext.end();
       RenderUtil.fillWidthHeight(poseStack, this.getScaledContentX(), this.getScaledContentY(),
           this.getScaledContentWidth(), this.getScaledContentHeight(), 0x333495eb);
 
@@ -616,6 +626,7 @@ public class View extends GuiComponent implements Comparable<View>, StyleNode {
           this.getScaledY() + this.getScaledHeight()
               - this.unscale(this.layout.getBottomBorder(), this.unscaleBorder),
           0x3384ab05);
+      this.graphicsContext.begin();
     }
   }
 
@@ -700,6 +711,10 @@ public class View extends GuiComponent implements Comparable<View>, StyleNode {
     this.getStyleManager().notifyListeners();
     this.focusChanged();
 
+    if (this.parent != null) {
+      this.parent.focusedView = this;
+    }
+
     return true;
   }
 
@@ -709,21 +724,29 @@ public class View extends GuiComponent implements Comparable<View>, StyleNode {
       this.getStyleManager().removeState(States.FOCUS_VISIBLE);
       this.getStyleManager().notifyListeners();
       this.focusChanged();
+
+      if (this.parent != null) {
+        this.parent.focusedView = null;
+      }
     }
   }
 
-  public boolean mouseClicked(double mouseX, double mouseY, int button) {
+  /**
+   * Called when the mouse is pressed on this component.
+   * 
+   * @param mouseX - the mouse's x coordinate
+   * @param mouseY - the mouse's y coordinate
+   * @param button - the button that was pressed
+   * @return <code>true</code> if drag events should be captured
+   */
+  public boolean mousePressed(double mouseX, double mouseY, int button) {
     if (this.post(new MouseEvent.ButtonEvent(mouseX, mouseY, button,
         GLFW.GLFW_PRESS)) == Event.Result.ALLOW) {
-      return true;
-    }
-
-    if (button != GLFW.GLFW_MOUSE_BUTTON_LEFT) {
       return false;
     }
 
     // Clicked on scrollbar region
-    if (this.isScrollbarEnabled()
+    if (this.isScrollbarEnabled() && button == GLFW.GLFW_MOUSE_BUTTON_LEFT
         && mouseX >= this.getScaledX() + this.getScaledWidth() - SCROLLBAR_WIDTH
         && mouseX <= this.getScaledX() + this.getScaledWidth()
         && mouseY >= this.getScaledY()
@@ -738,7 +761,7 @@ public class View extends GuiComponent implements Comparable<View>, StyleNode {
       return true;
     }
 
-    if (!this.isHovered() || !this.tryFocus(false)) {
+    if (!this.isFocused()) {
       return false;
     }
 
@@ -749,59 +772,55 @@ public class View extends GuiComponent implements Comparable<View>, StyleNode {
       this.post(new ActionEvent());
     }
 
-    return true;
-  }
-
-  public boolean mouseReleased(double mouseX, double mouseY, int button) {
-    return this.post(new MouseEvent.ButtonEvent(mouseX, mouseY, button,
-        GLFW.GLFW_RELEASE)) == Event.Result.ALLOW;
-  }
-
-  public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX,
-      double deltaY) {
-    if (this.isScrollbarEnabled() &&
-        mouseY >= this.getScaledY() && mouseY <= this.getScaledY() + this.getScaledHeight()) {
-      this.scrollOffset = this.clampScrollOffset(this.scrollOffset
-          + ((float) deltaY) * this.fullHeight / this.getScaledHeight());
-      return true;
-    }
-    return this.post(
-        new MouseEvent.DragEvent(mouseX, mouseY, button, deltaX, deltaY)) == Event.Result.ALLOW;
-  }
-
-  public boolean mouseScrolled(double mouseX, double mouseY, double scrollDelta) {
-    if (this.isScrollbarEnabled()) {
-      this.scrollVelocity += (float) (-scrollDelta * SCROLL_CHUNK);
-    }
-    return this.post(
-        new MouseEvent.ScrollEvent(mouseX, mouseY, scrollDelta)) == Event.Result.ALLOW;
-  }
-
-  public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-    if (this.post(
-        new KeyEvent(keyCode, scanCode, GLFW.GLFW_PRESS, modifiers)) == Event.Result.ALLOW) {
-      return true;
-    }
-
-    if (keyCode == GLFW.GLFW_KEY_ENTER && this.post(new ActionEvent()) == Event.Result.ALLOW) {
-      return true;
-    }
-
     return false;
   }
 
-  public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
-    return this.post(
-        new KeyEvent(keyCode, scanCode, GLFW.GLFW_RELEASE, modifiers)) == Event.Result.ALLOW;
+  public void mouseReleased(double mouseX, double mouseY, int button) {
+    this.post(new MouseEvent.ButtonEvent(mouseX, mouseY, button, GLFW.GLFW_RELEASE));
   }
 
-  public boolean charTyped(char codePoint, int modifiers) {
-    return this.post(new CharTypeEvent(codePoint, modifiers)) == Event.Result.ALLOW;
+  public void mouseDragged(double mouseX, double mouseY, int button,
+      double deltaX, double deltaY) {
+    if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT
+        && this.isScrollbarEnabled()
+        && mouseY >= this.getScaledY()
+        && mouseY <= this.getScaledY() + this.getScaledHeight()) {
+      this.scrollOffset = this.clampScrollOffset(this.scrollOffset
+          + ((float) deltaY) * this.fullHeight / this.getScaledHeight());
+      return;
+    }
+    this.post(new MouseEvent.DragEvent(mouseX, mouseY, button, deltaX, deltaY));
   }
 
-  public boolean changeFocus(boolean forward) {
+  public void mouseScrolled(double mouseX, double mouseY, double scrollDelta) {
+    if (this.isScrollbarEnabled()) {
+      this.scrollVelocity += (float) (-scrollDelta * SCROLL_CHUNK);
+    }
+    this.post(new MouseEvent.ScrollEvent(mouseX, mouseY, scrollDelta));
+  }
+
+  public void keyPressed(int keyCode, int scanCode, int modifiers) {
+    if (this.post(
+        new KeyEvent(keyCode, scanCode, GLFW.GLFW_PRESS, modifiers)) == Event.Result.ALLOW) {
+      return;
+    }
+
+    if (keyCode == GLFW.GLFW_KEY_ENTER && this.post(new ActionEvent()) == Event.Result.ALLOW) {
+      return;
+    }
+  }
+
+  public void keyReleased(int keyCode, int scanCode, int modifiers) {
+    this.post(new KeyEvent(keyCode, scanCode, GLFW.GLFW_RELEASE, modifiers));
+  }
+
+  public void charTyped(char codePoint, int modifiers) {
+    this.post(new CharTypeEvent(codePoint, modifiers));
+  }
+
+  public Optional<View> changeFocus(boolean forward) {
     if (!this.focusable || this.getStyleManager().hasState(States.DISABLED)) {
-      return false;
+      return Optional.empty();
     }
 
     var focused = this.getStyleManager().toggleState(States.FOCUS);
@@ -812,7 +831,8 @@ public class View extends GuiComponent implements Comparable<View>, StyleNode {
     }
     this.getStyleManager().notifyListeners();
     this.focusChanged();
-    return focused;
+
+    return focused ? Optional.of(this) : Optional.empty();
   }
 
   protected void focusChanged() {}
@@ -898,20 +918,23 @@ public class View extends GuiComponent implements Comparable<View>, StyleNode {
   }
 
   public final float getX() {
-    var x = this.layout.getX();
-    x += (x * this.getXScale()) - (x * this.style.xScale.get());
-    x += this.parent == null ? 0.0F : this.parent.getScaledContentX();
+    var position = this.style.position.get();
+    var x = this.parent == null ? 0.0F : this.parent.getScaledContentX();
+    if (position != PositionType.ABSOLUTE) {
+      var layoutX = this.layout.getX();
+      x += layoutX + (layoutX * this.getXScale()) - (layoutX * this.style.xScale.get());
+    }
 
     var left = this.style.left.get();
     var right = this.style.right.get();
-    var parentWidth = this.parent == null ? this.screen.width : this.parent.getWidth();
+    var parentWidth = this.parent == null ? this.screen.width : this.parent.getScaledWidth();
     if (left != Length.AUTO) {
       x += left.valueForLength(parentWidth);
     } else if (right != Length.AUTO) {
-      if (this.style.position.get() == PositionType.ABSOLUTE) {
+      if (position == PositionType.ABSOLUTE) {
         var parentRight = this.parent == null ? this.screen.width
             : this.parent.getScaledContentX() + this.parent.getScaledContentWidth();
-        x = parentRight - right.valueForLength(parentWidth) - this.getWidth();
+        x = parentRight - right.valueForLength(parentWidth) - this.getScaledWidth();
       } else {
         x -= right.valueForLength(parentWidth);
       }
@@ -949,20 +972,23 @@ public class View extends GuiComponent implements Comparable<View>, StyleNode {
   }
 
   public final float getY() {
-    var y = this.layout.getY();
-    y += (y * this.getYScale()) - (y * this.style.yScale.get());
-    y += this.parent == null ? 0.0F : this.parent.getScaledContentY();
+    var position = this.style.position.get();
+    var y = this.parent == null ? 0.0F : this.parent.getScaledContentY();
+    if (position != PositionType.ABSOLUTE) {
+      var layoutY = this.layout.getY();
+      y += layoutY + (layoutY * this.getYScale()) - (layoutY * this.style.yScale.get());
+    }
 
     var top = this.style.top.get();
     var bottom = this.style.bottom.get();
-    var parentHeight = this.parent == null ? this.screen.height : this.parent.getHeight();
+    var parentHeight = this.parent == null ? this.screen.height : this.parent.getScaledHeight();
     if (top != Length.AUTO) {
       y += top.valueForLength(parentHeight);
     } else if (bottom != Length.AUTO) {
-      if (this.style.position.get() == PositionType.ABSOLUTE) {
+      if (position == PositionType.ABSOLUTE) {
         var parentRight = this.parent == null ? this.screen.height
             : this.parent.getScaledContentY() + this.parent.getScaledContentHeight();
-        y = parentRight - bottom.valueForLength(parentHeight) - this.getHeight();
+        y = parentRight - bottom.valueForLength(parentHeight) - this.getScaledHeight();
       } else {
         y -= bottom.valueForLength(parentHeight);
       }
@@ -971,7 +997,7 @@ public class View extends GuiComponent implements Comparable<View>, StyleNode {
     return y
         + this.style.yTranslation.get()
         + (this.unscaleHeight
-            ? this.getHeight() * (float) this.window.getGuiScale() - this.getHeight()
+            ? this.getHeight() * this.graphicsContext.scale() - this.getHeight()
             : 0.0F);
   }
 
@@ -1119,22 +1145,34 @@ public class View extends GuiComponent implements Comparable<View>, StyleNode {
 
   protected final float unscaleOffset(float value, boolean condition) {
     return condition
-        ? value * (float) this.window.getGuiScale() - value
+        ? value * this.graphicsContext.scale() - value
         : 0.0F;
   }
 
   protected final float unscale(float value, boolean condition) {
-    return condition ? value / (float) this.window.getGuiScale() : value;
+    return condition ? value / this.graphicsContext.scale() : value;
   }
 
-  public Optional<View> traverseUpward(Predicate<View> handler) {
-    return this.traverseUpward(handler, true);
+  public void traverseUpward(Consumer<View> handler) {
+    this.traverseUpward(handler, true);
   }
 
-  public Optional<View> traverseUpward(Predicate<View> handler, boolean includeSelf) {
+  public void traverseUpward(Consumer<View> handler, boolean includeSelf) {
     var view = includeSelf ? this : this.parent;
     while (view != null) {
-      if (handler.test(view)) {
+      handler.accept(view);
+      view = view.parent;
+    }
+  }
+
+  public Optional<View> traverseUpwardUntil(Predicate<View> filter) {
+    return this.traverseUpwardUntil(filter, true);
+  }
+
+  public Optional<View> traverseUpwardUntil(Predicate<View> filter, boolean includeSelf) {
+    var view = includeSelf ? this : this.parent;
+    while (view != null) {
+      if (filter.test(view)) {
         return Optional.of(view);
       }
       view = view.parent;
@@ -1174,11 +1212,7 @@ public class View extends GuiComponent implements Comparable<View>, StyleNode {
 
   @Override
   public boolean isVisible() {
-    return this.added && this.style.visibility.get() == Visibility.VISIBLE
-        && this.getX() < this.window.getGuiScaledWidth()
-        && this.getY() < this.window.getGuiScaledHeight()
-        && this.getX() + this.getWidth() > 0.0F
-        && this.getY() + this.getHeight() > 0.0F;
+    return this.added && this.style.visibility.get() == Visibility.VISIBLE;
   }
 
   @Override
@@ -1199,7 +1233,7 @@ public class View extends GuiComponent implements Comparable<View>, StyleNode {
     return this.style;
   }
 
-  public static class Properties {
+  public static final class Properties {
 
     @Nullable
     private String id;
@@ -1226,32 +1260,32 @@ public class View extends GuiComponent implements Comparable<View>, StyleNode {
       return this;
     }
 
-    public final Properties doubleClick(boolean doubleClick) {
+    public Properties doubleClick(boolean doubleClick) {
       this.doubleClick = doubleClick;
       return this;
     }
 
-    public final Properties unscaleWidth(boolean unscaleWidth) {
+    public Properties unscaleWidth(boolean unscaleWidth) {
       this.unscaleWidth = unscaleWidth;
       return this;
     }
 
-    public final Properties unscaleHeight(boolean unscaleHeight) {
+    public Properties unscaleHeight(boolean unscaleHeight) {
       this.unscaleHeight = unscaleHeight;
       return this;
     }
 
-    public final Properties unscaleBorder(boolean unscaleBorder) {
+    public Properties unscaleBorder(boolean unscaleBorder) {
       this.unscaleBorder = unscaleBorder;
       return this;
     }
 
-    public final Properties unscaleOutline(boolean unscaleOutline) {
+    public Properties unscaleOutline(boolean unscaleOutline) {
       this.unscaleOutline = unscaleOutline;
       return this;
     }
 
-    public final Properties focusable(boolean focusable) {
+    public Properties focusable(boolean focusable) {
       this.focusable = focusable;
       return this;
     }

@@ -1,7 +1,7 @@
 package sm0keysa1m0n.bliss.style.parser.value;
 
-import com.craftingdead.immerse.util.StringCountUtil;
 import sm0keysa1m0n.bliss.style.Percentage;
+import sm0keysa1m0n.bliss.style.parser.StringCountUtil;
 
 public class PercentageParser implements ValueParser<Percentage> {
 

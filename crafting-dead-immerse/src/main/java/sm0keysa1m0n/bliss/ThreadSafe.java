@@ -16,7 +16,7 @@
  * https://craftingdead.net/terms.php
  */
 
-package com.craftingdead.immerse.util;
+package sm0keysa1m0n.bliss;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;

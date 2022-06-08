@@ -30,6 +30,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import sm0keysa1m0n.bliss.Animation;
 import sm0keysa1m0n.bliss.Color;
+import sm0keysa1m0n.bliss.minecraft.MinecraftUtil;
 import sm0keysa1m0n.bliss.view.ImageView;
 import sm0keysa1m0n.bliss.view.ParentView;
 import sm0keysa1m0n.bliss.view.TextView;
@@ -96,7 +97,7 @@ public class Theme {
   public static ImageView createImageButton(ResourceLocation image, Runnable actionListener,
       View.Properties properties) {
     var view = new ImageView(properties.styleClasses("image-button").focusable(true));
-    view.setImage(image);
+    view.setImage(MinecraftUtil.createImageAccess(image));
     view.addActionSound(ImmerseSoundEvents.BUTTON_CLICK.get());
     view.addHoverSound(ImmerseSoundEvents.MAIN_MENU_HOVER.get());
     view.addListener(ActionEvent.class, event -> actionListener.run());
@@ -105,7 +106,8 @@ public class Theme {
 
   public static View createBackground() {
     var view = new ImageView(new View.Properties().styleClasses("background"))
-        .setImage(new ResourceLocation(CraftingDeadImmerse.ID, "textures/gui/background.png"));
+        .setImage(MinecraftUtil.createImageAccess(
+            new ResourceLocation(CraftingDeadImmerse.ID, "textures/gui/background.png")));
 
     var animator = new Animator.Builder()
         .addTarget(Animation.forProperty(view.getStyle().xTranslation)

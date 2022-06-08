@@ -21,13 +21,14 @@ package com.craftingdead.immerse.client.gui.screen.menu.play.list.server;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
-import org.jetbrains.annotations.Nullable;
 import org.jdesktop.core.animation.timing.Animator;
 import org.jdesktop.core.animation.timing.KeyFrames;
+import org.jetbrains.annotations.Nullable;
 import com.craftingdead.immerse.client.gui.screen.Theme;
 import net.minecraft.network.chat.TranslatableComponent;
 import sm0keysa1m0n.bliss.Animation;
 import sm0keysa1m0n.bliss.style.Percentage;
+import sm0keysa1m0n.bliss.style.States;
 import sm0keysa1m0n.bliss.view.ParentView;
 import sm0keysa1m0n.bliss.view.View;
 
@@ -112,39 +113,36 @@ public class ServerListView extends ParentView {
     }
   }
 
-  @Override
-  public boolean mouseClicked(double mouseX, double mouseY, int button) {
-    var result = super.mouseClicked(mouseX, mouseY, button);
-    // Might have joined a world/server so we are removed
-    if (this.isAdded()) {
-      this.updateSelected();
+  public void setSelectedItem(@Nullable ServerItemView selectedItem) {
+    if (this.selectedItem == selectedItem) {
+      return;
     }
-    return result;
-  }
-
-  protected void updateSelected() {
-    this.selectedItem = this.listView.getChildren().stream()
-        .filter(child -> child instanceof ServerItemView)
-        .map(child -> (ServerItemView) child)
-        .filter(View::isFocused)
-        .findAny()
-        .orElse(null);
-
-    this.playButton.setEnabled(this.selectedItem != null);
+    if (this.selectedItem != null) {
+      this.selectedItem.getStyleManager().removeState(States.CHECKED);
+      this.selectedItem.getStyleManager().notifyListeners();
+    }
+    this.selectedItem = selectedItem;
+    if (selectedItem != null) {
+      this.selectedItem.getStyleManager().addState(States.CHECKED);
+      this.selectedItem.getStyleManager().notifyListeners();
+    }
+    this.playButton.setEnabled(selectedItem != null);
   }
 
   public Optional<ServerItemView> getSelectedItem() {
     return Optional.ofNullable(this.selectedItem);
   }
 
+  @SuppressWarnings("removal")
   private void refresh() {
     if (this.refreshFuture == null || this.refreshFuture.isDone()) {
       this.listView.clearChildren();
-      this.selectedItem = null;
-      this.updateSelected();
+      this.setSelectedItem(null);
       this.refreshFuture = this.serverList.load()
           .thenAcceptAsync(servers -> {
-            servers.map(ServerItemView::new).forEach(this.listView::addChild);
+            servers
+                .map(server -> new ServerItemView(this, server))
+                .forEach(this.listView::addChild);
             this.listView.layout();
           }, this.minecraft);
     }

@@ -100,7 +100,7 @@ public class PlayView extends ParentView implements TransitionView {
 
     this.entranceAnimator = new Animator.Builder()
         .addTarget(Animation.forProperty(this.getStyle().xTranslation)
-            .keyFrames(new KeyFrames.Builder<>((float) -this.window.getWidth())
+            .keyFrames(new KeyFrames.Builder<>((float) -this.graphicsContext.width())
                 .addFrame(0.0F)
                 .build())
             .build())
@@ -110,7 +110,7 @@ public class PlayView extends ParentView implements TransitionView {
 
     this.exitAnimator = new Animator.Builder()
         .addTarget(Animation.forProperty(this.getStyle().xTranslation)
-            .to((float) -this.window.getWidth())
+            .to((float) -this.graphicsContext.width())
             .build())
 
         .setDuration(250L, TimeUnit.MILLISECONDS)
@@ -123,6 +123,7 @@ public class PlayView extends ParentView implements TransitionView {
         .build();
   }
 
+  @SuppressWarnings("removal")
   private void dropDownSelect(View content) {
     this.minecraft.getSoundManager().play(
         SimpleSoundInstance.forUI(ImmerseSoundEvents.SUBMENU_SELECT.get(), 1.0F));
@@ -133,6 +134,7 @@ public class PlayView extends ParentView implements TransitionView {
     this.content.replace(content);
   }
 
+  @SuppressWarnings("removal")
   @Override
   protected void added() {
     super.added();

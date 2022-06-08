@@ -34,8 +34,8 @@ public abstract class MinecraftMixin {
 
   @Inject(method = "resizeDisplay", at = @At("RETURN"))
   public void resizeDisplay(CallbackInfo callbackInfo) {
-    CraftingDeadImmerse.getInstance().getClientDist().getSkia()
-        .init(((Minecraft) (Object) this).getMainRenderTarget());
+    CraftingDeadImmerse.getInstance().getClientDist().getGraphicsContext()
+        .init((float) ((Minecraft) (Object) this).getWindow().getGuiScale());
   }
 
   /**

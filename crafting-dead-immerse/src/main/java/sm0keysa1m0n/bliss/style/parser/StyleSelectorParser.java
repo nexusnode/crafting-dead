@@ -2,7 +2,6 @@ package sm0keysa1m0n.bliss.style.parser;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
-import com.craftingdead.immerse.util.NumberedLineIterator;
 import sm0keysa1m0n.bliss.style.selector.CompoundSelector;
 import sm0keysa1m0n.bliss.style.selector.Selector;
 import sm0keysa1m0n.bliss.style.selector.SingleSelector;

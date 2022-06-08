@@ -16,7 +16,7 @@
  * https://craftingdead.net/terms.php
  */
 
-package com.craftingdead.immerse.util;
+package sm0keysa1m0n.bliss.style.parser;
 
 import org.apache.commons.io.LineIterator;
 
