@@ -144,7 +144,7 @@ public class MinecraftGraphicsContext implements GraphicsContext, AutoCloseable 
     GL11.glDisable(GL11.GL_STENCIL_TEST);
 
     RenderSystem.disableDepthTest();
-    GL11.glDisable(GL11.GL_DEPTH);
+    GL11.glDisable(GL11.GL_DEPTH_TEST);
 
     GL13.glActiveTexture(GL13.GL_TEXTURE0);
     RenderSystem.activeTexture(GL13.GL_TEXTURE0);

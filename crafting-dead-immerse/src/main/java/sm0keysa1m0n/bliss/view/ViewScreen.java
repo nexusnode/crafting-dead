@@ -80,6 +80,8 @@ public final class ViewScreen extends Screen {
       throw new IllegalStateException("Root is closed.");
     }
 
+    this.minecraft.keyboardHandler.setSendRepeatsToGui(true);
+
     if (!this.root.isAdded()) {
       this.root.added();
     }
@@ -89,6 +91,8 @@ public final class ViewScreen extends Screen {
 
   @Override
   public void removed() {
+    this.minecraft.keyboardHandler.setSendRepeatsToGui(false);
+
     if (this.keepOpen) {
       this.keepOpen = false;
       return;

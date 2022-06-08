@@ -86,6 +86,7 @@ minecraft {
 }
 
 def lwjgl_natives = ['natives-windows', 'natives-linux', 'natives-macos']
+def skija_natives = ['skija-macos-x64', 'skija-macos-arm64', 'skija-linux', 'skija-windows']
 
 configurations {
     lwjgl_native_library
@@ -94,13 +95,16 @@ configurations {
 
 dependencies {
     implementation project(':crafting-dead-core')
-    shaded_library (group: 'org.lwjgl', name: 'lwjgl-yoga', version: "${lwjgl_version}") {
+    shaded_library(group: 'org.lwjgl', name: 'lwjgl-yoga', version: "${lwjgl_version}") {
         exclude group: 'org.lwjgl', module: 'lwjgl'
     }
     lwjgl_natives.each {
-        lwjgl_native_library ("org.lwjgl:lwjgl-yoga:${lwjgl_version}:${it}") {
+        lwjgl_native_library("org.lwjgl:lwjgl-yoga:${lwjgl_version}:${it}") {
             exclude group: 'org.lwjgl', module: 'lwjgl'
         }
+    }
+    skija_natives.each {
+        shaded_library group: 'io.github.humbleui', name: "${it}", version: '0.102.0'
     }
 
 	shaded_library group: 'net.java.timingframework', name: 'timingframework-core', version: '7.3.1'
@@ -109,10 +113,7 @@ dependencies {
     }
     
     library group: 'net.rocketpowered', name: 'rocket-api', version: '0.0.5'
-    
-      shaded_library "io.github.humbleui:skija-windows:0.102.0"
-    
-    
+
     runtimeOnly fg.deobf("net.rocketpowered:rocket-connector:${minecraft_version}-0.0.7")
 }
 
