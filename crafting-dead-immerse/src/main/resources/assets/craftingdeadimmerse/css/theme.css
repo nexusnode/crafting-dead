@@ -69,7 +69,7 @@ TextFieldView {
 }
 
 .blur {
-    backdrop-filter: blur(20px);
+    backdrop-filter: blur(30px);
 }
 
 .seperator {

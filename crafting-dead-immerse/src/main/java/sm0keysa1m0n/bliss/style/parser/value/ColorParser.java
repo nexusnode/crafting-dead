@@ -13,9 +13,9 @@ public class ColorParser implements ValueParser<Color> {
   private final Pattern hexColorPattern = Pattern.compile("^#\\d{6}");
   private final Pattern hexAlphaColorPattern = Pattern.compile("^#\\d{6}\\s+\\d{2}%");
   private final Pattern rgbColorPattern =
-      Pattern.compile("^rgb\\((\\s?\\d+\\s?,\\s?){2}(\\s?\\d+\\s?)\\)");
+      Pattern.compile("^rgb\\((\\s?\\d+\\.?\\d+%?\\s?,){2}(\\s?\\d+\\.?\\d+%?\\s?)\\)");
   private final Pattern rgbaColorPattern =
-      Pattern.compile("^rgba\\((\\s?\\d+\\s?,\\s?){3}(\\s?\\d+\\s?)\\)");
+      Pattern.compile("^rgba\\((\\s?\\d+\\.?\\d+%?\\s?,){2,3}(\\s?\\d+\\.?\\d+%?\\s?)\\)");
 
   private ColorParser() {
     this.colorFormat = NumberFormat.getInstance();
@@ -32,7 +32,7 @@ public class ColorParser implements ValueParser<Color> {
       return 7;
     }
     if (!this.rgbColorPattern.matcher(style).matches()
-        && !rgbaColorPattern.matcher(style).matches()) {
+        && !this.rgbaColorPattern.matcher(style).matches()) {
       return 0;
     }
     return style.substring(0, style.indexOf(")") + 1).length();
@@ -61,28 +61,27 @@ public class ColorParser implements ValueParser<Color> {
       var greenValue = 0.0F;
       var blueValue = 0.0F;
       var alphaValue = 1.0F;
-      var i = 0;
-      for (var value : colorNames) {
-        if (i != 3) {
-          float colorValue;
-          value = value.trim();
-          if (value.endsWith("%")) {
-            colorValue = Float.valueOf(value.substring(0, value.length() - 1)) / 100f;
-          } else {
-            colorValue = Integer.valueOf(value) / 255.0F;
-          }
+      for (int i = 0; i < colorNames.length; i++) {
+        var value = colorNames[i].trim();
+        var percentage = value.endsWith("%");
 
-          if (i == 0) {
-            redValue = colorValue;
-          } else if (i == 1) {
-            greenValue = colorValue;
-          } else if (i == 2) {
-            blueValue = colorValue;
-          }
-        } else if (alpha) {
-          alphaValue = Float.valueOf(value);
+        var floatValue = percentage
+            ? Float.parseFloat(value.substring(0, value.length() - 1)) / 100.0F
+            : Float.parseFloat(value);
+
+        if (alpha && i == 3) {
+          alphaValue = floatValue;
+          continue;
         }
-        i++;
+
+        var colorValue = percentage ? floatValue : floatValue / 255.0F;
+        if (i == 0) {
+          redValue = colorValue;
+        } else if (i == 1) {
+          greenValue = colorValue;
+        } else if (i == 2) {
+          blueValue = colorValue;
+        }
       }
       return Color.create(redValue, greenValue, blueValue, alphaValue);
     }

@@ -2,12 +2,12 @@ package sm0keysa1m0n.bliss.property;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
-import org.jetbrains.annotations.Nullable;
 import org.jdesktop.core.animation.timing.Animator;
 import org.jdesktop.core.animation.timing.Evaluator;
 import org.jdesktop.core.animation.timing.Interpolator;
 import org.jdesktop.core.animation.timing.TimingTargetAdapter;
 import org.jdesktop.core.animation.timing.evaluators.KnownEvaluators;
+import org.jetbrains.annotations.Nullable;
 
 public interface Transition {
 

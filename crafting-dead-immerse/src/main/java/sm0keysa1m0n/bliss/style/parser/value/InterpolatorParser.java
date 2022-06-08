@@ -3,13 +3,18 @@ package sm0keysa1m0n.bliss.style.parser.value;
 import org.jdesktop.core.animation.timing.Interpolator;
 import org.jdesktop.core.animation.timing.interpolators.LinearInterpolator;
 import org.jdesktop.core.animation.timing.interpolators.SplineInterpolator;
+import sm0keysa1m0n.bliss.animation.CubicBezierInterpolator;
 
 public class InterpolatorParser implements ValueParser<Interpolator> {
 
-  public static final Interpolator EASE = new SplineInterpolator(0.25D, 0.1D, 0.25D, 1.0D);
-  public static final Interpolator EASE_IN = new SplineInterpolator(0.42D, 0.0D, 1.0D, 1.0D);
-  public static final Interpolator EASE_OUT = new SplineInterpolator(0.0D, 0.0D, 0.58D, 1.0D);
-  public static final Interpolator EASE_IN_OUT = new SplineInterpolator(0.42D, 0.0D, 0.58D, 1.0D);
+  public static final Interpolator EASE =
+      new CubicBezierInterpolator(0.25D, 0.1D, 0.25D, 1.0D);
+  public static final Interpolator EASE_IN =
+      new CubicBezierInterpolator(0.42D, 0.0D, 1.0D, 1.0D);
+  public static final Interpolator EASE_OUT =
+      new CubicBezierInterpolator(0.0D, 0.0D, 0.58D, 1.0D);
+  public static final Interpolator EASE_IN_OUT =
+      new CubicBezierInterpolator(0.42D, 0.0D, 0.58D, 1.0D);
 
   public static final InterpolatorParser INSTANCE = new InterpolatorParser();
 

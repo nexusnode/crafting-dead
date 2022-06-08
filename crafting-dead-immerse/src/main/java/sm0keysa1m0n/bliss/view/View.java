@@ -34,7 +34,6 @@ import net.minecraftforge.eventbus.api.IEventBus;
 import sm0keysa1m0n.bliss.Bliss;
 import sm0keysa1m0n.bliss.BoxSide;
 import sm0keysa1m0n.bliss.BoxSizing;
-import sm0keysa1m0n.bliss.Color;
 import sm0keysa1m0n.bliss.Length;
 import sm0keysa1m0n.bliss.Overflow;
 import sm0keysa1m0n.bliss.PointerEvents;
@@ -322,31 +321,26 @@ public class View implements Comparable<View>, StyleNode {
 
     try (var paint = new Paint()) {
       if (topBorderWidth > 0.0F) {
-        paint.setColor(Color.multiplyAlpha(
-            this.style.borderTopColor.get().valueHex(), this.getAlpha()));
+        paint.setColor(this.style.borderTopColor.get().multiplied(this.getAlpha()));
         this.drawBorderEdge(canvas, rect, innerRect, BoxSide.TOP, paint);
       }
       if (rightBorderWidth > 0.0F) {
-        paint.setColor(Color.multiplyAlpha(
-            this.style.borderRightColor.get().valueHex(), this.getAlpha()));
+        paint.setColor(this.style.borderRightColor.get().multiplied(this.getAlpha()));
         this.drawBorderEdge(canvas, rect, innerRect, BoxSide.RIGHT, paint);
       }
       if (bottomBorderWidth > 0.0F) {
-        paint.setColor(Color.multiplyAlpha(
-            this.style.borderBottomColor.get().valueHex(), this.getAlpha()));
+        paint.setColor(this.style.borderBottomColor.get().multiplied(this.getAlpha()));
         this.drawBorderEdge(canvas, rect, innerRect, BoxSide.BOTTOM, paint);
       }
       if (leftBorderWidth > 0.0F) {
-        paint.setColor(Color.multiplyAlpha(
-            this.style.borderLeftColor.get().valueHex(), this.getAlpha()));
+        paint.setColor(this.style.borderLeftColor.get().multiplied(this.getAlpha()));
         this.drawBorderEdge(canvas, rect, innerRect, BoxSide.LEFT, paint);
       }
     }
 
     try (var paint = new Paint()) {
       paint.setMode(PaintMode.FILL);
-      paint.setColor(Color.multiplyAlpha(this.style.backgroundColor.get().valueHex(),
-          this.getAlpha()));
+      paint.setColor(this.style.backgroundColor.get().multiplied(this.getAlpha()));
       canvas.drawRRect(rect, paint);
     }
   }
@@ -357,15 +351,14 @@ public class View implements Comparable<View>, StyleNode {
       return;
     }
 
-    try (var image = this.graphicsContext.surface().makeImageSnapshot(rect.toIRect());
+    var intRect = rect.toIRect();
+
+    try (var image = this.graphicsContext.surface().makeImageSnapshot(intRect);
         var paint = new Paint()) {
       for (var filter : backdropFilters) {
         filter.apply(paint);
       }
-
-      canvas.drawImageRect(image,
-          Rect.makeWH(rect.getWidth(), rect.getHeight()),
-          rect, paint);
+      canvas.drawImageRect(image, intRect.toRect(), paint);
     } catch (RuntimeException e) {
       // TODO consume this until makeImageSnapshot can return null.
     }

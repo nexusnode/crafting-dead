@@ -254,17 +254,17 @@ public class ViewStyle {
           }
         }));
     this.registerProperty(this.xScale =
-        new StyleableProperty<>(view, "x-scale", Float.class, 1.0F));
+        new StyleableProperty<>(view, "-bliss-x-scale", Float.class, 1.0F));
     this.registerProperty(this.yScale =
-        new StyleableProperty<>(view, "y-scale", Float.class, 1.0F));
+        new StyleableProperty<>(view, "-bliss-y-scale", Float.class, 1.0F));
     this.styleManager.registerProperty(
         ShorthandDispatcher.create("scale", Float.class, ShorthandArgMapper.TWO,
             this.xScale, this.yScale));
 
     this.registerProperty(this.xTranslation =
-        new StyleableProperty<>(view, "x-translation", Float.class, 0.0F));
+        new StyleableProperty<>(view, "-bliss-x-translation", Float.class, 0.0F));
     this.registerProperty(this.yTranslation =
-        new StyleableProperty<>(view, "y-translation", Float.class, 0.0F));
+        new StyleableProperty<>(view, "-bliss-y-translation", Float.class, 0.0F));
     this.registerProperty(this.opacity =
         new StyleableProperty<>(view, "opacity", Percentage.class, Percentage.ONE_HUNDRED));
     this.registerProperty(this.backgroundColor =
