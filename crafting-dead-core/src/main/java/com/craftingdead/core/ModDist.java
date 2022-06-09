@@ -18,4 +18,9 @@
 
 package com.craftingdead.core;
 
-public interface ModDist {}
+import net.minecraft.core.RegistryAccess;
+
+public interface ModDist {
+
+  RegistryAccess getEffectiveRegistry();
+}

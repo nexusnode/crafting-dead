@@ -1,0 +1,27 @@
+{
+  "general_attributes": {
+    "animations": {
+      "shoot": "craftingdead:pistol_shoot",
+      "reload": "craftingdead:reload",
+      "inspect": "craftingdead:inspect"
+    },
+    "secondary_action_trigger": "toggle",
+    "combat_slot": "secondary",
+    "accepted_magazines": [
+      "craftingdead:desert_eagle_magazine"
+    ],
+    "default_magazine": "craftingdead:desert_eagle_magazine",
+    "recoil": 8.0,
+    "range": 80.0,
+    "fire_delay": 160,
+    "damage": 8,
+    "reload_duration": 40,
+    "accuracy": 0.9
+  },
+  "sounds": {
+    "reload_sound": "craftingdead:m9_reload",
+    "shoot_sound": "craftingdead:desert_eagle_shoot",
+    "distant_shoot_sound": "craftingdead:desert_eagle_distant_shoot"
+  },
+  "type": "craftingdead:aimable"
+}

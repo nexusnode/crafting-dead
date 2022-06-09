@@ -21,6 +21,7 @@ package com.craftingdead.core;
 import com.craftingdead.core.capability.CapabilityUtil;
 import com.craftingdead.core.client.ClientDist;
 import com.craftingdead.core.client.animation.gun.GunAnimationTypes;
+import com.craftingdead.core.data.guns.GunDataProvider;
 import com.craftingdead.core.data.recipes.ModRecipeProvider;
 import com.craftingdead.core.data.tags.ModItemTagsProvider;
 import com.craftingdead.core.event.CombatPickupEvent;
@@ -199,6 +200,7 @@ public class CraftingDead {
           new ForgeBlockTagsProvider(dataGenerator, event.getExistingFileHelper()),
           event.getExistingFileHelper()));
       dataGenerator.addProvider(new ModRecipeProvider(dataGenerator));
+      dataGenerator.addProvider(new GunDataProvider(dataGenerator));
     }
   }
 

@@ -1,0 +1,35 @@
+{
+  "general_attributes": {
+    "animations": {
+      "shoot": "craftingdead:submachine_shoot",
+      "reload": "craftingdead:reload",
+      "inspect": "craftingdead:inspect"
+    },
+    "secondary_action_trigger": "toggle",
+    "fire_mode": [
+      "auto"
+    ],
+    "accepted_magazines": [
+      "craftingdead:p90_magazine"
+    ],
+    "default_magazine": "craftingdead:p90_magazine",
+    "accepted_attachments": [
+      "craftingdead:red_dot_sight",
+      "craftingdead:suppressor",
+      "craftingdead:acog_sight"
+    ],
+    "recoil": 2.0,
+    "range": 100.0,
+    "fire_delay": 80,
+    "damage": 5,
+    "reload_duration": 44,
+    "accuracy": 0.75
+  },
+  "sounds": {
+    "reload_sound": "craftingdead:p90_reload",
+    "shoot_sound": "craftingdead:p90_shoot",
+    "distant_shoot_sound": "craftingdead:p90_distant_shoot",
+    "silenced_shoot_sound": "craftingdead:silenced_p90_shoot"
+  },
+  "type": "craftingdead:aimable"
+}

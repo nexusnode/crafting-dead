@@ -1,0 +1,44 @@
+{
+  "general_attributes": {
+    "animations": {
+      "shoot": "craftingdead:rifle_shoot",
+      "reload": "craftingdead:reload",
+      "inspect": "craftingdead:inspect"
+    },
+    "secondary_action_trigger": "toggle",
+    "fire_mode": [
+      "auto",
+      "burst",
+      "semi"
+    ],
+    "accepted_magazines": [
+      "craftingdead:stanag_drum_magazine",
+      "craftingdead:stanag_20_round_magazine",
+      "craftingdead:stanag_30_round_magazine",
+      "craftingdead:stanag_box_magazine"
+    ],
+    "default_magazine": "craftingdead:stanag_20_round_magazine",
+    "accepted_attachments": [
+      "craftingdead:bipod",
+      "craftingdead:suppressor",
+      "craftingdead:lp_scope",
+      "craftingdead:red_dot_sight",
+      "craftingdead:eotech_sight",
+      "craftingdead:tactical_grip",
+      "craftingdead:acog_sight",
+      "craftingdead:hp_scope"
+    ],
+    "recoil": 4.25,
+    "range": 300.0,
+    "fire_delay": 110,
+    "damage": 6,
+    "reload_duration": 80,
+    "accuracy": 0.87
+  },
+  "sounds": {
+    "reload_sound": "craftingdead:m4a1_reload",
+    "shoot_sound": "craftingdead:scarl_shoot",
+    "silenced_shoot_sound": "craftingdead:silenced_m4a1_shoot"
+  },
+  "type": "craftingdead:aimable"
+}

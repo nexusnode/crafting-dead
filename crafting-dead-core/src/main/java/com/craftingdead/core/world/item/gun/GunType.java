@@ -47,6 +47,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.util.ExtraCodecs;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
@@ -298,8 +299,8 @@ public class GunType extends ForgeRegistryEntry<GunType> {
                 ForgeRegistries.ITEMS.getCodec().fieldOf("default_magazine")
                     .xmap(FunctionalUtil::supplier, Supplier::get)
                     .forGetter(t -> t.defaultMagazine),
-                Codec.list(Attachments.registry.get()
-                    .getCodec().xmap(FunctionalUtil::supplier, Supplier::get))
+                Codec.list(ExtraCodecs.lazyInitializedCodec(() -> Attachments.registry.get()
+                        .getCodec().xmap(FunctionalUtil::supplier, Supplier::get)))
                     .optionalFieldOf("accepted_attachments", Collections.emptyList())
                     .xmap(Set::copyOf, ArrayList::new)
                     .forGetter(GeneralAttributes::acceptedAttachments),

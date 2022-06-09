@@ -44,7 +44,8 @@ public class GunTypes {
       DeferredRegister.create(REGISTRY_KEY, CraftingDead.ID);
 
   public static final Supplier<IForgeRegistry<GunType>> registry =
-      deferredRegister.makeRegistry(GunType.class, RegistryBuilder::new);
+      deferredRegister.makeRegistry(GunType.class, () -> new RegistryBuilder<GunType>()
+          .disableSaving().dataPackRegistry(GunType.CODEC, GunType.CODEC));
 
   // ================================================================================
   // Assault Rifles

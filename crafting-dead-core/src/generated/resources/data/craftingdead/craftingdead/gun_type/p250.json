@@ -1,0 +1,32 @@
+{
+  "general_attributes": {
+    "animations": {
+      "shoot": "craftingdead:pistol_shoot",
+      "reload": "craftingdead:reload",
+      "inspect": "craftingdead:inspect"
+    },
+    "secondary_action_trigger": "toggle",
+    "combat_slot": "secondary",
+    "accepted_magazines": [
+      "craftingdead:p250_magazine"
+    ],
+    "default_magazine": "craftingdead:p250_magazine",
+    "accepted_attachments": [
+      "craftingdead:red_dot_sight",
+      "craftingdead:suppressor"
+    ],
+    "recoil": 3.5,
+    "range": 60.0,
+    "fire_delay": 160,
+    "damage": 6,
+    "reload_duration": 30,
+    "accuracy": 0.7
+  },
+  "sounds": {
+    "reload_sound": "craftingdead:m9_reload",
+    "shoot_sound": "craftingdead:p250_shoot",
+    "distant_shoot_sound": "craftingdead:p250_distant_shoot",
+    "silenced_shoot_sound": "craftingdead:silenced_m9_shoot"
+  },
+  "type": "craftingdead:aimable"
+}

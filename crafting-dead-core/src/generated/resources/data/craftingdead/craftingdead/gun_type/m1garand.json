@@ -1,0 +1,31 @@
+{
+  "general_attributes": {
+    "animations": {
+      "shoot": "craftingdead:rifle_shoot",
+      "reload": "craftingdead:reload",
+      "inspect": "craftingdead:inspect"
+    },
+    "secondary_action_trigger": "toggle",
+    "accepted_magazines": [
+      "craftingdead:m1garand_magazine"
+    ],
+    "default_magazine": "craftingdead:m1garand_magazine",
+    "accepted_attachments": [
+      "craftingdead:hp_scope",
+      "craftingdead:lp_scope",
+      "craftingdead:bipod"
+    ],
+    "recoil": 7.0,
+    "range": 200.0,
+    "has_crosshair": false,
+    "fire_delay": 170,
+    "damage": 10,
+    "reload_duration": 40,
+    "accuracy": 0.92
+  },
+  "sounds": {
+    "reload_sound": "craftingdead:as50_reload",
+    "shoot_sound": "craftingdead:m1garand_shoot"
+  },
+  "type": "craftingdead:aimable"
+}

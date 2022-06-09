@@ -1,0 +1,32 @@
+{
+  "general_attributes": {
+    "animations": {
+      "shoot": "craftingdead:pistol_shoot",
+      "reload": "craftingdead:reload",
+      "inspect": "craftingdead:inspect"
+    },
+    "secondary_action_trigger": "toggle",
+    "accepted_magazines": [
+      "craftingdead:mossberg_shells"
+    ],
+    "default_magazine": "craftingdead:mossberg_shells",
+    "accepted_attachments": [
+      "craftingdead:tactical_grip"
+    ],
+    "recoil": 9.0,
+    "rounds_per_shot": 8,
+    "range": 20.0,
+    "fire_delay": 1200,
+    "damage": 3,
+    "reload_duration": 60,
+    "accuracy": 0.7
+  },
+  "sounds": {
+    "reload_sound": "craftingdead:mossberg_reload",
+    "shoot_sound": "craftingdead:mossberg_shoot"
+  },
+  "aim_attributes": {
+    "bolt_action": true
+  },
+  "type": "craftingdead:aimable"
+}

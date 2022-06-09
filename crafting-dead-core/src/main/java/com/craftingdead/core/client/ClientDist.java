@@ -20,6 +20,10 @@ package com.craftingdead.core.client;
 
 import java.util.Optional;
 import java.util.Set;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.RegistryAccess.Frozen;
+import net.minecraftforge.fml.util.thread.EffectiveSide;
+import net.minecraftforge.server.ServerLifecycleHooks;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 import com.craftingdead.core.CraftingDead;
@@ -800,5 +804,17 @@ public class ClientDist implements ModDist {
           bufferSource.getBuffer(RenderType.entityTranslucent(clothingTexture)), packedLight,
           OverlayTexture.NO_OVERLAY);
     }
+  }
+
+  @Override
+  public RegistryAccess getEffectiveRegistry() {
+    var minecraft = Minecraft.getInstance();
+    if (EffectiveSide.get().isServer() && minecraft.getSingleplayerServer() != null) {
+      return minecraft.getSingleplayerServer().registryAccess();
+    } else if (EffectiveSide.get().isClient() && minecraft.player != null) {
+      return minecraft.player.connection.registryAccess();
+    }
+
+    return RegistryAccess.BUILTIN.get();
   }
 }

@@ -22,6 +22,7 @@ import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.world.item.gun.Gun;
 import com.craftingdead.core.world.item.gun.GunLike;
 import com.craftingdead.core.world.item.gun.GunType;
+import com.craftingdead.core.world.item.gun.GunTypes;
 import com.craftingdead.core.world.item.gun.TypedGun;
 import com.craftingdead.core.world.item.gun.TypedGunClient;
 import com.craftingdead.core.world.item.gun.attachment.Attachment;
@@ -43,6 +44,7 @@ import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.minecraftforge.registries.RegistryObject;
 import org.jetbrains.annotations.NotNull;
 
 @RegisterGunColor
@@ -50,9 +52,15 @@ public class GunItem extends ProjectileWeaponItem implements GunLike {
 
   private final Supplier<? extends GunType> type;
 
-  protected GunItem(Supplier<? extends GunType> type) {
+  protected GunItem(RegistryObject<? extends GunType> type) {
     super(new Properties().stacksTo(1).tab(ModItems.COMBAT_TAB));
-    this.type = type;
+
+    this.type = () -> {
+      //TODO: This is a temporary work around for how datapack registries work,
+      // the gun capability system will need to be reworked - juanmuscaria
+      var registry = CraftingDead.getInstance().getModDist().getEffectiveRegistry();
+      return registry.registryOrThrow(GunTypes.REGISTRY_KEY).get(type.getId());
+    };
   }
 
   @Override

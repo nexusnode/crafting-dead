@@ -1,0 +1,38 @@
+{
+  "general_attributes": {
+    "animations": {
+      "shoot": "craftingdead:rifle_shoot",
+      "reload": "craftingdead:reload",
+      "inspect": "craftingdead:inspect"
+    },
+    "secondary_action_trigger": "toggle",
+    "fire_mode": [
+      "auto",
+      "semi"
+    ],
+    "accepted_magazines": [
+      "craftingdead:acr_magazine"
+    ],
+    "default_magazine": "craftingdead:acr_magazine",
+    "accepted_attachments": [
+      "craftingdead:eotech_sight",
+      "craftingdead:red_dot_sight",
+      "craftingdead:suppressor",
+      "craftingdead:tactical_grip",
+      "craftingdead:hp_scope",
+      "craftingdead:lp_scope"
+    ],
+    "recoil": 3.25,
+    "range": 150.0,
+    "fire_delay": 92,
+    "damage": 7,
+    "reload_duration": 80,
+    "accuracy": 0.8
+  },
+  "sounds": {
+    "reload_sound": "craftingdead:m4a1_reload",
+    "shoot_sound": "craftingdead:acr_shoot",
+    "silenced_shoot_sound": "craftingdead:silenced_m4a1_shoot"
+  },
+  "type": "craftingdead:aimable"
+}

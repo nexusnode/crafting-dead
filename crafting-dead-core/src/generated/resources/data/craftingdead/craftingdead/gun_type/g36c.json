@@ -1,0 +1,36 @@
+{
+  "general_attributes": {
+    "animations": {
+      "shoot": "craftingdead:rifle_shoot",
+      "reload": "craftingdead:reload",
+      "inspect": "craftingdead:inspect"
+    },
+    "secondary_action_trigger": "toggle",
+    "fire_mode": [
+      "auto",
+      "semi"
+    ],
+    "accepted_magazines": [
+      "craftingdead:g36c_magazine"
+    ],
+    "default_magazine": "craftingdead:g36c_magazine",
+    "accepted_attachments": [
+      "craftingdead:tactical_grip",
+      "craftingdead:acog_sight",
+      "craftingdead:red_dot_sight",
+      "craftingdead:eotech_sight"
+    ],
+    "recoil": 2.0,
+    "range": 80.0,
+    "fire_delay": 92,
+    "damage": 8,
+    "reload_duration": 44,
+    "accuracy": 0.91
+  },
+  "sounds": {
+    "reload_sound": "craftingdead:m4a1_reload",
+    "shoot_sound": "craftingdead:g36c_shoot",
+    "silenced_shoot_sound": "craftingdead:silenced_m4a1_shoot"
+  },
+  "type": "craftingdead:aimable"
+}

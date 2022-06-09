@@ -1,0 +1,25 @@
+{
+  "general_attributes": {
+    "animations": {
+      "shoot": "craftingdead:pistol_shoot",
+      "reload": "craftingdead:reload",
+      "inspect": "craftingdead:inspect"
+    },
+    "secondary_action_trigger": "toggle",
+    "combat_slot": "secondary",
+    "accepted_magazines": [
+      "craftingdead:taser_cartridge"
+    ],
+    "default_magazine": "craftingdead:taser_cartridge",
+    "recoil": 1.5,
+    "range": 7.0,
+    "fire_delay": 2000,
+    "damage": 7,
+    "reload_duration": 60,
+    "accuracy": 0.9
+  },
+  "sounds": {
+    "shoot_sound": "craftingdead:taser_shoot"
+  },
+  "type": "craftingdead:aimable"
+}

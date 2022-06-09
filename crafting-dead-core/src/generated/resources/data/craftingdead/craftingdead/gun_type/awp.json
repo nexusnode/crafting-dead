@@ -1,0 +1,37 @@
+{
+  "general_attributes": {
+    "animations": {
+      "shoot": "craftingdead:rifle_shoot",
+      "reload": "craftingdead:reload",
+      "inspect": "craftingdead:inspect"
+    },
+    "secondary_action_trigger": "toggle",
+    "accepted_magazines": [
+      "craftingdead:awp_magazine"
+    ],
+    "default_magazine": "craftingdead:awp_magazine",
+    "accepted_attachments": [
+      "craftingdead:lp_scope",
+      "craftingdead:suppressor",
+      "craftingdead:bipod",
+      "craftingdead:hp_scope"
+    ],
+    "recoil": 9.0,
+    "range": 400.0,
+    "has_crosshair": false,
+    "fire_delay": 1200,
+    "damage": 20,
+    "reload_duration": 60,
+    "accuracy": 0.97
+  },
+  "sounds": {
+    "reload_sound": "craftingdead:awp_reload",
+    "shoot_sound": "craftingdead:awp_shoot",
+    "distant_shoot_sound": "craftingdead:awp_distant_shoot",
+    "silenced_shoot_sound": "craftingdead:silenced_m4a1_shoot"
+  },
+  "aim_attributes": {
+    "bolt_action": true
+  },
+  "type": "craftingdead:aimable"
+}
