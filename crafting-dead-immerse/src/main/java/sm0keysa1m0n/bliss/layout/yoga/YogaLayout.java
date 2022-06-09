@@ -36,10 +36,10 @@ public final class YogaLayout implements Layout {
 
   @Override
   public void setAll(ViewStyle style) {
-    this.setTopBorderWidth(style.borderTopWidth.get());
-    this.setRightBorderWidth(style.borderRightWidth.get());
-    this.setBottomBorderWidth(style.borderBottomWidth.get());
-    this.setLeftBorderWidth(style.borderLeftWidth.get());
+    this.setTopBorderWidth(style.borderTopWidth.get().fixed());
+    this.setRightBorderWidth(style.borderRightWidth.get().fixed());
+    this.setBottomBorderWidth(style.borderBottomWidth.get().fixed());
+    this.setLeftBorderWidth(style.borderLeftWidth.get().fixed());
 
     style.paddingTop.get().dispatch(this::setTopPadding, this::setTopPaddingPercent);
     style.paddingRight.get().dispatch(this::setRightPadding, this::setRightPaddingPercent);

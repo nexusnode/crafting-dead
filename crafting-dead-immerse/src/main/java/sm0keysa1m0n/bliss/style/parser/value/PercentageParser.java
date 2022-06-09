@@ -1,33 +1,24 @@
 package sm0keysa1m0n.bliss.style.parser.value;
 
+import org.jetbrains.annotations.Nullable;
 import sm0keysa1m0n.bliss.style.Percentage;
-import sm0keysa1m0n.bliss.style.parser.StringCountUtil;
+import sm0keysa1m0n.bliss.style.parser.ParserException;
+import sm0keysa1m0n.bliss.style.parser.StyleReader;
 
-public class PercentageParser implements ValueParser<Percentage> {
+public class PercentageParser {
 
-  public static final PercentageParser INSTANCE = new PercentageParser();
-
-  private PercentageParser() {}
-
-  @Override
-  public int validate(String style) {
-    int floatLength = StringCountUtil.floatAtStart(style);
-
-    if (floatLength == 0) {
-      return 0;
+  @Nullable
+  public static Percentage parse(StyleReader reader) throws ParserException {
+    var val = reader.readFloat();
+    if (val == null) {
+      return null;
     }
 
-    if (floatLength < style.length() && style.charAt(floatLength) == '%') {
-      return floatLength + 1;
+    if (reader.peek() == '%') {
+      reader.skip();
+      return new Percentage(val / 100.0F);
     }
 
-    return floatLength;
-  }
-
-  @Override
-  public Percentage parse(String style) {
-    return style.contains("%")
-        ? new Percentage(Float.parseFloat(style.replace("%", "")) / 100.0F)
-        : new Percentage(Float.parseFloat(style));
+    return new Percentage(val);
   }
 }

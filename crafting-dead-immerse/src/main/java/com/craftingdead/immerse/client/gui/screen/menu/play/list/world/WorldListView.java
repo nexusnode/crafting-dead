@@ -55,7 +55,7 @@ public class WorldListView extends ParentView {
   public WorldListView() {
     super(new Properties());
 
-    this.listView = new ParentView(new Properties().id("content"));
+    this.listView = new ParentView(new Properties().styleClasses("list-content"));
     this.loadWorlds();
 
     this.playButton = Theme.createGreenButton(
@@ -83,7 +83,7 @@ public class WorldListView extends ParentView {
         () -> this.getSelectedItem().ifPresent(WorldItemView::recreateWorld));
     this.recreateButton.setEnabled(false);
 
-    var controls = new ParentView(new Properties().id("controls"));
+    var controls = new ParentView(new Properties().styleClasses("list-controls"));
 
     var firstRow = new ParentView(new Properties());
     firstRow.addChild(this.playButton);

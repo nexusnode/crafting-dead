@@ -20,6 +20,7 @@ package com.craftingdead.immerse.client.gui.screen.menu;
 
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.atomic.AtomicReference;
 import org.jetbrains.annotations.Nullable;
 import com.craftingdead.core.tags.ModItemTags;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
@@ -33,12 +34,20 @@ import net.minecraft.client.gui.screens.OptionsScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.rocketpowered.api.Rocket;
+import net.rocketpowered.common.payload.GameProfilePayload;
+import net.rocketpowered.common.payload.RolePayload;
+import reactor.core.Disposable;
+import sm0keysa1m0n.bliss.minecraft.MinecraftUtil;
+import sm0keysa1m0n.bliss.minecraft.view.AvatarView;
 import sm0keysa1m0n.bliss.minecraft.view.EntityView;
+import sm0keysa1m0n.bliss.view.ImageView;
 import sm0keysa1m0n.bliss.view.ParentView;
 import sm0keysa1m0n.bliss.view.TextView;
 import sm0keysa1m0n.bliss.view.View;
@@ -50,41 +59,79 @@ public class MainMenuView extends ParentView {
 
   private final ParentView contentContainer = new ParentView(new Properties().id("content"));
 
+  private final TextView roleTextView = new TextView(new Properties()).setWrap(false);
+
+  private Disposable listener;
+
   @SuppressWarnings("removal")
   public MainMenuView() {
     super(new Properties());
 
     var homeView = new HomeView();
+    this.contentContainer.addChild(homeView);
+
     var playView = new PlayView();
 
     this.addChild(Theme.createBackground());
 
     this.addChild(new FogView(new Properties()));
 
-    var sideBar = new ParentView(new Properties().id("side-bar").styleClasses("blur"));
+    var profileBar = new ParentView(
+        new Properties().id("profile-bar").styleClasses("side-bar", "blur", "shadow"));
 
-    sideBar.addChild(this.createButton(
+    var profileView = new ParentView(new Properties().id("profile"));
+
+    profileView.addChild(
+        new AvatarView(new Properties().id("avatar").styleClasses("shadow"),
+            this.minecraft.getUser().getGameProfile()));
+
+    var profileTextView = new ParentView(new Properties().id("profile-text"));
+
+    profileTextView.addChild(new TextView(new Properties().id("name").styleClasses("profile-name"))
+        .setWrap(false)
+        .setText(this.minecraft.getUser().getName()));
+    profileTextView.addChild(this.roleTextView);
+    profileView.addChild(profileTextView);
+
+    profileBar.addChild(profileView);
+
+    var rankView = new ParentView(new Properties().id("rank"));
+
+    rankView.addChild(new ImageView(new Properties().id("rank-icon").styleClasses("shadow"))
+        .setImage(MinecraftUtil.createImageAccess(
+            new ResourceLocation(CraftingDeadImmerse.ID, "textures/gui/rank/chicken.png"))));
+    rankView.addChild(new TextView(new Properties())
+        .setText(new TranslatableComponent("view.main_menu.rank")));
+
+    profileBar.addChild(rankView);
+
+    profileBar.addChild(Theme.newSeparator());
+
+    var menuBar = new ParentView(
+        new Properties().id("menu-bar").styleClasses("side-bar", "blur"));
+
+    menuBar.addChild(this.createButton(
         new ResourceLocation(CraftingDeadImmerse.ID, "textures/gui/logo.svg"),
         new Properties().id("home"),
         new TranslatableComponent("menu.home_button"),
         () -> this.transitionTo(homeView)));
 
-    sideBar.addChild(Theme.newSeparator());
+    menuBar.addChild(Theme.newSeparator());
 
-    sideBar.addChild(this.createButton(
+    menuBar.addChild(this.createButton(
         new ResourceLocation(CraftingDeadImmerse.ID, "textures/gui/play.svg"),
         new Properties().id("play").styleClasses("grow-button"),
         new TranslatableComponent("menu.play_button"),
         () -> this.transitionTo(playView)));
 
-    sideBar.addChild(this.createButton(
+    menuBar.addChild(this.createButton(
         new ResourceLocation(CraftingDeadImmerse.ID, "textures/gui/settings.svg"),
         new Properties().id("settings").styleClasses("grow-button"),
         new TranslatableComponent("menu.options"),
         () -> this.getScreen().keepOpenAndSetScreen(
             new OptionsScreen(this.getScreen(), this.minecraft.options))));
 
-    sideBar.addChild(this.createButton("quit-container",
+    menuBar.addChild(this.createButton("quit-container",
         new ResourceLocation(CraftingDeadImmerse.ID, "textures/gui/power.svg"),
         new Properties().id("quit").styleClasses("grow-button"),
         new TranslatableComponent("menu.quit"),
@@ -107,9 +154,32 @@ public class MainMenuView extends ParentView {
 
     this.addChild(this.contentContainer);
 
-    this.addChild(sideBar);
+    this.addChild(menuBar);
+    this.addChild(profileBar);
+  }
 
-    this.contentContainer.addChild(homeView);
+  @Override
+  protected void added() {
+    super.added();
+    AtomicReference<RolePayload> primaryRole = new AtomicReference<>();
+    this.listener = Rocket.getGameClientGatewayFeed()
+        .flatMap(gateway -> gateway.getGameProfileFeed(gateway.user().id())
+            .doOnNext(__ -> primaryRole.set(null))
+            .flatMapIterable(GameProfilePayload::roles)
+            .flatMap(gateway::getRoleFeed)
+            .doOnNext(role -> {
+              var newRole = primaryRole.updateAndGet(
+                  oldRole -> oldRole == null || role.compareTo(oldRole) > 0 ? role : oldRole);
+              this.roleTextView.setText(
+                  newRole == null ? TextComponent.EMPTY : new TextComponent(newRole.name()));
+            }))
+        .subscribe();
+  }
+
+  @Override
+  protected void removed() {
+    super.removed();
+    this.listener.dispose();
   }
 
   private View createButton(ResourceLocation imageLocation, Properties properties,

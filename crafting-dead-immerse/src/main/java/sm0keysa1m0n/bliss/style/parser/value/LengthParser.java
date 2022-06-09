@@ -1,42 +1,47 @@
 package sm0keysa1m0n.bliss.style.parser.value;
 
+import org.jetbrains.annotations.Nullable;
 import sm0keysa1m0n.bliss.Length;
 import sm0keysa1m0n.bliss.calc.CalcParser;
-import sm0keysa1m0n.bliss.style.parser.StringCountUtil;
+import sm0keysa1m0n.bliss.style.parser.ParserException;
+import sm0keysa1m0n.bliss.style.parser.StyleReader;
 
-public class LengthParser implements ValueParser<Length> {
+public class LengthParser {
 
-  public static final LengthParser INSTANCE = new LengthParser();
-
-  private LengthParser() {}
-
-  @Override
-  public int validate(String style) {
-    int floatLength = StringCountUtil.floatAtStart(style);
-
-    if (floatLength == 0) {
-      return 0;
+  @Nullable
+  public static Length parse(StyleReader reader) throws ParserException {
+    var func = reader.readFunction();
+    if (func != null) {
+      return switch (func.name()) {
+        case "calc" -> Length.calculated(CalcParser.parse(func.arguments()));
+        default -> throw new ParserException("Unknown length function: " + func.name());
+      };
     }
 
-    if (floatLength < style.length() && style.charAt(floatLength) == '%') {
-      return floatLength + 1;
-    }
-    return floatLength;
-  }
+    var val = reader.readFloat();
+    if (val != null) {
+      if (val == 0) {
+        return Length.fixed(0);
+      }
 
-  @Override
-  public Length parse(String style) {
-    if (style.startsWith("calc(")) {
-      return Length.calculated(
-          CalcParser.parse(style.substring(style.indexOf('(') + 1, style.lastIndexOf(')'))));
+      var unit = reader.readUnquotedString();
+      if (unit == null) {
+        throw new ParserException("Expected unit at index " + reader.getCursor());
+      }
+
+      if (unit.equals("%")) {
+        return Length.percentage(val);
+      } else {
+        // TODO add units
+        return Length.fixed(val);
+      }
     }
 
-    if (style.contains("%")) {
-      return Length.percentage(Float.parseFloat(style.replace('%', '\0')));
-    } else if (style.equals("auto")) {
+    var keyword = reader.readUnquotedString();
+    if (keyword != null && keyword.equals("auto")) {
       return Length.AUTO;
-    } else {
-      return Length.fixed(Float.parseFloat(style.replace("px", "")));
     }
+
+    return null;
   }
 }

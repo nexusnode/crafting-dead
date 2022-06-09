@@ -9,13 +9,13 @@
 }
 
 .dialog {
-    width: 250;
-    height: 100;
-    padding: 5;
+    width: 250px;
+    height: 100px;
+    padding: 5px;
     align-items: center;
     justify-content: center;
     background-color: rgba(54, 54, 54, 0.625);
-    border-radius: 7.5;
+    border-radius: 7.5px;
 }
 
 .dialog>TextView {
@@ -23,20 +23,20 @@
 }
 
 .dialog>* {
-    margin: 3.5;
+    margin: 3.5px;
 }
 
 .dialog>TextFieldView {
     width: 80%;
-    height: 20;
-    padding: 4;
+    height: 20px;
+    padding: 4px;
     background-color: rgba(18, 18, 18, 0.25);
     box-sizing: border-box;
 }
 
 .dialog>#controls {
     width: 80%;
-    height: 20;
+    height: 20px;
     flex-direction: row;
     justify-content: space-around;
 }
@@ -63,14 +63,14 @@ GuildView>PanoramaView {
 }
 
 GuildView>#side-bar {
-    width: 100;
+    width: 100px;
     align-items: center;
     justify-content: center;
     background-color: rgba(54, 54, 54, 0.625);
 }
 
 GuildView>#side-bar>* {
-    padding: 5;
+    padding: 5px;
     transition: 250ms color;
     text-align: center;
     box-sizing: border-box;
@@ -81,13 +81,13 @@ GuildView>#side-bar>*:hover {
 }
 
 ManageMembersView>#title {
-    padding: 7;
+    padding: 7px;
     text-align: center;
 }
 
 ManageMembersView>#list {
     flex-grow: 1;
-    padding-bottom: 5;
+    padding-bottom: 5px;
     width: 100%;
     overflow: scroll;
     flex-direction: row;
@@ -98,19 +98,19 @@ ManageMembersView>#list {
 
 ManageMembersView>#controls {
     width: 100%;
-    max-width: 250;
-    height: 45;
+    max-width: 250px;
+    height: 45px;
     justify-content: center;
     align-items: center;
     flex-direction: row;
 }
 
 ManageMembersView>#controls>* {
-    margin: 3;
+    margin: 3px;
 }
 
 YourGuildView>#title {
-    padding: 7;
+    padding: 7px;
     text-align: center;
 }
 
@@ -129,7 +129,7 @@ YourGuildView>#guild>#information {
 }
 
 YourGuildView>#guild>#information>TextView {
-    padding: 5;
+    padding: 5px;
 }
 
 YourGuildView>#guild>#information>#controls {
@@ -141,14 +141,14 @@ YourGuildView>#guild>#information>#controls {
 YourGuildView>#guild>#information>#controls>* {
     flex-grow: 0;
     width: 100%;
-    border-top-width: 1;
+    border-top-width: 1px;
     border-top-color: rgba(125, 125, 125, 0.48);
 }
 
 YourGuildView>#guild>#members {
-    flex-grow: 1;
+    flex-grow: 1px;
     height: 100%;
-    padding-bottom: 5;
+    padding-bottom: 5px;
     overflow: scroll;
     flex-direction: row;
     flex-wrap: wrap;
@@ -157,11 +157,11 @@ YourGuildView>#guild>#members {
 }
 
 MemberView {
-    width: 110;
-    height: 25;
-    border-left-width: 1;
-    padding: 3;
-    margin: 5;
+    width: 110px;
+    height: 25px;
+    border-left-width: 1px;
+    padding: 3px;
+    margin: 5px;
     flex-direction: row;
     align-items: center;
     background-color: rgba(51, 51, 51, 0.625);
@@ -173,21 +173,21 @@ MemberView>#text {
 }
 
 MemberView>AvatarView {
-    height: 25;
-    border-width: 1;
-    margin-right: 3;
+    height: 25px;
+    border-width: 1px;
+    margin-right: 3px;
     aspect-ratio: 1;
 }
 
 InvitesView>#title {
-    padding: 7;
+    padding: 7px;
     text-align: center;
 }
 
 InvitesView>#list {
     flex-grow: 1;
     width: 100%;
-    padding-bottom: 5;
+    padding-bottom: 5px;
     overflow: scroll;
     flex-direction: row;
     flex-wrap: wrap;
@@ -196,10 +196,10 @@ InvitesView>#list {
 }
 
 InvitesView>#list>* {
-    width: 300;
-    height: 46;
-    padding: 3;
-    margin: 5;
+    width: 300px;
+    height: 46px;
+    padding: 3px;
+    margin: 5px;
     flex-direction: column;
     background-color: rgba(51, 51, 51, 0.625);
 }
@@ -210,7 +210,7 @@ InvitesView>#list>*:focus-visible {
 
 InvitesView>#list>*:hover {
     outline-color: rgb(170, 170, 170);
-    outline-width: 1;
+    outline-width: 1px;
 }
 
 InvitesView>#list>*>#player-counts {
@@ -219,13 +219,13 @@ InvitesView>#list>*>#player-counts {
 }
 
 InvitesView>#controls {
-    width: 200;
-    height: 45;
+    width: 200px;
+    height: 45px;
     justify-content: center;
     align-items: center;
     flex-direction: row;
 }
 
 InvitesView>#controls>* {
-    margin: 3;
+    margin: 3px;
 }

@@ -23,6 +23,10 @@ public class StyleList {
     this.merge(original);
   }
 
+  public List<StyleRule> getRules() {
+    return this.rules;
+  }
+
   public StyleList merge(StyleList source) {
     source.rules.forEach(rule -> this.addRule(rule.selector(), rule.properties()));
     this.fonts.putAll(source.fonts);

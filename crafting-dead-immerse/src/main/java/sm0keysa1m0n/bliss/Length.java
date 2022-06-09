@@ -22,6 +22,11 @@ public interface Length {
     public Type type() {
       return Type.AUTO;
     }
+
+    @Override
+    public String toString() {
+      return "Length[auto]";
+    }
   };
   public static final Length UNDEFINED = new Length() {
 
@@ -39,6 +44,11 @@ public interface Length {
     public Type type() {
       return Type.UNDEFINED;
     }
+
+    @Override
+    public String toString() {
+      return "Length[undefined]";
+    }
   };
 
   default void dispatch(FloatConsumer fixed, FloatConsumer percentage) {
@@ -51,6 +61,10 @@ public interface Length {
 
   default float percent() {
     throw new IllegalStateException("Not a percentage.");
+  }
+
+  default float fixed() {
+    throw new IllegalStateException("Not a fixed value.");
   }
 
   float valueForLength(float maximumValue);
@@ -78,6 +92,11 @@ public interface Length {
 
     @Override
     public float valueForLength(float maximumValue) {
+      return this.value;
+    }
+
+    @Override
+    public float fixed() {
       return this.value;
     }
 

@@ -8,6 +8,7 @@ import io.github.humbleui.skija.svg.SVGDOM;
 import io.github.humbleui.skija.svg.SVGLengthContext;
 import io.github.humbleui.types.Point;
 import io.github.humbleui.types.Rect;
+import sm0keysa1m0n.bliss.ImageRendering;
 
 public class SvgImageAccess implements ImageAccess {
 
@@ -28,7 +29,7 @@ public class SvgImageAccess implements ImageAccess {
   }
 
   @Override
-  public void draw(Canvas canvas, Paint paint) {
+  public void draw(Canvas canvas, Paint paint, ImageRendering imageRendering) {
     canvas.drawPicture(this.picture, null, paint);
   }
 

@@ -1,8 +1,8 @@
 @import "craftingdeadimmerse:theme";
 
 #home {
-    margin: 5;
-    width: 20;
+    margin: 5px;
+    width: 20px;
     aspect-ratio: 1;
 }
 
@@ -11,20 +11,20 @@
 }
 
 #play {
-    margin: 5;
-    width: 18;
+    margin: 5px;
+    width: 18px;
     aspect-ratio: 1;
 }
 
 #settings {
-    margin: 5;
-    width: 12;
+    margin: 5px;
+    width: 12px;
     aspect-ratio: 1;
 }
 
 #quit {
-    margin: 5;
-    width: 12;
+    margin: 5px;
+    width: 12px;
     aspect-ratio: 1;
 }
 
@@ -36,28 +36,93 @@ MainMenuView {
     flex-direction: row;
 }
 
-MainMenuView>#content {
+#content {
     width: 100%;
     height: 100%;
-    margin-left: 32;
+    margin-left: 32px;
+    margin-right: 32px;
 }
 
-MainMenuView>#content>* {
+#content>* {
     width: 100%;
     height: 100%;
     position: absolute;
 }
 
-MainMenuView>#side-bar {
-    border-right-width: 1;
+.side-bar {
     height: 100%;
-    width: 32;
-    position: absolute;
+    align-items: center;
     background-color: rgba(119, 119, 119, 0.35);
+}
+
+#profile-bar {
+    width: 120px;
+    position: absolute;
+    right: 0px;
+    transition: -bliss-x-translation 250ms;
+    -bliss-x-translation: 88;
+}
+
+#profile-bar:hover {
+    -bliss-x-translation: 0;
+}
+
+#profile {
+    flex-direction: row;
+    width: 100%;
+    height: 32px;
+    padding: 3px;
+}
+
+.shadow {
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.3), 0 6px 20px 0 rgba(0, 0, 0, 0.29);
+}
+
+#avatar {
+    width: 26px;
+    aspect-ratio: 1;
+    margin-right: 3px;
+    box-sizing: border-box;
+}
+
+.profile-name {
+    font-family: 'Stratum2 Medium';
+}
+
+#rank {
+    flex-direction: row;
+    padding: 8px;
+    width: 100%;
+    height: 32px;
+}
+
+#rank-icon {
+    image-rendering: crisp-edges;
+    aspect-ratio: 1;
+    width: 16px;
+    margin-right: 8px;
+}
+
+#profile-bar TextView {
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 1);
+}
+
+#profile-bar>#profile #name {
+    font-size: 9;
+}
+
+#profile-bar>#profile>#profile-text {
+    flex-grow: 1;
+}
+
+#menu-bar {
+    width: 32px;
+    position: absolute;
+    border-right-width: 1px;
     border-right-color: rgba(181, 181, 181, 0.5);
 }
 
-MainMenuView>#entity-container {
+#entity-container {
     width: 25%;
     height: 50%;
     top: 30%;
@@ -67,7 +132,7 @@ MainMenuView>#entity-container {
     justify-content: center;
 }
 
-MainMenuView>#entity-container>EntityView {
+#entity-container>EntityView {
     aspect-ratio: 1;
     width: 100%;
     height: 100%;
@@ -83,10 +148,10 @@ HomeView {
     z-index: -2;
 }
 
-HomeView>#news {
+#news {
     width: 45%;
     height: 75%;
-    padding: 10;
+    padding: 10px;
     margin-left: 10%;
     overflow: scroll;
     background-color: rgba(119, 119, 119, 0.35);
@@ -101,36 +166,36 @@ PlayView {
     background-color: rgba(119, 119, 119, 0.35);
 }
 
-PlayView>#content {
+PlayView>#play-content {
     flex-grow: 1;
 }
 
-PlayView>#content>* {
+PlayView>#play-content>* {
     flex-grow: 1;
 }
 
-PlayView>#content>#official>TabsView {
-    height: 20;
+PlayView>#play-content>#official>TabsView {
+    height: 20px;
 }
 
-PlayView>#content>#official>#official-content {
+PlayView>#play-content>#official>#official-content {
     flex-grow: 1;
 }
 
 PlayView>#title {
-    height: 30;
-    padding-top: 6;
-    padding-bottom: 6;
-    margin-left: 10;
+    height: 30px;
+    padding-top: 6px;
+    padding-bottom: 6px;
+    margin-left: 10px;
     font-size: 14;
     font-family: 'Stratum2 Regular';
 }
 
 PlayView>DropdownView {
-    width: 100;
-    height: 21;
-    margin: 2;
-    margin-left: 10;
+    width: 100px;
+    height: 21px;
+    margin: 2px;
+    margin-left: 10px;
 }
 
 ServerListView,
@@ -141,10 +206,8 @@ WorldListView {
 }
 
 /* Button section */
-ServerListView>#controls,
-MutableServerListView>#controls,
-WorldListView>#controls {
-    height: 56;
+.list-controls {
+    height: 56px;
     flex-shrink: 0;
     justify-content: center;
     align-items: center;
@@ -152,39 +215,35 @@ WorldListView>#controls {
 }
 
 /* Button rows */
-ServerListView>#controls>*,
-MutableServerListView>#controls>*,
-WorldListView>#controls>* {
-    width: 220;
+.list-controls>* {
+    width: 220px;
     flex-direction: row;
     align-items: center;
 }
 
 /* Buttons */
-ServerListView>#controls>ParentView>*,
-MutableServerListView>#controls>ParentView>*,
-WorldListView>#controls>ParentView>* {
-    margin: 3;
+.list-controls>ParentView>* {
+    margin: 3px;
     flex-basis: 0;
 }
 
-ServerListView>#content,
-MutableServerListView>#content {
+.list-content {
     flex-grow: 1;
-    padding-bottom: 7;
+    padding-top: 7px;
+    padding-bottom: 7px;
     overflow: scroll;
     align-items: center;
 }
 
 ServerItemView {
     width: 90%;
-    margin-top: 3;
-    margin-left: 7;
-    margin-right: 7;
-    padding-left: 10;
-    padding-right: 20;
-    height: 22;
-    max-width: 520;
+    margin-top: 3px;
+    margin-left: 7px;
+    margin-right: 7px;
+    padding-left: 10px;
+    padding-right: 20px;
+    height: 22px;
+    max-width: 520px;
     flex-direction: row;
     justify-content: flex-end;
     align-items: center;
@@ -202,49 +261,41 @@ ServerItemView>#motd {
 
 ServerItemView>#ping,
 ServerItemView>#players {
-    flex-basis: 60;
-    margin-left: 10;
+    flex-basis: 60px;
+    margin-left: 10px;
 }
 
 ServerItemView>#map {
-    flex-basis: 90;
+    flex-basis: 90px;
 }
 
-MutableServerListView>#controls>* {
-    width: 300;
-}
-
-WorldListView>#content {
-    flex-grow: 1;
-    padding-top: 4;
-    padding-bottom: 10;
-    overflow: scroll;
-    align-items: center;
+MutableServerListView>.list-controls>* {
+    width: 300px;
 }
 
 WorldItemView {
-    width: 300;
-    height: 46;
-    margin-top: 6;
-    padding: 4;
+    width: 300px;
+    height: 46px;
+    margin-top: 6px;
+    padding: 4px;
     flex-direction: row;
     flex-shrink: 0;
     box-sizing: border-box;
 }
 
 WorldItemView>#icon {
-    height: 38;
-    width: 38;
-    margin-right: 5;
+    height: 38px;
+    width: 38px;
+    margin-right: 5px;
 }
 
 WorldItemView>#texts {
-    width: 120;
+    width: 120px;
     flex-grow: 1;
-    padding-bottom: 1;
+    padding-bottom: 1px;
     justify-content: center;
 }
 
 WorldItemView>#texts>#details {
-    margin-top: 2;
+    margin-top: 2px;
 }

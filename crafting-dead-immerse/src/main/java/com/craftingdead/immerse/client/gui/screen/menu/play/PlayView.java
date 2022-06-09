@@ -44,7 +44,7 @@ import sm0keysa1m0n.bliss.view.View;
 
 public class PlayView extends ParentView implements TransitionView {
 
-  private final ParentView content = new ParentView(new Properties().id("content"));
+  private final ParentView content = new ParentView(new Properties().id("play-content"));
   private final ParentView officialContent =
       new ParentView(new Properties().id("official-content"));
 

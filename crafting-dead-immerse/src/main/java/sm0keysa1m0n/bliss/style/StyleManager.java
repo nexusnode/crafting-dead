@@ -6,9 +6,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import sm0keysa1m0n.bliss.style.parser.ParserException;
 import sm0keysa1m0n.bliss.style.parser.TransitionParser;
 
 public class StyleManager {
+
+  private static final Logger logger = LoggerFactory.getLogger(StyleManager.class);
 
   private final Map<String, PropertyDispatcher<?>> properties = new HashMap<>();
   private final List<PropertyDispatcher<?>> listeners = new ArrayList<>();
@@ -64,7 +69,7 @@ public class StyleManager {
     }
   }
 
-  public void parseInlineCSS(String css) {
+  public void parseInline(String css) throws ParserException {
     for (var propertyStr : css.split(";")) {
       var split = propertyStr.split(":", 2);
       var propertyName = split[0].trim();
@@ -95,15 +100,18 @@ public class StyleManager {
 
     this.properties.values().forEach(PropertyDispatcher::reset);
 
-    for (var entry : rules.entrySet()) {
-      var rule = entry.getKey();
-      var nodeStates = entry.getValue();
+    for (var ruleEntry : rules.entrySet()) {
+      var rule = ruleEntry.getKey();
+      var nodeStates = ruleEntry.getValue();
       TransitionParser transitionParser = null;
       for (var property : rule.properties()) {
         var dispatcher = this.properties.get(property.name());
         if (dispatcher != null) {
-          dispatcher.defineState(property.value(), rule.selector().getSpecificity(),
-              nodeStates);
+          try {
+            dispatcher.defineState(property.value(), rule.selector().getSpecificity(), nodeStates);
+          } catch (ParserException e) {
+            logger.warn("Failed to parse property: {}", property, e);
+          }
           continue;
         }
 
@@ -112,12 +120,21 @@ public class StyleManager {
             transitionParser = new TransitionParser();
           }
 
-          transitionParser.tryParse(property.name(), property.value());
+          try {
+            transitionParser.tryParse(property.name(), property.value());
+          } catch (ParserException e) {
+            logger.warn("Failed to parse transition property: {}", property, e);
+            continue;
+          }
         }
       }
 
       if (transitionParser != null) {
-        transitionParser.build().ifPresent(transitions::add);
+        try {
+          transitionParser.build().ifPresent(transitions::add);
+        } catch (ParserException e) {
+          logger.warn("Failed to parse transition: ", e);
+        }
       }
     }
 

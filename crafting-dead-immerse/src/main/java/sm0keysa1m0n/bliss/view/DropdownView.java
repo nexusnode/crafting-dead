@@ -423,7 +423,7 @@ public class DropdownView extends View {
       try (var paint = new Paint()) {
         paint.setColor(Color.multiplyAlpha(style.getColor() == null
             ? DropdownView.this.getStyle().color.get().valueHex()
-            : style.getColor().getValue() + (255 << 24), alpha));
+            : style.getColor().getValue() + Color.FULL_ALPHA, alpha));
         canvas.translate(4 * scale,
             this.textLine.getHeight() + (height * scale) / 2.0F
                 - this.textLine.getXHeight() * 2.0F);

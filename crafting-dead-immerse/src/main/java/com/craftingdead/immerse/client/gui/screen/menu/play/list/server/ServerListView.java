@@ -52,7 +52,7 @@ public class ServerListView extends ParentView {
     super(new Properties());
     this.serverList = serverList;
 
-    this.listView = new ParentView(new Properties().id("content"));
+    this.listView = new ParentView(new Properties().styleClasses("list-content"));
     this.addChild(this.listView);
 
     this.playButton = Theme.createGreenButton(
@@ -60,7 +60,7 @@ public class ServerListView extends ParentView {
         () -> this.getSelectedItem().ifPresent(ServerItemView::connect));
     this.playButton.setEnabled(false);
 
-    this.controlsView = new ParentView(new ParentView.Properties().id("controls"));
+    this.controlsView = new ParentView(new ParentView.Properties().styleClasses("list-controls"));
     this.controlsView.addChild(this.createTopRowControls());
     this.controlsView.addChild(this.createBottomRowControls());
 

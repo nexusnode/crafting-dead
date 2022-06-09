@@ -1,5 +1,5 @@
 *:focus-visible {
-    outline-width: 3;
+    outline-width: 3px;
     outline-color: rgb(170, 220, 240);
 }
 
@@ -13,7 +13,7 @@ TabsView {
 }
 
 TabsView>* {
-    width: 60;
+    width: 60px;
     height: 100%;
     justify-content: center;
 }

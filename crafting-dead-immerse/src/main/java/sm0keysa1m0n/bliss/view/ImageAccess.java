@@ -4,6 +4,7 @@ import io.github.humbleui.skija.Canvas;
 import io.github.humbleui.skija.Image;
 import io.github.humbleui.skija.Paint;
 import io.github.humbleui.types.Point;
+import sm0keysa1m0n.bliss.ImageRendering;
 
 public interface ImageAccess extends AutoCloseable {
 
@@ -11,7 +12,7 @@ public interface ImageAccess extends AutoCloseable {
 
   void prepare(float width, float height);
 
-  void draw(Canvas canvas, Paint paint);
+  void draw(Canvas canvas, Paint paint, ImageRendering imageRendering);
 
   @Override
   void close();

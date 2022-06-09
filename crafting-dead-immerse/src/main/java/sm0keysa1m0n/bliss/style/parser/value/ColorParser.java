@@ -1,61 +1,58 @@
 package sm0keysa1m0n.bliss.style.parser.value;
 
-import java.text.NumberFormat;
-import java.util.regex.Pattern;
+import org.jetbrains.annotations.Nullable;
 import sm0keysa1m0n.bliss.Color;
+import sm0keysa1m0n.bliss.style.parser.ParserException;
+import sm0keysa1m0n.bliss.style.parser.StyleReader;
 
-public class ColorParser implements ValueParser<Color> {
+public class ColorParser {
 
-  public static final ColorParser INSTANCE = new ColorParser();
-
-  private final NumberFormat colorFormat;
-
-  private final Pattern hexColorPattern = Pattern.compile("^#\\d{6}");
-  private final Pattern hexAlphaColorPattern = Pattern.compile("^#\\d{6}\\s+\\d{2}%");
-  private final Pattern rgbColorPattern =
-      Pattern.compile("^rgb\\((\\s?\\d+\\.?\\d+%?\\s?,){2}(\\s?\\d+\\.?\\d+%?\\s?)\\)");
-  private final Pattern rgbaColorPattern =
-      Pattern.compile("^rgba\\((\\s?\\d+\\.?\\d+%?\\s?,){2,3}(\\s?\\d+\\.?\\d+%?\\s?)\\)");
-
-  private ColorParser() {
-    this.colorFormat = NumberFormat.getInstance();
-    this.colorFormat.setMinimumFractionDigits(0);
-    this.colorFormat.setMaximumFractionDigits(1);
+  private static String doubleChars(String input) {
+    var builder = new StringBuilder();
+    for (int i = 0; i < input.length(); i++) {
+      var ch = input.charAt(i);
+      builder.append(ch);
+      builder.append(ch);
+    }
+    return builder.toString();
   }
 
-  @Override
-  public int validate(String style) {
-    if (this.hexColorPattern.matcher(style).matches()) {
-      if (this.hexAlphaColorPattern.matcher(style).matches()) {
-        return style.substring(0, style.indexOf("%") + 1).length();
-      }
-      return 7;
-    }
-    if (!this.rgbColorPattern.matcher(style).matches()
-        && !this.rgbaColorPattern.matcher(style).matches()) {
-      return 0;
-    }
-    return style.substring(0, style.indexOf(")") + 1).length();
+  private static ParserException invalidHexColor(int index) {
+    return new ParserException("Invalid hex color at index " + index);
   }
 
-  @Override
-  public Color parse(String style) {
-    // Hexa Color ex: #FF0011 20%
-    if (style.startsWith("#")) {
-      if (!style.contains(" ")) {
-        return Color.parseWithFullAlpha(style);
-      } else {
-        var split = style.split(" ");
-        var rgb = split[0];
-        var alpha = Float.parseFloat(split[1].substring(0, split[1].length() - 1)) / 100;
-        return Color.parseWithAlpha(rgb, alpha);
+  @Nullable
+  public static Color parse(StyleReader reader) throws ParserException {
+    var start = reader.getCursor();
+
+    // Hex color eg: #FF0011
+    if (reader.peek() == '#') {
+      reader.skip();
+      var hexValue = reader.readUnquotedString();
+      if (hexValue == null) {
+        throw invalidHexColor(start);
+      }
+
+      try {
+        return Color.create(switch (hexValue.length()) {
+          case 3 -> Integer.parseUnsignedInt(doubleChars(hexValue), 16) + Color.FULL_ALPHA;
+          case 4 -> Integer.parseUnsignedInt(doubleChars(hexValue), 16);
+          case 6 -> Integer.parseUnsignedInt(hexValue, 16) + Color.FULL_ALPHA;
+          case 8 -> Integer.parseUnsignedInt(hexValue, 16);
+          default -> throw invalidHexColor(start);
+        });
+      } catch (NumberFormatException e) {
+        throw invalidHexColor(start);
       }
     }
+
+    var func = reader.readFunction();
+
     // RGB or RGBA Color ex: rgba(255, 255, 255, 255)
-    if (style.startsWith("rgb")) {
-      var alpha = style.startsWith("rgba");
+    if (func != null) {
+      var alpha = func.name().equals("rgba");
 
-      var colorNames = style.substring(alpha ? 5 : 4, style.length() - 1).split(",");
+      var colorNames = func.arguments().split(",");
 
       var redValue = 0.0F;
       var greenValue = 0.0F;
@@ -86,11 +83,17 @@ public class ColorParser implements ValueParser<Color> {
       return Color.create(redValue, greenValue, blueValue, alphaValue);
     }
 
-    var color = NamedColors.getColor(style);
+    var keyword = reader.readUnquotedString();
+    if (keyword == null) {
+      return null;
+    }
+
+    var color = NamedColors.getColor(keyword);
     if (color != null) {
       return color;
     }
 
-    throw new RuntimeException("Invalid color: " + style);
+    reader.setCursor(start);
+    return null;
   }
 }

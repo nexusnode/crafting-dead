@@ -1,23 +1,30 @@
 package sm0keysa1m0n.bliss.style.parser.value;
 
+import org.jetbrains.annotations.Nullable;
+import net.minecraft.ResourceLocationException;
 import net.minecraft.resources.ResourceLocation;
+import sm0keysa1m0n.bliss.style.parser.ParserException;
+import sm0keysa1m0n.bliss.style.parser.StyleReader;
 
-public class ResourceLocationParser implements ValueParser<ResourceLocation> {
+public class ResourceLocationParser {
 
-  public static final ResourceLocationParser INSTANCE = new ResourceLocationParser();
+  @Nullable
+  public static ResourceLocation parse(StyleReader reader) throws ParserException {
+    var start = reader.getCursor();
 
-  private ResourceLocationParser() {}
+    while (reader.canRead() && ResourceLocation.isAllowedInResourceLocation(reader.peek())) {
+      reader.skip();
+    }
 
-  @Override
-  public int validate(String style) {
-    return style.substring(0, style.indexOf(')') + 1).length();
-  }
+    if (start == reader.getCursor()) {
+      return null;
+    }
 
-  @Override
-  public ResourceLocation parse(String style) {
-    var pathWithNamespace = style.split("\\(");
-    var namespace = pathWithNamespace[0].trim();
-    var path = pathWithNamespace[1].replace(")", "").replace("\"", "");
-    return new ResourceLocation(namespace, path);
+    var value = reader.getString().substring(start, reader.getCursor());
+    try {
+      return new ResourceLocation(value);
+    } catch (ResourceLocationException e) {
+      throw new ParserException("Invalid resource location: " + value);
+    }
   }
 }

@@ -3,6 +3,7 @@ package sm0keysa1m0n.bliss.style.parser;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -33,52 +34,57 @@ public class StyleSheetParser {
 
   public static ParseResult loadStyleSheet(InputStream inputStream, FontLoader fontLoader)
       throws IOException {
+    try (var reader = new InputStreamReader(inputStream, StandardCharsets.UTF_8)) {
+      return loadStyleSheet(reader, fontLoader);
+    }
+  }
+
+  public static ParseResult loadStyleSheet(Reader reader, FontLoader fontLoader)
+      throws IOException {
     var list = new StyleList();
     var dependencies = new ArrayList<ResourceLocation>();
-    try (var reader = new InputStreamReader(inputStream, StandardCharsets.UTF_8)) {
-      var iterator = new NumberedLineIterator(reader);
-      boolean insideComment = false;
-      while (iterator.hasNext()) {
-        var line = iterator.nextLine().trim();
-        if (StringUtils.isEmpty(line)) {
-          continue;
-        }
-
-        if (line.startsWith("/*")) {
-          insideComment = !line.endsWith("*/");
-          continue;
-        }
-
-        if (insideComment && line.startsWith("*/")) {
-          insideComment = false;
-          continue;
-        }
-
-        if (line.startsWith("@")) {
-          if (line.startsWith(FONT_FACE)) {
-            readFontFace(iterator, list, fontLoader);
-          } else if (line.startsWith(IMPORT)) {
-            dependencies.add(new ResourceLocation(line.substring(IMPORT.length())
-                .replace("'", "")
-                .replace("\"", "")
-                .replace(";", "")
-                .trim()));
-          } else {
-            logger.warn("Unknown at-rule: {}", line);
-          }
-          continue;
-        }
-
-
-        var selectors = StyleSelectorParser.readSelectors(line, iterator);
-        var properties = readBlock(iterator);
-        for (var selector : selectors) {
-          list.addRule(selector, properties);
-        }
+    var iterator = new NumberedLineIterator(reader);
+    boolean insideComment = false;
+    while (iterator.hasNext()) {
+      var line = iterator.nextLine().trim();
+      if (StringUtils.isEmpty(line)) {
+        continue;
       }
 
-      return new ParseResult(list, dependencies);
+      if (line.startsWith("/*")) {
+        insideComment = !line.endsWith("*/");
+        continue;
+      }
+
+      if (insideComment && line.startsWith("*/")) {
+        insideComment = false;
+        continue;
+      }
+
+      if (line.startsWith("@")) {
+        if (line.startsWith(FONT_FACE)) {
+          readFontFace(iterator, list, fontLoader);
+        } else if (line.startsWith(IMPORT)) {
+          dependencies.add(new ResourceLocation(line.substring(IMPORT.length())
+              .replace("'", "")
+              .replace("\"", "")
+              .replace(";", "")
+              .trim()));
+        } else {
+          logger.warn("Unknown at-rule: {}", line);
+        }
+        continue;
+      }
+
+
+      var selectors = StyleSelectorParser.readSelectors(line, iterator);
+      var properties = readBlock(iterator);
+      for (var selector : selectors) {
+        list.addRule(selector, properties);
+      }
     }
+
+    return new ParseResult(list, dependencies);
   }
 
   public record ParseResult(StyleList styleList, Collection<ResourceLocation> dependencies) {}
@@ -131,7 +137,7 @@ public class StyleSheetParser {
     if (!content.hasNext()) {
       return Set.of();
     }
-    var currentLine = content.nextLine();
+    var currentLine = content.nextLine().strip();
     var elements = new LinkedHashSet<StyleProperty>();
     while (!StringUtils.contains(currentLine, "}")) {
       if (StringUtils.contains(currentLine, "{")) {
@@ -140,10 +146,15 @@ public class StyleSheetParser {
         return Set.of();
       }
       if (currentLine.isBlank()) {
-        currentLine = content.nextLine();
+        currentLine = content.nextLine().strip();
         continue;
       }
-      var propertyParts = currentLine.replace(';', ' ').strip().split(":", 2);
+      var propertyBuilder = new StringBuilder(currentLine);
+      while (!currentLine.endsWith(";")) {
+        currentLine = content.nextLine().strip();
+        propertyBuilder.append(currentLine);
+      }
+      var propertyParts = propertyBuilder.toString().replace(';', ' ').strip().split(":", 2);
       var property = new StyleProperty(propertyParts[0].strip(), propertyParts[1].strip());
       // Replace existing.
       elements.remove(property);
@@ -151,7 +162,7 @@ public class StyleSheetParser {
       if (!content.hasNext()) {
         return Set.of();
       }
-      currentLine = content.nextLine();
+      currentLine = content.nextLine().strip();
     }
     return elements;
   }

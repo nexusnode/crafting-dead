@@ -2,10 +2,12 @@ package sm0keysa1m0n.bliss.style.parser.value;
 
 import org.jdesktop.core.animation.timing.Interpolator;
 import org.jdesktop.core.animation.timing.interpolators.LinearInterpolator;
-import org.jdesktop.core.animation.timing.interpolators.SplineInterpolator;
+import org.jetbrains.annotations.Nullable;
 import sm0keysa1m0n.bliss.animation.CubicBezierInterpolator;
+import sm0keysa1m0n.bliss.style.parser.ParserException;
+import sm0keysa1m0n.bliss.style.parser.StyleReader;
 
-public class InterpolatorParser implements ValueParser<Interpolator> {
+public class InterpolatorParser {
 
   public static final Interpolator EASE =
       new CubicBezierInterpolator(0.25D, 0.1D, 0.25D, 1.0D);
@@ -16,57 +18,36 @@ public class InterpolatorParser implements ValueParser<Interpolator> {
   public static final Interpolator EASE_IN_OUT =
       new CubicBezierInterpolator(0.42D, 0.0D, 0.58D, 1.0D);
 
-  public static final InterpolatorParser INSTANCE = new InterpolatorParser();
+  @Nullable
+  public static Interpolator parse(StyleReader reader) throws ParserException {
+    var func = reader.readFunction();
+    if (func != null) {
+      return switch (func.name()) {
+        case "cubic-bezier" -> {
+          var points = func.arguments().split(",");
+          var pointsArray = new double[4];
+          for (int i = 0; i < pointsArray.length; i++) {
+            pointsArray[i] = Double.parseDouble(points[i].strip());
+          }
 
-  private InterpolatorParser() {}
-
-  @Override
-  public int validate(String style) {
-    if (style.startsWith("ease")) {
-      return "ease".length();
-    } else if (style.startsWith("linear")) {
-      return "linear".length();
-    } else if (style.startsWith("ease-in")) {
-      return "ease-in".length();
-    } else if (style.startsWith("ease-out")) {
-      return "ease-out".length();
-    } else if (style.startsWith("ease-in-out")) {
-      return "ease-in-out".length();
+          yield new CubicBezierInterpolator(
+              pointsArray[0], pointsArray[1], pointsArray[2], pointsArray[3]);
+        }
+        default -> throw new ParserException("Unknown interpolator: " + func.name());
+      };
     }
 
-    if (style.startsWith("cubic-bezier")) {
-      return style.indexOf(')') + 1;
+    var keyword = reader.readUnquotedString();
+    if (keyword == null) {
+      return null;
     }
 
-    throw new IllegalStateException("Unsupported timing function: " + style);
-  }
-
-  @Override
-  public Interpolator parse(String style) {
-    if (style.equals("ease")) {
-      return EASE;
-    } else if (style.equals("linear")) {
-      return LinearInterpolator.getInstance();
-    } else if (style.equals("ease-in")) {
-      return EASE_IN;
-    } else if (style.equals("ease-out")) {
-      return EASE_OUT;
-    } else if (style.equals("ease-in-out")) {
-      return EASE_IN_OUT;
-    }
-
-    if (style.startsWith("cubic-bezier")) {
-      var points =
-          style.substring(style.indexOf('('), style.indexOf(')')).replace(" ", "").split(",");
-
-      var pointsArray = new double[4];
-      for (int i = 0; i < pointsArray.length; i++) {
-        pointsArray[i] = Double.parseDouble(points[i]);
-      }
-
-      return new SplineInterpolator(pointsArray[0], pointsArray[1], pointsArray[2], pointsArray[3]);
-    }
-
-    throw new IllegalStateException("Unsupported timing function: " + style);
+    return switch (keyword) {
+      case "linear" -> LinearInterpolator.getInstance();
+      case "ease" -> EASE;
+      case "ease-in" -> EASE_IN;
+      case "ease-out" -> EASE_OUT;
+      default -> throw new ParserException("Unknown interpolator: " + keyword);
+    };
   }
 }

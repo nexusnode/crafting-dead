@@ -1,5 +1,6 @@
 package sm0keysa1m0n.bliss.view;
 
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -17,11 +18,12 @@ import com.google.common.collect.ImmutableSet;
 import com.mojang.blaze3d.vertex.PoseStack;
 import io.github.humbleui.skija.Canvas;
 import io.github.humbleui.skija.ClipMode;
+import io.github.humbleui.skija.FilterBlurMode;
+import io.github.humbleui.skija.MaskFilter;
 import io.github.humbleui.skija.Paint;
 import io.github.humbleui.skija.PaintMode;
 import io.github.humbleui.types.Point;
 import io.github.humbleui.types.RRect;
-import io.github.humbleui.types.Rect;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
@@ -274,7 +276,8 @@ public class View implements Comparable<View>, StyleNode {
     final var borderBottomLeftRadius =
         this.unscale(this.style.borderBottomLeftRadius.get(), this.unscaleBorder);
 
-    final var outlineWidth = this.unscale(this.style.outlineWidth.get(), this.unscaleOutline);
+    final var outlineWidth =
+        this.unscale(this.style.outlineWidth.get().fixed(), this.unscaleOutline);
 
     final var radii = new float[] {
         borderTopLeftRadius * scale,
@@ -300,16 +303,10 @@ public class View implements Comparable<View>, StyleNode {
       }
     }
 
+    this.drawBackdrop(canvas, rect);
+
     if (clip) {
       canvas.clipRRect(rect, true);
-      this.drawBackdrop(canvas, rect);
-    } else {
-      canvas.save();
-      {
-        canvas.clipRRect(rect, true);
-        this.drawBackdrop(canvas, rect);
-      }
-      canvas.restore();
     }
 
     var innerRect = RRect.makeComplexLTRB(
@@ -343,11 +340,57 @@ public class View implements Comparable<View>, StyleNode {
       paint.setColor(this.style.backgroundColor.get().multiplied(this.getAlpha()));
       canvas.drawRRect(rect, paint);
     }
+
+    if (clip) {
+      this.drawBoxShadows(canvas, rect, true);
+    } else {
+      canvas.save();
+      {
+        canvas.clipRRect(rect, true);
+        this.drawBoxShadows(canvas, rect, true);
+      }
+      canvas.restore();
+    }
   }
 
-  private void drawBackdrop(Canvas canvas, Rect rect) {
+  private static RRect inflate(RRect rect, float spreadX, float spreadY) {
+    var midSpread = (spreadX + spreadY) / 2.0F;
+    float[] radii = Arrays.copyOf(rect._radii, rect._radii.length);
+    for (int i = 0; i < radii.length; ++i) {
+      radii[i] = Math.max(0.0F, radii[i] + midSpread);
+    }
+    return new RRect(rect._left - spreadX, rect._top - spreadY,
+        Math.max(rect._left - spreadX, rect._right + spreadX),
+        Math.max(rect._top - spreadY, rect._bottom + spreadY),
+        radii);
+  }
+
+  private void drawBoxShadows(Canvas canvas, RRect rect, boolean inset) {
+    var shadows = this.style.boxShadow.get();
+    for (var shadow : shadows) {
+      try (var paint = new Paint()) {
+        paint.setColor(shadow.color().multiplied(this.getAlpha()));
+        if (shadow.blurRadius() > 0) {
+          paint.setMaskFilter(MaskFilter.makeBlur(FilterBlurMode.NORMAL, shadow.blurRadius()));
+        }
+        if (shadow.inset() && inset) {
+          var delta = new Point(10 + Math.abs(shadow.offsetX()), 10 + Math.abs(shadow.offsetY()));
+          var inner = inflate(rect, -shadow.spreadRadius(), -shadow.spreadRadius())
+              .offset(shadow.offsetX(), shadow.offsetY());
+          var outer = inflate(rect, delta.getX(), delta.getY());
+          canvas.drawDRRect(outer, inner, paint);
+        } else if (!shadow.inset() && !inset) {
+          canvas.drawRRect(inflate(rect, shadow.spreadRadius(), shadow.spreadRadius())
+              .offset(shadow.offsetX(), shadow.offsetY()), paint);
+        }
+      }
+    }
+  }
+
+  private void drawBackdrop(Canvas canvas, RRect rect) {
     var backdropFilters = this.style.backdropFilter.get();
     if (backdropFilters.length == 0) {
+      this.drawBoxShadows(canvas, rect, false);
       return;
     }
 
@@ -358,7 +401,20 @@ public class View implements Comparable<View>, StyleNode {
       for (var filter : backdropFilters) {
         filter.apply(paint);
       }
-      canvas.drawImageRect(image, intRect.toRect(), paint);
+
+      canvas.save();
+      {
+        canvas.clipRRect(rect, ClipMode.DIFFERENCE);
+        this.drawBoxShadows(canvas, rect, false);
+      }
+      canvas.restore();
+
+      canvas.save();
+      {
+        canvas.clipRRect(rect, true);
+        canvas.drawImageRect(image, intRect.toRect(), paint);
+      }
+      canvas.restore();
     } catch (RuntimeException e) {
       // TODO consume this until makeImageSnapshot can return null.
     }

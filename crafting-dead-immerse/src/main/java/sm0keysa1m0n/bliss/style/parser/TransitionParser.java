@@ -34,7 +34,7 @@ public class TransitionParser {
     this.interpolatorParser = interpolatorParser;
   }
 
-  public boolean tryParse(String name, String value) {
+  public boolean tryParse(String name, String value) throws ParserException {
     if (name.equals("transition")) {
       var transitions = value.split(",");
       for (var transition : transitions) {
@@ -48,7 +48,7 @@ public class TransitionParser {
 
         if (values.length == 3) {
           var temp = values[2];
-          if (this.interpolatorParser.validate(temp) > 0) {
+          if (this.interpolatorParser.parse(new StyleReader(value)) != null) {
             this.interpolator = temp;
           } else {
             this.delay = temp;
@@ -77,7 +77,7 @@ public class TransitionParser {
       return true;
     }
 
-    if (name.equals("transition-interpolator")) {
+    if (name.equals("transition-timing-function")) {
       this.interpolator = value;
       return true;
     }
@@ -85,7 +85,7 @@ public class TransitionParser {
     return false;
   }
 
-  public Optional<StyleTransition> build() {
+  public Optional<StyleTransition> build() throws ParserException {
     StyleTransition.TargetSelector[] selectors = {StyleTransition.TargetSelector.ALL};
     long[] delays = {0L};
     long[] durations = {0L};
@@ -151,7 +151,7 @@ public class TransitionParser {
       var interpolatorsStr = this.interpolator.split(" ");
       interpolators = new Interpolator[interpolatorsStr.length];
       for (int i = 0; i < interpolatorsStr.length; i++) {
-        interpolators[i] = this.interpolatorParser.parse(interpolatorsStr[i]);
+        interpolators[i] = this.interpolatorParser.parse(new StyleReader(interpolatorsStr[i]));
       }
     }
 

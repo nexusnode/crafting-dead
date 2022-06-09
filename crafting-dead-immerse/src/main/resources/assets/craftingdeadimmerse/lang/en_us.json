@@ -184,6 +184,8 @@
     "menu.play.tab.survival": "Survival",
     "menu.play.tab.tdm": "TDM",
 
+    "view.main_menu.rank": "Ranks coming soon...",
+
     "view.server_list.motd": "MOTD",
     "view.server_list.map": "MAP",
     "view.server_list.ping": "PING",

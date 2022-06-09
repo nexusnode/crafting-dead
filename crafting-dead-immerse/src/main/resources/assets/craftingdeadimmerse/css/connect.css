@@ -15,12 +15,12 @@ ConnectView > #dialog {
 
 ConnectView > #dialog > #status, ConnectView > #dialog > #animation {
     width: 100%;
-    height: 25;
+    height: 25px;
     text-align: center;
 }
 
 ConnectView > #dialog > #cancel-button {
-    width: 150;
-    height: 20;
+    width: 150px;
+    height: 20px;
     flex-grow: 0;
 }

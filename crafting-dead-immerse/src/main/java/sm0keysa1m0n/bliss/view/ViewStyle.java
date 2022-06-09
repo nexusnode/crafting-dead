@@ -4,12 +4,14 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import io.github.humbleui.skija.paragraph.Alignment;
 import io.github.humbleui.skija.paragraph.Shadow;
+import sm0keysa1m0n.bliss.BoxShadow;
 import sm0keysa1m0n.bliss.BoxSizing;
 import sm0keysa1m0n.bliss.Color;
 import sm0keysa1m0n.bliss.Display;
 import sm0keysa1m0n.bliss.Filter;
-import sm0keysa1m0n.bliss.ObjectFit;
+import sm0keysa1m0n.bliss.ImageRendering;
 import sm0keysa1m0n.bliss.Length;
+import sm0keysa1m0n.bliss.ObjectFit;
 import sm0keysa1m0n.bliss.Overflow;
 import sm0keysa1m0n.bliss.PointerEvents;
 import sm0keysa1m0n.bliss.Visibility;
@@ -40,10 +42,10 @@ public class ViewStyle {
   public final StyleableProperty<Float> flexShrink;
   public final StyleableProperty<Length> flexBasis;
   public final StyleableProperty<Float> flex;
-  public final StyleableProperty<Float> borderTopWidth;
-  public final StyleableProperty<Float> borderRightWidth;
-  public final StyleableProperty<Float> borderBottomWidth;
-  public final StyleableProperty<Float> borderLeftWidth;
+  public final StyleableProperty<Length> borderTopWidth;
+  public final StyleableProperty<Length> borderRightWidth;
+  public final StyleableProperty<Length> borderBottomWidth;
+  public final StyleableProperty<Length> borderLeftWidth;
   public final StyleableProperty<Length> top;
   public final StyleableProperty<Length> right;
   public final StyleableProperty<Length> bottom;
@@ -62,6 +64,8 @@ public class ViewStyle {
   public final StyleableProperty<Length> height;
   public final StyleableProperty<Length> minWidth;
   public final StyleableProperty<Length> minHeight;
+  public final StyleableProperty<Length> maxWidth;
+  public final StyleableProperty<Length> maxHeight;
   public final StyleableProperty<Overflow> overflow;
   public final StyleableProperty<Integer> zIndex;
   public final StyleableProperty<Float> xScale;
@@ -70,7 +74,7 @@ public class ViewStyle {
   public final StyleableProperty<Float> yTranslation;
   public final StyleableProperty<Percentage> opacity;
   public final StyleableProperty<Color> backgroundColor;
-  public final StyleableProperty<Float> outlineWidth;
+  public final StyleableProperty<Length> outlineWidth;
   public final StyleableProperty<Color> outlineColor;
   public final StyleableProperty<Float> borderTopLeftRadius;
   public final StyleableProperty<Float> borderTopRightRadius;
@@ -90,6 +94,8 @@ public class ViewStyle {
   public final StyleableProperty<Visibility> visibility;
   public final StyleableProperty<BoxSizing> boxSizing;
   public final StyleableProperty<PointerEvents> pointerEvents;
+  public final StyleableProperty<BoxShadow[]> boxShadow;
+  public final StyleableProperty<ImageRendering> imageRendering;
 
   private final View view;
 
@@ -136,18 +142,18 @@ public class ViewStyle {
             this.forLayout(Layout::setFlex)));
 
     this.registerProperty(this.borderTopWidth =
-        new StyleableProperty<>(view, "border-top-width", Float.class, 0.0F,
-            this.forLayout(Layout::setTopBorderWidth)));
+        new StyleableProperty<>(view, "border-top-width", Length.class, Length.ZERO,
+            this.forLayout((layout, length) -> layout.setTopBorderWidth(length.fixed()))));
     this.registerProperty(this.borderRightWidth =
-        new StyleableProperty<>(view, "border-right-width", Float.class, 0.0F,
-            this.forLayout(Layout::setRightBorderWidth)));
+        new StyleableProperty<>(view, "border-right-width", Length.class, Length.ZERO,
+            this.forLayout((layout, length) -> layout.setRightBorderWidth(length.fixed()))));
     this.registerProperty(this.borderBottomWidth =
-        new StyleableProperty<>(view, "border-bottom-width", Float.class, 0.0F,
-            this.forLayout(Layout::setBottomBorderWidth)));
+        new StyleableProperty<>(view, "border-bottom-width", Length.class, Length.ZERO,
+            this.forLayout((layout, length) -> layout.setBottomBorderWidth(length.fixed()))));
     this.registerProperty(this.borderLeftWidth =
-        new StyleableProperty<>(view, "border-left-width", Float.class, 0.0F,
-            this.forLayout(Layout::setLeftBorderWidth)));
-    this.styleManager.registerProperty(ShorthandDispatcher.create("border-width", Float.class,
+        new StyleableProperty<>(view, "border-left-width", Length.class, Length.ZERO,
+            this.forLayout((layout, length) -> layout.setLeftBorderWidth(length.fixed()))));
+    this.styleManager.registerProperty(ShorthandDispatcher.create("border-width", Length.class,
         ShorthandArgMapper.BOX_MAPPER, this.borderTopWidth, this.borderRightWidth,
         this.borderBottomWidth, this.borderLeftWidth));
 
@@ -244,6 +250,16 @@ public class ViewStyle {
             value -> value.dispatch(
                 view.getLayout()::setMinHeight,
                 view.getLayout()::setMinHeightPercent)));
+    this.registerProperty(this.maxWidth =
+        new StyleableProperty<>(view, "max-width", Length.class, Length.ZERO,
+            value -> value.dispatch(
+                view.getLayout()::setMaxWidth,
+                view.getLayout()::setMaxWidthPercent)));
+    this.registerProperty(this.maxHeight =
+        new StyleableProperty<>(view, "max-height", Length.class, Length.ZERO,
+            value -> value.dispatch(
+                view.getLayout()::setMaxHeight,
+                view.getLayout()::setMaxHeightPercent)));
     this.registerProperty(this.overflow = new StyleableProperty<>(view, "overflow", Overflow.class,
         Overflow.VISIBLE, this.forLayout(Layout::setOverflow)));
 
@@ -270,7 +286,7 @@ public class ViewStyle {
     this.registerProperty(this.backgroundColor =
         new StyleableProperty<>(view, "background-color", Color.class, Color.TRANSPARENT));
     this.registerProperty(this.outlineWidth =
-        new StyleableProperty<>(view, "outline-width", Float.class, 0.0F));
+        new StyleableProperty<>(view, "outline-width", Length.class, Length.ZERO));
     this.registerProperty(this.outlineColor =
         new StyleableProperty<>(view, "outline-color", Color.class, Color.BLACK));
     this.registerProperty(this.borderTopLeftRadius =
@@ -301,7 +317,8 @@ public class ViewStyle {
     this.registerProperty(
         this.color = new StyleableProperty<>(view, "color", Color.class, Color.WHITE));
     this.registerProperty(
-        this.objectFit = new StyleableProperty<>(view, "object-fit", ObjectFit.class, ObjectFit.FILL));
+        this.objectFit =
+            new StyleableProperty<>(view, "object-fit", ObjectFit.class, ObjectFit.FILL));
     this.registerProperty(
         this.fontSize = new StyleableProperty<>(view, "font-size", Integer.class, 11));
     this.registerProperty(this.fontFamily =
@@ -318,6 +335,11 @@ public class ViewStyle {
         new StyleableProperty<>(view, "box-sizing", BoxSizing.class, BoxSizing.CONTENT_BOX));
     this.registerProperty(this.pointerEvents =
         new StyleableProperty<>(view, "pointer-events", PointerEvents.class, PointerEvents.AUTO));
+    this.registerProperty(this.boxShadow =
+        new StyleableProperty<>(view, "box-shadow", BoxShadow[].class, new BoxShadow[0]));
+    this.registerProperty(this.imageRendering =
+        new StyleableProperty<>(view, "image-rendering", ImageRendering.class,
+            ImageRendering.AUTO));
   }
 
   public StyleManager getStyleManager() {
@@ -346,9 +368,5 @@ public class ViewStyle {
     this.borderRightColor.defineState(color, states);
     this.borderBottomColor.defineState(color, states);
     this.borderLeftColor.defineState(color, states);
-  }
-
-  public void setStyle(String style) {
-    this.styleManager.parseInlineCSS(style);
   }
 }

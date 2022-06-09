@@ -1,5 +1,6 @@
 package sm0keysa1m0n.bliss;
 
+import java.util.Arrays;
 import java.util.Objects;
 import org.jdesktop.core.animation.timing.Evaluator;
 import org.jdesktop.core.animation.timing.evaluators.KnownEvaluators;
@@ -24,6 +25,8 @@ public record Color(float[] value4f, int[] value4i, int valueHex) {
       }
     });
   }
+
+  public static final int FULL_ALPHA = 255 << 24;
 
   public static final Color TRANSPARENT = create(0, 0, 0, 0);
 
@@ -150,6 +153,12 @@ public record Color(float[] value4f, int[] value4i, int valueHex) {
 
   public boolean transparent() {
     return this.alpha() == 0;
+  }
+
+  @Override
+  public String toString() {
+    return "Color[rgba" + Arrays.toString(this.value4i)
+        +  " / #" + Integer.toHexString(this.valueHex) + "]";
   }
 
   @Override

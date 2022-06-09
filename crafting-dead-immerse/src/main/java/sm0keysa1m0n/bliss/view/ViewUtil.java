@@ -21,6 +21,7 @@ import net.minecraft.util.StringDecomposer;
 import net.minecraftforge.common.ForgeHooks;
 import sm0keysa1m0n.bliss.Bliss;
 import sm0keysa1m0n.bliss.Length;
+import sm0keysa1m0n.bliss.style.parser.ParserException;
 
 public class ViewUtil {
 
@@ -34,7 +35,13 @@ public class ViewUtil {
    * @return ourself
    */
   public static void addAll(ParentView parentView, File file) {
-    addAll(parentView, file, view -> view.getStyle().setStyle("flex: 1;"));
+    addAll(parentView, file, view -> {
+      try {
+        view.getStyle().getStyleManager().parseInline("flex: 1;");
+      } catch (ParserException e) {
+        throw new IllegalStateException(e);
+      }
+    });
   }
 
   /**
@@ -87,7 +94,11 @@ public class ViewUtil {
 
             Node styleNode = node.getAttributes().getNamedItem("style");
             if (styleNode != null && styleNode.getNodeValue() != null) {
-              view.getStyle().setStyle(styleNode.getNodeValue());
+              try {
+                view.getStyle().getStyleManager().parseInline(styleNode.getNodeValue());
+              } catch (ParserException e) {
+                logger.warn("Invalid style: {}", styleNode.getNodeValue(), e);
+              }
             }
 
             view.getStyle().width.set(Length.percentage(100.0F));
@@ -95,11 +106,7 @@ public class ViewUtil {
           }
           break;
         case "image":
-          final String width;
-          final String height;
           String url = null;
-          String fitType = null;
-
           Node urlNode = node.getAttributes().getNamedItem("url");
           if (urlNode != null && urlNode.getNodeValue() != null) {
             url = urlNode.getNodeValue();
@@ -108,33 +115,17 @@ public class ViewUtil {
             break;
           }
 
-          Node widthNode = node.getAttributes().getNamedItem("width");
-          if (widthNode != null && widthNode.getNodeValue() != null) {
-            width = widthNode.getNodeValue();
-          } else {
-            width = null;
-          }
-
-          Node heightNode = node.getAttributes().getNamedItem("height");
-          if (heightNode != null && heightNode.getNodeValue() != null) {
-            height = heightNode.getNodeValue();
-          } else {
-            height = null;
-          }
-
-          if (width == null && height == null) {
-            logger.warn("Both width and height cannot be empty for image in {}",
-                file.getAbsolutePath());
-            break;
-          }
-
-          Node fitNode = node.getAttributes().getNamedItem("fit");
-          if (fitNode != null && fitNode.getNodeValue() != null) {
-            fitType = fitNode.getNodeValue();
-          }
           var view = new ImageView(new View.Properties());
-          view.getStyle().setStyle(
-              "width: %s; height: %s; object-fit: %s;".formatted(width, height, fitType));
+
+          Node styleNode = node.getAttributes().getNamedItem("style");
+          if (styleNode != null && styleNode.getNodeValue() != null) {
+            try {
+              view.getStyle().getStyleManager().parseInline(styleNode.getNodeValue());
+            } catch (ParserException e) {
+              logger.warn("Invalid style: {}", styleNode.getNodeValue(), e);
+            }
+          }
+
           parentView.addChild(view);
           DownloadUtil.downloadImage(url)
               .thenAcceptAsync(result -> result.ifPresent(image -> {

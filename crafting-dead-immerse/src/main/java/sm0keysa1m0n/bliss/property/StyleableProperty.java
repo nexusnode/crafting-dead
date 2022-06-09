@@ -10,6 +10,8 @@ import org.jetbrains.annotations.Nullable;
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
 import sm0keysa1m0n.bliss.style.PropertyDispatcher;
 import sm0keysa1m0n.bliss.style.StyleNode;
+import sm0keysa1m0n.bliss.style.parser.ParserException;
+import sm0keysa1m0n.bliss.style.parser.StyleReader;
 import sm0keysa1m0n.bliss.style.parser.value.ValueParser;
 import sm0keysa1m0n.bliss.style.parser.value.ValueParserRegistry;
 import sm0keysa1m0n.bliss.style.selector.StyleNodeState;
@@ -36,34 +38,13 @@ public class StyleableProperty<T> extends BaseProperty<T> implements PropertyDis
   private int order;
 
   @SafeVarargs
-  public StyleableProperty(StyleNode owner, String name, Class<T> type, T defaultValue,
-      Consumer<T>... listeners) {
+  public StyleableProperty(StyleNode owner, String name, Class<T> type,
+      T defaultValue, Consumer<T>... listeners) {
     super(name, type, defaultValue, listeners);
     this.owner = owner;
     this.parser = ValueParserRegistry.getInstance().getParser(type);
     this.baseDefinition = new StateDefinition<>(0, 0, defaultValue, Set.of());
     this.addOrReplace(this.baseDefinition);
-  }
-
-  /**
-   * Varargs version of {@link #defineState(Object, Set)}.
-   */
-  public final void defineState(T value, StyleNodeState... states) {
-    this.defineState(value, Set.of(states));
-  }
-
-  /**
-   * User-facing method to define a state.
-   * 
-   * @param value - the value to associate the state with
-   * @param states - the state
-   */
-  public void defineState(T value, Set<StyleNodeState> states) {
-    this.defineState(1000, value, states);
-  }
-
-  private void defineState(int specificity, T value, Set<StyleNodeState> nodeStates) {
-    this.addOrReplace(new StateDefinition<>(this.order++, specificity, value, nodeStates));
   }
 
   private void addOrReplace(StateDefinition<T> definition) {
@@ -77,13 +58,23 @@ public class StyleableProperty<T> extends BaseProperty<T> implements PropertyDis
   }
 
   @Override
-  public void defineState(String value, int specificity, Set<StyleNodeState> nodeStates) {
+  public void defineState(String value, int specificity, Set<StyleNodeState> nodeStates)
+      throws ParserException {
+    var parsedValue = this.styleCache.get(value);
+    if (parsedValue == null) {
+      parsedValue = this.parser.parse(new StyleReader(value));
+      this.styleCache.put(value, parsedValue);
+    }
+    this.defineState(parsedValue, specificity, nodeStates);
+  }
+
+  @Override
+  public void defineState(T value, int specificity, Set<StyleNodeState> nodeStates) {
     nodeStates.stream()
         .map(StyleNodeState::node)
         .filter(this.trackedNodes::add)
         .forEach(node -> node.getStyleManager().addListener(this));
-    this.defineState(specificity,
-        this.styleCache.computeIfAbsent(value, this.parser::parse), nodeStates);
+    this.addOrReplace(new StateDefinition<>(this.order++, specificity, value, nodeStates));
   }
 
   @Override
@@ -116,11 +107,6 @@ public class StyleableProperty<T> extends BaseProperty<T> implements PropertyDis
     this.definitions.clear();
     this.order = 0;
     this.addOrReplace(this.baseDefinition);
-  }
-
-  @Override
-  public int validate(String style) {
-    return this.parser.validate(style);
   }
 
   public record StateDefinition<T> (int order, int specificity, T value,

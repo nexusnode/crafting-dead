@@ -1,38 +1,29 @@
 package sm0keysa1m0n.bliss.style.parser.value;
 
-import java.util.function.Function;
+import org.jetbrains.annotations.Nullable;
+import sm0keysa1m0n.bliss.style.parser.ParserException;
+import sm0keysa1m0n.bliss.style.parser.StyleReader;
 
+@FunctionalInterface
 public interface ValueParser<T> {
-
-  /**
-   * Validate a css string and return the consumed length. return 0 for an invalid css String.
-   *
-   * @param style css string
-   * @return the consumed chars count
-   */
-  int validate(String style);
 
   /**
    * Parse a css string and return the value.
    *
-   * @param style css string
+   * @param reader - the reader
    * @return the decoded value
    */
-  T parse(String style);
+  @Nullable
+  T parse(StyleReader reader) throws ParserException;
 
-  static <T> ValueParser<T> create(Function<String, Integer> validator,
-      Function<String, T> parser) {
-    return new ValueParser<>() {
-
-      @Override
-      public int validate(String style) {
-        return validator.apply(style);
-      }
-
-      @Override
-      public T parse(String style) {
-        return parser.apply(style);
-      }
-    };
+  @Nullable
+  default T parseAndRollback(StyleReader reader) throws ParserException {
+    var start = reader.getCursor();
+    try {
+      return this.parse(reader);
+    } catch (ParserException e) {
+      reader.setCursor(start);
+      throw e;
+    }
   }
 }

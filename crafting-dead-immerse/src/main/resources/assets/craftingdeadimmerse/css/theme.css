@@ -73,7 +73,7 @@ TextFieldView {
 }
 
 .seperator {
-    height: 1;
+    height: 1px;
     width: 100%;
     background-color: rgba(181, 181, 181, 0.5);
 }
@@ -88,7 +88,7 @@ TextFieldView {
 
 .button {
     flex-grow: 1;
-    height: 20;
+    height: 20px;
     justify-content: center;
     align-items: center;
     transition: background-color 100ms;
@@ -155,16 +155,16 @@ TextFieldView {
 }
 
 .item:hover {
-    outline-width: 1;
+    outline-width: 1px;
     outline-color: rgb(170, 170, 170);
 }
 
 .item:focus {
-    outline-width: 1;
+    outline-width: 1px;
     outline-color: white;
 }
 
 .item:checked {
-    outline-width: 2;
+    outline-width: 2px;
     outline-color: white;
 }

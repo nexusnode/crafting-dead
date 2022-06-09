@@ -78,11 +78,13 @@ public class ImageView extends View {
   public void renderContent(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
     super.renderContent(matrixStack, mouseX, mouseY, partialTicks);
 
+    var canvas = this.graphicsContext.canvas();
+
     if (this.image == null) {
       try (var paint = new Paint()) {
         paint.setAlphaf(this.getAlpha()).setColor(0xFFFFFF).setMode(PaintMode.FILL);
         var scale = this.graphicsContext.scale();
-        this.graphicsContext.canvas().drawRect(Rect.makeXYWH(
+        canvas.drawRect(Rect.makeXYWH(
             this.getScaledContentX() * scale,
             this.getScaledContentY() * scale,
             this.getScaledContentWidth() * scale,
@@ -90,9 +92,6 @@ public class ImageView extends View {
       }
       return;
     }
-
-
-    var canvas = this.graphicsContext.canvas();
 
     canvas.translate(
         this.getScaledContentX() * this.graphicsContext.scale(),
@@ -103,7 +102,7 @@ public class ImageView extends View {
       paint.setColorFilter(ColorFilter.makeBlend(
           this.getStyle().color.get().multiplied(this.getAlpha()),
           BlendMode.MODULATE));
-      this.image.draw(canvas, paint);
+      this.image.draw(canvas, paint, this.getStyle().imageRendering.get());
     }
     canvas.resetMatrix();
   }
