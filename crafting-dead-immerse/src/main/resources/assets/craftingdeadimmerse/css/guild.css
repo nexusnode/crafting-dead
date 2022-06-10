@@ -5,7 +5,7 @@
     height: 90%;
     align-items: center;
     background-color: rgba(54, 54, 54, 0.625);
-    border-radius: 7.5;
+    border-radius: 7.5px;
 }
 
 .dialog {
@@ -123,7 +123,7 @@ YourGuildView>#guild {
 YourGuildView>#guild>#information {
     height: 100%;
     width: 33%;
-    border-right-width: 1;
+    border-right-width: 1px;
     border-right-color: rgba(125, 125, 125, 0.48);
     background-color: rgba(18, 18, 18, 0.25);
 }
