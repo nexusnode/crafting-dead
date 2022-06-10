@@ -28,7 +28,7 @@ public interface GunClient {
    * 
    * @return <code>true</code> if it should be rendered, otherwise <code>false</code>
    */
-  boolean hasCrosshair();
+  boolean isCrosshairEnabled();
 
   /**
    * If the barrel of the gun is currently 'flashing'.

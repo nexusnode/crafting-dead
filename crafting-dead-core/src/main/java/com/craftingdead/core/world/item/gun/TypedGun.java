@@ -18,120 +18,125 @@
 
 package com.craftingdead.core.world.item.gun;
 
+import java.util.Optional;
+import java.util.Random;
+import java.util.Set;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
+import com.craftingdead.core.world.item.GunItem;
 import com.craftingdead.core.world.item.combatslot.CombatSlot;
 import com.craftingdead.core.world.item.gun.ammoprovider.AmmoProvider;
 import com.craftingdead.core.world.item.gun.attachment.Attachment;
 import com.craftingdead.core.world.item.gun.attachment.AttachmentLike;
-import java.util.Optional;
-import java.util.Random;
-import java.util.Set;
-import java.util.function.Function;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
-public class TypedGun<T extends GunType> extends AbstractGun {
+public abstract class TypedGun extends AbstractGun {
 
-  private final T type;
+  private final GunItem item;
+  private GunConfiguration configuration;
 
-  public static <T extends GunType> TypedGun<T> create(
-      Function<TypedGun<T>, ? extends TypedGunClient<? super TypedGun<T>>> clientFactory,
-      ItemStack itemStack, T type) {
-    TypedGun<T> gun = new TypedGun<>(clientFactory, itemStack, type);
-    gun.initialize();
-    return gun;
+  public TypedGun(ItemStack itemStack, GunItem item) {
+    super(itemStack);
+    this.item = item;
+    this.initialize();
   }
 
-  protected <SELF extends TypedGun<T>> TypedGun(
-      Function<SELF, ? extends TypedGunClient<? super SELF>> clientFactory,
-      ItemStack itemStack, T type) {
-    super(clientFactory, itemStack, type.getFireModes());
-    this.type = type;
+  public GunItem getItem() {
+    return this.item;
   }
 
-  public T getType() {
-    return this.type;
+  public GunConfiguration getConfiguration() {
+    this.checkInitialized();
+    return this.configuration;
+  }
+
+  @SuppressWarnings("deprecation")
+  @Override
+  protected void initialize() {
+    this.configuration = this.item.getConfiguration(
+        CraftingDead.getInstance().getModDist().registryAccess());
+    super.initialize();
   }
 
   @Override
   public boolean isAcceptedAttachment(ItemStack itemStack) {
     return CraftingDead.serverConfig.scopeAttachmentsAllowed.get() &&
         (itemStack.getItem() instanceof AttachmentLike
-        && this.type.getAcceptedAttachments()
-            .contains(((AttachmentLike) itemStack.getItem()).asAttachment()));
+            && this.item.getAcceptedAttachments()
+                .contains(((AttachmentLike) itemStack.getItem()).asAttachment()));
   }
 
   @Override
   public SecondaryActionTrigger getSecondaryActionTrigger() {
-    return this.type.getSecondaryActionTrigger();
+    return this.configuration.getSecondaryActionTrigger();
   }
 
   @Override
   public Optional<SoundEvent> getReloadSound() {
-    return this.type.getReloadSound();
+    return this.configuration.getReloadSound();
   }
 
   @Override
   public int getReloadDurationTicks() {
-    return this.type.getReloadDurationTicks();
+    return this.configuration.getReloadDurationTicks();
   }
 
   @Override
   public Set<? extends Item> getAcceptedMagazines() {
-    return this.type.getAcceptedMagazines();
+    return this.item.getAcceptedMagazines();
   }
 
   @Override
   public ItemStack getDefaultMagazineStack() {
-    return this.type.getDefaultMagazine().getDefaultInstance();
+    return this.item.getDefaultMagazine().getDefaultInstance();
   }
 
   @Override
   public CombatSlot getCombatSlot() {
-    return this.type.getCombatSlot();
+    return this.item.getCombatSlot();
   }
 
   @Override
   protected boolean canShoot(LivingExtension<?, ?> living) {
-    return super.canShoot(living) && this.type.getTriggerPredicate().test(this);
+    return super.canShoot(living) && this.item.getTriggerPredicate().test(this);
   }
 
   @Override
   public float getAccuracy(LivingExtension<?, ?> living, Random random) {
-    float accuracy = this.type.getAccuracyPct()
+    float accuracy = this.configuration.getAccuracyPercent()
         * this.getAttachmentMultiplier(Attachment.MultiplierType.ACCURACY);
     return Math.min(living.getModifiedAccuracy(accuracy, random), 1.0F);
   }
 
   @Override
   protected Set<FireMode> getFireModes() {
-    return this.type.getFireModes();
+    return this.configuration.getFireModes();
   }
 
   @Override
   protected AmmoProvider createAmmoProvider() {
-    return this.type.createAmmoProvider();
+    return this.item.createAmmoProvider();
   }
 
   @Override
   protected double getRange() {
-    return this.type.getRange();
+    return this.configuration.getRange();
   }
 
   @Override
   protected long getFireDelayMs() {
-    return this.type.getFireDelayMs();
+    return this.configuration.getFireDelayMs();
   }
 
   @Override
   protected int getRoundsPerShot() {
-    return this.type.getRoundsPerShot();
+    return this.configuration.getRoundsPerShot();
   }
 
   @Override
   protected float getDamage() {
-    return this.type.getDamage();
+    return this.configuration.getDamage();
   }
 }

@@ -18,25 +18,42 @@
 
 package com.craftingdead.core.world.item;
 
-import com.craftingdead.core.CraftingDead;
-import com.craftingdead.core.world.item.gun.Gun;
-import com.craftingdead.core.world.item.gun.GunLike;
-import com.craftingdead.core.world.item.gun.GunType;
-import com.craftingdead.core.world.item.gun.GunTypes;
-import com.craftingdead.core.world.item.gun.TypedGun;
-import com.craftingdead.core.world.item.gun.TypedGunClient;
-import com.craftingdead.core.world.item.gun.attachment.Attachment;
-import com.craftingdead.core.world.item.gun.magazine.Magazine;
+import java.util.EnumMap;
+import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.IntFunction;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import com.craftingdead.core.CraftingDead;
+import com.craftingdead.core.client.animation.Animation;
+import com.craftingdead.core.world.item.combatslot.CombatSlot;
+import com.craftingdead.core.world.item.gun.FireMode;
+import com.craftingdead.core.world.item.gun.Gun;
+import com.craftingdead.core.world.item.gun.GunAnimationEvent;
+import com.craftingdead.core.world.item.gun.GunConfiguration;
+import com.craftingdead.core.world.item.gun.GunConfigurations;
+import com.craftingdead.core.world.item.gun.ammoprovider.AmmoProvider;
+import com.craftingdead.core.world.item.gun.ammoprovider.MagazineAmmoProvider;
+import com.craftingdead.core.world.item.gun.attachment.Attachment;
+import com.craftingdead.core.world.item.gun.magazine.Magazine;
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.Registry;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ProjectileWeaponItem;
 import net.minecraft.world.item.TooltipFlag;
@@ -44,39 +61,97 @@ import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.minecraftforge.registries.RegistryObject;
-import org.jetbrains.annotations.NotNull;
 
 @RegisterGunColor
-public class GunItem extends ProjectileWeaponItem implements GunLike {
+public abstract class GunItem extends ProjectileWeaponItem {
 
-  private final Supplier<? extends GunType> type;
+  private final ResourceKey<GunConfiguration> propertiesKey;
 
-  protected GunItem(RegistryObject<? extends GunType> type) {
-    super(new Properties().stacksTo(1).tab(ModItems.COMBAT_TAB));
+  private final Map<GunAnimationEvent, Function<Gun, Animation>> animations;
 
-    this.type = () -> {
-      //TODO: This is a temporary work around for how datapack registries work,
-      // the gun capability system will need to be reworked - juanmuscaria
-      var registry = CraftingDead.getInstance().getModDist().getEffectiveRegistry();
-      return registry.registryOrThrow(GunTypes.REGISTRY_KEY).get(type.getId());
-    };
+  /**
+   * A set of magazines that are supported by this gun.
+   */
+  private final Set<Supplier<? extends Item>> acceptedMagazines;
+
+  /**
+   * The default magazine that is supplied with this gun when crafted.
+   */
+  private final Supplier<? extends Item> defaultMagazine;
+
+  /**
+   * A set of attachments that are supported by this gun.
+   */
+  private final Set<Supplier<? extends Attachment>> acceptedAttachments;
+
+  /**
+   * A {@link Predicate} used to determine if the gun can shoot or not.
+   */
+  private final Predicate<Gun> triggerPredicate;
+
+  private final CombatSlot combatSlot;
+
+  protected GunItem(Builder<?> builder) {
+    super(builder.properties);
+    this.propertiesKey = builder.propertiesKey;
+    this.animations = builder.animations;
+    this.acceptedMagazines = builder.acceptedMagazines;
+    this.defaultMagazine = builder.defaultMagazine;
+    this.acceptedAttachments = builder.acceptedAttachments;
+    this.triggerPredicate = builder.triggerPredicate;
+    this.combatSlot = builder.combatSlot;
   }
 
   @Override
   public @NotNull Predicate<ItemStack> getAllSupportedProjectiles() {
-    return itemStack -> this.type.get().getAcceptedMagazines()
+    return itemStack -> this.getAcceptedMagazines()
         .stream()
         .anyMatch(itemStack.getItem()::equals);
   }
 
-  // TODO: Maybe rework this - juanmuscaria
-  public ICapabilityProvider initCapabilities(ItemStack itemStack, CompoundTag nbt) {
-    return this.type.get().initCapabilities(itemStack, nbt);
+  @Override
+  public abstract ICapabilityProvider initCapabilities(ItemStack itemStack,
+      @Nullable CompoundTag nbt);
+
+  public Map<GunAnimationEvent, Function<Gun, Animation>> getAnimations() {
+    return this.animations;
   }
 
-  protected <T extends TypedGun<?>> Function<T, TypedGunClient<? super T>> getClientFactory() {
-    return this.type.get().getClientFactory();
+  public AmmoProvider createAmmoProvider() {
+    AmmoProvider ammoProvider =
+        new MagazineAmmoProvider(this.getDefaultMagazine().getDefaultInstance());
+    if (CraftingDead.serverConfig.reloadGunComeEmptyMag.get()) {
+      ammoProvider.getExpectedMagazine().setSize(0);
+    }
+    return ammoProvider;
+  }
+
+  public Set<Item> getAcceptedMagazines() {
+    return this.acceptedMagazines.stream().map(Supplier::get).collect(Collectors.toSet());
+  }
+
+  public Item getDefaultMagazine() {
+    return this.defaultMagazine.get();
+  }
+
+  public Set<Attachment> getAcceptedAttachments() {
+    return this.acceptedAttachments.stream().map(Supplier::get).collect(Collectors.toSet());
+  }
+
+  public Predicate<Gun> getTriggerPredicate() {
+    return this.triggerPredicate;
+  }
+
+  public CombatSlot getCombatSlot() {
+    return this.combatSlot;
+  }
+
+  public GunConfiguration getConfiguration(RegistryAccess registryAccess) {
+    return this.getConfiguration(registryAccess.registryOrThrow(GunConfigurations.REGISTRY_KEY));
+  }
+
+  public GunConfiguration getConfiguration(Registry<GunConfiguration> registry) {
+    return registry.get(this.propertiesKey);
   }
 
   @Override
@@ -91,35 +166,41 @@ public class GunItem extends ProjectileWeaponItem implements GunLike {
   }
 
   @Override
-  public void appendHoverText(ItemStack itemStack, Level world,
+  public void appendHoverText(ItemStack itemStack, @Nullable Level level,
       List<Component> lines, TooltipFlag tooltipFlag) {
-    super.appendHoverText(itemStack, world, lines, tooltipFlag);
+    super.appendHoverText(itemStack, level, lines, tooltipFlag);
 
-    itemStack.getCapability(Gun.CAPABILITY).ifPresent(gun -> {
-      Component ammoCount =
-          new TextComponent(String.valueOf(gun.getAmmoProvider().getMagazine()
-              .map(Magazine::getSize)
-              .orElse(0))).withStyle(ChatFormatting.RED);
-      Component damageText =
-          new TextComponent(String.valueOf(this.type.get().getDamage()))
+    if (level != null) {
+      var configuration = this.getConfiguration(level.registryAccess());
+      var damageText =
+          new TextComponent(String.valueOf(configuration.getDamage()))
               .withStyle(ChatFormatting.RED);
-      //TODO: Perhaps add a headshot property instead of using a multiplier? - juanmuscaria
-      Component headshotDamageText = new TextComponent(
-          String.valueOf((int) (this.type.get().getDamage() * CraftingDead.serverConfig.headshotBonusDamage.get())))
+      var headshotDamageText = new TextComponent(
+          String.valueOf((int) (configuration.getDamage()
+              * CraftingDead.serverConfig.headshotBonusDamage.get())))
+                  .withStyle(ChatFormatting.RED);
+      var accuracyText =
+          new TextComponent((int) (configuration.getAccuracyPercent() * 100.0F) + "%")
               .withStyle(ChatFormatting.RED);
-      Component accuracyText =
-          new TextComponent((int) (this.type.get().getAccuracyPct() * 100D) + "%")
+      var rpmText =
+          new TextComponent(String.valueOf(configuration.getFireRateRPM()))
               .withStyle(ChatFormatting.RED);
-      Component rpmText =
-          new TextComponent(String.valueOf(this.type.get().getFireRateRPM()))
+      var rangeText =
+          new TextComponent(configuration.getRange() + " blocks")
               .withStyle(ChatFormatting.RED);
-      Component rangeText =
-          new TextComponent(this.type.get().getRange() + " blocks")
-              .withStyle(ChatFormatting.RED);
+      if (configuration.getRoundsPerShot() > 1) {
+        var pelletsText = new TextComponent(String.valueOf(configuration.getRoundsPerShot()))
+            .withStyle(ChatFormatting.RED);
 
-      lines.add(new TranslatableComponent("gun.ammo_amount")
+        lines.add(new TranslatableComponent("gun.pellets_shot")
+            .withStyle(ChatFormatting.GRAY)
+            .append(pelletsText));
+      }
+
+      lines.add(new TranslatableComponent("gun.rpm")
           .withStyle(ChatFormatting.GRAY)
-          .append(ammoCount));
+          .append(rpmText));
+
       lines.add(new TranslatableComponent("gun.damage")
           .withStyle(ChatFormatting.GRAY)
           .append(damageText));
@@ -127,17 +208,24 @@ public class GunItem extends ProjectileWeaponItem implements GunLike {
           .withStyle(ChatFormatting.GRAY)
           .append(headshotDamageText));
 
-      if (this.type.get().getRoundsPerShot() > 1) {
-        Component pelletsText =
-            new TextComponent(String.valueOf(this.type.get().getRoundsPerShot()))
-                .withStyle(ChatFormatting.RED);
+      lines.add(new TranslatableComponent("gun.accuracy")
+          .withStyle(ChatFormatting.GRAY)
+          .append(accuracyText));
+      lines.add(new TranslatableComponent("gun.range")
+          .withStyle(ChatFormatting.GRAY)
+          .append(rangeText));
+    }
 
-        lines.add(new TranslatableComponent("gun.pellets_shot")
-            .withStyle(ChatFormatting.GRAY)
-            .append(pelletsText));
-      }
+    itemStack.getCapability(Gun.CAPABILITY).ifPresent(gun -> {
+      var ammoCount = new TextComponent(String.valueOf(gun.getAmmoProvider().getMagazine()
+          .map(Magazine::getSize)
+          .orElse(0))).withStyle(ChatFormatting.RED);
 
-      for (Attachment attachment : gun.getAttachments()) {
+      lines.add(new TranslatableComponent("gun.ammo_amount")
+          .withStyle(ChatFormatting.GRAY)
+          .append(ammoCount));
+
+      for (var attachment : gun.getAttachments()) {
         Component attachmentName = attachment.getDescription()
             .plainCopy()
             .withStyle(ChatFormatting.RED);
@@ -145,16 +233,6 @@ public class GunItem extends ProjectileWeaponItem implements GunLike {
             .withStyle(ChatFormatting.GRAY)
             .append(attachmentName));
       }
-
-      lines.add(new TranslatableComponent("gun.rpm")
-          .withStyle(ChatFormatting.GRAY)
-          .append(rpmText));
-      lines.add(new TranslatableComponent("gun.accuracy")
-          .withStyle(ChatFormatting.GRAY)
-          .append(accuracyText));
-      lines.add(new TranslatableComponent("gun.range")
-          .withStyle(ChatFormatting.GRAY)
-          .append(rangeText));
     });
   }
 
@@ -181,9 +259,93 @@ public class GunItem extends ProjectileWeaponItem implements GunLike {
     return 0;
   }
 
-  @Override
-  public GunType asGun() {
-    return type.get();
-  }
+  public static class Builder<SELF extends Builder<SELF>> {
 
+    private final Function<SELF, GunItem> factory;
+
+    private final ResourceKey<GunConfiguration> propertiesKey;
+
+    private final Properties properties = new Properties().stacksTo(1).tab(ModItems.COMBAT_TAB);
+
+    private final Set<FireMode> fireModes = EnumSet.noneOf(FireMode.class);
+
+    private final Map<GunAnimationEvent, Function<Gun, Animation>> animations =
+        new EnumMap<>(GunAnimationEvent.class);
+
+    private final Set<Supplier<? extends Item>> acceptedMagazines = new HashSet<>();
+
+    private Supplier<? extends Item> defaultMagazine;
+
+    private final Set<Supplier<? extends Attachment>> acceptedAttachments = new HashSet<>();
+
+    private Predicate<Gun> triggerPredicate = gun -> true;
+
+    private CombatSlot combatSlot = CombatSlot.PRIMARY;
+
+    public Builder(Function<SELF, GunItem> factory, ResourceKey<GunConfiguration> propertiesKey) {
+      this.factory = factory;
+      this.propertiesKey = propertiesKey;
+    }
+
+    public SELF properties(Consumer<Properties> consumer) {
+      consumer.accept(this.properties);
+      return this.self();
+    }
+
+    public SELF addFireMode(FireMode fireMode) {
+      this.fireModes.add(fireMode);
+      return this.self();
+    }
+
+    public SELF putAnimation(GunAnimationEvent event, Supplier<Animation> animation) {
+      return this.putAnimation(event, __ -> animation.get());
+    }
+
+    public SELF putReloadAnimation(IntFunction<Animation> animation) {
+      return this.putAnimation(GunAnimationEvent.RELOAD,
+          gun -> animation.apply(gun.getReloadDurationTicks()));
+    }
+
+    public SELF putAnimation(GunAnimationEvent event, Function<Gun, Animation> animation) {
+      this.animations.put(event, animation);
+      return this.self();
+    }
+
+    public SELF addAcceptedMagazine(Supplier<? extends Item> acceptedMagazine) {
+      this.acceptedMagazines.add(acceptedMagazine);
+      return this.self();
+    }
+
+    public SELF setDefaultMagazine(Supplier<? extends Item> defaultMagazine) {
+      if (this.defaultMagazine != null) {
+        throw new IllegalArgumentException("Default magazine already set");
+      }
+      this.defaultMagazine = defaultMagazine;
+      return this.addAcceptedMagazine(defaultMagazine);
+    }
+
+    public SELF addAcceptedAttachment(Supplier<? extends Attachment> acceptedAttachment) {
+      this.acceptedAttachments.add(acceptedAttachment);
+      return this.self();
+    }
+
+    public SELF setTriggerPredicate(Predicate<Gun> triggerPredicate) {
+      this.triggerPredicate = triggerPredicate;
+      return this.self();
+    }
+
+    public SELF setCombatSlot(CombatSlot combatSlot) {
+      this.combatSlot = combatSlot;
+      return this.self();
+    }
+
+    public GunItem build() {
+      return this.factory.apply(this.self());
+    }
+
+    @SuppressWarnings("unchecked")
+    protected final SELF self() {
+      return (SELF) this;
+    }
+  }
 }

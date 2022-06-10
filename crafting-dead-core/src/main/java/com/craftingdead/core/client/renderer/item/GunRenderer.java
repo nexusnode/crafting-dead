@@ -584,11 +584,11 @@ public class GunRenderer implements CustomItemRenderer {
     dependencies.addAll(this.properties.ironSights().stream()
         .map(Pair::getFirst)
         .collect(Collectors.toSet()));
-    dependencies.addAll(this.item.asGun().getAcceptedAttachments().stream()
+    dependencies.addAll(this.item.getAcceptedAttachments().stream()
         .map(Attachment::getRegistryName)
         .map(GunRenderer::getAttachmentModelLocation)
         .collect(Collectors.toSet()));
-    dependencies.addAll(this.item.asGun().getAcceptedMagazines().stream()
+    dependencies.addAll(this.item.getAcceptedMagazines().stream()
         .map(Item::getRegistryName)
         .map(GunRenderer::getMagazineModelLocation)
         .collect(Collectors.toSet()));

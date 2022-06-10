@@ -18,34 +18,41 @@
 
 package com.craftingdead.core.world.entity.grenade;
 
+import java.util.OptionalInt;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.world.entity.ModEntityTypes;
 import com.craftingdead.core.world.item.GrenadeItem;
 import com.craftingdead.core.world.item.ModItems;
-import com.craftingdead.core.world.item.GunItem;
-import java.util.List;
-import java.util.OptionalInt;
-import java.util.Random;
-import java.util.stream.Collectors;
+import com.craftingdead.core.world.item.gun.GunConfiguration;
+import com.craftingdead.core.world.item.gun.GunConfigurations;
 import net.minecraft.Util;
+import net.minecraft.core.Holder;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.registries.RegistryObject;
 
 public class DecoyGrenadeEntity extends Grenade {
 
   private long lastShotMs;
-  private final GunItem gunItem = getRandomGun(this.random);
+  private final Holder<GunConfiguration> gunProperties;
 
-  public DecoyGrenadeEntity(EntityType<? extends Grenade> entityIn, Level worldIn) {
-    super(entityIn, worldIn);
+  public DecoyGrenadeEntity(EntityType<? extends Grenade> type, Level level) {
+    super(type, level);
+    this.gunProperties = this.getRandomProperties();
   }
 
-  public DecoyGrenadeEntity(LivingEntity thrower, Level worldIn) {
-    super(ModEntityTypes.DECOY_GRENADE.get(), thrower, worldIn);
+  public DecoyGrenadeEntity(LivingEntity thrower, Level level) {
+    super(ModEntityTypes.DECOY_GRENADE.get(), thrower, level);
+    this.gunProperties = this.getRandomProperties();
+  }
+
+  private Holder<GunConfiguration> getRandomProperties() {
+    return this.level.registryAccess()
+        .registryOrThrow(GunConfigurations.REGISTRY_KEY)
+        .getRandom(this.random)
+        .get();
   }
 
   @Override
@@ -92,12 +99,12 @@ public class DecoyGrenadeEntity extends Grenade {
   }
 
   public boolean canShoot() {
-    final long fireDelayMs = this.gunItem.asGun().getFireDelayMs();
+    var fireDelayMs = this.gunProperties.value().getFireDelayMs();
     return (Util.getMillis() - this.lastShotMs) >= fireDelayMs;
   }
 
   public void playFakeShoot() {
-    this.playSound(this.gunItem.asGun().getShootSound(), 1.5F, 1F);
+    this.playSound(this.gunProperties.value().getShootSound(), 1.5F, 1F);
     this.lastShotMs = Util.getMillis();
   }
 
@@ -109,16 +116,5 @@ public class DecoyGrenadeEntity extends Grenade {
   @Override
   public GrenadeItem asItem() {
     return ModItems.DECOY_GRENADE.get();
-  }
-
-  private static GunItem getRandomGun(Random random) {
-    List<GunItem> possibleGuns = ModItems.deferredRegister.getEntries().stream()
-        .map(RegistryObject::get)
-        .filter(GunItem.class::isInstance)
-        .map(GunItem.class::cast)
-        .collect(Collectors.toList());
-
-    // Supposing the list will never be empty
-    return possibleGuns.get(random.nextInt(possibleGuns.size()));
   }
 }

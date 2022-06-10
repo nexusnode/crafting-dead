@@ -1,0 +1,19 @@
+{
+  "aim_settings": {
+    "bolt_action": true
+  },
+  "sounds": {
+    "reload_sound": "craftingdead:awp_reload",
+    "shoot_sound": "craftingdead:awp_shoot",
+    "distant_shoot_sound": "craftingdead:awp_distant_shoot",
+    "silenced_shoot_sound": "craftingdead:silenced_m4a1_shoot"
+  },
+  "range": 400.0,
+  "crosshair_enabled": false,
+  "secondary_action_trigger": "toggle",
+  "accuracy_percent": 0.97,
+  "recoil": 9.0,
+  "fire_delay_ms": 1200,
+  "damage": 20.0,
+  "reload_duration_ticks": 60
+}

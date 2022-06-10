@@ -24,11 +24,12 @@ import net.minecraftforge.server.ServerLifecycleHooks;
 
 public class ServerDist implements ModDist {
 
+  @SuppressWarnings("deprecation")
   @Override
-  public RegistryAccess getEffectiveRegistry() {
-   if (ServerLifecycleHooks.getCurrentServer() != null) {
-     return ServerLifecycleHooks.getCurrentServer().registryAccess();
-   }
-    return RegistryAccess.BUILTIN.get();
+  public RegistryAccess registryAccess() {
+    if (ServerLifecycleHooks.getCurrentServer() != null) {
+      return ServerLifecycleHooks.getCurrentServer().registryAccess();
+    }
+    return ModDist.super.registryAccess();
   }
 }

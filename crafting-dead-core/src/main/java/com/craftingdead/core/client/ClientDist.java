@@ -20,10 +20,6 @@ package com.craftingdead.core.client;
 
 import java.util.Optional;
 import java.util.Set;
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.core.RegistryAccess.Frozen;
-import net.minecraftforge.fml.util.thread.EffectiveSide;
-import net.minecraftforge.server.ServerLifecycleHooks;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 import com.craftingdead.core.CraftingDead;
@@ -65,10 +61,10 @@ import com.craftingdead.core.world.entity.grenade.FlashGrenadeEntity;
 import com.craftingdead.core.world.inventory.ModEquipmentSlot;
 import com.craftingdead.core.world.inventory.ModMenuTypes;
 import com.craftingdead.core.world.item.ArbitraryTooltips;
+import com.craftingdead.core.world.item.GunItem;
 import com.craftingdead.core.world.item.RegisterGunColor;
 import com.craftingdead.core.world.item.clothing.Clothing;
 import com.craftingdead.core.world.item.gun.Gun;
-import com.craftingdead.core.world.item.GunItem;
 import com.craftingdead.core.world.item.gun.skin.Paint;
 import com.craftingdead.core.world.item.gun.skin.Skins;
 import com.craftingdead.core.world.item.scope.Scope;
@@ -94,6 +90,7 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.client.tutorial.Tutorial;
 import net.minecraft.client.tutorial.TutorialSteps;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.Mth;
@@ -129,6 +126,7 @@ import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.config.ModConfigEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fml.util.thread.EffectiveSide;
 import net.minecraftforge.registries.ForgeRegistries;
 
 public class ClientDist implements ModDist {
@@ -215,6 +213,19 @@ public class ClientDist implements ModDist {
     this.ingameGui =
         new IngameGui(this.minecraft, this, new ResourceLocation(clientConfig.crosshair.get()));
     this.cameraManager = new CameraManager();
+  }
+
+  @SuppressWarnings("deprecation")
+  @Override
+  public RegistryAccess registryAccess() {
+    var minecraft = Minecraft.getInstance();
+    if (EffectiveSide.get().isServer() && minecraft.getSingleplayerServer() != null) {
+      return minecraft.getSingleplayerServer().registryAccess();
+    } else if (EffectiveSide.get().isClient() && minecraft.player != null) {
+      return minecraft.player.connection.registryAccess();
+    }
+
+    return ModDist.super.registryAccess();
   }
 
   public void setTutorialStep(ModTutorialSteps step) {
@@ -617,7 +628,7 @@ public class ClientDist implements ModDist {
 
       player.getMainHandGun().ifPresent(gun -> {
         event.setCanceled(true);
-        if (gun.getClient().hasCrosshair()) {
+        if (gun.getClient().isCrosshairEnabled()) {
           this.ingameGui.renderCrosshairs(event.getMatrixStack(),
               gun.getAccuracy(player, player.getEntity().getRandom()),
               event.getPartialTicks(), event.getWindow().getGuiScaledWidth(),
@@ -804,17 +815,5 @@ public class ClientDist implements ModDist {
           bufferSource.getBuffer(RenderType.entityTranslucent(clothingTexture)), packedLight,
           OverlayTexture.NO_OVERLAY);
     }
-  }
-
-  @Override
-  public RegistryAccess getEffectiveRegistry() {
-    var minecraft = Minecraft.getInstance();
-    if (EffectiveSide.get().isServer() && minecraft.getSingleplayerServer() != null) {
-      return minecraft.getSingleplayerServer().registryAccess();
-    } else if (EffectiveSide.get().isClient() && minecraft.player != null) {
-      return minecraft.player.connection.registryAccess();
-    }
-
-    return RegistryAccess.BUILTIN.get();
   }
 }

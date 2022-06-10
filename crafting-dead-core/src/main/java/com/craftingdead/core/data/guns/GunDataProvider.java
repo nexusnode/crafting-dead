@@ -18,16 +18,17 @@
 
 package com.craftingdead.core.data.guns;
 
-import com.craftingdead.core.world.item.gun.GunType;
-import com.craftingdead.core.world.item.gun.GunTypes;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.Objects;
+import org.slf4j.Logger;
+import com.craftingdead.core.world.item.gun.GunConfiguration;
+import com.craftingdead.core.world.item.gun.GunConfigurations;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.mojang.logging.LogUtils;
 import com.mojang.serialization.JsonOps;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.util.Objects;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.DataProvider;
@@ -35,13 +36,14 @@ import net.minecraft.data.HashCache;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
-import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
 
 public class GunDataProvider implements DataProvider {
-  private static final Logger LOGGER = LogUtils.getLogger();
-  final RegistryOps<JsonElement> ops = RegistryOps.create(JsonOps.INSTANCE, RegistryAccess.BUILTIN.get());
-  final Gson gson = new GsonBuilder().setPrettyPrinting().create();
+
+  private static final Logger logger = LogUtils.getLogger();
+
+  private final RegistryOps<JsonElement> ops =
+      RegistryOps.create(JsonOps.INSTANCE, RegistryAccess.BUILTIN.get());
+  private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
   private final DataGenerator dataGenerator;
 
   public GunDataProvider(DataGenerator dataGenerator) {
@@ -49,22 +51,22 @@ public class GunDataProvider implements DataProvider {
   }
 
   @Override
-  public void run(@NotNull HashCache cache) throws IOException {
-    for (GunType gunType : GunTypes.registry.get()) {
-      encodeGun(gunType, GunTypes.REGISTRY_KEY.location(), cache);
+  public void run(HashCache cache) throws IOException {
+    for (GunConfiguration gunType : GunConfigurations.registry.get()) {
+      encodeGun(gunType, GunConfigurations.REGISTRY_KEY.location(), cache);
     }
   }
 
-  protected void encodeGun(GunType gun, ResourceLocation registryLocation, HashCache cache) {
+  private void encodeGun(GunConfiguration gun, ResourceLocation registryLocation, HashCache cache) {
     Path outputFolder = dataGenerator.getOutputFolder();
     var gunId = Objects.requireNonNull(gun.getRegistryName());
     final String pathString = String.join("/", PackType.SERVER_DATA.getDirectory(),
-        gunId.getNamespace(), gunId.getNamespace(), registryLocation.getPath(), gunId.getPath()+".json");
+        gunId.getNamespace(), gunId.getNamespace(), registryLocation.getPath(),
+        gunId.getPath() + ".json");
     final Path path = outputFolder.resolve(pathString);
-    GunType.CODEC.encodeStart(ops, gun)
-        .resultOrPartial(msg -> LOGGER.error("Failed to encode {}: {}", path, msg)) // Log error on encode failure.
-        .ifPresent(json ->
-        {
+    GunConfiguration.DIRECT_CODEC.encodeStart(ops, gun)
+        .resultOrPartial(msg -> logger.error("Failed to encode {}: {}", path, msg))
+        .ifPresent(json -> {
           try {
             DataProvider.save(gson, cache, json, path);
           } catch (IOException e) {
@@ -74,7 +76,6 @@ public class GunDataProvider implements DataProvider {
   }
 
   @Override
-  @NotNull
   public String getName() {
     return "Crafting Dead Guns";
   }

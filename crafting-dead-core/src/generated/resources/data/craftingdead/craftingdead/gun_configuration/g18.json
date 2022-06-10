@@ -1,0 +1,16 @@
+{
+  "aim_settings": {},
+  "sounds": {
+    "reload_sound": "craftingdead:m1911_reload",
+    "shoot_sound": "craftingdead:g18_shoot",
+    "distant_shoot_sound": "craftingdead:g18_distant_shoot",
+    "silenced_shoot_sound": "craftingdead:silenced_rpk_shoot"
+  },
+  "range": 50.0,
+  "secondary_action_trigger": "toggle",
+  "accuracy_percent": 0.7,
+  "recoil": 2.5,
+  "fire_delay_ms": 160,
+  "damage": 7.0,
+  "reload_duration_ticks": 44
+}

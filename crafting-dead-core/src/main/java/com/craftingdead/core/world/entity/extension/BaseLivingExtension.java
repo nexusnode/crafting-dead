@@ -364,7 +364,6 @@ class BaseLivingExtension<E extends LivingEntity, H extends LivingHandler>
     this.lastClothingStack = clothingStack;
   }
 
-
   @Override
   public float handleDamaged(DamageSource source, float amount) {
     var damage = this.handlers.values().stream().reduce(amount,

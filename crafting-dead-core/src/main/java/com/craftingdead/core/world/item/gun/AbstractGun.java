@@ -29,7 +29,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -58,6 +57,7 @@ import com.craftingdead.core.world.item.gun.magazine.Magazine;
 import com.craftingdead.core.world.item.gun.skin.Paint;
 import com.craftingdead.core.world.item.gun.skin.Skin;
 import com.craftingdead.core.world.item.hat.Hat;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
@@ -164,11 +164,11 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
   private Set<Attachment> attachments;
   private boolean attachmentsDirty;
 
-  private final Iterator<FireMode> fireModeInfiniteIterator;
+  private Iterator<FireMode> fireModeInfiniteIterator;
 
   private volatile boolean performingSecondaryAction;
 
-  private final Lazy<AbstractGunClient<?>> client;
+  private Lazy<AbstractGunClient<?>> client;
 
   // Used to ensure the gun thread gets killed if we're not being ticked anymore.
   private volatile long lastTickMs;
@@ -187,41 +187,41 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
   private Holder<Skin> skin;
   private boolean skinDirty;
 
-  @SuppressWarnings("unchecked")
-  public <SELF extends AbstractGun> AbstractGun(
-      Function<SELF, ? extends AbstractGunClient<? super SELF>> clientFactory,
-      ItemStack itemStack, Set<FireMode> fireModes) {
+  public AbstractGun(ItemStack itemStack) {
     this.itemStack = itemStack;
-    this.fireModeInfiniteIterator = Iterables.cycle(Iterables.filter(fireModes,
-        (mode) -> mode != FireMode.BURST || CraftingDead.serverConfig.burstfireEnabled.get()))
-        .iterator();
-    this.fireMode = this.fireModeInfiniteIterator.next();
-    this.client = FMLEnvironment.dist.isClient()
-        ? Lazy.concurrentOf(() -> clientFactory.apply((SELF) this))
-        : Lazy.of(() -> {
-          throw new IllegalStateException("Cannot access gun client on dedicated server");
-        });
+    this.dataManager.register(PAINT_STACK, ItemStack.EMPTY);
   }
 
-  /**
-   * Initialise the gun - must be called before usage. This is not done in the constructor so that
-   * the {@link GunEvent.Initialize} event is posted after the gun is constructed, preventing access
-   * to uninitialised fields.
-   */
+  protected abstract AbstractGunClient<?> createClient();
+
+  public void checkInitialized() {
+    Preconditions.checkState(this.initialized, "Gun not initialized.");
+  }
+
   protected void initialize() {
     if (this.initialized) {
       throw new IllegalStateException("Already initialized");
     }
     this.initialized = true;
 
-    GunEvent.Initialize event =
-        new GunEvent.Initialize(this, this.itemStack, this.createAmmoProvider());
+    var event = new GunEvent.Initialize(this, this.itemStack,
+        this.attachments == null ? Set.of() : this.attachments,
+        this.ammoProvider == null ? this.createAmmoProvider() : this.ammoProvider);
     MinecraftForge.EVENT_BUS.post(event);
 
     this.setAmmoProvider(event.getAmmoProvider());
     this.attachments = Set.copyOf(event.getAttachments());
 
-    this.dataManager.register(PAINT_STACK, ItemStack.EMPTY);
+    this.fireModeInfiniteIterator = Iterables.cycle(Iterables.filter(this.getFireModes(),
+        (mode) -> mode != FireMode.BURST || CraftingDead.serverConfig.burstfireEnabled.get()))
+        .iterator();
+    this.fireMode = this.fireModeInfiniteIterator.next();
+
+    this.client = FMLEnvironment.dist.isClient()
+        ? Lazy.concurrentOf(() -> this.createClient())
+        : Lazy.of(() -> {
+          throw new IllegalStateException("Cannot access gun client on server.");
+        });
   }
 
   protected abstract Set<FireMode> getFireModes();
@@ -731,39 +731,42 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
 
   @Override
   public CompoundTag serializeNBT() {
-    CompoundTag nbt = new CompoundTag();
-    nbt.putString("ammoProviderType", this.ammoProvider.getType().getRegistryName().toString());
-    nbt.put("ammoProvider", this.ammoProvider.serializeNBT());
-    ListTag attachmentsNbt = this.attachments.stream()
+    var tag = new CompoundTag();
+    if (!this.initialized) {
+      return tag;
+    }
+    tag.putString("ammoProviderType", this.ammoProvider.getType().getRegistryName().toString());
+    tag.put("ammoProvider", this.ammoProvider.serializeNBT());
+    var attachmentsTag = this.attachments.stream()
         .map(Attachment::getRegistryName)
         .map(ResourceLocation::toString)
         .map(StringTag::valueOf)
         .collect(ListTag::new, ListTag::add, List::addAll);
-    nbt.put("attachments", attachmentsNbt);
-    nbt.put("paintStack", this.getPaintStack().serializeNBT());
+    tag.put("attachments", attachmentsTag);
+    tag.put("paintStack", this.getPaintStack().serializeNBT());
     if (this.skin != null) {
-      nbt.put("skin", Skin.CODEC.encodeStart(NbtOps.INSTANCE, this.skin)
+      tag.put("skin", Skin.CODEC.encodeStart(NbtOps.INSTANCE, this.skin)
           .getOrThrow(false, logger::error));
     }
-    return nbt;
+    return tag;
   }
 
   @Override
-  public void deserializeNBT(CompoundTag nbt) {
-    if (nbt.contains("ammoProviderType", Tag.TAG_STRING)) {
+  public void deserializeNBT(CompoundTag tag) {
+    if (tag.contains("ammoProviderType", Tag.TAG_STRING)) {
       this.setAmmoProvider(AmmoProviderTypes.registry.get().getValue(
-          new ResourceLocation(nbt.getString("ammoProviderType"))).create());
-      this.ammoProvider.deserializeNBT(nbt.getCompound("ammoProvider"));
+          new ResourceLocation(tag.getString("ammoProviderType"))).create());
+      this.ammoProvider.deserializeNBT(tag.getCompound("ammoProvider"));
       this.ammoProviderChanged = true;
     }
-    this.setAttachments(nbt.getList("attachments", 8)
+    this.setAttachments(tag.getList("attachments", Tag.TAG_STRING)
         .stream()
         .map(Tag::getAsString)
         .map(ResourceLocation::new)
         .map(Attachments.registry.get()::getValue)
         .collect(Collectors.toSet()));
-    this.setPaintStack(ItemStack.of(nbt.getCompound("paintStack")));
-    this.skin = Skin.CODEC.parse(NbtOps.INSTANCE, nbt.get("skin")).result().orElse(null);
+    this.setPaintStack(ItemStack.of(tag.getCompound("paintStack")));
+    this.skin = Skin.CODEC.parse(NbtOps.INSTANCE, tag.get("skin")).result().orElse(null);
   }
 
   @Override
