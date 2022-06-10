@@ -27,6 +27,7 @@ import java.util.function.Supplier;
 import org.jetbrains.annotations.Nullable;
 import com.craftingdead.core.util.FunctionalUtil;
 import com.craftingdead.core.world.item.gun.Gun.SecondaryActionTrigger;
+import com.google.common.collect.ImmutableSet;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.sounds.SoundEvent;
@@ -58,7 +59,8 @@ public class GunConfiguration extends ForgeRegistryEntry<GunConfiguration> {
                   .forGetter(GunConfiguration::getSecondaryActionTrigger),
               Codec.list(FireMode.CODEC)
                   .optionalFieldOf("fire_modes", List.of(FireMode.SEMI))
-                  .xmap(Set::copyOf, ArrayList::new)
+                  // Use Guava's ImmutableSet as it maintains insertion order.
+                  .<Set<FireMode>>xmap(ImmutableSet::copyOf, ArrayList::new)
                   .forGetter(GunConfiguration::getFireModes),
               AimAttributes.CODEC
                   .optionalFieldOf("aim_settings")

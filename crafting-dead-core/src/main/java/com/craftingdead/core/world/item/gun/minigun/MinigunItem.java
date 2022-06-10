@@ -40,7 +40,7 @@ public class MinigunItem extends GunItem {
         Gun.CAPABILITY, CombatSlotProvider.CAPABILITY);
   }
 
-  public static Builder<?> builder(ResourceKey<GunConfiguration> propertiesKey) {
-    return new Builder<>(MinigunItem::new, propertiesKey);
+  public static Builder<?> builder(ResourceKey<GunConfiguration> configurationKey) {
+    return new Builder<>(MinigunItem::new, configurationKey);
   }
 }

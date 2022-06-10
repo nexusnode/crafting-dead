@@ -65,7 +65,7 @@ import net.minecraftforge.common.capabilities.ICapabilityProvider;
 @RegisterGunColor
 public abstract class GunItem extends ProjectileWeaponItem {
 
-  private final ResourceKey<GunConfiguration> propertiesKey;
+  private final ResourceKey<GunConfiguration> configurationKey;
 
   private final Map<GunAnimationEvent, Function<Gun, Animation>> animations;
 
@@ -93,7 +93,7 @@ public abstract class GunItem extends ProjectileWeaponItem {
 
   protected GunItem(Builder<?> builder) {
     super(builder.properties);
-    this.propertiesKey = builder.propertiesKey;
+    this.configurationKey = builder.configurationKey;
     this.animations = builder.animations;
     this.acceptedMagazines = builder.acceptedMagazines;
     this.defaultMagazine = builder.defaultMagazine;
@@ -151,7 +151,7 @@ public abstract class GunItem extends ProjectileWeaponItem {
   }
 
   public GunConfiguration getConfiguration(Registry<GunConfiguration> registry) {
-    return registry.get(this.propertiesKey);
+    return registry.get(this.configurationKey);
   }
 
   @Override
@@ -263,7 +263,7 @@ public abstract class GunItem extends ProjectileWeaponItem {
 
     private final Function<SELF, GunItem> factory;
 
-    private final ResourceKey<GunConfiguration> propertiesKey;
+    private final ResourceKey<GunConfiguration> configurationKey;
 
     private final Properties properties = new Properties().stacksTo(1).tab(ModItems.COMBAT_TAB);
 
@@ -282,9 +282,9 @@ public abstract class GunItem extends ProjectileWeaponItem {
 
     private CombatSlot combatSlot = CombatSlot.PRIMARY;
 
-    public Builder(Function<SELF, GunItem> factory, ResourceKey<GunConfiguration> propertiesKey) {
+    public Builder(Function<SELF, GunItem> factory, ResourceKey<GunConfiguration> configurationKey) {
       this.factory = factory;
-      this.propertiesKey = propertiesKey;
+      this.configurationKey = configurationKey;
     }
 
     public SELF properties(Consumer<Properties> consumer) {

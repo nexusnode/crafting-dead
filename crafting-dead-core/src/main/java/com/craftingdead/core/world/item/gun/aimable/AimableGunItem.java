@@ -41,7 +41,7 @@ public class AimableGunItem extends GunItem {
         Gun.CAPABILITY, CombatSlotProvider.CAPABILITY, Scope.CAPABILITY);
   }
 
-  public static Builder<?> builder(ResourceKey<GunConfiguration> propertiesKey) {
-    return new Builder<>(AimableGunItem::new, propertiesKey);
+  public static Builder<?> builder(ResourceKey<GunConfiguration> configurationKey) {
+    return new Builder<>(AimableGunItem::new, configurationKey);
   }
 }
