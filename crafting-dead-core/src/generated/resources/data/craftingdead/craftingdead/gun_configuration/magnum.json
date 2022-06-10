@@ -1,0 +1,14 @@
+{
+  "aim_settings": {},
+  "sounds": {
+    "reload_sound": "craftingdead:magnum_reload",
+    "shoot_sound": "craftingdead:magnum_shoot"
+  },
+  "range": 80.0,
+  "secondary_action_trigger": "toggle",
+  "accuracy_percent": 0.8,
+  "recoil": 8.0,
+  "fire_delay_ms": 160,
+  "damage": 7.0,
+  "reload_duration_ticks": 40
+}

@@ -22,7 +22,7 @@ import java.util.Optional;
 import com.craftingdead.core.client.animation.Animation;
 import net.minecraft.sounds.SoundEvent;
 
-public class TypedGunClient<T extends TypedGun<?>> extends AbstractGunClient<T> {
+public class TypedGunClient<T extends TypedGun> extends AbstractGunClient<T> {
 
   public TypedGunClient(T gun) {
     super(gun);
@@ -30,41 +30,41 @@ public class TypedGunClient<T extends TypedGun<?>> extends AbstractGunClient<T> 
 
   @Override
   protected Optional<SoundEvent> getSecondaryActionSound() {
-    return this.gun.getType().getSecondaryActionSound();
+    return this.gun.getConfiguration().getSecondaryActionSound();
   }
 
   @Override
   protected long getSecondaryActionSoundRepeatDelayMs() {
-    return this.gun.getType().getSecondaryActionSoundRepeatDelayMs();
+    return this.gun.getConfiguration().getSecondaryActionSoundRepeatDelayMs();
   }
 
   @Override
   protected float getRecoil() {
-    return this.gun.getType().getRecoil();
+    return this.gun.getConfiguration().getRecoil();
   }
 
   @Override
   protected SoundEvent getShootSound() {
-    return this.gun.getType().getShootSound();
+    return this.gun.getConfiguration().getShootSound();
   }
 
   @Override
   protected Optional<SoundEvent> getDistantShootSound() {
-    return this.gun.getType().getDistantShootSound();
+    return this.gun.getConfiguration().getDistantShootSound();
   }
 
   @Override
   protected Optional<SoundEvent> getSilencedShootSound() {
-    return this.gun.getType().getSilencedShootSound();
+    return this.gun.getConfiguration().getSilencedShootSound();
   }
 
   @Override
-  public boolean hasCrosshair() {
-    return this.gun.getType().hasCrosshair();
+  public boolean isCrosshairEnabled() {
+    return this.gun.getConfiguration().isCrosshairEnabled();
   }
 
   @Override
   public Animation getAnimation(GunAnimationEvent event) {
-    return this.gun.getType().getAnimations().get(event).apply(this.gun.getType());
+    return this.gun.getItem().getAnimations().get(event).apply(this.gun);
   }
 }

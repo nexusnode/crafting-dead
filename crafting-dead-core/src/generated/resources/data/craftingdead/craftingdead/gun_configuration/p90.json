@@ -1,0 +1,19 @@
+{
+  "fire_modes": [
+    "auto"
+  ],
+  "aim_settings": {},
+  "sounds": {
+    "reload_sound": "craftingdead:p90_reload",
+    "shoot_sound": "craftingdead:p90_shoot",
+    "distant_shoot_sound": "craftingdead:p90_distant_shoot",
+    "silenced_shoot_sound": "craftingdead:silenced_p90_shoot"
+  },
+  "range": 100.0,
+  "secondary_action_trigger": "toggle",
+  "accuracy_percent": 0.75,
+  "recoil": 2.0,
+  "fire_delay_ms": 80,
+  "damage": 5.0,
+  "reload_duration_ticks": 44
+}

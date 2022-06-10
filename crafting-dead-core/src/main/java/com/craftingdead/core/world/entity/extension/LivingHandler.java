@@ -19,13 +19,13 @@
 package com.craftingdead.core.world.entity.extension;
 
 import java.util.Collection;
-import com.craftingdead.core.network.Synched;
 import java.util.List;
+import com.craftingdead.core.network.Synched;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.common.util.INBTSerializable;
@@ -84,7 +84,8 @@ public interface LivingHandler extends INBTSerializable<CompoundTag>, Synched {
    * @param lootingLevel - the amount of loot that will be dropped.
    * @return if the event should be cancelled
    */
-  default boolean handleDeathLoot(DamageSource cause, Collection<ItemEntity> loot, int lootingLevel) {
+  default boolean handleDeathLoot(DamageSource cause, Collection<ItemEntity> loot,
+      int lootingLevel) {
     return false;
   }
 
@@ -113,7 +114,8 @@ public interface LivingHandler extends INBTSerializable<CompoundTag>, Synched {
    * @param placedAgainst - the block which was placed against
    * @return if the event should be cancelled
    */
-  default boolean handleBlockPlace(BlockSnapshot replacedBlock, BlockState placedBlock, BlockState placedAgainst) {
+  default boolean handleBlockPlace(BlockSnapshot replacedBlock, BlockState placedBlock,
+      BlockState placedAgainst) {
     return false;
   }
 
@@ -125,7 +127,8 @@ public interface LivingHandler extends INBTSerializable<CompoundTag>, Synched {
    * @param placedAgainst - the block which was placed against
    * @return if the event should be cancelled
    */
-  default boolean handleMultiBlockPlace(List<BlockSnapshot> replacedBlocks, BlockState placedBlock, BlockState placedAgainst) {
+  default boolean handleMultiBlockPlace(List<BlockSnapshot> replacedBlocks, BlockState placedBlock,
+      BlockState placedAgainst) {
     return false;
   }
 

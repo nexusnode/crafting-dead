@@ -22,7 +22,7 @@ import java.util.function.Supplier;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.client.animation.Animation;
 import com.craftingdead.core.util.FunctionRegistryEntry;
-import com.craftingdead.core.world.item.gun.GunType;
+import com.craftingdead.core.world.item.gun.GunConfiguration;
 import com.mojang.serialization.Codec;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
@@ -35,38 +35,38 @@ import net.minecraftforge.registries.RegistryObject;
 
 public class GunAnimationTypes {
 
-  public static final ResourceKey<Registry<FunctionRegistryEntry<GunType, Animation>>> REGISTRY_KEY =
+  public static final ResourceKey<Registry<FunctionRegistryEntry<GunConfiguration, Animation>>> REGISTRY_KEY =
       ResourceKey.createRegistryKey(new ResourceLocation(CraftingDead.ID, "gun_animation_type"));
 
-  public static final DeferredRegister<FunctionRegistryEntry<GunType, Animation>> deferredRegister =
+  public static final DeferredRegister<FunctionRegistryEntry<GunConfiguration, Animation>> deferredRegister =
       DeferredRegister.create(REGISTRY_KEY, CraftingDead.ID);
 
   @SuppressWarnings("unchecked")
-  public static final Supplier<IForgeRegistry<FunctionRegistryEntry<GunType, Animation>>> registry =
+  public static final Supplier<IForgeRegistry<FunctionRegistryEntry<GunConfiguration, Animation>>> registry =
       deferredRegister.makeRegistry(
-          (Class<FunctionRegistryEntry<GunType, Animation>>) (Class<?>) FunctionRegistryEntry.class,
+          (Class<FunctionRegistryEntry<GunConfiguration, Animation>>) (Class<?>) FunctionRegistryEntry.class,
           RegistryBuilder::new);
 
-  public static final Codec<FunctionRegistryEntry<GunType, Animation>> CODEC =
+  public static final Codec<FunctionRegistryEntry<GunConfiguration, Animation>> CODEC =
       ExtraCodecs.lazyInitializedCodec(() -> registry.get().getCodec());
 
-  public static final RegistryObject<FunctionRegistryEntry<GunType, Animation>> INSPECT =
+  public static final RegistryObject<FunctionRegistryEntry<GunConfiguration, Animation>> INSPECT =
       deferredRegister.register("inspect",
           () -> FunctionRegistryEntry.of(gun -> new InspectAnimation()));
 
-  public static final RegistryObject<FunctionRegistryEntry<GunType, Animation>> RELOAD =
+  public static final RegistryObject<FunctionRegistryEntry<GunConfiguration, Animation>> RELOAD =
       deferredRegister.register("reload",
           () -> FunctionRegistryEntry.of(gun -> new ReloadAnimation(gun.getReloadDurationTicks())));
 
-  public static final RegistryObject<FunctionRegistryEntry<GunType, Animation>> PISTOL_SHOOT =
+  public static final RegistryObject<FunctionRegistryEntry<GunConfiguration, Animation>> PISTOL_SHOOT =
       deferredRegister.register("pistol_shoot",
           () -> FunctionRegistryEntry.of(gun -> new PistolShootAnimation()));
 
-  public static final RegistryObject<FunctionRegistryEntry<GunType, Animation>> RIFLE_SHOOT =
+  public static final RegistryObject<FunctionRegistryEntry<GunConfiguration, Animation>> RIFLE_SHOOT =
       deferredRegister.register("rifle_shoot",
           () -> FunctionRegistryEntry.of(gun -> new RifleShootAnimation()));
 
-  public static final RegistryObject<FunctionRegistryEntry<GunType, Animation>> SUBMACHINE_SHOOT =
+  public static final RegistryObject<FunctionRegistryEntry<GunConfiguration, Animation>> SUBMACHINE_SHOOT =
       deferredRegister.register("submachine_shoot",
           () -> FunctionRegistryEntry.of(gun -> new SubmachineShootAnimation()));
 }

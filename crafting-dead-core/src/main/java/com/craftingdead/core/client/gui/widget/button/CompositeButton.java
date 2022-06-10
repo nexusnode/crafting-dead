@@ -18,14 +18,13 @@
 
 package com.craftingdead.core.client.gui.widget.button;
 
+import java.util.function.Function;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import java.util.function.Function;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
-import org.jetbrains.annotations.NotNull;
 
 public class CompositeButton extends Button {
 

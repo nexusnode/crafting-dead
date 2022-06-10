@@ -19,5 +19,17 @@
 package com.craftingdead.core.server;
 
 import com.craftingdead.core.ModDist;
+import net.minecraft.core.RegistryAccess;
+import net.minecraftforge.server.ServerLifecycleHooks;
 
-public class ServerDist implements ModDist {}
+public class ServerDist implements ModDist {
+
+  @SuppressWarnings("deprecation")
+  @Override
+  public RegistryAccess registryAccess() {
+    if (ServerLifecycleHooks.getCurrentServer() != null) {
+      return ServerLifecycleHooks.getCurrentServer().registryAccess();
+    }
+    return ModDist.super.registryAccess();
+  }
+}

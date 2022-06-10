@@ -23,12 +23,12 @@ import com.craftingdead.core.world.item.gun.TypedGun;
 import com.craftingdead.core.world.item.gun.TypedGunClient;
 import net.minecraft.util.Mth;
 
-public class MinigunClient extends TypedGunClient<TypedGun<?>> {
+public class MinigunClient extends TypedGunClient<TypedGun> {
 
   private int lastBarrelRotation;
   private int barrelRotation;
 
-  public MinigunClient(TypedGun<?> gun) {
+  public MinigunClient(TypedGun gun) {
     super(gun);
   }
 

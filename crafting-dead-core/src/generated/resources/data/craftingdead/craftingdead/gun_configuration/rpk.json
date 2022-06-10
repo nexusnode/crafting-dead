@@ -1,0 +1,18 @@
+{
+  "fire_modes": [
+    "auto"
+  ],
+  "aim_settings": {},
+  "sounds": {
+    "reload_sound": "craftingdead:rpk_reload",
+    "shoot_sound": "craftingdead:rpk_shoot",
+    "silenced_shoot_sound": "craftingdead:silenced_m240b_shoot"
+  },
+  "range": 150.0,
+  "secondary_action_trigger": "toggle",
+  "accuracy_percent": 0.9,
+  "recoil": 4.5,
+  "fire_delay_ms": 92,
+  "damage": 6.0,
+  "reload_duration_ticks": 60
+}

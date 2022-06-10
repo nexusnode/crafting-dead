@@ -16,25 +16,20 @@
  * https://craftingdead.net/terms.php
  */
 
-package com.craftingdead.core.world.item.gun.minigun;
+package com.craftingdead.core.world.item.gun;
 
-import com.craftingdead.core.world.item.gun.GunType;
-import com.craftingdead.core.world.item.gun.TypedGun;
-import com.craftingdead.core.world.item.gun.TypedGunClient;
-import java.util.function.Function;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 
-public class MinigunType extends GunType {
+/**
+ * @param boltAction - Whether the gun has bolt action
+ */
+public record AimAttributes(boolean boltAction) {
 
-  protected MinigunType(Builder<?> builder) {
-    super(builder);
-  }
-
-  @Override
-  public <T extends TypedGun<?>> Function<T, TypedGunClient<? super T>> getClientFactory() {
-    return MinigunClient::new;
-  }
-
-  public static Builder<?> builder() {
-    return new Builder<>(MinigunType::new);
-  }
+  public static final Codec<AimAttributes> CODEC =
+      RecordCodecBuilder.create(instance -> instance
+          .group(Codec.BOOL
+              .optionalFieldOf("bolt_action", false)
+              .forGetter(AimAttributes::boltAction))
+          .apply(instance, AimAttributes::new));
 }

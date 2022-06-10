@@ -18,32 +18,31 @@
 
 package com.craftingdead.core.world.item.gun.aimable;
 
+import java.util.Optional;
+import java.util.Random;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
+import com.craftingdead.core.world.item.GunItem;
+import com.craftingdead.core.world.item.gun.AbstractGunClient;
+import com.craftingdead.core.world.item.gun.AimAttributes;
 import com.craftingdead.core.world.item.gun.TypedGun;
 import com.craftingdead.core.world.item.gun.attachment.Attachment;
 import com.craftingdead.core.world.item.scope.Scope;
-import java.util.Optional;
-import java.util.Random;
-import java.util.function.Function;
 import net.minecraft.Util;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 
-public final class AimableGun extends TypedGun<AimableGunType> implements Scope {
+public class AimableGun extends TypedGun implements Scope {
 
   private boolean waitingForBoltAction;
 
-  public static AimableGun create(Function<AimableGun, AimableGunClient> clientFactory,
-      ItemStack itemStack, AimableGunType type) {
-    AimableGun gun = new AimableGun(clientFactory, itemStack, type);
-    gun.initialize();
-    return gun;
+  public AimableGun(ItemStack itemStack, GunItem item) {
+    super(itemStack, item);
   }
 
-  private AimableGun(Function<AimableGun, AimableGunClient> clientFactory, ItemStack itemStack,
-      AimableGunType type) {
-    super(clientFactory, itemStack, type);
+  @Override
+  protected AbstractGunClient<?> createClient() {
+    return new AimableGunClient<>(this);
   }
 
   @Override
@@ -55,7 +54,7 @@ public final class AimableGun extends TypedGun<AimableGunType> implements Scope 
   @Override
   public void tick(LivingExtension<?, ?> living) {
     long timeDelta = Util.getMillis() - this.lastShotMs;
-    if (timeDelta >= this.getType().getFireDelayMs() && this.waitingForBoltAction) {
+    if (timeDelta >= this.getFireDelayMs() && this.waitingForBoltAction) {
       this.waitingForBoltAction = false;
       if (!this.isPerformingSecondaryAction()) {
         this.setPerformingSecondaryAction(living, true, false);
@@ -67,7 +66,9 @@ public final class AimableGun extends TypedGun<AimableGunType> implements Scope 
   @Override
   protected void processShot(LivingExtension<?, ?> living) {
     super.processShot(living);
-    if (this.isPerformingSecondaryAction() && this.getType().hasBoltAction()) {
+    var aimAttributes = this.getConfiguration().getAimSettings();
+    if (this.isPerformingSecondaryAction()
+        && aimAttributes.map(AimAttributes::boltAction).orElse(false)) {
       this.setPerformingSecondaryAction(living, false, false);
       this.waitingForBoltAction = true;
     }
@@ -82,12 +83,15 @@ public final class AimableGun extends TypedGun<AimableGunType> implements Scope 
   public float getZoomMultiplier(LivingExtension<?, ?> living) {
     return this.hasIronSight()
         ? 2.0F
-        : this.getAttachmentMultiplier(Attachment.MultiplierType.ZOOM) + CraftingDead.serverConfig.scopeZoomMultiplier.get().floatValue();
+        : this.getAttachmentMultiplier(Attachment.MultiplierType.ZOOM)
+            + CraftingDead.serverConfig.scopeZoomMultiplier.get().floatValue();
   }
 
   @Override
   public float getAccuracy(LivingExtension<?, ?> living, Random random) {
-    return super.getAccuracy(living, random) * (isScoping(living) ? CraftingDead.serverConfig.scopeZoomAccuracyMultiplier.get().floatValue() : 1F);
+    return this.isScoping(living)
+        ? CraftingDead.serverConfig.scopeZoomAccuracyMultiplier.get().floatValue()
+        : 1.0F;
   }
 
   @Override

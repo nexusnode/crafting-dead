@@ -1,0 +1,15 @@
+{
+  "aim_settings": {},
+  "sounds": {
+    "reload_sound": "craftingdead:m9_reload",
+    "shoot_sound": "craftingdead:desert_eagle_shoot",
+    "distant_shoot_sound": "craftingdead:desert_eagle_distant_shoot"
+  },
+  "range": 80.0,
+  "secondary_action_trigger": "toggle",
+  "accuracy_percent": 0.9,
+  "recoil": 8.0,
+  "fire_delay_ms": 160,
+  "damage": 8.0,
+  "reload_duration_ticks": 40
+}

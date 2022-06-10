@@ -1,0 +1,18 @@
+{
+  "fire_modes": [
+    "auto"
+  ],
+  "sounds": {
+    "reload_sound": "craftingdead:m240b_reload",
+    "secondary_action_sound": "craftingdead:minigun_barrel",
+    "secondary_action_sound_repeat_delay": 177,
+    "shoot_sound": "craftingdead:minigun_shoot"
+  },
+  "range": 350.0,
+  "secondary_action_trigger": "hold",
+  "accuracy_percent": 0.6,
+  "recoil": 2.5,
+  "fire_delay_ms": 75,
+  "damage": 4.0,
+  "reload_duration_ticks": 100
+}

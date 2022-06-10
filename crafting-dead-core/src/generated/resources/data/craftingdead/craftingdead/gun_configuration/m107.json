@@ -1,0 +1,17 @@
+{
+  "aim_settings": {
+    "bolt_action": true
+  },
+  "sounds": {
+    "reload_sound": "craftingdead:m107_reload",
+    "shoot_sound": "craftingdead:m107_shoot"
+  },
+  "range": 400.0,
+  "crosshair_enabled": false,
+  "secondary_action_trigger": "toggle",
+  "accuracy_percent": 0.9,
+  "recoil": 12.0,
+  "fire_delay_ms": 750,
+  "damage": 20.0,
+  "reload_duration_ticks": 60
+}

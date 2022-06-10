@@ -80,8 +80,10 @@ public abstract class GunEvent extends Event {
     private final Set<Attachment> attachments = new HashSet<>();
     private AmmoProvider ammoProvider;
 
-    public Initialize(Gun gun, ItemStack itemStack, AmmoProvider ammoProvider) {
+    public Initialize(Gun gun, ItemStack itemStack,
+        Set<Attachment> attachments, AmmoProvider ammoProvider) {
       super(gun, itemStack);
+      this.attachments.addAll(attachments);
       this.ammoProvider = ammoProvider;
     }
 

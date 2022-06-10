@@ -18,9 +18,13 @@
 
 package com.craftingdead.core;
 
+import org.apache.commons.lang3.mutable.MutableInt;
+import org.apache.commons.lang3.tuple.Pair;
+import org.slf4j.Logger;
 import com.craftingdead.core.capability.CapabilityUtil;
 import com.craftingdead.core.client.ClientDist;
 import com.craftingdead.core.client.animation.gun.GunAnimationTypes;
+import com.craftingdead.core.data.guns.GunDataProvider;
 import com.craftingdead.core.data.recipes.ModRecipeProvider;
 import com.craftingdead.core.data.tags.ModItemTagsProvider;
 import com.craftingdead.core.event.CombatPickupEvent;
@@ -44,9 +48,8 @@ import com.craftingdead.core.world.item.combatslot.CombatSlotProvider;
 import com.craftingdead.core.world.item.crafting.ModRecipeSerializers;
 import com.craftingdead.core.world.item.enchantment.ModEnchantments;
 import com.craftingdead.core.world.item.gun.Gun;
+import com.craftingdead.core.world.item.gun.GunConfigurations;
 import com.craftingdead.core.world.item.gun.GunTriggerPredicates;
-import com.craftingdead.core.world.item.gun.GunTypeFactories;
-import com.craftingdead.core.world.item.gun.GunTypes;
 import com.craftingdead.core.world.item.gun.ammoprovider.AmmoProviderTypes;
 import com.craftingdead.core.world.item.gun.attachment.Attachments;
 import com.craftingdead.core.world.item.gun.magazine.Magazine;
@@ -95,9 +98,6 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.JarVersionLookupHandler;
 import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
 import net.minecraftforge.network.PacketDistributor;
-import org.apache.commons.lang3.mutable.MutableInt;
-import org.apache.commons.lang3.tuple.Pair;
-import org.slf4j.Logger;
 
 @Mod(CraftingDead.ID)
 public class CraftingDead {
@@ -157,8 +157,7 @@ public class CraftingDead {
     ActionTypes.deferredRegister.register(modEventBus);
     AmmoProviderTypes.deferredRegister.register(modEventBus);
     Attachments.deferredRegister.register(modEventBus);
-    GunTypes.deferredRegister.register(modEventBus);
-    GunTypeFactories.deferredRegister.register(modEventBus);
+    GunConfigurations.deferredRegister.register(modEventBus);
     GunAnimationTypes.deferredRegister.register(modEventBus);
     GunTriggerPredicates.deferredRegister.register(modEventBus);
 
@@ -199,6 +198,7 @@ public class CraftingDead {
           new ForgeBlockTagsProvider(dataGenerator, event.getExistingFileHelper()),
           event.getExistingFileHelper()));
       dataGenerator.addProvider(new ModRecipeProvider(dataGenerator));
+      dataGenerator.addProvider(new GunDataProvider(dataGenerator));
     }
   }
 

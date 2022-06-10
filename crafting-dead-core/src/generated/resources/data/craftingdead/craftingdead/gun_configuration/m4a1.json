@@ -1,0 +1,21 @@
+{
+  "fire_modes": [
+    "auto",
+    "burst",
+    "semi"
+  ],
+  "aim_settings": {},
+  "sounds": {
+    "reload_sound": "craftingdead:m4a1_reload",
+    "shoot_sound": "craftingdead:m4a1_shoot",
+    "distant_shoot_sound": "craftingdead:m4a1_distant_shoot",
+    "silenced_shoot_sound": "craftingdead:silenced_m4a1_shoot"
+  },
+  "range": 160.0,
+  "secondary_action_trigger": "toggle",
+  "accuracy_percent": 0.9,
+  "recoil": 3.5,
+  "fire_delay_ms": 100,
+  "damage": 7.0,
+  "reload_duration_ticks": 80
+}

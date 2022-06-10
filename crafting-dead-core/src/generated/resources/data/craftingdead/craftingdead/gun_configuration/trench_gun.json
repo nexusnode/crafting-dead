@@ -1,0 +1,17 @@
+{
+  "aim_settings": {
+    "bolt_action": true
+  },
+  "sounds": {
+    "reload_sound": "craftingdead:shotgun_reload",
+    "shoot_sound": "craftingdead:trench_gun_shoot"
+  },
+  "range": 25.0,
+  "secondary_action_trigger": "toggle",
+  "accuracy_percent": 0.7,
+  "recoil": 9.0,
+  "rounds_per_shot": 8,
+  "fire_delay_ms": 1200,
+  "damage": 2.0,
+  "reload_duration_ticks": 20
+}

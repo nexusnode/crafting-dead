@@ -18,4 +18,16 @@
 
 package com.craftingdead.core;
 
-public interface ModDist {}
+import net.minecraft.core.RegistryAccess;
+
+public interface ModDist {
+
+  /**
+   * Awful hack to find a {@link RegistryAccess} instance. Used by gun capabilities to load data as
+   * there is no level context upon item creation.
+   */
+  @Deprecated
+  default RegistryAccess registryAccess() {
+    return RegistryAccess.BUILTIN.get();
+  }
+}

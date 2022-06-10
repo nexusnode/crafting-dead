@@ -21,9 +21,9 @@ package com.craftingdead.core.world.item.gun.aimable;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.item.gun.TypedGunClient;
 
-public class AimableGunClient extends TypedGunClient<AimableGun> {
+public class AimableGunClient<T extends AimableGun> extends TypedGunClient<T> {
 
-  public AimableGunClient(AimableGun gun) {
+  public AimableGunClient(T gun) {
     super(gun);
   }
 
