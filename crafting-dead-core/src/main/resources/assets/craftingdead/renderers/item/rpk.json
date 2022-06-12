@@ -96,7 +96,7 @@
         "craftingdead:red_dot_sight": {
             "translation": [
                 0.5,
-                6.8,
+                7,
                 4
             ]
         },
@@ -110,8 +110,8 @@
         "craftingdead:bipod": {
             "translation": [
                 0.5,
-                1,
-                -18
+                10,
+                -16
             ]
         },
         "craftingdead:eotech_sight": {
@@ -131,7 +131,7 @@
         "craftingdead:suppressor": {
             "translation": [
                 0.5,
-                3,
+                2.5,
                 -23
         
             ]

@@ -108,13 +108,6 @@
                 1.001
             ]
         },
-        "craftingdead:acog_sight": {
-            "translation": [
-                0,
-                4.5,
-                -3
-            ]
-        },
         "craftingdead:bipod": {
             "translation": [
                 0.5,
