@@ -853,7 +853,6 @@ public class ModItems {
           .setDefaultMagazine(ModItems.MAC10_MAGAZINE)
           .addAcceptedMagazine(ModItems.MAC10_EXTENDED_MAGAZINE)
           .addAcceptedAttachment(Attachments.RED_DOT_SIGHT)
-          .addAcceptedAttachment(Attachments.ACOG_SIGHT)
           .addAcceptedAttachment(Attachments.SUPPRESSOR)
           .build());
 
@@ -955,7 +954,6 @@ public class ModItems {
               .putReloadAnimation(ReloadAnimation::new)
               .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
               .setDefaultMagazine(ModItems.TRENCH_GUN_SHELLS)
-              .addAcceptedAttachment(Attachments.TACTICAL_GRIP)
               .build());
 
   public static final RegistryObject<GunItem> MOSSBERG =
@@ -964,7 +962,6 @@ public class ModItems {
           .putReloadAnimation(ReloadAnimation::new)
           .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
           .setDefaultMagazine(ModItems.MOSSBERG_SHELLS)
-          .addAcceptedAttachment(Attachments.TACTICAL_GRIP)
           .build());
 
   // ================================================================================
