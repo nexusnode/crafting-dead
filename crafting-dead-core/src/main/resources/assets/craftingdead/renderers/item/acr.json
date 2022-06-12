@@ -20,6 +20,13 @@
             -2
         ]
     },
+    "attachment_aiming_transform": {
+        "translation": [
+            -9.5,
+            -3,
+            -2
+        ]
+    },
     "hand_transforms": {
         "held_right_handed": {
             "right_hand": {

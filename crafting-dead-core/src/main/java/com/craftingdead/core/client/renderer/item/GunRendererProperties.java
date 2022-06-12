@@ -38,6 +38,7 @@ public record GunRendererProperties(
     ResourceLocation modelLocation,
     Transformation muzzleFlashTransform,
     Transformation aimingTransform,
+    Transformation attachmentAimingTransform,
     Transformation sprintingTransform,
     Transformation backTransform,
     Map<ResourceLocation, Transformation> attachmentTransforms,
@@ -64,6 +65,9 @@ public record GunRendererProperties(
               RenderUtil.TRANSFORMATION_MATRIX_CODEC
                   .optionalFieldOf("aiming_transform", Transformation.identity())
                   .forGetter(GunRendererProperties::aimingTransform),
+              RenderUtil.TRANSFORMATION_MATRIX_CODEC
+                  .optionalFieldOf("attachment_aiming_transform", Transformation.identity())
+                  .forGetter(GunRendererProperties::attachmentAimingTransform),
               RenderUtil.TRANSFORMATION_MATRIX_CODEC
                   .optionalFieldOf("sprinting_transform", DEFAULT_SPRINTING_TRANSFORM)
                   .forGetter(GunRendererProperties::sprintingTransform),

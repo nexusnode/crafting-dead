@@ -434,8 +434,13 @@ public class GunRenderer implements CustomItemRenderer {
 
     Transformation perspectiveTransform;
     if (aimingPct > 0) {
-      perspectiveTransform =
-          TransformationHelper.slerp(normalTransform, this.properties.aimingTransform(), aimingPct);
+      if (gun.hasIronSight()) {
+        perspectiveTransform =
+            TransformationHelper.slerp(normalTransform, this.properties.aimingTransform(), aimingPct);
+      } else {
+        perspectiveTransform =
+            TransformationHelper.slerp(normalTransform, this.properties.attachmentAimingTransform(), aimingPct);
+      }
     } else {
       perspectiveTransform = normalTransform;
     }
