@@ -20,23 +20,16 @@ package com.craftingdead.core.world.entity.extension;
 
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 
-public record EntitySnapshot(Vec3 position, AABB boundingBox, Vec2 rotation, float eyeHeight,
-    boolean complete) {
+public record EntitySnapshot(Vec3 position, AABB boundingBox, Vec2 rotation,
+    Vec3 velocity, boolean crouching, float eyeHeight, boolean complete) {
 
-  public EntitySnapshot(Vec3 position, AABB boundingBox, Vec2 rotation) {
-    this(position, boundingBox, rotation, -1, false);
-  }
-
-  public EntitySnapshot(Entity entity, float partialTick) {
-    this(entity.getPosition(partialTick),
-        entity.getBoundingBox(),
-        new Vec2(entity.getViewXRot(partialTick), entity.getViewYRot(partialTick)),
-        entity.getEyeHeight(), true);
+  public EntitySnapshot(Vec3 position, AABB boundingBox, Vec2 rotation, Vec3 velocity,
+      boolean crouching) {
+    this(position, boundingBox, rotation, velocity, crouching, -1, false);
   }
 
   public EntitySnapshot combineUntrustedSnapshot(EntitySnapshot snapshot) {
@@ -61,7 +54,13 @@ public record EntitySnapshot(Vec3 position, AABB boundingBox, Vec2 rotation, flo
       rotation = this.rotation;
     }
 
-    return new EntitySnapshot(position, boundingBox, rotation, this.eyeHeight, true);
+    var deltaMovement = snapshot.velocity;
+    if (this.velocity.distanceTo(snapshot.velocity) > 0.1D) {
+      deltaMovement = this.velocity;
+    }
+
+    return new EntitySnapshot(position, boundingBox, rotation, deltaMovement, snapshot.crouching,
+        this.eyeHeight, true);
   }
 
   public void encode(FriendlyByteBuf out) {
@@ -76,6 +75,10 @@ public record EntitySnapshot(Vec3 position, AABB boundingBox, Vec2 rotation, flo
     out.writeDouble(this.boundingBox.maxZ);
     out.writeFloat(this.rotation.x);
     out.writeFloat(this.rotation.y);
+    out.writeDouble(this.velocity.x);
+    out.writeDouble(this.velocity.y);
+    out.writeDouble(this.velocity.z);
+    out.writeBoolean(this.crouching);
   }
 
   public static EntitySnapshot decode(FriendlyByteBuf in) {
@@ -87,6 +90,8 @@ public record EntitySnapshot(Vec3 position, AABB boundingBox, Vec2 rotation, flo
     var maxY = in.readDouble();
     var maxZ = in.readDouble();
     var rotation = new Vec2(in.readFloat(), in.readFloat());
-    return new EntitySnapshot(position, new AABB(minX, minY, minZ, maxX, maxY, maxZ), rotation);
+    var velocity = new Vec3(in.readDouble(), in.readDouble(), in.readDouble());
+    return new EntitySnapshot(position, new AABB(minX, minY, minZ, maxX, maxY, maxZ),
+        rotation, velocity, in.readBoolean());
   }
 }

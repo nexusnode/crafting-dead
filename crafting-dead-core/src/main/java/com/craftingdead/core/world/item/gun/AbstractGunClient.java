@@ -28,30 +28,29 @@ import com.craftingdead.core.client.animation.AnimationController;
 import com.craftingdead.core.network.NetworkChannel;
 import com.craftingdead.core.network.message.play.ValidatePendingHitMessage;
 import com.craftingdead.core.sounds.ModSoundEvents;
-import com.craftingdead.core.world.entity.extension.EntitySnapshot;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.item.gun.attachment.Attachment;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.material.Material;
+import net.minecraft.Util;
+import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.CameraType;
+import net.minecraft.core.particles.BlockParticleOption;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.core.particles.BlockParticleOption;
-import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.sounds.SoundSource;
-import net.minecraft.sounds.SoundEvent;
-import net.minecraft.Util;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.level.Level;
 
 public abstract class AbstractGunClient<T extends AbstractGun> implements GunClient {
 
@@ -189,13 +188,16 @@ public abstract class AbstractGunClient<T extends AbstractGun> implements GunCli
 
   public void handleHitEntityPre(LivingExtension<?, ?> living, Entity hitEntity,
       Vec3 hitPos, long randomSeed) {
-    if (living.getEntity() instanceof LocalPlayer
-        && hitEntity instanceof LivingEntity) {
-      this.livingHitValidationBuffer.put(hitEntity.getId(),
-          new PendingHit((byte) (AbstractGun.HIT_VALIDATION_DELAY_TICKS - this.hitValidationTicks),
-              new EntitySnapshot(living.getEntity(), this.minecraft.getFrameTime()),
-              new EntitySnapshot(hitEntity, this.minecraft.getFrameTime()), randomSeed,
-              this.gun.getShotCount()));
+    if (living.getEntity() instanceof LocalPlayer) {
+      hitEntity.getCapability(LivingExtension.CAPABILITY)
+          .ifPresent(hitLiving -> {
+            this.livingHitValidationBuffer.put(hitEntity.getId(),
+                new PendingHit(
+                    (byte) (AbstractGun.HIT_VALIDATION_DELAY_TICKS - this.hitValidationTicks),
+                    living.makeSnapshot(this.minecraft.getFrameTime()),
+                    hitLiving.makeSnapshot(this.minecraft.getFrameTime()), randomSeed,
+                    this.gun.getShotCount()));
+          });
     }
   }
 

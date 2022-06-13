@@ -548,7 +548,7 @@ public class IngameGui {
     final var x = (width / 2.0F) - (imageWidth / 2.0F) - 0.5F;
     final var y = (height / 2.0F) - (imageHeight / 2.0F);
 
-    final var newSpread = (1.15F - accuracy) * 60.0F;
+    final var newSpread = (1.0F - accuracy + 0.075F) * 60.0F;
     final var lerpSpread = Mth.lerp(0.5F, this.lastSpread, newSpread);
     final var crosshair = this.client.getCrosshairManager().getCrosshair(this.crosshairLocation);
 

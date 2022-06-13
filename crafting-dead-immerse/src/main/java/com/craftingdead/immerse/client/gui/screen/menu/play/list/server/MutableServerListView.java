@@ -109,6 +109,7 @@ public class MutableServerListView extends ServerListView {
 
   private void removeServer(ServerItemView serverItem) {
     this.listView.removeChild(serverItem);
+    this.listView.layout();
     this.getSelectedItem().ifPresent(item -> {
       if (item == serverItem) {
         this.setSelectedItem(null);

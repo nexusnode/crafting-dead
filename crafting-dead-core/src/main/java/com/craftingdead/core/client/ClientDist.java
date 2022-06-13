@@ -630,7 +630,7 @@ public class ClientDist implements ModDist {
         event.setCanceled(true);
         if (gun.getClient().isCrosshairEnabled()) {
           this.ingameGui.renderCrosshairs(event.getMatrixStack(),
-              gun.getAccuracy(player, player.getEntity().getRandom()),
+              gun.getAccuracy(player),
               event.getPartialTicks(), event.getWindow().getGuiScaledWidth(),
               event.getWindow().getGuiScaledHeight());
         }

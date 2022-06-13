@@ -19,7 +19,6 @@
 package com.craftingdead.core.world.item.gun.aimable;
 
 import java.util.Optional;
-import java.util.Random;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.item.GunItem;
@@ -88,15 +87,8 @@ public class AimableGun extends TypedGun implements Scope {
   }
 
   @Override
-  public float getAccuracy(LivingExtension<?, ?> living, Random random) {
-    return this.isScoping(living)
-        ? CraftingDead.serverConfig.scopeZoomAccuracyMultiplier.get().floatValue()
-        : 1.0F;
-  }
-
-  @Override
   public Optional<ResourceLocation> getOverlayTexture(LivingExtension<?, ?> living) {
-    for (Attachment attachment : this.getAttachments()) {
+    for (var attachment : this.getAttachments()) {
       if (attachment.isScope()) {
         return Optional.of(new ResourceLocation(attachment.getRegistryName().getNamespace(),
             "textures/scope/" + attachment.getRegistryName().getPath() + ".png"));

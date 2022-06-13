@@ -21,7 +21,6 @@ package com.craftingdead.core.world.item.gun;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Random;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -96,10 +95,9 @@ public interface Gun extends CombatSlotProvider, Synched {
    * Get current accuracy percentage of the gun.
    * 
    * @param living - the entity holding the gun
-   * @param random - a {@link Random} instance
    * @return the accuracy percentage
    */
-  float getAccuracy(LivingExtension<?, ?> living, Random random);
+  float getAccuracy(LivingExtension<?, ?> living);
 
   /**
    * Get current attachments on the gun.

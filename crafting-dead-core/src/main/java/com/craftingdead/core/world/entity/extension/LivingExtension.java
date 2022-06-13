@@ -18,7 +18,6 @@
 
 package com.craftingdead.core.world.entity.extension;
 
-import com.craftingdead.core.world.inventory.ModEquipmentSlot;
 import java.util.Optional;
 import java.util.Random;
 import javax.annotation.Nonnull;
@@ -27,6 +26,7 @@ import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.capability.CapabilityUtil;
 import com.craftingdead.core.world.action.Action;
 import com.craftingdead.core.world.action.ActionObserver;
+import com.craftingdead.core.world.inventory.ModEquipmentSlot;
 import com.craftingdead.core.world.item.gun.Gun;
 import net.minecraft.core.particles.ItemParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
@@ -34,10 +34,11 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.common.capabilities.CapabilityToken;
@@ -200,29 +201,6 @@ public interface LivingExtension<E extends LivingEntity, H extends LivingHandler
   void setCrouching(boolean crouching, boolean sendUpdate);
 
   /**
-   * Get a modified gun accuracy for this {@link LivingExtension}. E.g. walking will reduce
-   * accuracy.
-   * 
-   * @param accuracy - the accuracy to modify
-   * @param random - a {@link Random} instance
-   * @return the modified accuracy
-   */
-  default float getModifiedAccuracy(float accuracy, Random random) {
-    if (this.isMoving()) {
-      accuracy -= 0.15F;
-    } else if (this.isCrouching()) {
-      accuracy += 0.15F;
-    }
-
-    // Apply some random accuracy for non-players (bots)
-    if (!(this.getEntity() instanceof Player)) {
-      accuracy -= random.nextFloat();
-    }
-
-    return accuracy;
-  }
-
-  /**
    * Get the {@link LivingEntity} associated with this {@link LivingExtension}.
    * 
    * @return the {@link LivingEntity}
@@ -230,15 +208,17 @@ public interface LivingExtension<E extends LivingEntity, H extends LivingHandler
   E getEntity();
 
   /**
-   * Get the drop chance for the entity equipment slots.
-   * The array indexes will be in correlation with {@link ModEquipmentSlot}
+   * Get the drop chance for the entity equipment slots. The array indexes will be in correlation
+   * with {@link ModEquipmentSlot}
    *
    * <p>
    *
-   * NOTE: Drop chances follows the vanilla drop chance formula <code>Math.max(randomFloat - (lootingLevel * 0.01F), 0.0F) < dropChance</code>
-   * Use <code>2.0F</code> for guarantee drop
+   * NOTE: Drop chances follows the vanilla drop chance formula
+   * <code>Math.max(randomFloat - (lootingLevel * 0.01F), 0.0F) < dropChance</code> Use
+   * <code>2.0F</code> for guarantee drop
    *
-   * @return an array containing the drop chance for each slot, this array will be a copy of the original.
+   * @return an array containing the drop chance for each slot, this array will be a copy of the
+   *         original.
    */
   float[] getEquipmentDropChances();
 
@@ -247,8 +227,9 @@ public interface LivingExtension<E extends LivingEntity, H extends LivingHandler
    *
    * <p>
    *
-   * NOTE: Drop chances follows the vanilla drop chance formula <code>Math.max(randomFloat - (lootingLevel * 0.01F), 0.0F) < dropChance</code>
-   * Use <code>2.0F</code> for guarantee drop
+   * NOTE: Drop chances follows the vanilla drop chance formula
+   * <code>Math.max(randomFloat - (lootingLevel * 0.01F), 0.0F) < dropChance</code> Use
+   * <code>2.0F</code> for guarantee drop
    *
    * @param slot - the equipment slot to get the drop chance
    * @return the drop chance for the provided equipment slot
@@ -256,13 +237,14 @@ public interface LivingExtension<E extends LivingEntity, H extends LivingHandler
   float getEquipmentDropChance(ModEquipmentSlot slot);
 
   /**
-   * Defines the new drop chances for the entity equipment slots.
-   * The provided array must contain all slots from {@link ModEquipmentSlot}
+   * Defines the new drop chances for the entity equipment slots. The provided array must contain
+   * all slots from {@link ModEquipmentSlot}
    *
    * <p>
    *
-   * NOTE: Drop chances follows the vanilla drop chance scheme <code>Math.max(randomFloat - (lootingLevel * 0.01F), 0.0F) < dropChance</code>
-   * Use <code>2.0F</code> for guarantee drop
+   * NOTE: Drop chances follows the vanilla drop chance scheme
+   * <code>Math.max(randomFloat - (lootingLevel * 0.01F), 0.0F) < dropChance</code> Use
+   * <code>2.0F</code> for guarantee drop
    *
    * @param newChances - the new drop chances to be defined
    */
@@ -273,8 +255,9 @@ public interface LivingExtension<E extends LivingEntity, H extends LivingHandler
    *
    * <p>
    *
-   * NOTE: Drop chances follows the vanilla drop chance scheme <code>Math.max(randomFloat - (lootingLevel * 0.01F), 0.0F) < dropChance</code>
-   * Use <code>2.0F</code> for guarantee drop
+   * NOTE: Drop chances follows the vanilla drop chance scheme
+   * <code>Math.max(randomFloat - (lootingLevel * 0.01F), 0.0F) < dropChance</code> Use
+   * <code>2.0F</code> for guarantee drop
    *
    * @param slot - the equipment slot to set the new drop chance
    * @param chance - the new drop chance
@@ -352,5 +335,20 @@ public interface LivingExtension<E extends LivingEntity, H extends LivingHandler
             pos.y, pos.z, velocity.x, velocity.y + 0.05D, velocity.z);
       }
     }
+  }
+
+  default Vec3 getVelocity() {
+    // 0.98 is a magic number used in Minecraft's movement calculations.
+    var gravity = this.getEntity().getAttributeValue(ForgeMod.ENTITY_GRAVITY.get()) * 0.98F;
+    return this.getEntity().getDeltaMovement().add(0, gravity, 0);
+  }
+
+  default EntitySnapshot makeSnapshot(float partialTick) {
+    var entity = this.getEntity();
+    return new EntitySnapshot(entity.getPosition(partialTick),
+        entity.getBoundingBox(),
+        new Vec2(entity.getViewXRot(partialTick), entity.getViewYRot(partialTick)),
+        this.getVelocity(), this.isCrouching(),
+        entity.getEyeHeight(), true);
   }
 }

@@ -19,14 +19,12 @@
 package com.craftingdead.core.world.item.gun;
 
 import java.util.Optional;
-import java.util.Random;
 import java.util.Set;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.item.GunItem;
 import com.craftingdead.core.world.item.combatslot.CombatSlot;
 import com.craftingdead.core.world.item.gun.ammoprovider.AmmoProvider;
-import com.craftingdead.core.world.item.gun.attachment.Attachment;
 import com.craftingdead.core.world.item.gun.attachment.AttachmentLike;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.item.Item;
@@ -104,10 +102,8 @@ public abstract class TypedGun extends AbstractGun {
   }
 
   @Override
-  public float getAccuracy(LivingExtension<?, ?> living, Random random) {
-    float accuracy = this.configuration.getAccuracyPercent()
-        * this.getAttachmentMultiplier(Attachment.MultiplierType.ACCURACY);
-    return Math.min(living.getModifiedAccuracy(accuracy, random), 1.0F);
+  protected float getAccuracy() {
+    return this.configuration.getAccuracyPercent();
   }
 
   @Override

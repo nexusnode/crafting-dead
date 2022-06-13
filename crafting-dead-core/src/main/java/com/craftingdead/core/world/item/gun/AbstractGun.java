@@ -330,9 +330,31 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
       var random = player.getRandom();
       random.setSeed(pendingHit.randomSeed());
       rayTrace(player.getLevel(), playerSnapshot, hitSnapshot, this.getRange(),
-          this.getAccuracy(player, random), pendingHit.shotCount(), random)
+          this.getAccuracy(playerSnapshot.velocity(), playerSnapshot.crouching()),
+          pendingHit.shotCount(), random)
               .ifPresent(hitPos -> this.hitEntity(player, hitLiving.getEntity(), hitPos, false));
     }
+  }
+
+  @Override
+  public final float getAccuracy(LivingExtension<?, ?> living) {
+    return this.getAccuracy(living.getVelocity(), living.isCrouching());
+  }
+
+  protected abstract float getAccuracy();
+
+  private float getAccuracy(Vec3 velocity, boolean crouching) {
+    var accuracy =
+        this.getAccuracy() * this.getAttachmentMultiplier(Attachment.MultiplierType.ACCURACY);
+
+    accuracy *= 1.0F - (float) velocity.length();
+
+    if (crouching) {
+      // Increase by 10%
+      accuracy *= 1.1F;
+    }
+
+    return Math.min(1.0F, accuracy);
   }
 
   protected abstract double getRange();
@@ -425,7 +447,7 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
 
       var partialTick = level.isClientSide() ? this.getClient().getPartialTick() : 1.0F;
       var hitResult = rayTrace(entity, this.getRange(), partialTick,
-          this.getAccuracy(living, random), this.getShotCount(), random).orElse(null);
+          this.getAccuracy(living), this.getShotCount(), random).orElse(null);
 
       if (hitResult != null) {
         switch (hitResult.getType()) {
@@ -888,8 +910,9 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
   }
 
   public static float getAccuracyOffset(float accuracy, int shotCount, Random random) {
-    return (1.0F - (accuracy * accuracy)) * (Math.min(20, shotCount + 1) / 2.0F)
-        * ((1.0F - accuracy) * (random.nextInt(9) + 1))
-        * (random.nextInt(5) % 2 == 0 ? -1.0F : 1.0F);
+    return ((1.0F - (accuracy * accuracy))
+        * (Math.min(20, shotCount + 1) / 2.0F)
+        * (random.nextInt(5) % 2 == 0 ? -1.0F : 1.0F))
+        + ((1.0F - accuracy) * (random.nextInt(9) + 1));
   }
 }

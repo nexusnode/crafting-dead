@@ -59,7 +59,6 @@ public class ServerConfig {
 //  public final ForgeConfigSpec.BooleanValue scopeNightVision;
 //  public final ForgeConfigSpec.BooleanValue scopeThermalVision;
   public final ForgeConfigSpec.DoubleValue scopeZoomMultiplier;
-  public final ForgeConfigSpec.DoubleValue scopeZoomAccuracyMultiplier;
 //  public final ForgeConfigSpec.BooleanValue scopeZoomBeforeShooting;
 
   // ================================================================================
@@ -223,10 +222,6 @@ public class ServerConfig {
           .translation("options.craftingdead.server.zoom_amount_multiplier")
           .comment("Additional zoom given to the base scope zoom (Multiplier)")
           .defineInRange("zoomMultiplier", 1D, 0.1D, 3D);
-      this.scopeZoomAccuracyMultiplier = builder
-          .translation("options.craftingdead.server.zoom_accuracy_multiplier")
-          .comment("Additional accuracy given when scoping (Multiplier)")
-          .defineInRange("zoomAccuracyMultiplier", 1D, 0.1D, 3D);
 //      this.scopeZoomBeforeShooting = builder
 //          .translation("")
 //          .define("Zoom Before Shooting", true);
