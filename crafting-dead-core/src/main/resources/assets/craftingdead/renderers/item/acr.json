@@ -13,14 +13,14 @@
             1.2
         ]
     },
-    "aiming_transform": {
+    "aim_transform": {
         "translation": [
             -9.5,
             -3,
             -2
         ]
     },
-    "attachment_aiming_transform": {
+    "attachment_aim_transform": {
         "translation": [
             -9.5,
             -3,

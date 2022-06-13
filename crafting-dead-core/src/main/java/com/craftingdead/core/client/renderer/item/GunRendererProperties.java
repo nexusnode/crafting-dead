@@ -34,11 +34,11 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.StringRepresentable;
 
-public record GunRendererProperties(
+public record GunRendererProperties( 
     ResourceLocation modelLocation,
     Transformation muzzleFlashTransform,
-    Transformation aimingTransform,
-    Transformation attachmentAimingTransform,
+    Transformation aimTransform,
+    Transformation scopeAimTransform,
     Transformation sprintingTransform,
     Transformation backTransform,
     Map<ResourceLocation, Transformation> attachmentTransforms,
@@ -63,11 +63,11 @@ public record GunRendererProperties(
                   .fieldOf("muzzle_flash_transform")
                   .forGetter(GunRendererProperties::muzzleFlashTransform),
               RenderUtil.TRANSFORMATION_MATRIX_CODEC
-                  .optionalFieldOf("aiming_transform", Transformation.identity())
-                  .forGetter(GunRendererProperties::aimingTransform),
+                  .optionalFieldOf("aim_transform", Transformation.identity())
+                  .forGetter(GunRendererProperties::aimTransform),
               RenderUtil.TRANSFORMATION_MATRIX_CODEC
-                  .optionalFieldOf("attachment_aiming_transform", Transformation.identity())
-                  .forGetter(GunRendererProperties::attachmentAimingTransform),
+                  .optionalFieldOf("scoping_aim_transform", Transformation.identity())
+                  .forGetter(GunRendererProperties::scopeAimTransform),
               RenderUtil.TRANSFORMATION_MATRIX_CODEC
                   .optionalFieldOf("sprinting_transform", DEFAULT_SPRINTING_TRANSFORM)
                   .forGetter(GunRendererProperties::sprintingTransform),

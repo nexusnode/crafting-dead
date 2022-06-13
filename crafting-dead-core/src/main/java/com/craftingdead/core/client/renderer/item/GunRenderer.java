@@ -432,18 +432,13 @@ public class GunRenderer implements CustomItemRenderer {
     bakedModel = bakedModel.handlePerspective(transformType, tempPoseStack);
     var normalTransform = new Transformation(tempPoseStack.last().pose());
 
-    Transformation perspectiveTransform;
-    if (aimingPct > 0) {
-      if (gun.hasIronSight()) {
-        perspectiveTransform =
-            TransformationHelper.slerp(normalTransform, this.properties.aimingTransform(), aimingPct);
-      } else {
-        perspectiveTransform =
-            TransformationHelper.slerp(normalTransform, this.properties.attachmentAimingTransform(), aimingPct);
-      }
-    } else {
-      perspectiveTransform = normalTransform;
-    }
+    var perspectiveTransform = aimingPct > 0
+        ? TransformationHelper.slerp(normalTransform,
+            gun.hasIronSight()
+                ? this.properties.aimTransform()
+                : this.properties.scopeAimTransform(),
+            aimingPct)
+        : normalTransform;
 
     perspectiveTransform.push(matrixStack);
     {
