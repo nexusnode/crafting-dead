@@ -229,6 +229,7 @@ WorldListView {
 
 .list-content {
     flex-grow: 1;
+    box-sizing: border-box;
     padding-top: 7px;
     padding-bottom: 7px;
     overflow: scroll;
