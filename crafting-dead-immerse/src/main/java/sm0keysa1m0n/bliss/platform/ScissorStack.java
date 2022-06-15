@@ -36,7 +36,8 @@ public class ScissorStack {
       return;
     }
     RenderSystem.enableScissor(rect.getLeft(), rect.getTop(),
-        rect.getLeft() + rect.getRight(), rect.getTop() + rect.getBottom());
+        Math.max(rect.getRight() - rect.getLeft(), 0),
+        Math.max(rect.getBottom() - rect.getTop(), 0));
   }
 
   @Nullable
