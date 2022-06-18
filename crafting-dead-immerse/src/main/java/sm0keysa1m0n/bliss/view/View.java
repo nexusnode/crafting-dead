@@ -196,7 +196,8 @@ public class View implements Comparable<View>, StyleNode {
         var scale = this.graphicsContext.scale();
         ScissorStack.push(
             (int) (this.getScaledX() * scale),
-            (int) (this.getScaledY() * scale),
+            // Convert to OpenGL coordinate
+            (int) (minecraft.getWindow().getHeight() - ((this.getScaledY() * scale) + (this.getScaledHeight() * scale))),
             (int) (this.getScaledWidth() * scale),
             (int) (this.getScaledHeight() * scale));
       }

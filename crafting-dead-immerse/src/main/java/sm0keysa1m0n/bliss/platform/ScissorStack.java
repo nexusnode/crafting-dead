@@ -2,6 +2,7 @@ package sm0keysa1m0n.bliss.platform;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.Objects;
 import org.jetbrains.annotations.Nullable;
 import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.humbleui.types.IRect;
@@ -15,13 +16,15 @@ public class ScissorStack {
 
   private static final Deque<IRect> regionStack = new ArrayDeque<>();
 
+  // Note: OpenGL uses left-bottom coordinate, manual conversion from left-top coordinate required
   public static void push(int x, int y, int width, int height) {
     push(new IRect(x, y, width, height));
   }
 
   public static void push(IRect rect) {
     var parentRect = peek();
-    regionStack.push(parentRect == null ? rect : rect.intersect(parentRect));
+    regionStack.push(
+        Objects.requireNonNullElse(parentRect == null ? rect : rect.intersect(parentRect), rect));
   }
 
   public static void pop() {
@@ -35,9 +38,10 @@ public class ScissorStack {
     if (rect == null) {
       return;
     }
+    // getRight == width, getBottom == height
     RenderSystem.enableScissor(rect.getLeft(), rect.getTop(),
-        Math.max(rect.getRight() - rect.getLeft(), 0),
-        Math.max(rect.getBottom() - rect.getTop(), 0));
+        rect.getRight(),
+        rect.getBottom());
   }
 
   @Nullable
