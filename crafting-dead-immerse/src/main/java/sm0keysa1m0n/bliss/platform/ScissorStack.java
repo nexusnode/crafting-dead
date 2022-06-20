@@ -18,7 +18,7 @@ public class ScissorStack {
 
   // Note: OpenGL uses left-bottom coordinate, manual conversion from left-top coordinate required
   public static void push(int x, int y, int width, int height) {
-    push(new IRect(x, y, width, height));
+    push(IRect.makeXYWH(x, y, width, height));
   }
 
   public static void push(IRect rect) {
@@ -38,10 +38,8 @@ public class ScissorStack {
     if (rect == null) {
       return;
     }
-    // getRight == width, getBottom == height
     RenderSystem.enableScissor(rect.getLeft(), rect.getTop(),
-        rect.getRight(),
-        rect.getBottom());
+        rect.getWidth(), rect.getHeight());
   }
 
   @Nullable
