@@ -66,7 +66,7 @@ public record GunRendererProperties(
                   .optionalFieldOf("aim_transform", Transformation.identity())
                   .forGetter(GunRendererProperties::aimTransform),
               RenderUtil.TRANSFORMATION_MATRIX_CODEC
-                  .optionalFieldOf("scoping_aim_transform", Transformation.identity())
+                  .optionalFieldOf("scope_aim_transform", Transformation.identity())
                   .forGetter(GunRendererProperties::scopeAimTransform),
               RenderUtil.TRANSFORMATION_MATRIX_CODEC
                   .optionalFieldOf("sprinting_transform", DEFAULT_SPRINTING_TRANSFORM)
