@@ -2,7 +2,7 @@
   "type": "minecraft:crafting_shapeless",
   "ingredients": [
     {
-      "item": "craftingdeadimmerse:canned_bacon"
+      "item": "craftingdeadimmerse:canned_sweetcorn"
     },
     [
       {
@@ -17,6 +17,6 @@
     ]
   ],
   "result": {
-    "item": "craftingdeadimmerse:open_canned_bacon"
+    "item": "craftingdeadimmerse:open_canned_sweetcorn"
   }
 }

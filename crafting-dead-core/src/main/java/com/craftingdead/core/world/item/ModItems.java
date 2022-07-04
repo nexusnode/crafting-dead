@@ -557,125 +557,133 @@ public class ModItems {
   // ================================================================================
 
   public static final RegistryObject<GunItem> M4A1 =
-      deferredRegister.register("m4a1", () -> AimableGunItem.builder(GunConfigurations.M4A1.getKey())
-          .putAnimation(GunAnimationEvent.SHOOT, RifleShootAnimation::new)
-          .putReloadAnimation(ReloadAnimation::new)
-          .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
-          .setDefaultMagazine(ModItems.STANAG_20_ROUND_MAGAZINE)
-          .addAcceptedMagazine(ModItems.STANAG_30_ROUND_MAGAZINE)
-          .addAcceptedMagazine(ModItems.STANAG_DRUM_MAGAZINE)
-          .addAcceptedMagazine(ModItems.STANAG_BOX_MAGAZINE)
-          .addAcceptedAttachment(Attachments.RED_DOT_SIGHT)
-          .addAcceptedAttachment(Attachments.ACOG_SIGHT)
-          .addAcceptedAttachment(Attachments.LP_SCOPE)
-          .addAcceptedAttachment(Attachments.HP_SCOPE)
-          .addAcceptedAttachment(Attachments.TACTICAL_GRIP)
-          .addAcceptedAttachment(Attachments.BIPOD)
-          .addAcceptedAttachment(Attachments.SUPPRESSOR)
-          .addAcceptedAttachment(Attachments.EOTECH_SIGHT)
-          .build());
+      deferredRegister.register("m4a1",
+          () -> AimableGunItem.builder(GunConfigurations.M4A1.getKey())
+              .putAnimation(GunAnimationEvent.SHOOT, RifleShootAnimation::new)
+              .putReloadAnimation(ReloadAnimation::new)
+              .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
+              .setDefaultMagazine(ModItems.STANAG_20_ROUND_MAGAZINE)
+              .addAcceptedMagazine(ModItems.STANAG_30_ROUND_MAGAZINE)
+              .addAcceptedMagazine(ModItems.STANAG_DRUM_MAGAZINE)
+              .addAcceptedMagazine(ModItems.STANAG_BOX_MAGAZINE)
+              .addAcceptedAttachment(Attachments.RED_DOT_SIGHT)
+              .addAcceptedAttachment(Attachments.ACOG_SIGHT)
+              .addAcceptedAttachment(Attachments.LP_SCOPE)
+              .addAcceptedAttachment(Attachments.HP_SCOPE)
+              .addAcceptedAttachment(Attachments.TACTICAL_GRIP)
+              .addAcceptedAttachment(Attachments.BIPOD)
+              .addAcceptedAttachment(Attachments.SUPPRESSOR)
+              .addAcceptedAttachment(Attachments.EOTECH_SIGHT)
+              .build());
 
   public static final RegistryObject<GunItem> SCARL =
-      deferredRegister.register("scarl", () -> AimableGunItem.builder(GunConfigurations.SCARL.getKey())
-          .putAnimation(GunAnimationEvent.SHOOT, RifleShootAnimation::new)
-          .putReloadAnimation(ReloadAnimation::new)
-          .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
-          .setDefaultMagazine(ModItems.STANAG_20_ROUND_MAGAZINE)
-          .addAcceptedMagazine(ModItems.STANAG_30_ROUND_MAGAZINE)
-          .addAcceptedMagazine(ModItems.STANAG_DRUM_MAGAZINE)
-          .addAcceptedMagazine(ModItems.STANAG_BOX_MAGAZINE)
-          .addAcceptedAttachment(Attachments.RED_DOT_SIGHT)
-          .addAcceptedAttachment(Attachments.ACOG_SIGHT)
-          .addAcceptedAttachment(Attachments.LP_SCOPE)
-          .addAcceptedAttachment(Attachments.HP_SCOPE)
-          .addAcceptedAttachment(Attachments.TACTICAL_GRIP)
-          .addAcceptedAttachment(Attachments.BIPOD)
-          .addAcceptedAttachment(Attachments.SUPPRESSOR)
-          .addAcceptedAttachment(Attachments.EOTECH_SIGHT)
-          .build());
+      deferredRegister.register("scarl",
+          () -> AimableGunItem.builder(GunConfigurations.SCARL.getKey())
+              .putAnimation(GunAnimationEvent.SHOOT, RifleShootAnimation::new)
+              .putReloadAnimation(ReloadAnimation::new)
+              .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
+              .setDefaultMagazine(ModItems.STANAG_20_ROUND_MAGAZINE)
+              .addAcceptedMagazine(ModItems.STANAG_30_ROUND_MAGAZINE)
+              .addAcceptedMagazine(ModItems.STANAG_DRUM_MAGAZINE)
+              .addAcceptedMagazine(ModItems.STANAG_BOX_MAGAZINE)
+              .addAcceptedAttachment(Attachments.RED_DOT_SIGHT)
+              .addAcceptedAttachment(Attachments.ACOG_SIGHT)
+              .addAcceptedAttachment(Attachments.LP_SCOPE)
+              .addAcceptedAttachment(Attachments.HP_SCOPE)
+              .addAcceptedAttachment(Attachments.TACTICAL_GRIP)
+              .addAcceptedAttachment(Attachments.BIPOD)
+              .addAcceptedAttachment(Attachments.SUPPRESSOR)
+              .addAcceptedAttachment(Attachments.EOTECH_SIGHT)
+              .build());
 
   public static final RegistryObject<GunItem> AK47 =
-      deferredRegister.register("ak47", () -> AimableGunItem.builder(GunConfigurations.AK47.getKey())
-          .putAnimation(GunAnimationEvent.SHOOT, RifleShootAnimation::new)
-          .putReloadAnimation(ReloadAnimation::new)
-          .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
-          .setDefaultMagazine(ModItems.AK47_30_ROUND_MAGAZINE)
-          .addAcceptedAttachment(Attachments.RED_DOT_SIGHT)
-          .addAcceptedAttachment(Attachments.ACOG_SIGHT)
-          .addAcceptedAttachment(Attachments.LP_SCOPE)
-          .addAcceptedAttachment(Attachments.HP_SCOPE)
-          .addAcceptedAttachment(Attachments.TACTICAL_GRIP)
-          .addAcceptedAttachment(Attachments.BIPOD)
-          .addAcceptedAttachment(Attachments.EOTECH_SIGHT)
-          .addAcceptedAttachment(Attachments.SUPPRESSOR)
-          .build());
+      deferredRegister.register("ak47",
+          () -> AimableGunItem.builder(GunConfigurations.AK47.getKey())
+              .putAnimation(GunAnimationEvent.SHOOT, RifleShootAnimation::new)
+              .putReloadAnimation(ReloadAnimation::new)
+              .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
+              .setDefaultMagazine(ModItems.AK47_30_ROUND_MAGAZINE)
+              .addAcceptedAttachment(Attachments.RED_DOT_SIGHT)
+              .addAcceptedAttachment(Attachments.ACOG_SIGHT)
+              .addAcceptedAttachment(Attachments.LP_SCOPE)
+              .addAcceptedAttachment(Attachments.HP_SCOPE)
+              .addAcceptedAttachment(Attachments.TACTICAL_GRIP)
+              .addAcceptedAttachment(Attachments.BIPOD)
+              .addAcceptedAttachment(Attachments.EOTECH_SIGHT)
+              .addAcceptedAttachment(Attachments.SUPPRESSOR)
+              .build());
 
   public static final RegistryObject<GunItem> FNFAL =
-      deferredRegister.register("fnfal", () -> AimableGunItem.builder(GunConfigurations.FNFAL.getKey())
-          .putAnimation(GunAnimationEvent.SHOOT, RifleShootAnimation::new)
-          .putReloadAnimation(ReloadAnimation::new)
-          .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
-          .setDefaultMagazine(ModItems.FNFAL_MAGAZINE)
-          .addAcceptedAttachment(Attachments.RED_DOT_SIGHT)
-          .addAcceptedAttachment(Attachments.ACOG_SIGHT)
-          .addAcceptedAttachment(Attachments.LP_SCOPE)
-          .addAcceptedAttachment(Attachments.HP_SCOPE)
-          .addAcceptedAttachment(Attachments.TACTICAL_GRIP)
-          .addAcceptedAttachment(Attachments.BIPOD)
-          .addAcceptedAttachment(Attachments.SUPPRESSOR)
-          .build());
+      deferredRegister.register("fnfal",
+          () -> AimableGunItem.builder(GunConfigurations.FNFAL.getKey())
+              .putAnimation(GunAnimationEvent.SHOOT, RifleShootAnimation::new)
+              .putReloadAnimation(ReloadAnimation::new)
+              .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
+              .setDefaultMagazine(ModItems.FNFAL_MAGAZINE)
+              .addAcceptedAttachment(Attachments.RED_DOT_SIGHT)
+              .addAcceptedAttachment(Attachments.ACOG_SIGHT)
+              .addAcceptedAttachment(Attachments.LP_SCOPE)
+              .addAcceptedAttachment(Attachments.HP_SCOPE)
+              .addAcceptedAttachment(Attachments.TACTICAL_GRIP)
+              .addAcceptedAttachment(Attachments.BIPOD)
+              .addAcceptedAttachment(Attachments.SUPPRESSOR)
+              .build());
 
   public static final RegistryObject<GunItem> ACR =
-      deferredRegister.register("acr", () -> AimableGunItem.builder(GunConfigurations.ACR.getKey())
-          .putAnimation(GunAnimationEvent.SHOOT, RifleShootAnimation::new)
-          .putReloadAnimation(ReloadAnimation::new)
-          .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
-          .setDefaultMagazine(ModItems.ACR_MAGAZINE)
-          .addAcceptedAttachment(Attachments.RED_DOT_SIGHT)
-          .addAcceptedAttachment(Attachments.SUPPRESSOR)
-          .addAcceptedAttachment(Attachments.LP_SCOPE)
-          .addAcceptedAttachment(Attachments.HP_SCOPE)
-          .addAcceptedAttachment(Attachments.TACTICAL_GRIP)
-          .addAcceptedAttachment(Attachments.EOTECH_SIGHT)
-          .build());
+      deferredRegister.register("acr",
+          () -> AimableGunItem.builder(GunConfigurations.ACR.getKey())
+              .putAnimation(GunAnimationEvent.SHOOT, RifleShootAnimation::new)
+              .putReloadAnimation(ReloadAnimation::new)
+              .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
+              .setDefaultMagazine(ModItems.ACR_MAGAZINE)
+              .addAcceptedAttachment(Attachments.RED_DOT_SIGHT)
+              .addAcceptedAttachment(Attachments.SUPPRESSOR)
+              .addAcceptedAttachment(Attachments.LP_SCOPE)
+              .addAcceptedAttachment(Attachments.HP_SCOPE)
+              .addAcceptedAttachment(Attachments.TACTICAL_GRIP)
+              .addAcceptedAttachment(Attachments.EOTECH_SIGHT)
+              .build());
 
   public static final RegistryObject<GunItem> HK417 =
-      deferredRegister.register("hk417", () -> AimableGunItem.builder(GunConfigurations.HK417.getKey())
-          .putAnimation(GunAnimationEvent.SHOOT, RifleShootAnimation::new)
-          .putReloadAnimation(ReloadAnimation::new)
-          .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
-          .setDefaultMagazine(ModItems.HK417_MAGAZINE)
-          .addAcceptedAttachment(Attachments.RED_DOT_SIGHT)
-          .addAcceptedAttachment(Attachments.TACTICAL_GRIP)
-          .addAcceptedAttachment(Attachments.ACOG_SIGHT)
-          .addAcceptedAttachment(Attachments.LP_SCOPE)
-          .addAcceptedAttachment(Attachments.HP_SCOPE)
-          .addAcceptedAttachment(Attachments.SUPPRESSOR)
-          .addAcceptedAttachment(Attachments.EOTECH_SIGHT)
-          .build());
+      deferredRegister.register("hk417",
+          () -> AimableGunItem.builder(GunConfigurations.HK417.getKey())
+              .putAnimation(GunAnimationEvent.SHOOT, RifleShootAnimation::new)
+              .putReloadAnimation(ReloadAnimation::new)
+              .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
+              .setDefaultMagazine(ModItems.HK417_MAGAZINE)
+              .addAcceptedAttachment(Attachments.RED_DOT_SIGHT)
+              .addAcceptedAttachment(Attachments.TACTICAL_GRIP)
+              .addAcceptedAttachment(Attachments.ACOG_SIGHT)
+              .addAcceptedAttachment(Attachments.LP_SCOPE)
+              .addAcceptedAttachment(Attachments.HP_SCOPE)
+              .addAcceptedAttachment(Attachments.SUPPRESSOR)
+              .addAcceptedAttachment(Attachments.EOTECH_SIGHT)
+              .build());
 
   public static final RegistryObject<GunItem> MPT55 =
-      deferredRegister.register("mpt55", () -> AimableGunItem.builder(GunConfigurations.MPT55.getKey())
-          .putAnimation(GunAnimationEvent.SHOOT, RifleShootAnimation::new)
-          .putReloadAnimation(ReloadAnimation::new)
-          .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
-          .setDefaultMagazine(ModItems.MPT55_MAGAZINE)
-          .addAcceptedAttachment(Attachments.RED_DOT_SIGHT)
-          .addAcceptedAttachment(Attachments.ACOG_SIGHT)
-          .addAcceptedAttachment(Attachments.LP_SCOPE)
-          .addAcceptedAttachment(Attachments.SUPPRESSOR)
-          .build());
+      deferredRegister.register("mpt55",
+          () -> AimableGunItem.builder(GunConfigurations.MPT55.getKey())
+              .putAnimation(GunAnimationEvent.SHOOT, RifleShootAnimation::new)
+              .putReloadAnimation(ReloadAnimation::new)
+              .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
+              .setDefaultMagazine(ModItems.MPT55_MAGAZINE)
+              .addAcceptedAttachment(Attachments.RED_DOT_SIGHT)
+              .addAcceptedAttachment(Attachments.ACOG_SIGHT)
+              .addAcceptedAttachment(Attachments.LP_SCOPE)
+              .addAcceptedAttachment(Attachments.SUPPRESSOR)
+              .build());
 
   public static final RegistryObject<GunItem> M1GARAND =
-      deferredRegister.register("m1garand", () -> AimableGunItem.builder(GunConfigurations.M1GARAND.getKey())
-          .putAnimation(GunAnimationEvent.SHOOT, RifleShootAnimation::new)
-          .putReloadAnimation(ReloadAnimation::new)
-          .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
-          .setDefaultMagazine(ModItems.M1GARAND_MAGAZINE)
-          .addAcceptedAttachment(Attachments.LP_SCOPE)
-          .addAcceptedAttachment(Attachments.HP_SCOPE)
-          .addAcceptedAttachment(Attachments.BIPOD)
-          .build());
+      deferredRegister.register("m1garand",
+          () -> AimableGunItem.builder(GunConfigurations.M1GARAND.getKey())
+              .putAnimation(GunAnimationEvent.SHOOT, RifleShootAnimation::new)
+              .putReloadAnimation(ReloadAnimation::new)
+              .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
+              .setDefaultMagazine(ModItems.M1GARAND_MAGAZINE)
+              .addAcceptedAttachment(Attachments.LP_SCOPE)
+              .addAcceptedAttachment(Attachments.HP_SCOPE)
+              .addAcceptedAttachment(Attachments.BIPOD)
+              .build());
 
   public static final RegistryObject<GunItem> SPORTER22 =
       deferredRegister.register("sporter22",
@@ -694,112 +702,121 @@ public class ModItems {
               .build());
 
   public static final RegistryObject<GunItem> G36C =
-      deferredRegister.register("g36c", () -> AimableGunItem.builder(GunConfigurations.G36C.getKey())
-          .putAnimation(GunAnimationEvent.SHOOT, RifleShootAnimation::new)
-          .putReloadAnimation(ReloadAnimation::new)
-          .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
-          .setDefaultMagazine(ModItems.G36C_MAGAZINE)
-          .addAcceptedAttachment(Attachments.RED_DOT_SIGHT)
-          .addAcceptedAttachment(Attachments.TACTICAL_GRIP)
-          .addAcceptedAttachment(Attachments.ACOG_SIGHT)
-          .addAcceptedAttachment(Attachments.EOTECH_SIGHT)
-          .build());
+      deferredRegister.register("g36c",
+          () -> AimableGunItem.builder(GunConfigurations.G36C.getKey())
+              .putAnimation(GunAnimationEvent.SHOOT, RifleShootAnimation::new)
+              .putReloadAnimation(ReloadAnimation::new)
+              .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
+              .setDefaultMagazine(ModItems.G36C_MAGAZINE)
+              .addAcceptedAttachment(Attachments.RED_DOT_SIGHT)
+              .addAcceptedAttachment(Attachments.TACTICAL_GRIP)
+              .addAcceptedAttachment(Attachments.ACOG_SIGHT)
+              .addAcceptedAttachment(Attachments.EOTECH_SIGHT)
+              .build());
 
   // ================================================================================
   // Machine Guns
   // ================================================================================
 
   public static final RegistryObject<GunItem> M240B =
-      deferredRegister.register("m240b", () -> AimableGunItem.builder(GunConfigurations.M240B.getKey())
-          .putAnimation(GunAnimationEvent.SHOOT, SubmachineShootAnimation::new)
-          .putReloadAnimation(ReloadAnimation::new)
-          .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
-          .setDefaultMagazine(ModItems.M240B_MAGAZINE)
-          .addAcceptedAttachment(Attachments.RED_DOT_SIGHT)
-          .addAcceptedAttachment(Attachments.TACTICAL_GRIP)
-          .addAcceptedAttachment(Attachments.BIPOD)
-          .addAcceptedAttachment(Attachments.SUPPRESSOR)
-          .addAcceptedAttachment(Attachments.EOTECH_SIGHT)
-          .build());
+      deferredRegister.register("m240b",
+          () -> AimableGunItem.builder(GunConfigurations.M240B.getKey())
+              .putAnimation(GunAnimationEvent.SHOOT, SubmachineShootAnimation::new)
+              .putReloadAnimation(ReloadAnimation::new)
+              .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
+              .setDefaultMagazine(ModItems.M240B_MAGAZINE)
+              .addAcceptedAttachment(Attachments.RED_DOT_SIGHT)
+              .addAcceptedAttachment(Attachments.TACTICAL_GRIP)
+              .addAcceptedAttachment(Attachments.BIPOD)
+              .addAcceptedAttachment(Attachments.SUPPRESSOR)
+              .addAcceptedAttachment(Attachments.EOTECH_SIGHT)
+              .build());
 
   public static final RegistryObject<GunItem> RPK =
-      deferredRegister.register("rpk", () -> AimableGunItem.builder(GunConfigurations.RPK.getKey())
-          .putAnimation(GunAnimationEvent.SHOOT, RifleShootAnimation::new)
-          .putReloadAnimation(ReloadAnimation::new)
-          .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
-          .setDefaultMagazine(ModItems.RPK_MAGAZINE)
-          .addAcceptedMagazine(ModItems.RPK_DRUM_MAGAZINE)
-          .addAcceptedAttachment(Attachments.RED_DOT_SIGHT)
-          .addAcceptedAttachment(Attachments.SUPPRESSOR)
-          .addAcceptedAttachment(Attachments.ACOG_SIGHT)
-          .build());
+      deferredRegister.register("rpk",
+          () -> AimableGunItem.builder(GunConfigurations.RPK.getKey())
+              .putAnimation(GunAnimationEvent.SHOOT, RifleShootAnimation::new)
+              .putReloadAnimation(ReloadAnimation::new)
+              .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
+              .setDefaultMagazine(ModItems.RPK_MAGAZINE)
+              .addAcceptedMagazine(ModItems.RPK_DRUM_MAGAZINE)
+              .addAcceptedAttachment(Attachments.RED_DOT_SIGHT)
+              .addAcceptedAttachment(Attachments.SUPPRESSOR)
+              .addAcceptedAttachment(Attachments.ACOG_SIGHT)
+              .build());
 
   public static final RegistryObject<GunItem> MINIGUN =
-      deferredRegister.register("minigun", () -> MinigunItem.builder(GunConfigurations.MINIGUN.getKey())
-          .putAnimation(GunAnimationEvent.SHOOT, SubmachineShootAnimation::new)
-          .putReloadAnimation(ReloadAnimation::new)
-          .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
-          .setDefaultMagazine(ModItems.MINIGUN_MAGAZINE)
-          .setTriggerPredicate(Gun::isPerformingSecondaryAction)
-          .build());
+      deferredRegister.register("minigun",
+          () -> MinigunItem.builder(GunConfigurations.MINIGUN.getKey())
+              .putAnimation(GunAnimationEvent.SHOOT, SubmachineShootAnimation::new)
+              .putReloadAnimation(ReloadAnimation::new)
+              .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
+              .setDefaultMagazine(ModItems.MINIGUN_MAGAZINE)
+              .setTriggerPredicate(Gun::isPerformingSecondaryAction)
+              .build());
 
   public static final RegistryObject<GunItem> MK48MOD =
-      deferredRegister.register("mk48mod", () -> AimableGunItem.builder(GunConfigurations.MK48MOD.getKey())
-          .putAnimation(GunAnimationEvent.SHOOT, SubmachineShootAnimation::new)
-          .putReloadAnimation(ReloadAnimation::new)
-          .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
-          .setDefaultMagazine(ModItems.MK48MOD_MAGAZINE)
-          .addAcceptedAttachment(Attachments.RED_DOT_SIGHT)
-          .addAcceptedAttachment(Attachments.TACTICAL_GRIP)
-          .addAcceptedAttachment(Attachments.BIPOD)
-          .addAcceptedAttachment(Attachments.SUPPRESSOR)
-          .addAcceptedAttachment(Attachments.EOTECH_SIGHT)
-          .build());
+      deferredRegister.register("mk48mod",
+          () -> AimableGunItem.builder(GunConfigurations.MK48MOD.getKey())
+              .putAnimation(GunAnimationEvent.SHOOT, SubmachineShootAnimation::new)
+              .putReloadAnimation(ReloadAnimation::new)
+              .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
+              .setDefaultMagazine(ModItems.MK48MOD_MAGAZINE)
+              .addAcceptedAttachment(Attachments.RED_DOT_SIGHT)
+              .addAcceptedAttachment(Attachments.TACTICAL_GRIP)
+              .addAcceptedAttachment(Attachments.BIPOD)
+              .addAcceptedAttachment(Attachments.SUPPRESSOR)
+              .addAcceptedAttachment(Attachments.EOTECH_SIGHT)
+              .build());
 
   // ================================================================================
   // Pistols
   // ================================================================================
 
   public static final RegistryObject<GunItem> TASER =
-      deferredRegister.register("taser", () -> AimableGunItem.builder(GunConfigurations.TASER.getKey())
-          .setCombatSlot(CombatSlot.SECONDARY)
-          .putAnimation(GunAnimationEvent.SHOOT, PistolShootAnimation::new)
-          .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
-          .putReloadAnimation(ReloadAnimation::new)
-          .setDefaultMagazine(ModItems.TASER_CARTRIDGE)
-          .build());
+      deferredRegister.register("taser",
+          () -> AimableGunItem.builder(GunConfigurations.TASER.getKey())
+              .setCombatSlot(CombatSlot.SECONDARY)
+              .putAnimation(GunAnimationEvent.SHOOT, PistolShootAnimation::new)
+              .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
+              .putReloadAnimation(ReloadAnimation::new)
+              .setDefaultMagazine(ModItems.TASER_CARTRIDGE)
+              .build());
 
   public static final RegistryObject<GunItem> M1911 =
-      deferredRegister.register("m1911", () -> AimableGunItem.builder(GunConfigurations.M1911.getKey())
-          .setCombatSlot(CombatSlot.SECONDARY)
-          .putAnimation(GunAnimationEvent.SHOOT, PistolShootAnimation::new)
-          .putReloadAnimation(ReloadAnimation::new)
-          .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
-          .setDefaultMagazine(ModItems.M1911_MAGAZINE)
-          .addAcceptedAttachment(Attachments.RED_DOT_SIGHT)
-          .addAcceptedAttachment(Attachments.SUPPRESSOR)
-          .build());
+      deferredRegister.register("m1911",
+          () -> AimableGunItem.builder(GunConfigurations.M1911.getKey())
+              .setCombatSlot(CombatSlot.SECONDARY)
+              .putAnimation(GunAnimationEvent.SHOOT, PistolShootAnimation::new)
+              .putReloadAnimation(ReloadAnimation::new)
+              .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
+              .setDefaultMagazine(ModItems.M1911_MAGAZINE)
+              .addAcceptedAttachment(Attachments.RED_DOT_SIGHT)
+              .addAcceptedAttachment(Attachments.SUPPRESSOR)
+              .build());
 
   public static final RegistryObject<GunItem> G18 =
-      deferredRegister.register("g18", () -> AimableGunItem.builder(GunConfigurations.G18.getKey())
-          .setCombatSlot(CombatSlot.SECONDARY)
-          .putAnimation(GunAnimationEvent.SHOOT, PistolShootAnimation::new)
-          .putReloadAnimation(ReloadAnimation::new)
-          .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
-          .setDefaultMagazine(ModItems.G18_MAGAZINE)
-          .addAcceptedAttachment(Attachments.RED_DOT_SIGHT)
-          .addAcceptedAttachment(Attachments.SUPPRESSOR)
-          .build());
+      deferredRegister.register("g18",
+          () -> AimableGunItem.builder(GunConfigurations.G18.getKey())
+              .setCombatSlot(CombatSlot.SECONDARY)
+              .putAnimation(GunAnimationEvent.SHOOT, PistolShootAnimation::new)
+              .putReloadAnimation(ReloadAnimation::new)
+              .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
+              .setDefaultMagazine(ModItems.G18_MAGAZINE)
+              .addAcceptedAttachment(Attachments.RED_DOT_SIGHT)
+              .addAcceptedAttachment(Attachments.SUPPRESSOR)
+              .build());
 
   public static final RegistryObject<GunItem> M9 =
-      deferredRegister.register("m9", () -> AimableGunItem.builder(GunConfigurations.M9.getKey())
-          .setCombatSlot(CombatSlot.SECONDARY)
-          .putAnimation(GunAnimationEvent.SHOOT, PistolShootAnimation::new)
-          .putReloadAnimation(ReloadAnimation::new)
-          .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
-          .setDefaultMagazine(ModItems.M9_MAGAZINE)
-          .addAcceptedAttachment(Attachments.SUPPRESSOR)
-          .build());
+      deferredRegister.register("m9",
+          () -> AimableGunItem.builder(GunConfigurations.M9.getKey())
+              .setCombatSlot(CombatSlot.SECONDARY)
+              .putAnimation(GunAnimationEvent.SHOOT, PistolShootAnimation::new)
+              .putReloadAnimation(ReloadAnimation::new)
+              .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
+              .setDefaultMagazine(ModItems.M9_MAGAZINE)
+              .addAcceptedAttachment(Attachments.SUPPRESSOR)
+              .build());
 
   public static final RegistryObject<GunItem> DESERT_EAGLE =
       deferredRegister.register("desert_eagle",
@@ -812,136 +829,151 @@ public class ModItems {
               .build());
 
   public static final RegistryObject<GunItem> P250 =
-      deferredRegister.register("p250", () -> AimableGunItem.builder(GunConfigurations.P250.getKey())
-          .setCombatSlot(CombatSlot.SECONDARY)
-          .putAnimation(GunAnimationEvent.SHOOT, PistolShootAnimation::new)
-          .putReloadAnimation(ReloadAnimation::new)
-          .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
-          .setDefaultMagazine(ModItems.P250_MAGAZINE)
-          .addAcceptedAttachment(Attachments.RED_DOT_SIGHT)
-          .addAcceptedAttachment(Attachments.SUPPRESSOR)
-          .build());
+      deferredRegister.register("p250",
+          () -> AimableGunItem.builder(GunConfigurations.P250.getKey())
+              .setCombatSlot(CombatSlot.SECONDARY)
+              .putAnimation(GunAnimationEvent.SHOOT, PistolShootAnimation::new)
+              .putReloadAnimation(ReloadAnimation::new)
+              .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
+              .setDefaultMagazine(ModItems.P250_MAGAZINE)
+              .addAcceptedAttachment(Attachments.RED_DOT_SIGHT)
+              .addAcceptedAttachment(Attachments.SUPPRESSOR)
+              .build());
 
   public static final RegistryObject<GunItem> MAGNUM =
-      deferredRegister.register("magnum", () -> AimableGunItem.builder(GunConfigurations.MAGNUM.getKey())
-          .setCombatSlot(CombatSlot.SECONDARY)
-          .putAnimation(GunAnimationEvent.SHOOT, PistolShootAnimation::new)
-          .putReloadAnimation(ReloadAnimation::new)
-          .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
-          .setDefaultMagazine(ModItems.MAGNUM_MAGAZINE)
-          .build());
+      deferredRegister.register("magnum",
+          () -> AimableGunItem.builder(GunConfigurations.MAGNUM.getKey())
+              .setCombatSlot(CombatSlot.SECONDARY)
+              .putAnimation(GunAnimationEvent.SHOOT, PistolShootAnimation::new)
+              .putReloadAnimation(ReloadAnimation::new)
+              .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
+              .setDefaultMagazine(ModItems.MAGNUM_MAGAZINE)
+              .build());
 
   public static final RegistryObject<GunItem> FN57 =
-      deferredRegister.register("fn57", () -> AimableGunItem.builder(GunConfigurations.FN57.getKey())
-          .setCombatSlot(CombatSlot.SECONDARY)
-          .putAnimation(GunAnimationEvent.SHOOT, PistolShootAnimation::new)
-          .putReloadAnimation(ReloadAnimation::new)
-          .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
-          .setDefaultMagazine(ModItems.FN57_MAGAZINE)
-          .addAcceptedAttachment(Attachments.SUPPRESSOR)
-          .build());
+      deferredRegister.register("fn57",
+          () -> AimableGunItem.builder(GunConfigurations.FN57.getKey())
+              .setCombatSlot(CombatSlot.SECONDARY)
+              .putAnimation(GunAnimationEvent.SHOOT, PistolShootAnimation::new)
+              .putReloadAnimation(ReloadAnimation::new)
+              .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
+              .setDefaultMagazine(ModItems.FN57_MAGAZINE)
+              .addAcceptedAttachment(Attachments.SUPPRESSOR)
+              .build());
 
   // ================================================================================
   // Submachine Guns
   // ================================================================================
 
   public static final RegistryObject<GunItem> MAC10 =
-      deferredRegister.register("mac10", () -> AimableGunItem.builder(GunConfigurations.MAC10.getKey())
-          .putAnimation(GunAnimationEvent.SHOOT, SubmachineShootAnimation::new)
-          .putReloadAnimation(ReloadAnimation::new)
-          .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
-          .setDefaultMagazine(ModItems.MAC10_MAGAZINE)
-          .addAcceptedMagazine(ModItems.MAC10_EXTENDED_MAGAZINE)
-          .addAcceptedAttachment(Attachments.RED_DOT_SIGHT)
-          .addAcceptedAttachment(Attachments.SUPPRESSOR)
-          .build());
+      deferredRegister.register("mac10",
+          () -> AimableGunItem.builder(GunConfigurations.MAC10.getKey())
+              .putAnimation(GunAnimationEvent.SHOOT, SubmachineShootAnimation::new)
+              .putReloadAnimation(ReloadAnimation::new)
+              .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
+              .setDefaultMagazine(ModItems.MAC10_MAGAZINE)
+              .addAcceptedMagazine(ModItems.MAC10_EXTENDED_MAGAZINE)
+              .addAcceptedAttachment(Attachments.RED_DOT_SIGHT)
+              .addAcceptedAttachment(Attachments.SUPPRESSOR)
+              .build());
 
   public static final RegistryObject<GunItem> P90 =
-      deferredRegister.register("p90", () -> AimableGunItem.builder(GunConfigurations.P90.getKey())
-          .putAnimation(GunAnimationEvent.SHOOT, SubmachineShootAnimation::new)
-          .putReloadAnimation(ReloadAnimation::new)
-          .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
-          .setDefaultMagazine(ModItems.P90_MAGAZINE)
-          .addAcceptedAttachment(Attachments.RED_DOT_SIGHT)
-          .addAcceptedAttachment(Attachments.ACOG_SIGHT)
-          .addAcceptedAttachment(Attachments.SUPPRESSOR)
-          .build());
+      deferredRegister.register("p90",
+          () -> AimableGunItem.builder(GunConfigurations.P90.getKey())
+              .putAnimation(GunAnimationEvent.SHOOT, SubmachineShootAnimation::new)
+              .putReloadAnimation(ReloadAnimation::new)
+              .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
+              .setDefaultMagazine(ModItems.P90_MAGAZINE)
+              .addAcceptedAttachment(Attachments.RED_DOT_SIGHT)
+              .addAcceptedAttachment(Attachments.ACOG_SIGHT)
+              .addAcceptedAttachment(Attachments.SUPPRESSOR)
+              .build());
 
   public static final RegistryObject<GunItem> VECTOR =
-      deferredRegister.register("vector", () -> AimableGunItem.builder(GunConfigurations.VECTOR.getKey())
-          .putAnimation(GunAnimationEvent.SHOOT, SubmachineShootAnimation::new)
-          .putReloadAnimation(ReloadAnimation::new)
-          .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
-          .setDefaultMagazine(ModItems.VECTOR_MAGAZINE)
-          .addAcceptedAttachment(Attachments.RED_DOT_SIGHT)
-          .addAcceptedAttachment(Attachments.ACOG_SIGHT)
-          .addAcceptedAttachment(Attachments.SUPPRESSOR)
-          .build());
+      deferredRegister.register("vector",
+          () -> AimableGunItem.builder(GunConfigurations.VECTOR.getKey())
+              .putAnimation(GunAnimationEvent.SHOOT, SubmachineShootAnimation::new)
+              .putReloadAnimation(ReloadAnimation::new)
+              .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
+              .setDefaultMagazine(ModItems.VECTOR_MAGAZINE)
+              .addAcceptedAttachment(Attachments.RED_DOT_SIGHT)
+              .addAcceptedAttachment(Attachments.ACOG_SIGHT)
+              .addAcceptedAttachment(Attachments.SUPPRESSOR)
+              .build());
 
   public static final RegistryObject<GunItem> MP5A5 =
-      deferredRegister.register("mp5a5", () -> AimableGunItem.builder(GunConfigurations.MP5A5.getKey())
-          .putAnimation(GunAnimationEvent.SHOOT, SubmachineShootAnimation::new)
-          .putReloadAnimation(ReloadAnimation::new)
-          .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
-          .setDefaultMagazine(ModItems.MP5A5_21_ROUND_MAGAZINE)
-          .addAcceptedMagazine(ModItems.MP5A5_35_ROUND_MAGAZINE)
-          .addAcceptedAttachment(Attachments.RED_DOT_SIGHT)
-          .addAcceptedAttachment(Attachments.ACOG_SIGHT)
-          .addAcceptedAttachment(Attachments.SUPPRESSOR)
-          .build());
+      deferredRegister.register("mp5a5",
+          () -> AimableGunItem.builder(GunConfigurations.MP5A5.getKey())
+              .putAnimation(GunAnimationEvent.SHOOT, SubmachineShootAnimation::new)
+              .putReloadAnimation(ReloadAnimation::new)
+              .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
+              .setDefaultMagazine(ModItems.MP5A5_21_ROUND_MAGAZINE)
+              .addAcceptedMagazine(ModItems.MP5A5_35_ROUND_MAGAZINE)
+              .addAcceptedAttachment(Attachments.RED_DOT_SIGHT)
+              .addAcceptedAttachment(Attachments.ACOG_SIGHT)
+              .addAcceptedAttachment(Attachments.SUPPRESSOR)
+              .build());
 
   // ================================================================================
   // Sniper Rifles
   // ================================================================================
 
   public static final RegistryObject<GunItem> M107 =
-      deferredRegister.register("m107", () -> AimableGunItem.builder(GunConfigurations.M107.getKey())
-          .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
-          .setDefaultMagazine(ModItems.M107_MAGAZINE)
-          .addAcceptedAttachment(Attachments.RED_DOT_SIGHT)
-          .addAcceptedAttachment(Attachments.ACOG_SIGHT)
-          .addAcceptedAttachment(Attachments.LP_SCOPE)
-          .addAcceptedAttachment(Attachments.HP_SCOPE)
-          .addAcceptedAttachment(Attachments.TACTICAL_GRIP)
-          .addAcceptedAttachment(Attachments.BIPOD)
-          .build());
+      deferredRegister.register("m107",
+          () -> AimableGunItem.builder(GunConfigurations.M107.getKey())
+              .putAnimation(GunAnimationEvent.SHOOT, RifleShootAnimation::new)
+              .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
+              .putReloadAnimation(ReloadAnimation::new)
+              .setDefaultMagazine(ModItems.M107_MAGAZINE)
+              .addAcceptedAttachment(Attachments.RED_DOT_SIGHT)
+              .addAcceptedAttachment(Attachments.ACOG_SIGHT)
+              .addAcceptedAttachment(Attachments.LP_SCOPE)
+              .addAcceptedAttachment(Attachments.HP_SCOPE)
+              .addAcceptedAttachment(Attachments.TACTICAL_GRIP)
+              .addAcceptedAttachment(Attachments.BIPOD)
+              .build());
 
   public static final RegistryObject<GunItem> AS50 =
-      deferredRegister.register("as50", () -> AimableGunItem.builder(GunConfigurations.AS50.getKey())
-          .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
-          .setDefaultMagazine(ModItems.AS50_MAGAZINE)
-          .addAcceptedAttachment(Attachments.RED_DOT_SIGHT)
-          .addAcceptedAttachment(Attachments.ACOG_SIGHT)
-          .addAcceptedAttachment(Attachments.LP_SCOPE)
-          .addAcceptedAttachment(Attachments.HP_SCOPE)
-          .addAcceptedAttachment(Attachments.TACTICAL_GRIP)
-          .addAcceptedAttachment(Attachments.BIPOD)
-          .build());
+      deferredRegister.register("as50",
+          () -> AimableGunItem.builder(GunConfigurations.AS50.getKey())
+              .putAnimation(GunAnimationEvent.SHOOT, RifleShootAnimation::new)
+              .putReloadAnimation(ReloadAnimation::new)
+              .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
+              .setDefaultMagazine(ModItems.AS50_MAGAZINE)
+              .addAcceptedAttachment(Attachments.RED_DOT_SIGHT)
+              .addAcceptedAttachment(Attachments.ACOG_SIGHT)
+              .addAcceptedAttachment(Attachments.LP_SCOPE)
+              .addAcceptedAttachment(Attachments.HP_SCOPE)
+              .addAcceptedAttachment(Attachments.TACTICAL_GRIP)
+              .addAcceptedAttachment(Attachments.BIPOD)
+              .build());
 
   public static final RegistryObject<GunItem> AWP =
-      deferredRegister.register("awp", () -> AimableGunItem.builder(GunConfigurations.AWP.getKey())
-          .putAnimation(GunAnimationEvent.SHOOT, RifleShootAnimation::new)
-          .putReloadAnimation(ReloadAnimation::new)
-          .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
-          .setDefaultMagazine(ModItems.AWP_MAGAZINE)
-          .addAcceptedAttachment(Attachments.LP_SCOPE)
-          .addAcceptedAttachment(Attachments.HP_SCOPE)
-          .addAcceptedAttachment(Attachments.BIPOD)
-          .addAcceptedAttachment(Attachments.SUPPRESSOR)
-          .build());
+      deferredRegister.register("awp",
+          () -> AimableGunItem.builder(GunConfigurations.AWP.getKey())
+              .putAnimation(GunAnimationEvent.SHOOT, RifleShootAnimation::new)
+              .putReloadAnimation(ReloadAnimation::new)
+              .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
+              .setDefaultMagazine(ModItems.AWP_MAGAZINE)
+              .addAcceptedAttachment(Attachments.LP_SCOPE)
+              .addAcceptedAttachment(Attachments.HP_SCOPE)
+              .addAcceptedAttachment(Attachments.BIPOD)
+              .addAcceptedAttachment(Attachments.SUPPRESSOR)
+              .build());
 
   public static final RegistryObject<GunItem> DMR =
-      deferredRegister.register("dmr", () -> AimableGunItem.builder(GunConfigurations.DMR.getKey())
-          .putAnimation(GunAnimationEvent.SHOOT, RifleShootAnimation::new)
-          .putReloadAnimation(ReloadAnimation::new)
-          .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
-          .setDefaultMagazine(ModItems.DMR_MAGAZINE)
-          .addAcceptedAttachment(Attachments.LP_SCOPE)
-          .addAcceptedAttachment(Attachments.HP_SCOPE)
-          .addAcceptedAttachment(Attachments.BIPOD)
-          .addAcceptedAttachment(Attachments.ACOG_SIGHT)
-          .addAcceptedAttachment(Attachments.SUPPRESSOR)
-          .build());
+      deferredRegister.register("dmr",
+          () -> AimableGunItem.builder(GunConfigurations.DMR.getKey())
+              .putAnimation(GunAnimationEvent.SHOOT, RifleShootAnimation::new)
+              .putReloadAnimation(ReloadAnimation::new)
+              .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
+              .setDefaultMagazine(ModItems.DMR_MAGAZINE)
+              .addAcceptedAttachment(Attachments.LP_SCOPE)
+              .addAcceptedAttachment(Attachments.HP_SCOPE)
+              .addAcceptedAttachment(Attachments.BIPOD)
+              .addAcceptedAttachment(Attachments.ACOG_SIGHT)
+              .addAcceptedAttachment(Attachments.SUPPRESSOR)
+              .build());
 
   // ================================================================================
   // Shotguns
@@ -957,12 +989,13 @@ public class ModItems {
               .build());
 
   public static final RegistryObject<GunItem> MOSSBERG =
-      deferredRegister.register("mossberg", () -> AimableGunItem.builder(GunConfigurations.MOSSBERG.getKey())
-          .putAnimation(GunAnimationEvent.SHOOT, PistolShootAnimation::new)
-          .putReloadAnimation(ReloadAnimation::new)
-          .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
-          .setDefaultMagazine(ModItems.MOSSBERG_SHELLS)
-          .build());
+      deferredRegister.register("mossberg",
+          () -> AimableGunItem.builder(GunConfigurations.MOSSBERG.getKey())
+              .putAnimation(GunAnimationEvent.SHOOT, PistolShootAnimation::new)
+              .putReloadAnimation(ReloadAnimation::new)
+              .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
+              .setDefaultMagazine(ModItems.MOSSBERG_SHELLS)
+              .build());
 
   // ================================================================================
   // Grenades

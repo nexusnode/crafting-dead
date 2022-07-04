@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "craftingdeadimmerse:item/canned_bacon"
+    "layer0": "craftingdeadimmerse:item/canned_corned_beef"
   }
 }

@@ -187,12 +187,12 @@ public class ImmerseItems {
       deferredRegister.register("cereal",
           () -> new Item(new Item.Properties().tab(TAB).food(ImmerseFoods.CEREAL)));
 
-  public static final RegistryObject<Item> CANNED_CORN =
-      deferredRegister.register("canned_corn",
+  public static final RegistryObject<Item> CANNED_SWEETCORN =
+      deferredRegister.register("canned_sweetcorn",
           () -> new Item(new Item.Properties().tab(TAB)));
 
-  public static final RegistryObject<Item> OPEN_CANNED_CORN =
-      deferredRegister.register("open_canned_corn",
+  public static final RegistryObject<Item> OPEN_CANNED_SWEETCORN =
+      deferredRegister.register("open_canned_sweetcorn",
           () -> new Item(new Item.Properties().tab(TAB).food(ImmerseFoods.CANNED_CORN)));
 
   public static final RegistryObject<Item> CANNED_BEANS =
@@ -227,12 +227,12 @@ public class ImmerseItems {
       deferredRegister.register("open_canned_pasta",
           () -> new Item(new Item.Properties().tab(TAB).food(ImmerseFoods.CANNED_PASTA)));
 
-  public static final RegistryObject<Item> CANNED_BACON =
-      deferredRegister.register("canned_bacon",
+  public static final RegistryObject<Item> CANNED_CORNED_BEEF =
+      deferredRegister.register("canned_corned_beef",
           () -> new Item(new Item.Properties().tab(TAB)));
 
-  public static final RegistryObject<Item> OPEN_CANNED_BACON =
-      deferredRegister.register("open_canned_bacon",
+  public static final RegistryObject<Item> OPEN_CANNED_CORNED_BEEF =
+      deferredRegister.register("open_canned_corned_beef",
           () -> new Item(new Item.Properties().tab(TAB).food(ImmerseFoods.CANNED_BACON)));
 
   public static final RegistryObject<Item> CANNED_CUSTARD =

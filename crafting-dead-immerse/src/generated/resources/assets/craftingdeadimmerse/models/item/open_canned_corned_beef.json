@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "craftingdeadimmerse:item/open_canned_corned_beef"
+  }
+}
