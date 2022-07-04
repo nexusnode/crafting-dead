@@ -1,4 +1,7 @@
 {
+    "death.attack.dehydration":"%1$s died of dehydration",
+    "effect.craftingdeadimmerse.dehydration": "Dehydration",
+
     "block.craftingdeadimmerse.base_center": "Base Center",
 
     "action.craftingdeadimmerse.build_base_center.message": "Building base center",
@@ -129,6 +132,8 @@
     "toasts.error": "Rocket Error",
     "commands.game.restart":"Restarting game",
     "commands.game.reload_rotation":"Reloading game rotation",
+    "commands.hydrate.success.single": "%s was hydrated.",
+    "commands.hydrate.success.multiple": "%s players were hydrated.",
 
     "message.first_blood_drawn": "%s drew first blood",
     "message.joined": "%s has joined the game",

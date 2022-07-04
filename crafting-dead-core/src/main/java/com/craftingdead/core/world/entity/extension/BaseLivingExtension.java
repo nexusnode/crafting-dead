@@ -143,6 +143,11 @@ class BaseLivingExtension<E extends LivingEntity, H extends LivingHandler>
     }
   }
 
+  @Override
+  public <T extends H> void removeHandler(LivingHandlerType<T> type) {
+    this.handlers.remove(type);
+  }
+
   @SuppressWarnings("unchecked")
   @Override
   public <T extends LivingHandler> Optional<T> getHandler(LivingHandlerType<T> type) {

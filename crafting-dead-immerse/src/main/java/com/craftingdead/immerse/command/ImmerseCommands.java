@@ -20,10 +20,21 @@ package com.craftingdead.immerse.command;
 
 import com.mojang.brigadier.CommandDispatcher;
 import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraftforge.server.permission.PermissionAPI;
+import net.minecraftforge.server.permission.nodes.PermissionNode;
 
-public class Commands {
+public class ImmerseCommands {
 
   public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
     GameCommand.register(dispatcher);
+    HydrateCommand.register(dispatcher);
+  }
+
+  public static boolean hasPermission(CommandSourceStack source,
+      PermissionNode<Boolean> permissionNode) {
+    return source.hasPermission(source.getServer().getOperatorUserPermissionLevel())
+        || source.getEntity() instanceof ServerPlayer player
+            && PermissionAPI.getPermission(player, permissionNode);
   }
 }

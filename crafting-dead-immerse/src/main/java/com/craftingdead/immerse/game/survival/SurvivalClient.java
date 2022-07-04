@@ -19,6 +19,7 @@
 package com.craftingdead.immerse.game.survival;
 
 import com.craftingdead.core.client.util.RenderUtil;
+import com.craftingdead.core.event.LivingExtensionEvent;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.game.GameClient;
@@ -27,6 +28,8 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.FluidTags;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 public class SurvivalClient extends SurvivalGame implements GameClient {
 
@@ -36,8 +39,22 @@ public class SurvivalClient extends SurvivalGame implements GameClient {
       new ResourceLocation(CraftingDeadImmerse.ID, "textures/gui/zombies_killed.png");
   private static final ResourceLocation PLAYERS_KILLED =
       new ResourceLocation(CraftingDeadImmerse.ID, "textures/gui/players_killed.png");
+  private static final ResourceLocation ICONS =
+      new ResourceLocation(CraftingDeadImmerse.ID, "textures/gui/icons.png");
 
   private final Minecraft minecraft = Minecraft.getInstance();
+
+  public SurvivalClient() {
+    super(false);
+  }
+
+  @SubscribeEvent
+  public void handleLivingExtensionLoad(LivingExtensionEvent.Load event) {
+    if (event.getLiving() instanceof PlayerExtension<?> player
+        && player.getLevel().isClientSide()) {
+      player.registerHandler(SurvivalPlayerHandler.TYPE, new SurvivalPlayerHandler(this, player));
+    }
+  }
 
   @Override
   public boolean renderOverlay(PlayerExtension<? extends AbstractClientPlayer> player,
@@ -65,6 +82,40 @@ public class SurvivalClient extends SurvivalGame implements GameClient {
 
     RenderSystem.disableBlend();
 
+    // Only draw in survival
+    if (this.minecraft.gameMode.canHurtPlayer() && !player.isCombatModeEnabled()) {
+      // Only render when air level is not being rendered
+      if (this.isThirstEnabled()
+          && !player.getEntity().isEyeInFluid(FluidTags.WATER)
+          && player.getEntity().getAirSupply() == player.getEntity().getMaxAirSupply()) {
+        renderWater(width, height,
+            (float) survivalPlayer.getWater() / (float) survivalPlayer.getMaxWater(), ICONS);
+      }
+    }
+
     return false;
+  }
+
+  private static void renderWater(int width, int height, float waterPercentage,
+      ResourceLocation resourceLocation) {
+    final int y = height - 49;
+    final int x = width / 2 + 91;
+    RenderSystem.enableBlend();
+    RenderSystem.setShaderTexture(0, resourceLocation);
+
+    for (int i = 0; i < 10; i++) {
+      // Draw droplet outline
+      RenderUtil.blit(x - i * 8 - 9, y, 9, 9, 0, 32);
+
+      float scaledWater = 10.0F * waterPercentage;
+      if (i + 1 <= scaledWater) {
+        // Draw full droplet
+        RenderUtil.blit(x - i * 8 - 9, y, 9, 9, 9, 32);
+      } else if (scaledWater >= i + 0.5F) {
+        // Draw half droplet
+        RenderUtil.blit(x - i * 8 - 9, y, 9, 9, 18, 32);
+      }
+    }
+    RenderSystem.disableBlend();
   }
 }

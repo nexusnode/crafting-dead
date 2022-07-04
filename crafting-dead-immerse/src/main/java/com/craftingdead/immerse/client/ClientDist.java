@@ -44,7 +44,7 @@ import com.craftingdead.immerse.client.util.ServerPinger;
 import com.craftingdead.immerse.game.ClientGameWrapper;
 import com.craftingdead.immerse.game.GameClient;
 import com.craftingdead.immerse.game.GameType;
-import com.craftingdead.immerse.server.LogicalServer;
+import com.craftingdead.immerse.game.LogicalServer;
 import com.craftingdead.immerse.world.item.BlueprintItem;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;

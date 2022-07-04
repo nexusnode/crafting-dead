@@ -94,10 +94,17 @@ public interface LivingExtension<E extends LivingEntity, H extends LivingHandler
   /**
    * Register a handler.
    * 
-   * @param id - the handler's ID
+   * @param type - the handler's type
    * @param handler - the handler to attach
    */
   <T extends H> void registerHandler(LivingHandlerType<T> type, T handler);
+
+  /**
+   * Remove a handler.
+   * 
+   * @param type - the handler's type
+   */
+  <T extends H> void removeHandler(LivingHandlerType<T> type);
 
   Optional<Action> getAction();
 

@@ -26,7 +26,6 @@ import com.craftingdead.immerse.game.survival.SurvivalServer;
 import com.craftingdead.immerse.game.tdm.TdmClient;
 import com.craftingdead.immerse.game.tdm.TdmNetworkProtocol;
 import com.craftingdead.immerse.game.tdm.TdmServer;
-import com.mojang.serialization.Codec;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -47,7 +46,7 @@ public class GameTypes {
       deferredRegister.makeRegistry(GameType.class, RegistryBuilder::new);
 
   public static final RegistryObject<GameType> SURVIVAL = deferredRegister.register("survival",
-      () -> new GameType(Codec.unit(SurvivalServer::new), () -> SurvivalClient::new,
+      () -> new GameType(SurvivalServer.CODEC, () -> SurvivalClient::new,
           NetworkProtocol.EMPTY));
 
   public static final RegistryObject<GameType> TEAM_DEATHMATCH = deferredRegister.register("tdm",

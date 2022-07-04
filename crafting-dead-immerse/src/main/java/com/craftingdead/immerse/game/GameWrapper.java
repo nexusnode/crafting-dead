@@ -52,8 +52,6 @@ public abstract sealed class GameWrapper<T extends Game, M extends GameModule> p
     this.modules = moduleBuilder.modules().buildOrThrow();
     this.tickableModules = moduleBuilder.tickables().build();
     this.synched = moduleBuilder.synched().buildOrThrow();
-
-    game.load();
   }
 
   protected abstract void buildModules(T game, ModuleBuilder<M> builder);
@@ -69,11 +67,11 @@ public abstract sealed class GameWrapper<T extends Game, M extends GameModule> p
 
   public void load() {
     this.modules.values().forEach(GameModule::load);
-    this.game.started();
+    this.game.load();
   }
 
   public void unload() {
-    this.game.ended();
+    this.game.unload();
     this.modules.values().forEach(GameModule::unload);
   }
 

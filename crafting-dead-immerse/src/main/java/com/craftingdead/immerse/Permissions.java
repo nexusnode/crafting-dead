@@ -19,15 +19,23 @@
 package com.craftingdead.immerse;
 
 import net.minecraftforge.server.permission.nodes.PermissionNode;
+import net.minecraftforge.server.permission.nodes.PermissionNode.PermissionResolver;
 import net.minecraftforge.server.permission.nodes.PermissionTypes;
 
 public class Permissions {
 
+  private static final PermissionResolver<Boolean> FALSE_RESOLVER =
+      (player, playerId, context) -> Boolean.FALSE;
+
   public static final PermissionNode<Boolean> GAME_OP =
-      new PermissionNode<Boolean>(CraftingDeadImmerse.ID, "game.op", PermissionTypes.BOOLEAN,
-          (player, playerUUID, context) -> false);
+      new PermissionNode<Boolean>(CraftingDeadImmerse.ID, "game.op",
+          PermissionTypes.BOOLEAN, FALSE_RESOLVER);
+
+  public static final PermissionNode<Boolean> HYDRATE =
+      new PermissionNode<Boolean>(CraftingDeadImmerse.ID, "hydrate",
+          PermissionTypes.BOOLEAN, FALSE_RESOLVER);
 
   public static final PermissionNode<Boolean> BASE_DESTROY =
-      new PermissionNode<Boolean>(CraftingDeadImmerse.ID, "base.destroy", PermissionTypes.BOOLEAN,
-          (player, playerUUID, context) -> false);
+      new PermissionNode<Boolean>(CraftingDeadImmerse.ID, "base.destroy",
+          PermissionTypes.BOOLEAN, FALSE_RESOLVER);
 }

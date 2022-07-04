@@ -18,9 +18,7 @@
 
 package com.craftingdead.immerse.game.survival;
 
-import com.craftingdead.core.event.LivingExtensionEvent;
 import com.craftingdead.core.network.SynchedData;
-import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.immerse.game.Game;
 import com.craftingdead.immerse.game.GameType;
 import com.craftingdead.immerse.game.GameTypes;
@@ -28,7 +26,6 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 public abstract class SurvivalGame implements Game {
 
@@ -37,8 +34,8 @@ public abstract class SurvivalGame implements Game {
 
   private final SynchedData data = new SynchedData();
 
-  public SurvivalGame() {
-    this.data.register(THIRST_ENABLED, true);
+  public SurvivalGame(boolean thirstEnabled) {
+    this.data.register(THIRST_ENABLED, thirstEnabled);
   }
 
   public boolean isThirstEnabled() {
@@ -55,25 +52,17 @@ public abstract class SurvivalGame implements Game {
   }
 
   @Override
-  public void started() {
+  public void load() {
     MinecraftForge.EVENT_BUS.register(this);
   }
 
   @Override
-  public void ended() {
+  public void unload() {
     MinecraftForge.EVENT_BUS.unregister(this);
   }
 
   @Override
   public void tick() {}
-
-  @SubscribeEvent
-  public void handleLivingExtensionLoad(LivingExtensionEvent.Load event) {
-    if (event.getLiving() instanceof PlayerExtension<?> player
-        && !player.getHandler(SurvivalPlayerHandler.TYPE).isPresent()) {
-      player.registerHandler(SurvivalPlayerHandler.TYPE, new SurvivalPlayerHandler(player));
-    }
-  }
 
   @Override
   public GameType getType() {

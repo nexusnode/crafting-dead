@@ -23,13 +23,14 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import org.jetbrains.annotations.Nullable;
 import com.craftingdead.core.event.GunEvent;
-import com.craftingdead.core.event.LivingExtensionEvent;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.core.world.item.ModItems;
 import com.craftingdead.core.world.item.combatslot.CombatSlot;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.game.GameServer;
 import com.craftingdead.immerse.game.GameUtil;
+import com.craftingdead.immerse.game.LogicalServer;
+import com.craftingdead.immerse.game.PlayerRemovalReason;
 import com.craftingdead.immerse.game.module.ServerModule;
 import com.craftingdead.immerse.game.module.shop.ServerShopModule;
 import com.craftingdead.immerse.game.module.shop.ShopCategory;
@@ -40,8 +41,6 @@ import com.craftingdead.immerse.game.module.team.TeamInstance;
 import com.craftingdead.immerse.game.tdm.message.TdmServerMessage;
 import com.craftingdead.immerse.game.tdm.state.GameStateInstance;
 import com.craftingdead.immerse.game.tdm.state.TdmState;
-import com.craftingdead.immerse.server.LogicalServer;
-import com.craftingdead.immerse.util.state.StateInstance;
 import com.craftingdead.immerse.util.state.StateMachine;
 import com.craftingdead.immerse.util.state.TimedStateInstance;
 import com.google.common.collect.ImmutableList;
@@ -54,11 +53,9 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.level.GameRules;
-import net.minecraft.world.level.GameRules.BooleanValue;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
@@ -243,44 +240,44 @@ public class TdmServer extends TdmGame implements GameServer, TeamHandler<TdmTea
   }
 
   @Override
-  public void started() {
-    final GameRules gameRules = this.getMinecraftServer().getGameRules();
+  public void load() {
+    var gameRules = this.getMinecraftServer().getGameRules();
 
-    GameRules.BooleanValue daylightCycle = gameRules.getRule(GameRules.RULE_DAYLIGHT);
+    var daylightCycle = gameRules.getRule(GameRules.RULE_DAYLIGHT);
     this.daylightCycleOld = daylightCycle.get();
     daylightCycle.set(false, this.getMinecraftServer());
 
-    GameRules.BooleanValue weatherCycle = gameRules.getRule(GameRules.RULE_WEATHER_CYCLE);
+    var weatherCycle = gameRules.getRule(GameRules.RULE_WEATHER_CYCLE);
     this.weatherCycleOld = weatherCycle.get();
     weatherCycle.set(false, this.getMinecraftServer());
 
-    BooleanValue showDeathMessages = gameRules.getRule(GameRules.RULE_SHOWDEATHMESSAGES);
+    var showDeathMessages = gameRules.getRule(GameRules.RULE_SHOWDEATHMESSAGES);
     this.showDeathMessagesOld = showDeathMessages.get();
     showDeathMessages.set(false, this.getMinecraftServer());
 
-    BooleanValue naturalRegeneration = gameRules.getRule(GameRules.RULE_NATURAL_REGENERATION);
+    var naturalRegeneration = gameRules.getRule(GameRules.RULE_NATURAL_REGENERATION);
     this.naturalRegenerationOld = naturalRegeneration.get();
     naturalRegeneration.set(false, this.getMinecraftServer());
 
-    BooleanValue immediateRespawn = gameRules.getRule(GameRules.RULE_DO_IMMEDIATE_RESPAWN);
+    var immediateRespawn = gameRules.getRule(GameRules.RULE_DO_IMMEDIATE_RESPAWN);
     this.immediateRespawnOld = immediateRespawn.get();
     immediateRespawn.set(true, this.getMinecraftServer());
 
-    ServerLevel world = this.getMinecraftServer().getLevel(Level.OVERWORLD);
+    var level = this.getMinecraftServer().getLevel(Level.OVERWORLD);
     // Set weather to clear
-    world.setWeatherParameters(6000, 0, false, false);
+    level.setWeatherParameters(6000, 0, false, false);
     // Set time to day
-    world.setDayTime(1000);
+    level.setDayTime(1000);
 
     this.oldDifficulty = this.getMinecraftServer().getWorldData().getDifficulty();
     this.getMinecraftServer().setDifficulty(Difficulty.PEACEFUL, true);
 
-    super.started();
+    super.load();
   }
 
   @Override
-  public void ended() {
-    final GameRules gameRules = this.getMinecraftServer().getGameRules();
+  public void unload() {
+    var gameRules = this.getMinecraftServer().getGameRules();
 
     gameRules.getRule(GameRules.RULE_DAYLIGHT).set(this.daylightCycleOld,
         this.getMinecraftServer());
@@ -295,12 +292,12 @@ public class TdmServer extends TdmGame implements GameServer, TeamHandler<TdmTea
 
     this.getMinecraftServer().setDifficulty(this.oldDifficulty, true);
 
-    for (ServerPlayer playerEntity : this.getMinecraftServer().getPlayerList().getPlayers()) {
+    for (var playerEntity : this.getMinecraftServer().getPlayerList().getPlayers()) {
       ((TdmServerPlayerHandler) PlayerExtension.getOrThrow(playerEntity)
           .getHandlerOrThrow(TdmPlayerHandler.TYPE)).invalidate();
     }
 
-    super.ended();
+    super.unload();
   }
 
   @Override
@@ -310,6 +307,8 @@ public class TdmServer extends TdmGame implements GameServer, TeamHandler<TdmTea
 
   @Override
   public void addPlayer(PlayerExtension<ServerPlayer> player) {
+    player.registerHandler(TdmPlayerHandler.TYPE,
+        new TdmServerPlayerHandler(this, player));
     this.getTeamModule().setPlayerTeam(player, null);
     GameUtil.sendGameMessageToAll(
         new TranslatableComponent("message.joined", player.getEntity().getDisplayName())
@@ -318,7 +317,9 @@ public class TdmServer extends TdmGame implements GameServer, TeamHandler<TdmTea
   }
 
   @Override
-  public void removePlayer(PlayerExtension<ServerPlayer> player) {
+  public void removePlayer(PlayerExtension<ServerPlayer> player, PlayerRemovalReason reason) {
+    player.removeHandler(TdmPlayerHandler.TYPE);
+
     this.getTeamModule().setPlayerTeam(player, null);
 
     this.deletePlayerData(player.getEntity().getUUID());
@@ -413,12 +414,12 @@ public class TdmServer extends TdmGame implements GameServer, TeamHandler<TdmTea
       @Nullable TeamInstance<TdmTeam> oldTeam,
       @Nullable TeamInstance<TdmTeam> newTeam) {
     if (oldTeam != null && newTeam != null) {
-      StateInstance<?> stateInstance = this.stateMachine.getCurrentState();
-      final float maxScore = this.getMaxScore() * 0.75F;
-      boolean scoresClose =
+      var stateInstance = this.stateMachine.getCurrentState();
+      var maxScore = this.getMaxScore() * 0.75F;
+      var scoresClose =
           (oldTeam != null && TdmTeam.getScore(oldTeam) > maxScore)
               || TdmTeam.getScore(newTeam) > maxScore;
-      boolean tooLate = (stateInstance.getState() == TdmState.GAME
+      var tooLate = (stateInstance.getState() == TdmState.GAME
           && ((GameStateInstance) stateInstance).getTimeElapsedSeconds() > 240)
           || stateInstance.getState() == TdmState.POST_GAME;
 
@@ -446,16 +447,6 @@ public class TdmServer extends TdmGame implements GameServer, TeamHandler<TdmTea
               player.getEntity().getDisplayName().getString(),
               newTeam.getTeam().getDisplayName().getString()),
           this.getMinecraftServer());
-    }
-  }
-
-  @SuppressWarnings("unchecked")
-  @SubscribeEvent
-  public void handleLivingLoad(LivingExtensionEvent.Load event) {
-    if (event.getLiving() instanceof PlayerExtension<?> player
-        && !player.getLevel().isClientSide()) {
-      player.registerHandler(TdmPlayerHandler.TYPE,
-          new TdmServerPlayerHandler(this, (PlayerExtension<ServerPlayer>) player));
     }
   }
 
