@@ -17,11 +17,11 @@
   "death.attack.bullet.headshot.item": "%1$s was shot in the head by %s with %s",
   "death.attack.grenade": "%s was blasted by %s" ,
 
-  "options.craftingdead.client.hit_marker_mode": "Hit Marker Mode",
-  "options.craftingdead.client.kill_sound_enabled": "Kill Sound Enabled",
   "options.craftingdead.client.crosshair": "Crosshair",
   "options.craftingdead.client.kill_sound": "Kill Sound",
 
+  "options.craftingdead.server.hit_marker_mode": "Hit Marker Mode",
+  "options.craftingdead.server.kill_sound_enabled": "Kill Sound Enabled",
   "options.craftingdead.server.burstfire.enable":"Burst Fire Enabled",
   "options.craftingdead.server.burstfire.shots_per_burst":"Shots Per burst",
   "options.craftingdead.server.reload.gun_comes_empty_mag":"Gun Comes With Empty Magazine",

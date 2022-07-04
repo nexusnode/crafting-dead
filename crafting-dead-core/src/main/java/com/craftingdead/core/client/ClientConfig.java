@@ -19,7 +19,6 @@
 package com.craftingdead.core.client;
 
 import com.craftingdead.core.client.crosshair.CrosshairManager;
-import com.craftingdead.core.client.gui.HitMarker;
 import com.craftingdead.core.client.tutorial.ModTutorialSteps;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
@@ -28,10 +27,6 @@ import net.minecraftforge.common.ForgeConfigSpec;
 public class ClientConfig {
 
   public final ForgeConfigSpec.BooleanValue displayBlood;
-
-  public final ForgeConfigSpec.EnumValue<HitMarker.Mode> hitMarkerMode;
-
-  public final ForgeConfigSpec.BooleanValue killSoundEnabled;
 
   public final ForgeConfigSpec.ConfigValue<String> killSound;
 
@@ -45,12 +40,6 @@ public class ClientConfig {
       this.displayBlood = builder
           .translation("options.craftingdead.client.display_blood")
           .define("displayBlood", true);
-      this.hitMarkerMode = builder
-          .translation("options.craftingdead.client.hit_marker_mode")
-          .defineEnum("hitMarkerMode", HitMarker.Mode.HIT_AND_KILL);
-      this.killSoundEnabled = builder
-          .translation("options.craftingdead.client.kill_sound_enabled")
-          .define("killSoundEnabled", true);
       this.killSound = builder
           .translation("options.craftingdead.client.kill_sound")
           .define("killSound", SoundEvents.TRIDENT_RETURN.getRegistryName().toString(),

@@ -18,11 +18,15 @@
 
 package com.craftingdead.core;
 
+import com.craftingdead.core.client.gui.HitMarker;
 import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Explosion.BlockInteraction;
 import net.minecraftforge.common.ForgeConfigSpec;
 
 public class ServerConfig {
+  
+  public final ForgeConfigSpec.EnumValue<HitMarker.Mode> hitMarkerMode;
+  public final ForgeConfigSpec.BooleanValue killSoundEnabled;
 
   // ================================================================================
   // Burst-fire Values
@@ -137,7 +141,13 @@ public class ServerConfig {
 
 
   ServerConfig(ForgeConfigSpec.Builder builder) {
-
+    this.hitMarkerMode = builder
+        .translation("options.craftingdead.server.hit_marker_mode")
+        .defineEnum("hitMarkerMode", HitMarker.Mode.HIT_AND_KILL);
+    this.killSoundEnabled = builder
+        .translation("options.craftingdead.server.kill_sound_enabled")
+        .define("killSoundEnabled", true);
+    
     // Burst-fire configuration
     builder
         .comment("Some guns allow 'burstfire', where it can fire multiple shots at the same time",
