@@ -703,6 +703,9 @@ public class ClientDist implements ModDist {
       case END -> {
         if (this.minecraft.player != null) {
           this.updateAdrenalineShader(event.renderTickTime);
+          this.ingameGui.renderFlashBangOverlay(this.minecraft.player, new PoseStack(),
+              this.minecraft.getWindow().getGuiScaledWidth(),
+              this.minecraft.getWindow().getGuiScaledHeight(), event.renderTickTime);
         }
       }
     }
