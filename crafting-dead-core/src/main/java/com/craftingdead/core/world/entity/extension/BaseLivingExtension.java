@@ -398,7 +398,11 @@ class BaseLivingExtension<E extends LivingEntity, H extends LivingHandler>
 
   @Override
   public boolean handleDeath(DamageSource cause) {
-    return this.handlers.values().stream().anyMatch(e -> e.handleDeath(cause));
+    if (this.handlers.values().stream().anyMatch(e -> e.handleDeath(cause))) {
+      return true;
+    }
+    this.cancelAction(true);
+    return false;
   }
 
   @Override
