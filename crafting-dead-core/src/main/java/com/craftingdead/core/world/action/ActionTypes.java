@@ -96,7 +96,7 @@ public class ActionTypes {
               .duration(16)
               .customAction((performer, target) -> target.getEntity().hurt(
                   DamageSource.mobAttack(target.getEntity()), 2.0F), 1.0F)
-              .returnItem(ModItems.BLOOD_SYRINGE)
+              .resultItem(ModItems.BLOOD_SYRINGE)
               .build());
 
   public static final RegistryObject<EntityItemActionType<?>> USE_FIRST_AID_KIT =
@@ -112,7 +112,7 @@ public class ActionTypes {
           () -> EntityItemActionType.builder(TargetSelector.SELF_OR_OTHERS)
               .forItem(ModItems.ADRENALINE_SYRINGE)
               .duration(16)
-              .returnItem(ModItems.SYRINGE)
+              .resultItem(ModItems.SYRINGE)
               .useResultItemInCreative(false)
               .effect(() -> new MobEffectInstance(ModMobEffects.ADRENALINE.get(), 20 * 20, 1))
               .build());
@@ -122,7 +122,7 @@ public class ActionTypes {
           () -> EntityItemActionType.builder(TargetSelector.SELF_OR_OTHERS)
               .forItem(ModItems.BLOOD_SYRINGE)
               .duration(16)
-              .returnItem(ModItems.SYRINGE)
+              .resultItem(ModItems.SYRINGE)
               .useResultItemInCreative(false)
               .effect(() -> new MobEffectInstance(MobEffects.HEAL, 1, 0))
               .build());

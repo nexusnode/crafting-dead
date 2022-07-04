@@ -70,17 +70,23 @@ public class BlockItemAction extends ItemAction {
   @Override
   public boolean start(boolean simulate) {
     this.blockState = this.performer.getLevel().getBlockState(this.context.getClickedPos());
-    return super.start(simulate) && this.type.getPredicate().test(this.blockState);
+    return super.start(simulate)
+        && this.isWithinMaxDistance()
+        && this.type.getPredicate().test(this.blockState);
   }
 
   @Override
   public boolean tick() {
-    if (!this.performer.getLevel().isClientSide() && this.performer.getEntity()
-        .distanceToSqr(Vec3.atCenterOf(this.context.getClickedPos())) > 64.0D) {
+    if (!this.performer.getLevel().isClientSide() && !this.isWithinMaxDistance()) {
       this.performer.cancelAction(true);
       return false;
     }
     return super.tick();
+  }
+
+  private boolean isWithinMaxDistance() {
+    return this.performer.getEntity().distanceToSqr(
+        Vec3.atCenterOf(this.context.getClickedPos())) <= this.type.getMaxDistanceSquared();
   }
 
   @Override

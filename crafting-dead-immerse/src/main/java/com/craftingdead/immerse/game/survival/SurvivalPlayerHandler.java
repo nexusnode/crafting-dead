@@ -41,6 +41,7 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.stats.Stats;
+import net.minecraft.util.Mth;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.monster.Zombie;
@@ -180,7 +181,7 @@ public class SurvivalPlayerHandler implements PlayerHandler {
   }
 
   public void setWater(int water) {
-    this.dataManager.set(WATER, water);
+    this.dataManager.set(WATER, Mth.clamp(water, 0, this.getMaxWater()));
   }
 
   public int getMaxWater() {

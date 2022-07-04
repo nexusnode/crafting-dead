@@ -77,9 +77,8 @@ public class SurvivalServer extends SurvivalGame implements GameServer {
   }
 
   @SubscribeEvent
-  public void handleUseItem(LivingEntityUseItemEvent.Finish event) {
-    event.getItem()
-        .getCapability(Hydration.CAPABILITY)
+  public void handleUseItemFinish(LivingEntityUseItemEvent.Finish event) {
+    event.getItem().getCapability(Hydration.CAPABILITY)
         .map(hydration -> hydration.getWater(event.getItem()))
         .ifPresent(hydration -> event
             .getEntityLiving()

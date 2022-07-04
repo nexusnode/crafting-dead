@@ -100,6 +100,6 @@ public class ActionItem extends Item {
 
   @Override
   public int getUseDuration(ItemStack itemStack) {
-    return this.getActionType().getTotalDurationTicks();
+    return this.getActionType().getDurationTicks();
   }
 }

@@ -30,11 +30,11 @@ import com.craftingdead.survival.CraftingDeadSurvival;
 import com.craftingdead.survival.world.effect.SurvivalMobEffects;
 import com.craftingdead.survival.world.item.SurvivalItems;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.tags.FluidTags;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.RegistryObject;
 
@@ -76,7 +76,7 @@ public class SurvivalActionTypes {
               .builder(TargetSelector.SELF_OR_OTHERS.hasEffect(SurvivalMobEffects.BLEEDING))
               .forItem(SurvivalItems.CLEAN_RAG)
               .duration(16)
-              .returnItem(SurvivalItems.BLOODY_RAG)
+              .resultItem(SurvivalItems.BLOODY_RAG)
               .build());
 
   public static final RegistryObject<BlockItemActionType> WASH_RAG =
@@ -84,10 +84,10 @@ public class SurvivalActionTypes {
           () -> BlockItemActionType.builder()
               .forItem(itemStack -> itemStack.is(SurvivalItems.DIRTY_RAG.get())
                   || itemStack.is(SurvivalItems.BLOODY_RAG.get()))
-              .returnItem(SurvivalItems.CLEAN_RAG)
+              .resultItem(SurvivalItems.CLEAN_RAG)
               .consumeItemInCreative(true)
               .finishSound(SoundEvents.BUCKET_FILL)
-              .forBlock(blockState -> blockState.getFluidState().is(Fluids.WATER))
+              .forFluid(FluidTags.WATER)
               .build());
 
   public static final RegistryObject<EntityItemActionType<?>> USE_SYRINGE_ON_ZOMBIE =
@@ -97,7 +97,7 @@ public class SurvivalActionTypes {
               .duration(16)
               .customAction((performer, target) -> target.getEntity().hurt(
                   DamageSource.mobAttack(target.getEntity()), 2.0F), 0.25F)
-              .returnItem(SurvivalItems.RBI_SYRINGE)
+              .resultItem(SurvivalItems.RBI_SYRINGE)
               .build());
 
   public static final RegistryObject<EntityItemActionType<?>> USE_CURE_SYRINGE =
@@ -105,7 +105,7 @@ public class SurvivalActionTypes {
           () -> EntityItemActionType.builder(TargetSelector.SELF_OR_OTHERS)
               .forItem(SurvivalItems.CURE_SYRINGE)
               .duration(16)
-              .returnItem(ModItems.SYRINGE)
+              .resultItem(ModItems.SYRINGE)
               .build());
 
   public static final RegistryObject<EntityItemActionType<?>> USE_RBI_SYRINGE =
@@ -114,6 +114,6 @@ public class SurvivalActionTypes {
               .forItem(SurvivalItems.RBI_SYRINGE)
               .duration(16)
               .effect(() -> new MobEffectInstance(SurvivalMobEffects.INFECTION.get(), 9999999))
-              .returnItem(ModItems.SYRINGE)
+              .resultItem(ModItems.SYRINGE)
               .build());
 }

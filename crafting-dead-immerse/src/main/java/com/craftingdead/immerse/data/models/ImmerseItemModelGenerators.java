@@ -43,6 +43,10 @@ public class ImmerseItemModelGenerators {
   }
 
   public void run() {
+    this.generateFlatItem(ImmerseItems.EMPTY_WATER_BOTTLE.get(), ModelTemplates.FLAT_ITEM);
+    this.generateFlatItem(ImmerseItems.WATER_BOTTLE.get(), ModelTemplates.FLAT_ITEM);
+    this.generateFlatItem(ImmerseItems.EMPTY_WATER_CANTEEN.get(), ModelTemplates.FLAT_ITEM);
+    this.generateFlatItem(ImmerseItems.WATER_CANTEEN.get(), ModelTemplates.FLAT_ITEM);
     this.generateFlatItem(ImmerseItems.POWER_BAR.get(), ModelTemplates.FLAT_ITEM);
     this.generateFlatItem(ImmerseItems.CANDY_BAR.get(), ModelTemplates.FLAT_ITEM);
     this.generateFlatItem(ImmerseItems.CEREAL.get(), ModelTemplates.FLAT_ITEM);

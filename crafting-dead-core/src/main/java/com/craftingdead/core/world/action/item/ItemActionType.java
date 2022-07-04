@@ -26,7 +26,9 @@ import com.craftingdead.core.world.action.Action;
 import com.craftingdead.core.world.action.ActionType;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.google.common.base.Predicates;
+import net.minecraft.SharedConstants;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -38,11 +40,11 @@ public abstract class ItemActionType<T extends ItemAction>
 
   private final boolean triggeredByClient;
   private final boolean freezeMovement;
-  private final int totalDurationTicks;
+  private final int durationTicks;
   private final Predicate<ItemStack> heldItemPredicate;
   private final boolean consumeItem;
   @Nullable
-  private final Supplier<? extends Item> returnItem;
+  private final Supplier<? extends Item> resultItem;
   @Nullable
   private final Supplier<SoundEvent> finishSound;
   private final boolean consumeItemInCreative;
@@ -51,10 +53,10 @@ public abstract class ItemActionType<T extends ItemAction>
   protected ItemActionType(Builder<?> builder) {
     this.triggeredByClient = builder.triggeredByClient;
     this.freezeMovement = builder.freezeMovement;
-    this.totalDurationTicks = builder.totalDurationTicks;
+    this.durationTicks = builder.durationTicks;
     this.heldItemPredicate = builder.heldItemPredicate;
     this.consumeItem = builder.consumeItem;
-    this.returnItem = builder.returnItem;
+    this.resultItem = builder.resultItem;
     this.finishSound = builder.finishSound;
     this.consumeItemInCreative = builder.consumeItemInCreative;
     this.useResultItemInCreative = builder.useResultItemInCreative;
@@ -64,8 +66,8 @@ public abstract class ItemActionType<T extends ItemAction>
     return this.freezeMovement;
   }
 
-  public int getTotalDurationTicks() {
-    return this.totalDurationTicks;
+  public int getDurationTicks() {
+    return this.durationTicks;
   }
 
   public Predicate<ItemStack> getHeldItemPredicate() {
@@ -76,8 +78,8 @@ public abstract class ItemActionType<T extends ItemAction>
     return this.consumeItem;
   }
 
-  public Optional<Item> getReturnItem() {
-    return Optional.ofNullable(this.returnItem).map(Supplier::get);
+  public Optional<Item> getResultItem() {
+    return Optional.ofNullable(this.resultItem).map(Supplier::get);
   }
 
   public Optional<SoundEvent> getFinishSound() {
@@ -115,12 +117,12 @@ public abstract class ItemActionType<T extends ItemAction>
 
     private boolean triggeredByClient;
     private boolean freezeMovement;
-    private int totalDurationTicks = 32;
+    private int durationTicks = 32;
     private Predicate<ItemStack> heldItemPredicate = Predicates.alwaysTrue();
 
     private boolean consumeItem = true;
     @Nullable
-    private Supplier<? extends Item> returnItem;
+    private Supplier<? extends Item> resultItem;
     @Nullable
     private Supplier<SoundEvent> finishSound;
 
@@ -138,9 +140,13 @@ public abstract class ItemActionType<T extends ItemAction>
       return this.self();
     }
 
-    public SELF duration(int totalDurationTicks) {
-      this.totalDurationTicks = totalDurationTicks;
+    public SELF duration(int durationTicks) {
+      this.durationTicks = durationTicks;
       return this.self();
+    }
+
+    public SELF durationSeconds(float durationSeconds) {
+      return this.duration(Mth.floor(SharedConstants.TICKS_PER_SECOND * durationSeconds));
     }
 
     public SELF forItem(Supplier<? extends Item> item) {
@@ -157,8 +163,8 @@ public abstract class ItemActionType<T extends ItemAction>
       return this.self();
     }
 
-    public SELF returnItem(Supplier<? extends Item> returnItem) {
-      this.returnItem = returnItem;
+    public SELF resultItem(Supplier<? extends Item> resultItem) {
+      this.resultItem = resultItem;
       return this.self();
     }
 

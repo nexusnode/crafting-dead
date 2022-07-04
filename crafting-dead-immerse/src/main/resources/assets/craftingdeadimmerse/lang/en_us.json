@@ -25,6 +25,7 @@
     "action.craftingdeadimmerse.build_jungle_plank_platform.message": "Building jungle plank platform",
     "action.craftingdeadimmerse.build_acacia_plank_platform.message": "Building acacia plank platform",
     "action.craftingdeadimmerse.build_dark_oak_plank_platform.message": "Building dark oak plank platform",
+    "action.craftingdeadimmerse.fill_water_canteen.message": "Filling water canteen",
 
     "itemGroup.craftingdeadimmerse": "Crafting Dead Immerse",
 
@@ -102,8 +103,8 @@
     "item.craftingdeadimmerse.mre": "MRE",
     "item.craftingdeadimmerse.pear": "Pear",
     "item.craftingdeadimmerse.orange": "Orange",
-    "item.craftingdeadimmerse.empty_water_canteel": "Empty Water Canteel",
-    "item.craftingdeadimmerse.water_canteel": "Water Canteel",
+    "item.craftingdeadimmerse.empty_water_canteen": "Empty Water Canteen",
+    "item.craftingdeadimmerse.water_canteen": "Water Canteen",
     "item.craftingdeadimmerse.rotten_orange": "Rotten Orange",
     "item.craftingdeadimmerse.rotten_pear": "Rotten Pear",
     "item.craftingdeadimmerse.rotten_apple": "Rotten Apple",

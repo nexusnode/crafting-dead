@@ -137,9 +137,9 @@ public class CraftingDeadSurvival {
   // ================================================================================
 
   private void handleCommonSetup(FMLCommonSetupEvent event) {
-    BrewingRecipeRegistry.addRecipe(Ingredient.of(ModItems.SYRINGE.get()),
+    event.enqueueWork(() -> BrewingRecipeRegistry.addRecipe(Ingredient.of(ModItems.SYRINGE.get()),
         Ingredient.of(Items.GOLDEN_APPLE, Items.ENCHANTED_GOLDEN_APPLE),
-        new ItemStack(SurvivalItems.CURE_SYRINGE.get()));
+        new ItemStack(SurvivalItems.CURE_SYRINGE.get())));
 
     registerEntitySpawnPlacements();
   }

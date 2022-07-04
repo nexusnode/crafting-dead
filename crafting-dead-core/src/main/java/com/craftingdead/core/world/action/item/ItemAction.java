@@ -104,7 +104,7 @@ public abstract class ItemAction implements Action {
   protected Optional<Item> getResultItem(LivingExtension<?, ?> performer) {
     return (!this.getType().useResultItemInCreative()
         && performer.getEntity() instanceof Player player
-        && player.isCreative()) ? Optional.empty() : this.getType().getReturnItem();
+        && player.isCreative()) ? Optional.empty() : this.getType().getResultItem();
   }
 
   @Override
@@ -127,7 +127,7 @@ public abstract class ItemAction implements Action {
       return 0.0F;
     } else {
       return (float) (this.getPerformer().getEntity().getTicksUsingItem() + partialTicks)
-          / this.getType().getTotalDurationTicks();
+          / this.getType().getDurationTicks();
     }
   }
 
