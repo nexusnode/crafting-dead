@@ -23,6 +23,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import org.jetbrains.annotations.Nullable;
 import com.craftingdead.core.event.GunEvent;
+import com.craftingdead.core.event.LivingExtensionEvent;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.core.world.item.ModItems;
 import com.craftingdead.core.world.item.combatslot.CombatSlot;
@@ -305,10 +306,18 @@ public class TdmServer extends TdmGame implements GameServer, TeamHandler<TdmTea
     return this.finished;
   }
 
+  @SuppressWarnings("unchecked")
+  @SubscribeEvent
+  public void handleLivingExtensionLoad(LivingExtensionEvent.Load event) {
+    if (event.getLiving() instanceof PlayerExtension<?> player
+        && !player.getLevel().isClientSide()) {
+      player.registerHandler(TdmPlayerHandler.TYPE,
+          new TdmServerPlayerHandler(this, (PlayerExtension<ServerPlayer>) player));
+    }
+  }
+
   @Override
   public void addPlayer(PlayerExtension<ServerPlayer> player) {
-    player.registerHandler(TdmPlayerHandler.TYPE,
-        new TdmServerPlayerHandler(this, player));
     this.getTeamModule().setPlayerTeam(player, null);
     GameUtil.sendGameMessageToAll(
         new TranslatableComponent("message.joined", player.getEntity().getDisplayName())
