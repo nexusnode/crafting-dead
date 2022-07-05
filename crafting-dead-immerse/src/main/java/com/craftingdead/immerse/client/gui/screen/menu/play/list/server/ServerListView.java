@@ -19,22 +19,24 @@
 package com.craftingdead.immerse.client.gui.screen.menu.play.list.server;
 
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import org.jdesktop.core.animation.timing.Animator;
 import org.jdesktop.core.animation.timing.KeyFrames;
 import org.jetbrains.annotations.Nullable;
 import com.craftingdead.immerse.client.gui.screen.Theme;
+import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.TranslatableComponent;
+import reactor.core.Disposable;
+import reactor.core.scheduler.Schedulers;
 import sm0keysa1m0n.bliss.Animation;
 import sm0keysa1m0n.bliss.style.Percentage;
 import sm0keysa1m0n.bliss.style.States;
 import sm0keysa1m0n.bliss.view.ParentView;
 import sm0keysa1m0n.bliss.view.View;
 
-public class ServerListView extends ParentView {
+public class ServerListView<S extends ServerList> extends ParentView {
 
-  protected final ServerList serverList;
+  private final S serverList;
 
   protected final ParentView listView;
 
@@ -45,10 +47,12 @@ public class ServerListView extends ParentView {
 
   private final View playButton;
 
-  @Nullable
-  private CompletableFuture<Void> refreshFuture;
+  private final VanillaServerStatusProvider statusProvider = new VanillaServerStatusProvider();
 
-  public ServerListView(ServerList serverList) {
+  @Nullable
+  private Disposable refreshTask;
+
+  public ServerListView(S serverList) {
     super(new Properties());
     this.serverList = serverList;
 
@@ -67,6 +71,20 @@ public class ServerListView extends ParentView {
     this.addChild(this.controlsView);
 
     this.refresh();
+  }
+
+  @Override
+  public void tick() {
+    super.tick();
+    this.statusProvider.tick();
+  }
+
+  public S getServerList() {
+    return this.serverList;
+  }
+
+  public ServerStatusProvider getStatusProvider() {
+    return this.statusProvider;
   }
 
   protected ParentView createTopRowControls() {
@@ -113,6 +131,14 @@ public class ServerListView extends ParentView {
     }
   }
 
+  @Override
+  protected void removed() {
+    super.removed();
+    if (this.refreshTask != null) {
+      this.refreshTask.dispose();
+    }
+  }
+
   public void setSelectedItem(@Nullable ServerItemView selectedItem) {
     if (this.selectedItem == selectedItem) {
       return;
@@ -133,19 +159,19 @@ public class ServerListView extends ParentView {
     return Optional.ofNullable(this.selectedItem);
   }
 
-  @SuppressWarnings("removal")
   private void refresh() {
-    if (this.refreshFuture == null || this.refreshFuture.isDone()) {
-      this.listView.clearChildren();
-      this.setSelectedItem(null);
-      this.refreshFuture = this.serverList.load()
-          .thenAcceptAsync(servers -> {
-            servers
-                .map(server -> new ServerItemView(this, server))
-                .forEach(this.listView::addChild);
-            this.listView.layout();
-          }, this.minecraft);
+    if (this.refreshTask != null && !this.refreshTask.isDisposed()) {
+      return;
     }
+    this.listView.clearChildren();
+    this.setSelectedItem(null);
+    this.refreshTask = this.serverList.load()
+        .publishOn(Schedulers.fromExecutor(Minecraft.getInstance()))
+        .map(entry -> new ServerItemView(this, entry))
+        .doOnNext(this.listView::addChild)
+        .then()
+        .doAfterTerminate(this.listView::layout)
+        .subscribe();
   }
 
   private void quickRefresh() {

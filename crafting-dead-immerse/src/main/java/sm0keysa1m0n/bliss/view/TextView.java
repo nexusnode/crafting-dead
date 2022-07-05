@@ -157,9 +157,10 @@ public class TextView extends View {
     switch (widthMode) {
       case UNDEFINED:
       case AT_MOST:
-        this.paragraph.layout(widthMode == MeasureMode.UNDEFINED ? Float.MAX_VALUE
+        this.paragraph.layout(widthMode == MeasureMode.UNDEFINED
+            ? Float.MAX_VALUE
             : width * this.graphicsContext.scale());
-        width = (this.paragraph.getMaxIntrinsicWidth()) / this.graphicsContext.scale();
+        width = this.paragraph.getMaxIntrinsicWidth() / this.graphicsContext.scale();
         break;
       default:
         this.paragraph.layout(width * this.graphicsContext.scale());

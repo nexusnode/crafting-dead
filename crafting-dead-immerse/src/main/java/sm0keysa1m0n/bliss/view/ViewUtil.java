@@ -87,10 +87,8 @@ public class ViewUtil {
           final var text = node.getTextContent();
 
           if (text != null) {
-            var builder = new ComponentBuilder();
-            StringDecomposer.iterateFormatted(ForgeHooks.newChatWithLinks(text),
-                Style.EMPTY, builder);
-            var view = new TextView(new View.Properties()).setText(builder.getComponent());
+            var view = new TextView(new View.Properties())
+                .setText(extractStyles(ForgeHooks.newChatWithLinks(text)));
 
             Node styleNode = node.getAttributes().getNamedItem("style");
             if (styleNode != null && styleNode.getNodeValue() != null) {
@@ -143,6 +141,12 @@ public class ViewUtil {
     if (parentView.isAdded()) {
       parentView.layout();
     }
+  }
+
+  public static Component extractStyles(Component component) {
+    var builder = new ComponentBuilder();
+    StringDecomposer.iterateFormatted(component, Style.EMPTY, builder);
+    return builder.getComponent();
   }
 
   private static class ComponentBuilder implements FormattedCharSink {

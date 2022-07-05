@@ -18,10 +18,10 @@
 
 package com.craftingdead.immerse.client.gui.screen.menu.play.list.server;
 
-import java.util.concurrent.CompletableFuture;
-import java.util.stream.Stream;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 public interface MutableServerList extends ServerList {
 
-  CompletableFuture<Void> save(Stream<ServerEntry> servers);
+  Mono<Void> save(Flux<ServerEntry> servers);
 }

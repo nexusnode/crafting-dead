@@ -57,10 +57,10 @@ public class PlayView extends ParentView implements TransitionView {
 
     var officialView = new ParentView(new Properties().id("official"));
 
-    var survivalServerListView = new ServerListView(new JsonServerList(
+    var survivalServerListView = new ServerListView<>(new JsonServerList(
         Paths.get(System.getProperty("user.dir"), "survival_servers.json")));
 
-    var deathmatchServerListView = new ServerListView(new JsonServerList(
+    var deathmatchServerListView = new ServerListView<>(new JsonServerList(
         Paths.get(System.getProperty("user.dir"), "tdm_servers.json")));
 
     officialView.addChild(new TabsView(new Properties())
@@ -80,7 +80,7 @@ public class PlayView extends ParentView implements TransitionView {
 
     var singleplayerView = new WorldListView();
 
-    var customServerListView = new MutableServerListView(new NbtServerList(
+    var customServerListView = new MutableServerListView<>(new NbtServerList(
         CraftingDeadImmerse.getInstance().getModDir().resolve("custom_servers.dat")));
 
     this.addChild(new TextView(new Properties().id("title"))

@@ -27,16 +27,17 @@ import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.multiplayer.resolver.ServerAddress;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.TranslatableComponent;
+import reactor.core.publisher.Flux;
 import sm0keysa1m0n.bliss.view.ParentView;
 import sm0keysa1m0n.bliss.view.View;
 import sm0keysa1m0n.bliss.view.ViewScreen;
 
-public class MutableServerListView extends ServerListView {
+public class MutableServerListView<S extends MutableServerList> extends ServerListView<S> {
 
   private View removeButton;
 
-  public MutableServerListView(MutableServerList serverProvider) {
-    super(serverProvider);
+  public MutableServerListView(S serverList) {
+    super(serverList);
   }
 
   @Override
@@ -119,10 +120,10 @@ public class MutableServerListView extends ServerListView {
   }
 
   private void saveServerList() {
-    ((MutableServerList) this.serverList)
-        .save(this.listView.getChildren().stream()
-            .filter(ServerItemView.class::isInstance)
-            .map(ServerItemView.class::cast)
-            .map(ServerItemView::getServerEntry));
+    Flux.fromIterable(this.listView.getChildren())
+        .ofType(ServerItemView.class)
+        .map(ServerItemView::getServerEntry)
+        .transform(this.getServerList()::save)
+        .subscribe();
   }
 }

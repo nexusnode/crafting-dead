@@ -18,36 +18,12 @@
 
 package com.craftingdead.immerse.client.gui.screen.menu.play.list.server;
 
-import java.util.Optional;
 import org.jetbrains.annotations.Nullable;
 import net.minecraft.client.multiplayer.resolver.ServerAddress;
 
-public class ServerEntry {
-
-  @Nullable
-  private final String map;
-  private final String hostName;
-  private final int port;
-
-  public ServerEntry(String map, String hostName, int port) {
-    this.map = map;
-    this.hostName = hostName;
-    this.port = port;
-  }
-
-  public Optional<String> getMap() {
-    return Optional.ofNullable(this.map);
-  }
-
-  public String getHostName() {
-    return this.hostName;
-  }
-
-  public int getPort() {
-    return this.port;
-  }
+public record ServerEntry(@Nullable String map, String host, int port) {
 
   public ServerAddress toServerAddress() {
-    return new ServerAddress(this.hostName, this.port);
+    return new ServerAddress(this.host, this.port);
   }
 }

@@ -40,7 +40,6 @@ import com.craftingdead.immerse.client.renderer.entity.layer.TeamClothingLayer;
 import com.craftingdead.immerse.client.shader.RectShader;
 import com.craftingdead.immerse.client.shader.RoundedRectShader;
 import com.craftingdead.immerse.client.shader.RoundedTexShader;
-import com.craftingdead.immerse.client.util.ServerPinger;
 import com.craftingdead.immerse.game.ClientGameWrapper;
 import com.craftingdead.immerse.game.GameClient;
 import com.craftingdead.immerse.game.GameType;
@@ -351,10 +350,8 @@ public class ClientDist implements ModDist {
           this.gameWrapper.tick();
         }
 
-        ServerPinger.INSTANCE.pingPendingNetworks();
-
         if (this.minecraft.player != null) {
-          boolean worldFocused = !this.minecraft.isPaused() && this.minecraft.getOverlay() == null
+          var worldFocused = !this.minecraft.isPaused() && this.minecraft.getOverlay() == null
               && (this.minecraft.screen == null);
 
           if (this.minecraft.player.isSpectator()) {
