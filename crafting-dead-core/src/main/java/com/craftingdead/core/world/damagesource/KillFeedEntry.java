@@ -22,44 +22,10 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 
-public class KillFeedEntry {
+public record KillFeedEntry(int killerEntityId, Component killerName, Component deadName,
+    ItemStack weaponStack, Type type) {
 
-  private final int killerEntityId;
-  private final Component killerName;
-  private final Component deadName;
-  private final ItemStack weaponStack;
-  private final Type type;
-
-  public KillFeedEntry(int killerEntityId, Component killerName, Component deadName,
-      ItemStack weaponStack, Type type) {
-    this.killerEntityId = killerEntityId;
-    this.killerName = killerName;
-    this.deadName = deadName;
-    this.weaponStack = weaponStack;
-    this.type = type;
-  }
-
-  public int getKillerEntityId() {
-    return this.killerEntityId;
-  }
-
-  public Component getKillerName() {
-    return this.killerName;
-  }
-
-  public Component getDeadName() {
-    return this.deadName;
-  }
-
-  public ItemStack getWeaponStack() {
-    return this.weaponStack;
-  }
-
-  public Type getType() {
-    return this.type;
-  }
-
-  public static enum Type {
+  public enum Type {
     NONE, HEADSHOT, WALLBANG, WALLBANG_HEADSHOT;
   }
 

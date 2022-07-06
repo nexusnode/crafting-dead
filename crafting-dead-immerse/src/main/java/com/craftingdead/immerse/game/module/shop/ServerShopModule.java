@@ -24,20 +24,17 @@ import java.util.UUID;
 import java.util.function.BiConsumer;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.core.world.item.combatslot.CombatSlot;
-import com.craftingdead.immerse.Permissions;
 import com.craftingdead.immerse.game.module.GameModule;
 import com.craftingdead.immerse.game.module.ServerModule;
 import com.craftingdead.immerse.game.module.shop.message.BuyItemMessage;
 import com.craftingdead.immerse.game.module.shop.message.SyncUserMessage;
 import com.craftingdead.immerse.game.network.GameNetworkChannel;
 import com.craftingdead.immerse.game.network.MessageHandlerRegistry;
-import com.mojang.authlib.GameProfile;
 import net.minecraft.network.Connection;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.NetworkEvent;
-import net.minecraftforge.server.permission.PermissionAPI;
 
 public class ServerShopModule extends ShopModule implements ServerModule, GameModule.Tickable {
 
@@ -68,12 +65,12 @@ public class ServerShopModule extends ShopModule implements ServerModule, GameMo
   }
 
   public void buyItem(PlayerExtension<ServerPlayer> player, UUID itemId) {
-    ShopItem item = this.items.get(itemId);
+    var item = this.items.get(itemId);
     if (item == null) {
       throw new IllegalArgumentException("Unknown item ID: " + itemId.toString());
     }
 
-    ShopUser user = this.users.get(player.entity().getUUID());
+    var user = this.users.get(player.entity().getUUID());
     if (user.money >= item.getPrice() && user.buyTimeSeconds != 0) {
       user.money -= item.getPrice();
       user.sync();
@@ -82,7 +79,7 @@ public class ServerShopModule extends ShopModule implements ServerModule, GameMo
   }
 
   public void resetBuyTime(UUID playerId) {
-    ShopUser user = this.users.get(playerId);
+    var user = this.users.get(playerId);
     if (user != null) {
       user.buyTimeSeconds = this.defaultBuyTimeSeconds;
       user.sync();
@@ -90,7 +87,7 @@ public class ServerShopModule extends ShopModule implements ServerModule, GameMo
   }
 
   private void handleBuyItem(BuyItemMessage message, NetworkEvent.Context context) {
-    this.buyItem(PlayerExtension.getOrThrow(context.getSender()), message.getItemId());
+    this.buyItem(PlayerExtension.getOrThrow(context.getSender()), message.itemId());
   }
 
   @Override
@@ -102,9 +99,8 @@ public class ServerShopModule extends ShopModule implements ServerModule, GameMo
   public void tick() {
     if (this.secondTimer++ >= 20) {
       this.secondTimer = 0;
-      for (ShopUser user : this.users.values()) {
-        if (user.buyTimeSeconds > 0
-            && PermissionAPI.getOfflinePermission(user.gameProfile.getId(), Permissions.GAME_OP)) {
+      for (var user : this.users.values()) {
+        if (user.buyTimeSeconds > 0) {
           user.buyTimeSeconds--;
           user.sync();
         }
@@ -114,8 +110,7 @@ public class ServerShopModule extends ShopModule implements ServerModule, GameMo
 
   @Override
   public void addPlayer(PlayerExtension<ServerPlayer> player) {
-    ShopUser user =
-        new ShopUser(player.entity().getGameProfile(), player.entity().connection.connection);
+    var user = new ShopUser(player.entity().connection.getConnection());
     this.users.put(player.entity().getUUID(), user);
     user.sync();
   }
@@ -127,13 +122,11 @@ public class ServerShopModule extends ShopModule implements ServerModule, GameMo
 
   private class ShopUser {
 
-    private final GameProfile gameProfile;
     private final Connection connection;
     private int buyTimeSeconds = ServerShopModule.this.defaultBuyTimeSeconds;
     private int money;
 
-    private ShopUser(GameProfile gameProfile, Connection connection) {
-      this.gameProfile = gameProfile;
+    private ShopUser(Connection connection) {
       this.connection = connection;
     }
 

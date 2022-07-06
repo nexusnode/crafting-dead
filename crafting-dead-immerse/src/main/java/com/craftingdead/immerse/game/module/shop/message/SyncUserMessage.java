@@ -20,23 +20,7 @@ package com.craftingdead.immerse.game.module.shop.message;
 
 import net.minecraft.network.FriendlyByteBuf;
 
-public class SyncUserMessage {
-
-  private final int buyTimeSeconds;
-  private final int money;
-
-  public SyncUserMessage(int buyTimeSeconds, int money) {
-    this.buyTimeSeconds = buyTimeSeconds;
-    this.money = money;
-  }
-
-  public int getBuyTimeSeconds() {
-    return this.buyTimeSeconds;
-  }
-
-  public int getMoney() {
-    return this.money;
-  }
+public record SyncUserMessage(int buyTimeSeconds, int money) {
 
   public void encode(FriendlyByteBuf out) {
     out.writeVarInt(this.buyTimeSeconds);

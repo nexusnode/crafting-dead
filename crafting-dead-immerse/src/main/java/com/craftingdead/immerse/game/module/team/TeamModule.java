@@ -71,7 +71,7 @@ public class TeamModule<T extends Enum<T> & Team> implements GameModule, Synched
 
   @Override
   public void encode(FriendlyByteBuf out, boolean writeAll) {
-    for (Map.Entry<T, TeamInstance<T>> entry : this.teams.entrySet()) {
+    for (var entry : this.teams.entrySet()) {
       if (entry.getValue().requiresSync()) {
         out.writeVarInt(entry.getKey().ordinal());
         entry.getValue().encode(out, false);
@@ -80,13 +80,13 @@ public class TeamModule<T extends Enum<T> & Team> implements GameModule, Synched
     // End marker
     out.writeVarInt(-1);
 
-    boolean writePlayerTeams = writeAll || !this.dirtyPlayerTeams.isEmpty();
+    var writePlayerTeams = writeAll || !this.dirtyPlayerTeams.isEmpty();
     out.writeBoolean(writePlayerTeams);
     if (writePlayerTeams) {
       out.writeBoolean(writeAll); // Clear player teams flag
-      Map<UUID, T> playerTeamsToSend = writeAll ? this.playerTeams : this.dirtyPlayerTeams;
+      var playerTeamsToSend = writeAll ? this.playerTeams : this.dirtyPlayerTeams;
       out.writeVarInt(playerTeamsToSend.size());
-      for (Map.Entry<UUID, T> entry : playerTeamsToSend.entrySet()) {
+      for (var entry : playerTeamsToSend.entrySet()) {
         out.writeUUID(entry.getKey());
         if (entry.getValue() == null) {
           out.writeBoolean(true);
@@ -103,7 +103,7 @@ public class TeamModule<T extends Enum<T> & Team> implements GameModule, Synched
   }
 
   private TeamInstance<T> getExpectedTeamInstance(T team) {
-    TeamInstance<T> teamInstance = this.teams.get(team);
+    var teamInstance = this.teams.get(team);
     if (teamInstance == null) {
       throw new IllegalStateException("Expected team '" + team.toString() + "' to be present");
     }
@@ -125,11 +125,11 @@ public class TeamModule<T extends Enum<T> & Team> implements GameModule, Synched
 
       int playerTeamsSize = in.readVarInt();
       for (int j = 0; j < playerTeamsSize; j++) {
-        UUID playerId = in.readUUID();
+        var playerId = in.readUUID();
         if (in.readBoolean()) {
           T team = this.playerTeams.remove(playerId);
           if (team != null) {
-            TeamInstance<T> teamInstance = this.getTeamInstance(team);
+            var teamInstance = this.getTeamInstance(team);
             // Team may have been deleted so don't expect it to be present.
             if (teamInstance != null) {
               teamInstance.removeMember(playerId);

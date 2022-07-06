@@ -327,24 +327,24 @@ public class RenderUtil {
     return scale / (float) minecraft.getWindow().getGuiScale();
   }
 
-  public static void renderGuiItem(ItemStack itemStack, int x, int y, int colour) {
-    renderGuiItem(itemStack, x, y, colour,
+  public static void renderGuiItem(PoseStack poseStack,ItemStack itemStack, int x, int y, int color) {
+    renderGuiItem(poseStack, itemStack, x, y, color,
         minecraft.getItemRenderer().getModel(itemStack, null, null, 0),
         ItemTransforms.TransformType.GUI);
   }
 
-  public static void renderGuiItem(ItemStack itemStack, int x, int y, int colour,
+  public static void renderGuiItem(PoseStack poseStack,ItemStack itemStack, int x, int y, int color,
       ItemTransforms.TransformType transformType) {
-    renderGuiItem(itemStack, x, y, colour,
+    renderGuiItem(poseStack,itemStack, x, y, color,
         minecraft.getItemRenderer().getModel(itemStack, null, null, 0), transformType);
   }
 
   /**
-   * Copied from {@link ItemRenderer#renderGuiItem} with the ability to customise the colour.
+   * Copied from {@link ItemRenderer#renderGuiItem} with the ability to customise the color.
    */
   @SuppressWarnings("deprecation")
-  public static void renderGuiItem(ItemStack itemStack, int x, int y,
-      int colour, BakedModel bakedmodel, ItemTransforms.TransformType transformType) {
+  public static void renderGuiItem(PoseStack poseStack, ItemStack itemStack, int x, int y,
+      int color, BakedModel bakedmodel, ItemTransforms.TransformType transformType) {
     minecraft.textureManager.getTexture(TextureAtlas.LOCATION_BLOCKS).setFilter(false, false);
     RenderSystem.setShaderTexture(0, TextureAtlas.LOCATION_BLOCKS);
     RenderSystem.enableBlend();
@@ -352,13 +352,11 @@ public class RenderUtil {
         GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
     RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 
-    var poseStack = RenderSystem.getModelViewStack();
     poseStack.pushPose();
     poseStack.translate(x, y, 100.0F + minecraft.getItemRenderer().blitOffset);
     poseStack.translate(8.0D, 8.0D, 0.0D);
     poseStack.scale(1.0F, -1.0F, 1.0F);
     poseStack.scale(16.0F, 16.0F, 16.0F);
-    RenderSystem.applyModelViewMatrix();
 
     var bufferSource = Minecraft.getInstance().renderBuffers().bufferSource();
     boolean enable3dLight = !bakedmodel.usesBlockLight();
@@ -366,11 +364,11 @@ public class RenderUtil {
       Lighting.setupForFlatItems();
     }
 
-    if (colour > -1) {
-      render(itemStack, transformType, false, new PoseStack(),
-          bufferSource, colour, FULL_LIGHT, OverlayTexture.NO_OVERLAY, bakedmodel);
+    if (color > -1) {
+      render(itemStack, transformType, false, poseStack,
+          bufferSource, color, FULL_LIGHT, OverlayTexture.NO_OVERLAY, bakedmodel);
     } else {
-      minecraft.getItemRenderer().render(itemStack, transformType, false, new PoseStack(),
+      minecraft.getItemRenderer().render(itemStack, transformType, false, poseStack,
           bufferSource, FULL_LIGHT, OverlayTexture.NO_OVERLAY, bakedmodel);
     }
 
@@ -381,7 +379,7 @@ public class RenderUtil {
     }
 
     poseStack.popPose();
-    RenderSystem.applyModelViewMatrix();
+//    RenderSystem.applyModelViewMatrix();
   }
 
   /**

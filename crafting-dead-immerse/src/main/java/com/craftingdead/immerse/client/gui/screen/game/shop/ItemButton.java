@@ -23,7 +23,6 @@ import java.util.List;
 import com.craftingdead.immerse.client.util.RenderUtil;
 import com.craftingdead.immerse.game.module.shop.ClientShopModule;
 import com.craftingdead.immerse.game.module.shop.ShopItem;
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -54,37 +53,39 @@ public class ItemButton extends GameButton implements InfoPanel {
   }
 
   @Override
-  public void renderButton(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
-    super.renderButton(matrixStack, mouseX, mouseY, partialTicks);
+  public void renderButton(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
+    super.renderButton(poseStack, mouseX, mouseY, partialTick);
     if (this.item.getPrice() > 0) {
-      RenderUtil.renderTextRight(this.font, matrixStack, x + width - 2, y + 7,
+      RenderUtil.renderTextRight(this.font, poseStack, x + this.width - 2, y + 7,
           this.getFormattedPrice(), 0, true);
     }
   }
 
   @Override
-  public void renderInfo(int x, int y, PoseStack matrixStack, int mouseX, int mouseY,
-      float partialTicks) {
-    this.font.drawShadow(matrixStack, this.getMessage(), x - 20, y - 65, 0xFFFFFFFF);
+  public void renderInfo(int x, int y, PoseStack poseStack, int mouseX, int mouseY,
+      float partialTick) {
+    this.font.drawShadow(poseStack, this.getMessage(), x - 20, y - 65, 0xFFFFFFFF);
 
-    drawCenteredString(matrixStack, this.font, this.getFormattedPrice(), x + 53, y - 75, 0);
+    drawCenteredString(poseStack, this.font, this.getFormattedPrice(), x + 53, y - 75, 0);
 
-    var modelViewStack = RenderSystem.getModelViewStack();
-    modelViewStack.pushPose();
-    modelViewStack.translate(x + 10, y - 40, 0);
-    var scale = 1.2F;
-    modelViewStack.scale(scale, scale, scale);
-    com.craftingdead.core.client.util.RenderUtil.renderGuiItem(this.item.getItemStack(), 0, 0,
-        0xFFFFFFFF, ItemTransforms.TransformType.FIXED);
-    modelViewStack.popPose();
+    poseStack.pushPose();
+    {
+      poseStack.translate(x + 10, y - 40, 0);
+      var scale = 1.2F;
+      poseStack.scale(scale, scale, scale);
+      com.craftingdead.core.client.util.RenderUtil.renderGuiItem(poseStack,
+          this.item.getItemStack(), 0, 0,
+          0xFFFFFFFF, ItemTransforms.TransformType.FIXED);
+    }
+    poseStack.popPose();
 
     List<Component> itemInfo = new ArrayList<>();
     this.item.getItemStack().getItem().appendHoverText(this.item.getItemStack(), null, itemInfo,
         Default.NORMAL);
 
     for (int i = 0; i < itemInfo.size(); i++) {
-      Component info = itemInfo.get(i);
-      this.font.drawShadow(matrixStack, info, x - 20,
+      var info = itemInfo.get(i);
+      this.font.drawShadow(poseStack, info, x - 20,
           y + (i * this.font.lineHeight + 1), 0xFFFFFFFF);
     }
   }
