@@ -26,11 +26,11 @@ import com.mojang.math.Vector3f;
 
 public interface Animation {
 
-  void apply(float partialTicks, PoseStack poseStack);
+  void apply(float partialTick, PoseStack poseStack);
 
-  void applyArm(InteractionHand hand, HumanoidArm arm, float partialTicks, PoseStack poseStack);
+  void applyArm(InteractionHand hand, HumanoidArm arm, float partialTick, PoseStack poseStack);
 
-  void applyCamera(float partialTicks, Vector3f rotations);
+  void applyCamera(float partialTick, Vector3f rotations);
 
   void tick();
 

@@ -23,7 +23,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import com.craftingdead.core.capability.CapabilityUtil;
 import com.craftingdead.core.client.ClientDist;
-import com.craftingdead.core.client.animation.gun.GunAnimationTypes;
 import com.craftingdead.core.data.guns.GunDataProvider;
 import com.craftingdead.core.data.recipes.ModRecipeProvider;
 import com.craftingdead.core.data.tags.ModItemTagsProvider;
@@ -158,7 +157,6 @@ public class CraftingDead {
     AmmoProviderTypes.deferredRegister.register(modEventBus);
     Attachments.deferredRegister.register(modEventBus);
     GunConfigurations.deferredRegister.register(modEventBus);
-    GunAnimationTypes.deferredRegister.register(modEventBus);
     GunTriggerPredicates.deferredRegister.register(modEventBus);
 
     MinecraftForge.EVENT_BUS.register(this);
