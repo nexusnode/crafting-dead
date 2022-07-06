@@ -68,7 +68,6 @@ import com.craftingdead.core.world.item.gun.Gun;
 import com.craftingdead.core.world.item.gun.skin.Paint;
 import com.craftingdead.core.world.item.gun.skin.Skins;
 import com.craftingdead.core.world.item.scope.Scope;
-import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Vector3f;
 import net.minecraft.Util;
@@ -115,8 +114,6 @@ import net.minecraftforge.client.event.ScreenOpenEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.client.event.sound.SoundLoadEvent;
 import net.minecraftforge.client.gui.ForgeIngameGui;
-import net.minecraftforge.client.settings.KeyConflictContext;
-import net.minecraftforge.client.settings.KeyModifier;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
@@ -145,9 +142,6 @@ public class ClientDist implements ModDist {
       new KeyMapping("key.toggle_fire_mode", GLFW.GLFW_KEY_V, "key.categories.gameplay");
   public static final KeyMapping OPEN_EQUIPMENT_MENU =
       new KeyMapping("key.equipment_menu", GLFW.GLFW_KEY_Z, "key.categories.inventory");
-  public static final KeyMapping TOGGLE_COMBAT_MODE =
-      new KeyMapping("key.toggle_combat_mode", KeyConflictContext.UNIVERSAL, KeyModifier.ALT,
-          InputConstants.Type.KEYSYM.getOrCreate(GLFW.GLFW_KEY_C), "key.categories.inventory");
 
   public static final ClientConfig clientConfig;
   public static final ForgeConfigSpec clientConfigSpec;
@@ -340,7 +334,6 @@ public class ClientDist implements ModDist {
     ClientRegistry.registerKeyBinding(RELOAD);
     ClientRegistry.registerKeyBinding(REMOVE_MAGAZINE);
     ClientRegistry.registerKeyBinding(OPEN_EQUIPMENT_MENU);
-    ClientRegistry.registerKeyBinding(TOGGLE_COMBAT_MODE);
 
     ArbitraryTooltips.registerAll();
   }
@@ -481,10 +474,6 @@ public class ClientDist implements ModDist {
               }
             }
             return;
-          }
-
-          while (TOGGLE_COMBAT_MODE.consumeClick()) {
-            player.setCombatModeEnabled(!player.isCombatModeEnabled());
           }
 
           // Update gun input

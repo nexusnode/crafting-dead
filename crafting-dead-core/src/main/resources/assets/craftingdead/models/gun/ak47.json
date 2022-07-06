@@ -2,8 +2,8 @@
 	"credit": "Made with Blockbench",
 	"texture_size": [64, 64],
 	"textures": {
-		"gun": "craftingdead:gun/ak47",
-		"particle": "craftingdead:gun/ak47"
+		"particle": "craftingdead:gun/ak47",
+		"gun": "craftingdead:gun/ak47"
 	},
 	"elements": [
 		{
@@ -382,9 +382,9 @@
 			"rotation": [0, 0, -90]
 		},
 		"gui": {
-			"rotation": [90, -50, 90],
-			"translation": [0.75, 0.5, 0],
-			"scale": [0.5, 0.5, 0.5]
+			"rotation": [0, 90, 0],
+			"translation": [-30, 0, 0],
+			"scale": [2, 2, 2]
 		},
 		"head": {
 			"rotation": [90, 0, -180],

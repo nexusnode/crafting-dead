@@ -6,7 +6,6 @@
   "key.remove_magazine": "Снять магазин",
   "key.toggle_fire_mode": "Переключить на режим: Огонь",
   "key.equipment_menu":"Открыть / закрыть меню снаряжения",
-  "key.toggle_combat_mode":"Переключить на режим: Бой",
 
   "tutorial.open_equipment_menu.title":"Открыть меню снаряжения",
   "tutorial.open_equipment_menu.description": "Нажми %s",

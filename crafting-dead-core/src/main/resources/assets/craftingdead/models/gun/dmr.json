@@ -2,8 +2,8 @@
 	"credit": "Made with Blockbench",
 	"texture_size": [128, 128],
 	"textures": {
-		"gun": "craftingdead:gun/dmr",
-		"particle": "craftingdead:gun/dmr"
+		"particle": "craftingdead:gun/dmr",
+		"gun": "craftingdead:gun/dmr"
 	},
 	"elements": [
 		{
@@ -343,9 +343,9 @@
 			"translation": [0, -1.5, -3.5]
 		},
 		"gui": {
-			"rotation": [40.5, -37.25, 32.75],
-			"translation": [0.75, 1.75, 0],
-			"scale": [0.51719, 0.51719, 0.51719]
+			"rotation": [0, 90, 0],
+			"translation": [-40, 3, 0],
+			"scale": [2, 2, 2]
 		},
 		"head": {
 			"rotation": [90, 0, -180],

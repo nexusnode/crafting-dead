@@ -22,6 +22,7 @@ import java.util.Random;
 import org.jetbrains.annotations.Nullable;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.client.ClientDist;
+import com.craftingdead.core.client.renderer.item.CombatSlotItemRenderer;
 import com.craftingdead.core.client.util.RenderUtil;
 import com.craftingdead.core.world.action.ActionObserver;
 import com.craftingdead.core.world.effect.ModMobEffects;
@@ -30,6 +31,7 @@ import com.craftingdead.core.world.item.gun.Gun;
 import com.craftingdead.core.world.item.gun.ammoprovider.AmmoProvider;
 import com.craftingdead.core.world.item.gun.magazine.Magazine;
 import com.craftingdead.core.world.item.scope.Scope;
+import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.ChatFormatting;
@@ -38,6 +40,7 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.block.model.ItemTransforms;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
@@ -166,7 +169,7 @@ public class IngameGui {
     }
 
     if (player.isCombatModeEnabled()) {
-      this.renderCombatMode(player, poseStack, width, height);
+      this.renderCombatMode(player, poseStack, width, height, partialTick);
     }
 
     this.renderHandcuffsDamage(poseStack, player.getHandcuffs(), width, height);
@@ -256,7 +259,7 @@ public class IngameGui {
   }
 
   private void renderCombatMode(PlayerExtension<AbstractClientPlayer> player,
-      PoseStack poseStack, int width, int height) {
+      PoseStack poseStack, int width, int height, float partialTick) {
     final var inventory = player.entity().getInventory();
 
     int boxX = width - 115;
@@ -267,6 +270,9 @@ public class IngameGui {
 
     int currentItemIndex = inventory.selected;
 
+    var rightPadding = 3;
+    var topPadding = 3;
+
     // Render primary
     var primaryStack = inventory.getItem(0);
     if (currentItemIndex == 0) {
@@ -275,16 +281,9 @@ public class IngameGui {
     RenderUtil.fill(poseStack, boxX, boxY, boxWidth, boxHeight, 0x66000000);
     this.minecraft.font.drawShadow(poseStack, "1", boxX + 5, boxY + 5,
         0xFFFFFFFF);
+    this.renderItemInCombatSlot(primaryStack,
+        boxX + boxWidth - rightPadding, boxY + topPadding, poseStack, partialTick);
 
-    poseStack.pushPose();
-    {
-      poseStack.translate(boxX + boxWidth / 2 - 16 / 2,
-          boxY + (boxHeight / 2) - 16 / 2, 0);
-      poseStack.scale(1.2F, 1.2F, 1.2F);
-      RenderUtil.renderGuiItem(poseStack, primaryStack, 0, 0, -1,
-          ItemTransforms.TransformType.FIXED);
-    }
-    poseStack.popPose();
 
     // Render secondary
     var secondaryStack = inventory.getItem(1);
@@ -295,15 +294,8 @@ public class IngameGui {
     RenderUtil.fill(poseStack, boxX, boxY, boxWidth, boxHeight, 0x66000000);
     this.minecraft.font.drawShadow(poseStack, "2", boxX + 5, boxY + 5,
         0xFFFFFFFF);
-    poseStack.pushPose();
-    {
-      poseStack.translate(boxX + boxWidth / 2 - 16 / 2,
-          boxY + (boxHeight / 2) - 16 / 2, 0);
-      poseStack.scale(1.2F, 1.2F, 1.2F);
-      RenderUtil.renderGuiItem(poseStack, secondaryStack, 0, 0, 0xFFFFFFFF,
-          ItemTransforms.TransformType.FIXED);
-    }
-    poseStack.popPose();
+    this.renderItemInCombatSlot(secondaryStack,
+        boxX + boxWidth - rightPadding, boxY + topPadding, poseStack, partialTick);
 
     // Render melee
     var meleeStack = inventory.getItem(2);
@@ -314,15 +306,8 @@ public class IngameGui {
     RenderUtil.fill(poseStack, boxX, boxY, boxWidth, boxHeight, 0x66000000);
     this.minecraft.font.drawShadow(poseStack, "3", boxX + 5, boxY + 5,
         0xFFFFFFFF);
-    poseStack.pushPose();
-    {
-      poseStack.translate(boxX + boxWidth / 2 - 16 / 2,
-          boxY + (boxHeight / 2) - 16 / 2, 0);
-      poseStack.scale(1.2F, 1.2F, 1.2F);
-      RenderUtil.renderGuiItem(poseStack, meleeStack, 0, 0, 0xFFFFFFFF,
-          ItemTransforms.TransformType.FIXED);
-    }
-    poseStack.popPose();
+    this.renderItemInCombatSlot(meleeStack,
+        boxX + boxWidth - rightPadding, boxY + topPadding, poseStack, partialTick);
 
     // Render extras
     boxY += boxMarginY;
@@ -385,6 +370,30 @@ public class IngameGui {
       RenderUtil.fill(poseStack, armourX + 42, height - healthBoxHeight / 2 - 5,
           Math.round(65 * (armour / 20)), 10, 0xCCFFFFFF);
     }
+  }
+
+  private void renderItemInCombatSlot(ItemStack itemStack, int x, int y, PoseStack poseStack,
+      float partialTick) {
+    poseStack.pushPose();
+
+    var halfItemWidth = 8.0F;
+    poseStack.translate(x - halfItemWidth, y + halfItemWidth, 0);
+
+    var renderer = this.client.getItemRendererManager().getItemRenderer(itemStack.getItem());
+    if (renderer instanceof CombatSlotItemRenderer combatSlotRenderer) {
+      RenderUtil.setupItemRendering(poseStack);
+      Lighting.setupForFlatItems();
+      var bufferSource = this.minecraft.renderBuffers().bufferSource();
+      combatSlotRenderer.renderInCombatSlot(itemStack, poseStack, partialTick,
+          bufferSource, RenderUtil.FULL_LIGHT,
+          OverlayTexture.NO_OVERLAY);
+      bufferSource.endBatch();
+      Lighting.setupFor3DItems();
+    } else {
+      RenderUtil.renderGuiItem(poseStack, itemStack, 0, 0, 0xFFFFFFFF,
+          ItemTransforms.TransformType.FIXED);
+    }
+    poseStack.popPose();
   }
 
   public void renderCrosshairs(PoseStack poseStack, float accuracy, float partialTicks, int width,

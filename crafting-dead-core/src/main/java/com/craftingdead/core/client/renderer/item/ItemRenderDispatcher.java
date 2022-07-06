@@ -83,7 +83,7 @@ public class ItemRenderDispatcher implements ResourceManagerReloadListener {
       int packedLight, int packedOverlay) {
     var renderer = this.renderers.get(itemStack.getItem().delegate);
     if (renderer != null && renderer.handlePerspective(itemStack, transformType)) {
-      renderer.renderItem(itemStack, transformType, living, poseStack, bufferSource,
+      renderer.render(itemStack, transformType, living, poseStack, bufferSource,
           packedLight, packedOverlay);
       return true;
     }

@@ -35,8 +35,8 @@ import com.craftingdead.core.client.model.geom.ModModelLayers;
 import com.craftingdead.core.client.util.RenderUtil;
 import com.craftingdead.core.util.EasingFunction;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
-import com.craftingdead.core.world.item.gun.Gun;
 import com.craftingdead.core.world.item.GunItem;
+import com.craftingdead.core.world.item.gun.Gun;
 import com.craftingdead.core.world.item.gun.attachment.Attachment;
 import com.craftingdead.core.world.item.gun.attachment.Attachments;
 import com.craftingdead.core.world.item.gun.skin.Paint;
@@ -80,7 +80,7 @@ import net.minecraftforge.client.model.SimpleModelState;
 import net.minecraftforge.client.model.data.EmptyModelData;
 import net.minecraftforge.common.model.TransformationHelper;
 
-public class GunRenderer implements CustomItemRenderer {
+public class GunRenderer implements CombatSlotItemRenderer {
 
   private static final Pair<Transformation, Transformation> IDENTITY_HAND_TRANSFORMS =
       Pair.of(Transformation.identity(), Transformation.identity());
@@ -119,10 +119,19 @@ public class GunRenderer implements CustomItemRenderer {
   }
 
   @Override
-  public void rotateCamera(ItemStack itemStack, LivingEntity livingEntity, float partialTicks,
+  public void renderInCombatSlot(ItemStack itemStack, PoseStack poseStack, float partialTick,
+      MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
+    var gun = CapabilityUtil.getOrThrow(Gun.CAPABILITY, itemStack, Gun.class);
+    this.renderGun(false, itemStack.hasFoil(), gun, 0.0F,
+        ItemTransforms.TransformType.GUI, partialTick, poseStack, bufferSource, packedLight,
+        packedOverlay);
+  }
+
+  @Override
+  public void rotateCamera(ItemStack itemStack, LivingEntity livingEntity, float partialTick,
       Vector3f rotations) {
     var gun = CapabilityUtil.getOrThrow(Gun.CAPABILITY, itemStack, Gun.class);
-    gun.getClient().getAnimationController().applyCamera(partialTicks, rotations);
+    gun.getClient().getAnimationController().applyCamera(partialTick, rotations);
   }
 
   @Override
@@ -136,7 +145,7 @@ public class GunRenderer implements CustomItemRenderer {
   }
 
   @Override
-  public void renderItem(
+  public void render(
       ItemStack itemStack,
       ItemTransforms.TransformType transformType,
       @Nullable LivingExtension<?, ?> living,
@@ -151,7 +160,7 @@ public class GunRenderer implements CustomItemRenderer {
       return;
     }
 
-    var partialTicks = this.minecraft.isPaused() ? 1.0F : this.minecraft.getFrameTime();
+    var partialTick = this.minecraft.isPaused() ? 1.0F : this.minecraft.getFrameTime();
 
     var gun = CapabilityUtil.getOrThrow(Gun.CAPABILITY, itemStack, Gun.class);
 
@@ -162,20 +171,20 @@ public class GunRenderer implements CustomItemRenderer {
         case FIRST_PERSON_RIGHT_HAND:
           if (living != null && living.entity() instanceof AbstractClientPlayer player) {
             this.renderFirstPerson(player, itemStack, gun, scoping, transformType,
-                partialTicks, poseStack, bufferSource, packedLight, packedOverlay);
+                partialTick, poseStack, bufferSource, packedLight, packedOverlay);
           }
           break;
         case THIRD_PERSON_LEFT_HAND:
         case THIRD_PERSON_RIGHT_HAND:
-          gun.getClient().getAnimationController().apply(partialTicks, poseStack);
-          this.renderGunWithAttachements(itemStack.hasFoil(), gun, 0.0F,
-              transformType, partialTicks, poseStack, bufferSource, packedLight,
+          gun.getClient().getAnimationController().apply(partialTick, poseStack);
+          this.renderGun(true, itemStack.hasFoil(), gun, 0.0F,
+              transformType, partialTick, poseStack, bufferSource, packedLight,
               packedOverlay);
           break;
         case HEAD:
           this.properties.backTransform().push(poseStack);
-          this.renderGunWithAttachements(itemStack.hasFoil(), gun, 0.0F,
-              transformType, partialTicks, poseStack, bufferSource, packedLight,
+          this.renderGun(true, itemStack.hasFoil(), gun, 0.0F,
+              transformType, partialTick, poseStack, bufferSource, packedLight,
               packedOverlay);
           poseStack.popPose();
           break;
@@ -185,8 +194,8 @@ public class GunRenderer implements CustomItemRenderer {
           poseStack.mulPose(Vector3f.ZP.rotationDegrees(180.0F));
           poseStack.mulPose(Vector3f.XP.rotationDegrees(180.0F));
         default:
-          this.renderGunWithAttachements(itemStack.hasFoil(), gun, 0.0F,
-              transformType, partialTicks, poseStack, bufferSource, packedLight,
+          this.renderGun(true, itemStack.hasFoil(), gun, 0.0F,
+              transformType, partialTick, poseStack, bufferSource, packedLight,
               packedOverlay);
           break;
       }
@@ -395,19 +404,20 @@ public class GunRenderer implements CustomItemRenderer {
 
       gun.getClient().getAnimationController().apply(partialTicks, poseStack);
 
-      this.renderGunWithAttachements(itemStack.hasFoil(), gun, aimingPct, transformType,
+      this.renderGun(true, itemStack.hasFoil(), gun, aimingPct, transformType,
           partialTicks, poseStack, renderTypeBuffer, packedLight, packedOverlay);
     }
     poseStack.popPose();
   }
 
-  private void renderGunWithAttachements(
+  private void renderGun(
+      boolean renderAttachments,
       boolean foil,
       Gun gun,
       float aimingPct,
       ItemTransforms.TransformType transformType,
-      float partialTicks,
-      PoseStack matrixStack,
+      float partialTick,
+      PoseStack poseStack,
       MultiBufferSource renderTypeBuffer,
       int packedLight,
       int packedOverlay) {
@@ -440,22 +450,24 @@ public class GunRenderer implements CustomItemRenderer {
             aimingPct)
         : normalTransform;
 
-    perspectiveTransform.push(matrixStack);
+    perspectiveTransform.push(poseStack);
     {
       this.renderBakedModel(bakedModel, foil, color, transformType,
-          matrixStack, renderTypeBuffer, packedLight, packedOverlay);
+          poseStack, renderTypeBuffer, packedLight, packedOverlay);
 
-      matrixStack.pushPose();
+      poseStack.pushPose();
       {
         this.renderMagazine(gun, skinTextureLocation, color, foil, transformType,
-            matrixStack, renderTypeBuffer, packedLight, packedOverlay);
+            poseStack, renderTypeBuffer, packedLight, packedOverlay);
       }
-      matrixStack.popPose();
+      poseStack.popPose();
 
-      this.renderAttachments(gun, skinTextureLocation, color, foil, transformType,
-          partialTicks, matrixStack, renderTypeBuffer, packedLight, packedOverlay);
+      if (renderAttachments) {
+        this.renderAttachments(gun, skinTextureLocation, color, foil, transformType,
+            partialTick, poseStack, renderTypeBuffer, packedLight, packedOverlay);
+      }
     }
-    matrixStack.popPose();
+    poseStack.popPose();
   }
 
   protected final void renderBakedModel(BakedModel bakedModel, boolean foil, int colour,

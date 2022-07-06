@@ -2,8 +2,8 @@
 	"credit": "Made with Blockbench",
 	"texture_size": [128, 128],
 	"textures": {
-		"gun": "craftingdead:gun/fnfal",
-		"particle": "craftingdead:gun/fnfal"
+		"particle": "craftingdead:gun/fnfal",
+		"gun": "craftingdead:gun/fnfal"
 	},
 	"elements": [
 		{
@@ -343,9 +343,9 @@
 			"translation": [0, -1.5, 0]
 		},
 		"gui": {
-			"rotation": [51.75, -41.25, 66.5],
-			"translation": [0.5, 0, 0],
-			"scale": [0.5, 0.5, 0.5]
+			"rotation": [0, 90, 0],
+			"translation": [-32, -4, 0],
+			"scale": [2, 2, 2]
 		},
 		"head": {
 			"rotation": [90, 0, -180],
@@ -373,7 +373,7 @@
 					"name": "Magazine",
 					"origin": [8, 8, 8],
 					"color": 0,
-					"children": [24]
+					"children": []
 				}
 			]
 		}

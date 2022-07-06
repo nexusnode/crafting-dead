@@ -2,8 +2,8 @@
 	"credit": "Made with Blockbench",
 	"texture_size": [64, 64],
 	"textures": {
-		"gun": "craftingdead:gun/desert_eagle",
-		"particle": "craftingdead:gun/desert_eagle"
+		"particle": "craftingdead:gun/desert_eagle",
+		"gun": "craftingdead:gun/desert_eagle"
 	},
 	"elements": [
 		{
@@ -179,8 +179,9 @@
 			"rotation": [0, 0, 88.25]
 		},
 		"gui": {
-			"rotation": [90, -51, 90],
-			"translation": [-1.5, 0.25, 0]
+			"rotation": [0, 90, 0],
+			"translation": [-2, 3.5, 0],
+			"scale": [2, 2, 2]
 		},
 		"head": {
 			"rotation": [-91.5, 0, 0],
@@ -195,10 +196,12 @@
 		{
 			"name": "Anchor",
 			"origin": [8, 8, 8],
+			"color": 0,
 			"children": [
 				{
 					"name": "Body",
 					"origin": [8, 8, 8],
+					"color": 0,
 					"children": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
 				}
 			]

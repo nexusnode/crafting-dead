@@ -327,24 +327,22 @@ public class RenderUtil {
     return scale / (float) minecraft.getWindow().getGuiScale();
   }
 
-  public static void renderGuiItem(PoseStack poseStack,ItemStack itemStack, int x, int y, int color) {
+  public static void renderGuiItem(PoseStack poseStack, ItemStack itemStack, int x, int y,
+      int color) {
     renderGuiItem(poseStack, itemStack, x, y, color,
         minecraft.getItemRenderer().getModel(itemStack, null, null, 0),
         ItemTransforms.TransformType.GUI);
   }
 
-  public static void renderGuiItem(PoseStack poseStack,ItemStack itemStack, int x, int y, int color,
+  public static void renderGuiItem(PoseStack poseStack, ItemStack itemStack, int x, int y,
+      int color,
       ItemTransforms.TransformType transformType) {
-    renderGuiItem(poseStack,itemStack, x, y, color,
+    renderGuiItem(poseStack, itemStack, x, y, color,
         minecraft.getItemRenderer().getModel(itemStack, null, null, 0), transformType);
   }
 
-  /**
-   * Copied from {@link ItemRenderer#renderGuiItem} with the ability to customise the color.
-   */
   @SuppressWarnings("deprecation")
-  public static void renderGuiItem(PoseStack poseStack, ItemStack itemStack, int x, int y,
-      int color, BakedModel bakedmodel, ItemTransforms.TransformType transformType) {
+  public static void setupItemRendering(PoseStack poseStack) {
     minecraft.textureManager.getTexture(TextureAtlas.LOCATION_BLOCKS).setFilter(false, false);
     RenderSystem.setShaderTexture(0, TextureAtlas.LOCATION_BLOCKS);
     RenderSystem.enableBlend();
@@ -352,18 +350,27 @@ public class RenderUtil {
         GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
     RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 
-    poseStack.pushPose();
-    poseStack.translate(x, y, 100.0F + minecraft.getItemRenderer().blitOffset);
-    poseStack.translate(8.0D, 8.0D, 0.0D);
+    poseStack.translate(0, 0, 100.0F + minecraft.getItemRenderer().blitOffset);
     poseStack.scale(1.0F, -1.0F, 1.0F);
     poseStack.scale(16.0F, 16.0F, 16.0F);
+  }
 
-    var bufferSource = Minecraft.getInstance().renderBuffers().bufferSource();
-    boolean enable3dLight = !bakedmodel.usesBlockLight();
-    if (enable3dLight) {
+  /**
+   * Copied from {@link ItemRenderer#renderGuiItem} with the ability to customise the color.
+   */
+  public static void renderGuiItem(PoseStack poseStack, ItemStack itemStack, int x, int y,
+      int color, BakedModel bakedmodel, ItemTransforms.TransformType transformType) {
+    poseStack.pushPose();
+    poseStack.translate(x, y, 0);
+    poseStack.translate(8.0D, 8.0D, 0.0D);
+    setupItemRendering(poseStack);
+
+    var flatLighting = !bakedmodel.usesBlockLight();
+    if (flatLighting) {
       Lighting.setupForFlatItems();
     }
 
+    var bufferSource = minecraft.renderBuffers().bufferSource();
     if (color > -1) {
       render(itemStack, transformType, false, poseStack,
           bufferSource, color, FULL_LIGHT, OverlayTexture.NO_OVERLAY, bakedmodel);
@@ -371,15 +378,14 @@ public class RenderUtil {
       minecraft.getItemRenderer().render(itemStack, transformType, false, poseStack,
           bufferSource, FULL_LIGHT, OverlayTexture.NO_OVERLAY, bakedmodel);
     }
-
     bufferSource.endBatch();
+
     RenderSystem.enableDepthTest();
-    if (enable3dLight) {
+    if (flatLighting) {
       Lighting.setupFor3DItems();
     }
 
     poseStack.popPose();
-//    RenderSystem.applyModelViewMatrix();
   }
 
   /**

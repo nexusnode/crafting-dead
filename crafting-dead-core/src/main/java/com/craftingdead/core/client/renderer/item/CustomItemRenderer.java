@@ -54,7 +54,7 @@ public interface CustomItemRenderer {
    * @param transformType - the perspective
    * @param itemStack - {@link ItemStack} being rendered
    */
-  void renderItem(ItemStack itemStack, ItemTransforms.TransformType transformType,
+  void render(ItemStack itemStack, ItemTransforms.TransformType transformType,
       @Nullable LivingExtension<?, ?> living, PoseStack poseStack,
       MultiBufferSource bufferSource, int packedLight, int packedOverlay);
 

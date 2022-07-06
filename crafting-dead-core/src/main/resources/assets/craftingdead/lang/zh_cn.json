@@ -6,7 +6,6 @@
   "key.remove_magazine": "移除弹夹",
   "key.toggle_fire_mode": "喷火模式",
   "key.equipment_menu":"打开/关闭设备菜单",
-  "key.toggle_combat_mode":"切换战斗模式",												
   
   "tutorial.open_equipment_menu.title":"打开设备菜单",
   "tutorial.open_equipment_menu.description": "按 %s",

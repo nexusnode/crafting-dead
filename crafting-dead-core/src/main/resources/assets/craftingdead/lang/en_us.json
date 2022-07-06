@@ -6,7 +6,6 @@
   "key.remove_magazine": "Remove Magazine",
   "key.toggle_fire_mode": "Toggle Fire Mode",
   "key.equipment_menu":"Open/Close Equipment menu",
-  "key.toggle_combat_mode":"Toggle combat mode",
 
   "tutorial.open_equipment_menu.title":"Open equipment menu",
   "tutorial.open_equipment_menu.description": "Press %s",
