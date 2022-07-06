@@ -16,7 +16,7 @@
     "aim_transform": {
         "translation": [
             -9.5,
-            1.75,
+            2.75,
             0
         ]
     },
@@ -81,7 +81,7 @@
             "translation": [
                 0,
                 -1,
-                2
+                0
             ]
         }
     },

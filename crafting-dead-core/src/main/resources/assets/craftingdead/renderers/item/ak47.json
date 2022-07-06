@@ -17,14 +17,14 @@
         "translation": [
             -9.5,
             3.25,
-            1.5
+            2.5
         ]
     },
     "scope_aim_transform": {
         "translation": [
             -9.5,
-            3.25,
-            1.5
+            2,
+            -1
         ]
     },
     "hand_transforms": {
@@ -102,16 +102,16 @@
     "attachment_transforms": {
         "craftingdead:red_dot_sight": {
             "translation": [
-                0.5,
+                0.51,
                 4.8,
-                4
+                3
             ]
         },
         "craftingdead:acog_sight": {
             "translation": [
                 0.5,
-                4.5,
-                5
+                2.5,
+                3
             ]
         },
         "craftingdead:bipod": {
@@ -125,7 +125,7 @@
             "translation": [
                 0.5,
                 5,
-                3
+                2
             ]
         },
         "craftingdead:lp_scope": {
