@@ -18,6 +18,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.TextComponent;
+import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec2;
 import sm0keysa1m0n.bliss.layout.Layout;
 import sm0keysa1m0n.bliss.layout.MeasureMode;
@@ -161,11 +162,12 @@ public class TextView extends View {
       case AT_MOST:
         this.paragraph.layout(widthMode == MeasureMode.UNDEFINED
             ? Float.MAX_VALUE
-            : width * this.graphicsContext.scale());
+            : Mth.ceil(width) * this.graphicsContext.scale());
+
         width = this.paragraph.getMaxIntrinsicWidth() / this.graphicsContext.scale();
         break;
       default:
-        this.paragraph.layout(width * this.graphicsContext.scale());
+        this.paragraph.layout(Mth.ceil(width) * this.graphicsContext.scale());
         break;
     }
     return new Vec2(width, this.paragraph.getHeight() / this.graphicsContext.scale());
