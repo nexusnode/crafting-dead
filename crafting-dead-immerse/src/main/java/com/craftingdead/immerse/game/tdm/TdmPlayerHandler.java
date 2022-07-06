@@ -93,7 +93,8 @@ public class TdmPlayerHandler<P extends Player> implements PlayerHandler {
 
   @Override
   public Visibility getVisibility() {
-    return this.getRemainingSpawnProtectionSeconds() > 0 ? Visibility.PARTIALLY_VISIBLE
+    return this.getRemainingSpawnProtectionSeconds() > 0
+        ? Visibility.PARTIALLY_VISIBLE
         : Visibility.VISIBLE;
   }
 
@@ -112,7 +113,8 @@ public class TdmPlayerHandler<P extends Player> implements PlayerHandler {
   }
 
   @Override
-  public boolean handleDeathLoot(DamageSource cause, Collection<ItemEntity> drops, int lootingLevel) {
+  public boolean handleDeathLoot(DamageSource cause, Collection<ItemEntity> drops,
+      int lootingLevel) {
     return true;
   }
 
