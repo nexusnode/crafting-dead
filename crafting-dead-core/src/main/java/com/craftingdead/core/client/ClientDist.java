@@ -110,6 +110,7 @@ import net.minecraftforge.client.event.RegisterClientReloadListenersEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderHandEvent;
 import net.minecraftforge.client.event.RenderLivingEvent;
+import net.minecraftforge.client.event.ScreenEvent;
 import net.minecraftforge.client.event.ScreenOpenEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.client.event.sound.SoundLoadEvent;
@@ -703,11 +704,22 @@ public class ClientDist implements ModDist {
       case END -> {
         if (this.minecraft.player != null) {
           this.updateAdrenalineShader(event.renderTickTime);
-          this.ingameGui.renderFlashBangOverlay(this.minecraft.player, new PoseStack(),
-              this.minecraft.getWindow().getGuiScaledWidth(),
-              this.minecraft.getWindow().getGuiScaledHeight(), event.renderTickTime);
+          if (this.minecraft.screen == null) {
+            this.ingameGui.renderFlashBangOverlay(this.minecraft.player, new PoseStack(),
+                this.minecraft.getWindow().getGuiScaledWidth(),
+                this.minecraft.getWindow().getGuiScaledHeight(), event.renderTickTime);
+          }
         }
       }
+    }
+  }
+
+  @SubscribeEvent
+  public void handleRenderScreen(ScreenEvent.DrawScreenEvent.Pre event) {
+    if (this.minecraft.player != null) {
+      this.ingameGui.renderFlashBangOverlay(this.minecraft.player, new PoseStack(),
+          this.minecraft.getWindow().getGuiScaledWidth(),
+          this.minecraft.getWindow().getGuiScaledHeight(), event.getPartialTicks());
     }
   }
 

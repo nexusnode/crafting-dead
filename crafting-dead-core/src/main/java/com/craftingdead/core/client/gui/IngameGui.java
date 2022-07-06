@@ -131,12 +131,11 @@ public class IngameGui {
     // Draws Flashbang effect
     var flashEffect = player.getEffect(ModMobEffects.FLASH_BLINDNESS.get());
     if (flashEffect != null) {
-      int alpha = (int) (255F
-          * (Mth.clamp(flashEffect.getDuration() - partialTick, 0, 20) / 20F));
-      int flashColour = 0x00FFFFFF | (alpha & 255) << 24;
-      RenderUtil.fillGradient(poseStack, 0, 0, width, height, flashColour, flashColour);
+      int alpha =
+          (int) (255.0F * (Mth.clamp(flashEffect.getDuration() - partialTick, 0, 20) / 20.0F));
+      int color = 0xFFFFFF | (alpha & 255) << 24;
+      RenderUtil.fill(poseStack, 0, 0, width, height, color);
     }
-
   }
 
   public void renderOverlay(PlayerExtension<AbstractClientPlayer> player, ItemStack heldStack,
