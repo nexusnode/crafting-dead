@@ -543,13 +543,13 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
 
     // Post gun hit entity event
     var event =
-        new GunEvent.HitEntity(this, itemStack, living, hitEntity, damage, hitPos, headshot);
+        new GunEvent.HitEntity(this, this.itemStack, living, hitEntity, damage, hitPos, headshot);
     if (MinecraftForge.EVENT_BUS.post(event)) {
       return;
     }
 
-    damage = event.getDamage();
-    headshot = event.isHeadshot();
+    damage = event.damage();
+    headshot = event.headshot();
 
     // Simulated client-side effects
     if (living.level().isClientSide()) {
@@ -562,8 +562,8 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
     // Also, allows multiple bullets to hit the same target at the same time.
     hitEntity.invulnerableTime = 0;
 
-    ModDamageSource.causeDamageWithoutKnockback(hitEntity,
-        ModDamageSource.causeGunDamage(entity, this.itemStack, headshot), damage);
+    ModDamageSource.hurtWithoutKnockback(hitEntity,
+        ModDamageSource.gun(entity, headshot), damage);
 
     checkCreateExplosion(this.itemStack, entity, hitPos);
 

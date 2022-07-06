@@ -48,7 +48,7 @@ public class KilledMessage {
     int y = height / 2 + 10;
 
     RenderSystem.setShader(GameRenderer::getPositionColorShader);
-    RenderUtil.fillWithShadow(poseStack, x, y, boxWidth, boxTitleHeight, 0xDD1c1c1c);
+    RenderUtil.fillWithShadow(poseStack, x, y, boxWidth, boxTitleHeight, 0xDD1C1C1C);
 
     poseStack.pushPose();
     {
@@ -81,15 +81,14 @@ public class KilledMessage {
     font.drawShadow(
         poseStack, this.itemStack.getDisplayName(), x + 80, y + 30, 0xFFFFFFFF);
 
-    final var modelViewStack = RenderSystem.getModelViewStack();
-    modelViewStack.pushPose();
+    poseStack.pushPose();
     {
-      modelViewStack.translate(x + 110, y + 50, 0);
+      poseStack.translate(x + 110, y + 50, 0);
       var scale = 1.2F;
-      modelViewStack.scale(scale, scale, scale);
-      com.craftingdead.core.client.util.RenderUtil.renderGuiItem(this.itemStack, 0, 0,
+      poseStack.scale(scale, scale, scale);
+      com.craftingdead.core.client.util.RenderUtil.renderGuiItem(poseStack, this.itemStack, 0, 0,
           0xFFFFFFFF, ItemTransforms.TransformType.FIXED);
     }
-    modelViewStack.popPose();
+    poseStack.popPose();
   }
 }

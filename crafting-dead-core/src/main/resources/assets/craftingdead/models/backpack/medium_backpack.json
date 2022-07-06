@@ -1,11 +1,56 @@
 {
-	"loader":"forge:obj",
-	"model":"craftingdead:models/backpack/medium_backpack.obj",
-	"flip-v":true,
-	"ambientToFullbright": false,
+	"credit": "Made with Blockbench",
+	"texture_size": [64, 32],
+	"elements": [
+		{
+			"name": "Shape1",
+			"from": [5, 15, 7],
+			"to": [11, 22, 10],
+			"shade": false,
+			"color": 4,
+			"faces": {
+				"north": {"uv": [2.25, 1.5, 0.75, 5], "texture": "#base"},
+				"east": {"uv": [3, 1.5, 2.25, 5], "texture": "#base"},
+				"south": {"uv": [4.5, 1.5, 3, 5], "texture": "#base"},
+				"west": {"uv": [0.75, 1.5, 0, 5], "texture": "#base"},
+				"up": {"uv": [0.75, 1.5, 2.25, 0], "texture": "#base"},
+				"down": {"uv": [2.25, 0, 3.75, 1.5], "texture": "#base"}
+			}
+		},
+		{
+			"name": "Shape2",
+			"from": [6, 22, 7],
+			"to": [10, 23, 10],
+			"shade": false,
+			"color": 7,
+			"faces": {
+				"north": {"uv": [1.75, 7, 0.75, 7.5], "texture": "#base"},
+				"east": {"uv": [2.5, 7, 1.75, 7.5], "texture": "#base"},
+				"south": {"uv": [3.5, 7, 2.5, 7.5], "texture": "#base"},
+				"west": {"uv": [0.75, 7, 0, 7.5], "texture": "#base"},
+				"up": {"uv": [0.75, 7, 1.75, 5.5], "texture": "#base"},
+				"down": {"uv": [1.75, 5.5, 2.75, 7], "texture": "#base"}
+			}
+		},
+		{
+			"name": "Shape3",
+			"from": [6, 16, 6],
+			"to": [10, 21, 7],
+			"shade": false,
+			"color": 2,
+			"faces": {
+				"north": {"uv": [1.25, 8.5, 0.25, 11], "texture": "#base"},
+				"east": {"uv": [1.5, 8.5, 1.25, 11], "texture": "#base"},
+				"south": {"uv": [2.5, 8.5, 1.5, 11], "texture": "#base"},
+				"west": {"uv": [0.25, 8.5, 0, 11], "texture": "#base"},
+				"up": {"uv": [0.25, 8.5, 1.25, 8], "texture": "#base"},
+				"down": {"uv": [1.25, 8, 2.25, 8.5], "texture": "#base"}
+			}
+		}
+	],
 	"transform": {
-		"rotation":  [ 180, 0, 0 ],
-		"translation":  [ 0.5, -0.085, -1.25 ],
-		"scale":  [ 1, 1, 1 ]
+		"rotation":  [ 0, 0, 0 ],
+		"translation": [ 0, -0.05, -0.8 ],
+		"scale":  [ 1, -1, -1 ]
 	}
 }

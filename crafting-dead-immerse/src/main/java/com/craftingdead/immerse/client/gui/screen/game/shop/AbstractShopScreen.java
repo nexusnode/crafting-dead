@@ -105,26 +105,26 @@ public abstract class AbstractShopScreen extends Screen {
   }
 
   @Override
-  public void render(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
-    this.renderBackground(matrixStack);
+  public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTicks) {
+    this.renderBackground(poseStack);
 
     int mx = this.width / 2;
     int my = this.height / 2;
 
     // Render Top and Bottom margins
     RenderSystem.setShader(GameRenderer::getPositionColorShader);
-    RenderUtil.fillWithShadow(matrixStack, 0, 0, this.width, 30, 0x80000000);
-    RenderUtil.fillWithShadow(matrixStack, 0, this.height - 30, this.width, 30, 0x80000000);
+    RenderUtil.fillWithShadow(poseStack, 0, 0, this.width, 30, 0x80000000);
+    RenderUtil.fillWithShadow(poseStack, 0, this.height - 30, this.width, 30, 0x80000000);
 
-    drawCenteredString(matrixStack, font,
+    drawCenteredString(poseStack, font,
         new TranslatableComponent("gui.screen.shop.back", "B").withStyle(ChatFormatting.ITALIC),
         mx - 150, 18, 0xFFFFFFFF);
 
-    drawCenteredString(matrixStack, this.font,
+    drawCenteredString(poseStack, this.font,
         this.getTitle().copy().withStyle(ChatFormatting.BOLD),
         mx, 10, 0xFFFFFFFF);
 
-    RenderUtil.renderTextRight(this.font, matrixStack, mx + 150, 18,
+    RenderUtil.renderTextRight(this.font, poseStack, mx + 150, 18,
         new TranslatableComponent("gui.screen.shop.buy_time",
             new TextComponent(String.valueOf(this.cachedBuyTime))
                 .withStyle(ChatFormatting.RED))
@@ -134,20 +134,20 @@ public abstract class AbstractShopScreen extends Screen {
     // render slots and background
     int bh = this.shopButtons.size() * 22;
     RenderSystem.setShader(GameRenderer::getPositionColorShader);
-    RenderUtil.fillWithShadow(matrixStack, mx - 150, my - 80, 120, bh + 15, 0x80000000);
+    RenderUtil.fillWithShadow(poseStack, mx - 150, my - 80, 120, bh + 15, 0x80000000);
 
-    super.render(matrixStack, mouseX, mouseY, partialTicks);
+    super.render(poseStack, mouseX, mouseY, partialTicks);
 
     // render info of item over
     RenderSystem.setShader(GameRenderer::getPositionColorShader);
-    RenderUtil.fillWithShadow(matrixStack, mx - 25, my - 80, 115, 160, 0x80000000);
-    this.font.drawShadow(matrixStack,
+    RenderUtil.fillWithShadow(poseStack, mx - 25, my - 80, 115, 160, 0x80000000);
+    this.font.drawShadow(poseStack,
         new TranslatableComponent("gui.screen.shop.selected").withStyle(ChatFormatting.BOLD),
         mx - 20, my - 75, 0xFFFFFFFF);
 
     for (var shopButton : this.shopButtons) {
       if (shopButton instanceof InfoPanel infoPanel && shopButton.isHoveredOrFocused()) {
-        infoPanel.renderInfo(mx, my, matrixStack, mouseX, mouseY, partialTicks);
+        infoPanel.renderInfo(mx, my, poseStack, mouseX, mouseY, partialTicks);
       }
     }
 
@@ -157,8 +157,8 @@ public abstract class AbstractShopScreen extends Screen {
     boolean renderMoney = this.shop.getMoney() > -1;
     if (renderMoney) {
       RenderSystem.setShader(GameRenderer::getPositionColorShader);
-      RenderUtil.fillWithShadow(matrixStack, mx + 95, my - 80, 69, moneyHeight, 0x80000000);
-      this.font.drawShadow(matrixStack,
+      RenderUtil.fillWithShadow(poseStack, mx + 95, my - 80, 69, moneyHeight, 0x80000000);
+      this.font.drawShadow(poseStack,
           new TextComponent("$" + this.shop.getMoney())
               .withStyle(ChatFormatting.BOLD, ChatFormatting.GREEN),
           mx + 100, my - 76, 0);
@@ -167,9 +167,9 @@ public abstract class AbstractShopScreen extends Screen {
     int inventoryYOffset = renderMoney ? moneyHeight + spacing : 0;
 
     RenderSystem.setShader(GameRenderer::getPositionColorShader);
-    RenderUtil.fillWithShadow(matrixStack, mx + 95, my - 80 + inventoryYOffset, 69, 140,
+    RenderUtil.fillWithShadow(poseStack, mx + 95, my - 80 + inventoryYOffset, 69, 140,
         0x80000000);
-    this.font.drawShadow(matrixStack,
+    this.font.drawShadow(poseStack,
         new TranslatableComponent("gui.screen.shop.inventory").withStyle(ChatFormatting.BOLD),
         mx + 100, my - 75 + inventoryYOffset, 0xFFFFFFFF);
 
@@ -177,7 +177,7 @@ public abstract class AbstractShopScreen extends Screen {
     var inventory = this.player.entity().getInventory();
     for (int i = 0; i < 7; i++) {
       var itemStack = inventory.getItem(i);
-      com.craftingdead.core.client.util.RenderUtil.renderGuiItem(itemStack, mx + 120,
+      com.craftingdead.core.client.util.RenderUtil.renderGuiItem(poseStack, itemStack, mx + 120,
           my - 60 + inventoryYOffset + (i * 21), 0xFFFFFFFF,
           ItemTransforms.TransformType.FIXED);
     }

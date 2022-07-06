@@ -21,17 +21,7 @@ package com.craftingdead.immerse.game.module.shop.message;
 import java.util.UUID;
 import net.minecraft.network.FriendlyByteBuf;
 
-public class BuyItemMessage {
-
-  private final UUID itemId;
-
-  public BuyItemMessage(UUID itemId) {
-    this.itemId = itemId;
-  }
-
-  public UUID getItemId() {
-    return this.itemId;
-  }
+public record BuyItemMessage(UUID itemId) {
 
   public void encode(FriendlyByteBuf out) {
     out.writeUUID(this.itemId);

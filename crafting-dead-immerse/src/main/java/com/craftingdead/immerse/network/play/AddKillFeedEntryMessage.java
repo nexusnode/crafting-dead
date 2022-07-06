@@ -16,11 +16,11 @@
  * https://craftingdead.net/terms.php
  */
 
-package com.craftingdead.core.network.message.play;
+package com.craftingdead.immerse.network.play;
 
 import java.util.function.Supplier;
-import com.craftingdead.core.CraftingDead;
-import com.craftingdead.core.world.damagesource.KillFeedEntry;
+import com.craftingdead.immerse.CraftingDeadImmerse;
+import com.craftingdead.immerse.world.KillFeedEntry;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
 
@@ -35,7 +35,7 @@ public record AddKillFeedEntryMessage(KillFeedEntry entry) {
   }
 
   public boolean handle(Supplier<NetworkEvent.Context> ctx) {
-    ctx.get().enqueueWork(() -> CraftingDead.getInstance().getClientDist().getIngameGui()
+    ctx.get().enqueueWork(() -> CraftingDeadImmerse.getInstance().getClientDist().getIngameGui()
         .addKillFeedEntry(this.entry));
     return true;
   }

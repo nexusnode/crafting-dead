@@ -214,7 +214,7 @@ public class CraftingDeadImmerse {
 
   @SubscribeEvent
   public void handlePermissionNodesGather(PermissionGatherEvent.Nodes event) {
-    event.addNodes(Permissions.GAME_OP, Permissions.BASE_DESTROY);
+    event.addNodes(Permissions.HYDRATE, Permissions.GAME_OP, Permissions.BASE_DESTROY);
   }
 
   @SubscribeEvent

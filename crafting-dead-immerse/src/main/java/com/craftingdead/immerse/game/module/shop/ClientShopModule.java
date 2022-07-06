@@ -54,7 +54,7 @@ public class ClientShopModule extends ShopModule implements GameModule.Tickable 
   }
 
   public boolean canAfford(int amount) {
-    return this.getMoney() >= amount;
+    return this.money >= amount;
   }
 
   public int getMoney() {
@@ -62,8 +62,8 @@ public class ClientShopModule extends ShopModule implements GameModule.Tickable 
   }
 
   private void handleSyncUser(SyncUserMessage message, NetworkEvent.Context context) {
-    this.buyTimeSeconds = message.getBuyTimeSeconds();
-    this.money = message.getMoney();
+    this.buyTimeSeconds = message.buyTimeSeconds();
+    this.money = message.money();
   }
 
   @Override

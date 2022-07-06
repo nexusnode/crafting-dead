@@ -474,7 +474,7 @@ public class TdmServer extends TdmGame implements GameServer, TeamHandler<TdmTea
 
   @SubscribeEvent(priority = EventPriority.LOWEST)
   public void handleTriggerPressed(GunEvent.TriggerPressed event) {
-    var handler = event.getLiving().getHandlerOrThrow(TdmPlayerHandler.TYPE);
+    var handler = event.living().getHandlerOrThrow(TdmPlayerHandler.TYPE);
     handler.setRemainingSpawnProtectionSeconds(0);
   }
 

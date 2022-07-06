@@ -18,19 +18,14 @@
 
 package com.craftingdead.core.client.gui;
 
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Random;
 import org.jetbrains.annotations.Nullable;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.client.ClientDist;
 import com.craftingdead.core.client.util.RenderUtil;
 import com.craftingdead.core.world.action.ActionObserver;
-import com.craftingdead.core.world.damagesource.KillFeedEntry;
 import com.craftingdead.core.world.effect.ModMobEffects;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
-import com.craftingdead.core.world.item.GrenadeItem;
-import com.craftingdead.core.world.item.GunItem;
 import com.craftingdead.core.world.item.gun.Gun;
 import com.craftingdead.core.world.item.gun.ammoprovider.AmmoProvider;
 import com.craftingdead.core.world.item.gun.magazine.Magazine;
@@ -38,7 +33,6 @@ import com.craftingdead.core.world.item.scope.Scope;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.ChatFormatting;
-import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiComponent;
@@ -61,13 +55,9 @@ public class IngameGui {
   private static final ResourceLocation SHIELD =
       new ResourceLocation(CraftingDead.ID, "textures/gui/shield.png");
 
-  private static final int KILL_FEED_MESSAGE_LIFE_MS = 5000;
-
   private final Minecraft minecraft;
 
   private final ClientDist client;
-
-  private final List<KillFeedEntry> killFeedMessages = new LinkedList<>();
 
   private ResourceLocation crosshairLocation;
 
@@ -78,9 +68,6 @@ public class IngameGui {
   @Nullable
   private HitMarker hitMarker;
 
-  private long killFeedVisibleTimeMs;
-  private long killFeedAnimationTimeMs;
-
   public IngameGui(Minecraft minecraft, ClientDist client, ResourceLocation crosshairLocation) {
     this.minecraft = minecraft;
     this.client = client;
@@ -89,13 +76,6 @@ public class IngameGui {
 
   public void setCrosshairLocation(ResourceLocation crosshairLocation) {
     this.crosshairLocation = crosshairLocation;
-  }
-
-  public void addKillFeedEntry(KillFeedEntry killFeedMessage) {
-    if (this.killFeedMessages.isEmpty()) {
-      this.killFeedVisibleTimeMs = 0L;
-    }
-    this.killFeedMessages.add(killFeedMessage);
   }
 
   public void setHitMarker(@Nullable HitMarker hitMarker) {
@@ -167,8 +147,6 @@ public class IngameGui {
       }
     }
 
-    this.renderKillFeed(poseStack, partialTick);
-
     heldStack.getCapability(Scope.CAPABILITY)
         .filter(scope -> scope.isScoping(player))
         .ifPresent(scope -> renderScopeOverlay(player, scope, width, height));
@@ -215,136 +193,6 @@ public class IngameGui {
       }
       modelViewStack.popPose();
       RenderSystem.applyModelViewMatrix();
-    }
-  }
-
-  private void renderKillFeed(PoseStack poseStack, float partialTicks) {
-    if (this.killFeedVisibleTimeMs == 0L) {
-      this.killFeedVisibleTimeMs = Util.getMillis();
-      this.killFeedAnimationTimeMs = 0L;
-    }
-
-    final long currentTime = Util.getMillis();
-    float durationPct = Mth.clamp(
-        (float) (currentTime - this.killFeedVisibleTimeMs) / KILL_FEED_MESSAGE_LIFE_MS, 0.0F, 1.0F);
-    if (durationPct == 1.0F && !this.killFeedMessages.isEmpty()) {
-      this.killFeedMessages.remove(0);
-      if (!this.killFeedMessages.isEmpty()) {
-        this.killFeedVisibleTimeMs = Util.getMillis();
-        this.killFeedAnimationTimeMs = 0L;
-      }
-    } else if (durationPct >= 0.75F && this.killFeedAnimationTimeMs == 0L) {
-      this.killFeedAnimationTimeMs = Util.getMillis();
-    }
-
-    float animationPct =
-        this.killFeedAnimationTimeMs != 0L
-            ? Mth.clamp((float) (currentTime - this.killFeedAnimationTimeMs)
-                / ((KILL_FEED_MESSAGE_LIFE_MS / 4.0F) - partialTicks), 0.0F, 1.0F)
-            : 0.0F;
-
-    final int killFeedMessageX = 5;
-    for (int i = 0; i < this.killFeedMessages.size(); i++) {
-      final KillFeedEntry killFeedMessage = this.killFeedMessages.get(i);
-      float killFeedMessageY = 5.0F + ((i - (1.0F * animationPct)) * 12.0F);
-      this.renderKillFeedEntry(killFeedMessage, poseStack, killFeedMessageX, killFeedMessageY,
-          i == 0 ? 1.0F - animationPct : 1.0F);
-    }
-  }
-
-  private void renderKillFeedEntry(KillFeedEntry entry, PoseStack poseStack,
-      float x, float y, float alpha) {
-    final String killerName = entry.getKillerName().getString();
-    final String deadName = entry.getDeadName().getString();
-    final int killerNameWidth = this.minecraft.font.width(killerName);
-    final int deadNameWidth = this.minecraft.font.width(deadName);
-
-    int spacing = 20;
-    alpha *= entry.getKillerEntityId() == this.minecraft.player.getId() ? 0.7F : 0.5F;
-
-    switch (entry.getType()) {
-      case WALLBANG_HEADSHOT:
-        spacing += 16;
-      case HEADSHOT:
-      case WALLBANG:
-        spacing += 16;
-        break;
-      default:
-        break;
-    }
-
-    final int opacity = Math.min((int) (alpha * 255.0F), 255);
-    if (opacity < 8) {
-      return;
-    }
-
-    int colour = 0x000000 + (opacity << 24);
-    RenderUtil.fillGradient(poseStack, x, y,
-        x + killerNameWidth + deadNameWidth + spacing, y + 11, colour, colour);
-
-    this.minecraft.font.drawShadow(poseStack, killerName,
-        x + 2, y + 2, 0xFFFFFF + ((int) (alpha * 255.0F) << 24));
-    this.minecraft.font.drawShadow(poseStack, deadName,
-        x + killerNameWidth + spacing - 1, y + 2, 0xFFFFFF + (opacity << 24));
-
-    switch (entry.getType()) {
-      case HEADSHOT:
-        RenderSystem.enableBlend();
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, alpha);
-        RenderSystem.setShaderTexture(0,
-            new ResourceLocation(CraftingDead.ID, "textures/gui/headshot.png"));
-        RenderUtil.blit(x + killerNameWidth + 17, y - 1, 12, 12);
-        RenderSystem.disableBlend();
-        break;
-      case WALLBANG:
-        RenderSystem.enableBlend();
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, alpha);
-        RenderSystem.setShaderTexture(0,
-            new ResourceLocation(CraftingDead.ID, "textures/gui/wallbang.png"));
-        RenderUtil.blit(x + killerNameWidth + 35, y - 1, 12, 12);
-        RenderSystem.disableBlend();
-        break;
-      case WALLBANG_HEADSHOT:
-        RenderSystem.enableBlend();
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, alpha);
-        RenderSystem.setShaderTexture(0,
-            new ResourceLocation(CraftingDead.ID, "textures/gui/wallbang.png"));
-        RenderUtil.blit(x + killerNameWidth + 35, y - 1, 12, 12);
-        RenderSystem.setShaderTexture(0,
-            new ResourceLocation(CraftingDead.ID, "textures/gui/headshot.png"));
-        RenderUtil.blit(x + killerNameWidth + 35 + 14, y - 1, 12, 12);
-        RenderSystem.disableBlend();
-        break;
-      default:
-        break;
-    }
-
-    if (!entry.getWeaponStack().isEmpty()) {
-      poseStack.pushPose();
-      {
-        poseStack.translate(x + killerNameWidth + 4, y - 1, 0);
-
-        if (entry.getWeaponStack().getItem() instanceof GunItem) {
-          var scale = 0.75F;
-          poseStack.scale(scale, scale, scale);
-        }
-
-        // if (this.itemStack.getItem() instanceof ItemKnife) {
-        // double scale = 0.6D;
-        // GL11.glScaled(scale, scale, scale);
-        // GL11.glRotated(180, 0, 1, 0);
-        // GL11.glRotated(-20, 0, 0, 1);
-        // }
-
-        if (entry.getWeaponStack().getItem() instanceof GrenadeItem) {
-          var scale = 0.8F;
-          poseStack.scale(scale, scale, scale);
-          poseStack.translate(4, 1, 0);
-        }
-
-        RenderUtil.renderGuiItem(entry.getWeaponStack(), 0, 0, 0xFFFFFF + (opacity << 24));
-      }
-      poseStack.popPose();
     }
   }
 
@@ -428,16 +276,16 @@ public class IngameGui {
     RenderUtil.fill(poseStack, boxX, boxY, boxWidth, boxHeight, 0x66000000);
     this.minecraft.font.drawShadow(poseStack, "1", boxX + 5, boxY + 5,
         0xFFFFFFFF);
-    final var modelViewStack = RenderSystem.getModelViewStack();
-    modelViewStack.pushPose();
+
+    poseStack.pushPose();
     {
-      modelViewStack.translate(boxX + boxWidth / 2 - 16 / 2,
+      poseStack.translate(boxX + boxWidth / 2 - 16 / 2,
           boxY + (boxHeight / 2) - 16 / 2, 0);
-      modelViewStack.scale(1.2F, 1.2F, 1.2F);
-      RenderUtil.renderGuiItem(primaryStack, 0, 0, -1, ItemTransforms.TransformType.FIXED);
+      poseStack.scale(1.2F, 1.2F, 1.2F);
+      RenderUtil.renderGuiItem(poseStack, primaryStack, 0, 0, -1,
+          ItemTransforms.TransformType.FIXED);
     }
-    modelViewStack.popPose();
-    RenderSystem.applyModelViewMatrix();
+    poseStack.popPose();
 
     // Render secondary
     var secondaryStack = inventory.getItem(1);
@@ -448,16 +296,15 @@ public class IngameGui {
     RenderUtil.fill(poseStack, boxX, boxY, boxWidth, boxHeight, 0x66000000);
     this.minecraft.font.drawShadow(poseStack, "2", boxX + 5, boxY + 5,
         0xFFFFFFFF);
-    modelViewStack.pushPose();
+    poseStack.pushPose();
     {
-      modelViewStack.translate(boxX + boxWidth / 2 - 16 / 2,
+      poseStack.translate(boxX + boxWidth / 2 - 16 / 2,
           boxY + (boxHeight / 2) - 16 / 2, 0);
-      modelViewStack.scale(1.2F, 1.2F, 1.2F);
-      RenderUtil.renderGuiItem(secondaryStack, 0, 0, 0xFFFFFFFF,
+      poseStack.scale(1.2F, 1.2F, 1.2F);
+      RenderUtil.renderGuiItem(poseStack, secondaryStack, 0, 0, 0xFFFFFFFF,
           ItemTransforms.TransformType.FIXED);
     }
-    modelViewStack.popPose();
-    RenderSystem.applyModelViewMatrix();
+    poseStack.popPose();
 
     // Render melee
     var meleeStack = inventory.getItem(2);
@@ -468,16 +315,15 @@ public class IngameGui {
     RenderUtil.fill(poseStack, boxX, boxY, boxWidth, boxHeight, 0x66000000);
     this.minecraft.font.drawShadow(poseStack, "3", boxX + 5, boxY + 5,
         0xFFFFFFFF);
-    modelViewStack.pushPose();
+    poseStack.pushPose();
     {
-      modelViewStack.translate(boxX + boxWidth / 2 - 16 / 2,
+      poseStack.translate(boxX + boxWidth / 2 - 16 / 2,
           boxY + (boxHeight / 2) - 16 / 2, 0);
-      modelViewStack.scale(1.2F, 1.2F, 1.2F);
-      RenderUtil.renderGuiItem(meleeStack, 0, 0, 0xFFFFFFFF,
+      poseStack.scale(1.2F, 1.2F, 1.2F);
+      RenderUtil.renderGuiItem(poseStack, meleeStack, 0, 0, 0xFFFFFFFF,
           ItemTransforms.TransformType.FIXED);
     }
-    modelViewStack.popPose();
-    RenderSystem.applyModelViewMatrix();
+    poseStack.popPose();
 
     // Render extras
     boxY += boxMarginY;
@@ -492,7 +338,7 @@ public class IngameGui {
       this.minecraft.font.drawShadow(poseStack, String.valueOf(4 + i), boxX + 1,
           boxY + 1, 0xFFFFFFFF);
 
-      RenderUtil.renderGuiItem(extraStack, boxX + boxWidth / 2 - 16 / 2,
+      RenderUtil.renderGuiItem(poseStack, extraStack, boxX + boxWidth / 2 - 16 / 2,
           boxY + (boxHeight / 2) - 6, 0xFFFFFFFF);
 
       boxX += 28;

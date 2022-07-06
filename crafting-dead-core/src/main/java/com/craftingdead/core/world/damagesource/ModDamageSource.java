@@ -25,23 +25,19 @@ import net.minecraft.world.damagesource.EntityDamageSource;
 import net.minecraft.world.damagesource.IndirectEntityDamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.item.ItemStack;
 
 public class ModDamageSource {
 
   public static final String BULLET_HEADSHOT_DAMAGE_TYPE = "bullet.headshot";
   public static final String BULLET_BODY_DAMAGE_TYPE = "bullet";
 
-  public static DamageSource causeGunDamage(LivingEntity source, ItemStack gunStack,
-      boolean headshot) {
-    return new KillFeedDamageSource(
-        headshot ? BULLET_HEADSHOT_DAMAGE_TYPE : BULLET_BODY_DAMAGE_TYPE, source, gunStack,
-        headshot ? KillFeedEntry.Type.HEADSHOT : KillFeedEntry.Type.NONE)
-            .bypassArmor()
-            .setProjectile()
-            .setExplosion();
+  public static DamageSource gun(LivingEntity source, boolean headshot) {
+    var messageId = headshot ? BULLET_HEADSHOT_DAMAGE_TYPE : BULLET_BODY_DAMAGE_TYPE;
+    return new EntityDamageSource(messageId, source)
+        .bypassArmor()
+        .setProjectile()
+        .setExplosion();
   }
 
   public static DamageSource grenade(Grenade grenade, @Nullable Entity thrower) {
@@ -59,30 +55,21 @@ public class ModDamageSource {
   }
 
   /**
-   * Causes a damage without doing knockback.
+   * Hurt an entity without doing knockback.
    *
    * @param victim - the victim
    * @param source - the source
    * @param amount - the amount of dmg
-   * @return the result from <code>victim.attackEntityFrom()</code>
+   * @return the result from {@link Entity#hurt(DamageSource, float)}.
    */
-  public static boolean causeDamageWithoutKnockback(Entity victim, DamageSource source,
-      float amount) {
-    if (victim instanceof LivingEntity) {
-      LivingEntity livingHit = (LivingEntity) victim;
+  public static boolean hurtWithoutKnockback(Entity victim, DamageSource source, float amount) {
+    if (victim instanceof LivingEntity livingHit) {
+      var livingResistance = livingHit.getAttribute(Attributes.KNOCKBACK_RESISTANCE);
+      var previousResistance = livingResistance.getBaseValue();
 
-      // Gets the KNOCKBACK RESISTANCE attribute of the victim
-      AttributeInstance livingResistance =
-          livingHit.getAttribute(Attributes.KNOCKBACK_RESISTANCE);
-      // Saves the previous resistance value to be used after applying the hit
-      double previousResistance = livingResistance.getBaseValue();
-
-      // Sets the resistance to make the living not receive knockback
       livingResistance.setBaseValue(Integer.MAX_VALUE);
-      // Finally attacks the entity without doing any knockback
-      boolean attackResult = livingHit.hurt(source, amount);
-      // Restores the previous knockback resistance value, so the
-      // entity can receive knockback again.
+      var attackResult = livingHit.hurt(source, amount);
+
       livingResistance.setBaseValue(previousResistance);
       return attackResult;
     }

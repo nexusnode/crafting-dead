@@ -71,4 +71,8 @@ public interface GameServer extends Game {
    * @return true to save
    */
   boolean persistGameData();
+
+  default boolean killFeedEnabled() {
+    return true;
+  }
 }
