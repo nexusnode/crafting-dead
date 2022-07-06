@@ -49,9 +49,9 @@ public class BlockItemAction extends ItemAction {
     super(hand);
     this.type = type;
     this.performer = performer;
-    this.context = new UseOnContext(performer.getLevel(),
-        performer.getEntity() instanceof Player player ? player : null, hand,
-        performer.getEntity().getItemInHand(hand), hitResult);
+    this.context = new UseOnContext(performer.level(),
+        performer.entity() instanceof Player player ? player : null, hand,
+        performer.entity().getItemInHand(hand), hitResult);
   }
 
   public UseOnContext getContext() {
@@ -69,7 +69,7 @@ public class BlockItemAction extends ItemAction {
 
   @Override
   public boolean start(boolean simulate) {
-    this.blockState = this.performer.getLevel().getBlockState(this.context.getClickedPos());
+    this.blockState = this.performer.level().getBlockState(this.context.getClickedPos());
     return super.start(simulate)
         && this.isWithinMaxDistance()
         && this.type.getPredicate().test(this.blockState);
@@ -77,7 +77,7 @@ public class BlockItemAction extends ItemAction {
 
   @Override
   public boolean tick() {
-    if (!this.performer.getLevel().isClientSide() && !this.isWithinMaxDistance()) {
+    if (!this.performer.level().isClientSide() && !this.isWithinMaxDistance()) {
       this.performer.cancelAction(true);
       return false;
     }
@@ -85,7 +85,7 @@ public class BlockItemAction extends ItemAction {
   }
 
   private boolean isWithinMaxDistance() {
-    return this.performer.getEntity().distanceToSqr(
+    return this.performer.entity().distanceToSqr(
         Vec3.atCenterOf(this.context.getClickedPos())) <= this.type.getMaxDistanceSquared();
   }
 

@@ -202,7 +202,7 @@ public class CraftingDeadSurvival {
   public void handlePerformAction(LivingExtensionEvent.PerformAction<EntityItemAction<?>> event) {
     var action = event.getAction();
     LivingExtension<?, ?> target = action.getSelectedTarget();
-    if (!event.getLiving().getLevel().isClientSide()
+    if (!event.getLiving().level().isClientSide()
         && action.getType() == ActionTypes.USE_SYRINGE.get()) {
       SurvivalActionTypes.USE_SYRINGE_ON_ZOMBIE.get()
           .createEntityAction(event.getLiving(), target, action.getHand())
@@ -237,7 +237,7 @@ public class CraftingDeadSurvival {
   public void handleAttachLivingExtensions(LivingExtensionEvent.Load event) {
     if (event.getLiving() instanceof PlayerExtension<?> player) {
       player.registerHandler(SurvivalPlayerHandler.TYPE, new SurvivalPlayerHandler(player));
-    } else if (event.getLiving().getEntity() instanceof AdvancedZombie
+    } else if (event.getLiving().entity() instanceof AdvancedZombie
         && event.getLiving() instanceof BasicLivingExtension living) {
       living.registerHandler(SurvivalZombieHandler.TYPE, new SurvivalZombieHandler());
     }

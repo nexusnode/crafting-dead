@@ -160,7 +160,7 @@ public class GunRenderer implements CustomItemRenderer {
       switch (transformType) {
         case FIRST_PERSON_LEFT_HAND:
         case FIRST_PERSON_RIGHT_HAND:
-          if (living != null && living.getEntity() instanceof AbstractClientPlayer player) {
+          if (living != null && living.entity() instanceof AbstractClientPlayer player) {
             this.renderFirstPerson(player, itemStack, gun, scoping, transformType,
                 partialTicks, poseStack, bufferSource, packedLight, packedOverlay);
           }

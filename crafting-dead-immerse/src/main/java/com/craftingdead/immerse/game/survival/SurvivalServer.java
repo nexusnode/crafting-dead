@@ -64,7 +64,7 @@ public class SurvivalServer extends SurvivalGame implements GameServer {
   @SubscribeEvent
   public void handleLivingExtensionLoad(LivingExtensionEvent.Load event) {
     if (event.getLiving() instanceof PlayerExtension<?> player
-        && !player.getLevel().isClientSide()) {
+        && !player.level().isClientSide()) {
       player.registerHandler(SurvivalPlayerHandler.TYPE, new SurvivalPlayerHandler(this, player));
     }
   }

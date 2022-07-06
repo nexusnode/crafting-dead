@@ -99,7 +99,7 @@ final class PlayerExtensionImpl<E extends Player>
   @Override
   public void playerTick() {
     if (this.isCrouching()) {
-      this.getEntity().setPose(Pose.SWIMMING);
+      this.entity().setPose(Pose.SWIMMING);
     }
     for (PlayerHandler handler : this.handlers.values()) {
       handler.playerTick();
@@ -108,7 +108,7 @@ final class PlayerExtensionImpl<E extends Player>
 
   @Override
   public boolean isMovementBlocked() {
-    return !this.getEntity().isSpectator() && super.isMovementBlocked();
+    return !this.entity().isSpectator() && super.isMovementBlocked();
   }
 
   @Override
@@ -118,7 +118,7 @@ final class PlayerExtensionImpl<E extends Player>
     }
 
     if (this.isHandcuffed()) {
-      if (!this.getLevel().isClientSide()) {
+      if (!this.level().isClientSide()) {
         this.handcuffInteract(HANDCUFFS_DAMAGE_CHANCE);
       }
       return true;
@@ -134,7 +134,7 @@ final class PlayerExtensionImpl<E extends Player>
     }
 
     if (this.isHandcuffed()) {
-      if (!this.getLevel().isClientSide()) {
+      if (!this.level().isClientSide()) {
         this.handcuffInteract(HANDCUFFS_DAMAGE_CHANCE);
       }
       return true;
@@ -152,7 +152,7 @@ final class PlayerExtensionImpl<E extends Player>
     }
 
     if (this.isHandcuffed()) {
-      if (this.getLevel().isClientSide()) {
+      if (this.level().isClientSide()) {
         mineResult.accept(Event.Result.DENY);
       } else {
         this.handcuffInteract(HANDCUFFS_DAMAGE_CHANCE);
@@ -170,7 +170,7 @@ final class PlayerExtensionImpl<E extends Player>
     }
 
     if (this.isHandcuffed()) {
-      if (!this.getLevel().isClientSide()) {
+      if (!this.level().isClientSide()) {
         this.handcuffInteract(HANDCUFFS_DAMAGE_CHANCE);
       }
       return true;
@@ -186,7 +186,7 @@ final class PlayerExtensionImpl<E extends Player>
     }
 
     if (this.isHandcuffed()) {
-      if (!this.getLevel().isClientSide()) {
+      if (!this.level().isClientSide()) {
         this.handcuffInteract(HANDCUFFS_DAMAGE_CHANCE);
       }
       return true;
@@ -200,24 +200,24 @@ final class PlayerExtensionImpl<E extends Player>
   }
 
   private void handcuffInteract(float chance) {
-    if (this.getRandom().nextFloat() < chance
+    if (this.random().nextFloat() < chance
         && !this.damageHandcuffs(1)
-        && !this.getEntity().isSilent()) {
-      this.getLevel().playSound(null, this.getEntity().getX(), this.getEntity().getY(),
-          this.getEntity().getZ(), SoundEvents.ITEM_BREAK, this.getEntity().getSoundSource(), 0.8F,
-          0.8F + this.getLevel().getRandom().nextFloat() * 0.4F);
+        && !this.entity().isSilent()) {
+      this.level().playSound(null, this.entity().getX(), this.entity().getY(),
+          this.entity().getZ(), SoundEvents.ITEM_BREAK, this.entity().getSoundSource(), 0.8F,
+          0.8F + this.level().getRandom().nextFloat() * 0.4F);
     }
   }
 
   @Override
   public boolean isCombatModeEnabled() {
-    return !this.getEntity().isSpectator()
+    return !this.entity().isSpectator()
         && (this.cachedCombatModeEnabled || this.data.get(COMBAT_MODE_ENABLED));
   }
 
   @Override
   public void setCombatModeEnabled(boolean combatModeEnabled) {
-    if (this.getLevel().isClientSide() && combatModeEnabled != this.isCombatModeEnabled()) {
+    if (this.level().isClientSide() && combatModeEnabled != this.isCombatModeEnabled()) {
       NetworkChannel.PLAY.getSimpleChannel().sendToServer(
           new EnableCombatModeMessage(combatModeEnabled));
     } else {
@@ -230,9 +230,9 @@ final class PlayerExtensionImpl<E extends Player>
     if (MinecraftForge.EVENT_BUS.post(new OpenEquipmentMenuEvent(this))) {
       return;
     }
-    this.getEntity().openMenu(new SimpleMenuProvider(
+    this.entity().openMenu(new SimpleMenuProvider(
         (windowId, inventory, player) -> new EquipmentMenu(windowId,
-            this.getEntity().getInventory(), this.getItemHandler()),
+            this.entity().getInventory(), this.getItemHandler()),
         new TranslatableComponent("container.equipment")));
   }
 
@@ -240,7 +240,7 @@ final class PlayerExtensionImpl<E extends Player>
   public void openStorage(ModEquipmentSlot slotType) {
     var storageStack = this.getItemHandler().getStackInSlot(slotType.getIndex());
     storageStack.getCapability(Storage.CAPABILITY)
-        .ifPresent(storage -> this.getEntity().openMenu(
+        .ifPresent(storage -> this.entity().openMenu(
             new SimpleMenuProvider(storage, storageStack.getHoverName())));
   }
 
@@ -250,7 +250,7 @@ final class PlayerExtensionImpl<E extends Player>
       return true;
     } else if (source instanceof KillFeedProvider provider) {
       NetworkChannel.PLAY.getSimpleChannel().send(PacketDistributor.ALL.noArg(),
-          new AddKillFeedEntryMessage(provider.createKillFeedEntry(this.getEntity())));
+          new AddKillFeedEntryMessage(provider.createKillFeedEntry(this.entity())));
     }
     return false;
   }
@@ -263,8 +263,8 @@ final class PlayerExtensionImpl<E extends Player>
 
     var handcuffs = this.getHandcuffs();
     if (!handcuffs.isEmpty()) {
-      var itemEntity = new ItemEntity(this.getLevel(), this.getEntity().getX(),
-          this.getEntity().getY(), this.getEntity().getZ(), handcuffs);
+      var itemEntity = new ItemEntity(this.level(), this.entity().getX(),
+          this.entity().getY(), this.entity().getZ(), handcuffs);
       itemEntity.setDefaultPickUpDelay();
       drops.add(itemEntity);
     }
@@ -274,7 +274,7 @@ final class PlayerExtensionImpl<E extends Player>
 
   @Override
   protected boolean keepInventory() {
-    return this.getLevel().getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY);
+    return this.level().getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY);
   }
 
   @Override

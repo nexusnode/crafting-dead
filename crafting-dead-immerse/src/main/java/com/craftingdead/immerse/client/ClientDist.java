@@ -388,7 +388,7 @@ public class ClientDist implements ModDist {
   public void handleDrawHighlightBlock(DrawSelectionEvent.HighlightBlock event) {
     var cameraPlayer = CraftingDead.getInstance().getClientDist().getCameraPlayer();
     if (cameraPlayer != null
-        && cameraPlayer.getMainHandItem().getItem() instanceof BlueprintItem blueprint) {
+        && cameraPlayer.mainHandItem().getItem() instanceof BlueprintItem blueprint) {
       event.setCanceled(true);
       this.blueprintOutlineRenderer.render(cameraPlayer, blueprint, event.getTarget(),
           event.getCamera(), event.getPoseStack(), event.getMultiBufferSource());

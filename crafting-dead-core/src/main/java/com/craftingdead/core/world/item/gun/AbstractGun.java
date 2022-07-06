@@ -232,18 +232,18 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
   public void tick(LivingExtension<?, ?> living) {
     this.lastTickMs = Util.getMillis();
 
-    if (!living.getLevel().isClientSide() && !this.isTriggerPressed()
+    if (!living.level().isClientSide() && !this.isTriggerPressed()
         && this.wasTriggerPressed) {
-      this.triggerPressedTicks = living.getEntity().getServer().getTickCount();
+      this.triggerPressedTicks = living.entity().getServer().getTickCount();
     }
     this.wasTriggerPressed = this.isTriggerPressed();
 
 
-    if (this.isPerformingSecondaryAction() && living.getEntity().isSprinting()) {
+    if (this.isPerformingSecondaryAction() && living.entity().isSprinting()) {
       this.setPerformingSecondaryAction(living, false, true);
     }
 
-    if (living.getLevel().isClientSide()) {
+    if (living.level().isClientSide()) {
       this.getClient().handleTick(living);
     }
   }
@@ -273,11 +273,11 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
     }
 
     if (sendUpdate) {
-      var target = living.getLevel().isClientSide()
+      var target = living.level().isClientSide()
           ? PacketDistributor.SERVER.noArg()
-          : PacketDistributor.TRACKING_ENTITY.with(living::getEntity);
+          : PacketDistributor.TRACKING_ENTITY.with(living::entity);
       NetworkChannel.PLAY.getSimpleChannel().send(target,
-          new TriggerPressedMessage(living.getEntity().getId(), triggerPressed));
+          new TriggerPressedMessage(living.entity().getId(), triggerPressed));
     }
   }
 
@@ -303,8 +303,8 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
       return;
     }
 
-    int latencyTicks = (player.getEntity().latency / 1000) * 20 + tickOffset;
-    int tick = player.getEntity().getServer().getTickCount();
+    int latencyTicks = (player.entity().latency / 1000) * 20 + tickOffset;
+    int tick = player.entity().getServer().getTickCount();
 
     if (tick - latencyTicks > this.triggerPressedTicks && !this.isTriggerPressed()) {
       return;
@@ -326,13 +326,13 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
       return;
     }
 
-    if (hitLiving.getEntity().isAlive()) {
-      var random = player.getRandom();
+    if (hitLiving.entity().isAlive()) {
+      var random = player.random();
       random.setSeed(pendingHit.randomSeed());
-      rayTrace(player.getLevel(), playerSnapshot, hitSnapshot, this.getRange(),
+      rayTrace(player.level(), playerSnapshot, hitSnapshot, this.getRange(),
           this.getAccuracy(playerSnapshot.velocity(), playerSnapshot.crouching()),
           pendingHit.shotCount(), random)
-              .ifPresent(hitPos -> this.hitEntity(player, hitLiving.getEntity(), hitPos, false));
+              .ifPresent(hitPos -> this.hitEntity(player, hitLiving.entity(), hitPos, false));
     }
   }
 
@@ -380,13 +380,13 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
     }
     this.lastShotMs = time;
 
-    LogicalSide side = living.getLevel().isClientSide() ? LogicalSide.CLIENT : LogicalSide.SERVER;
+    LogicalSide side = living.level().isClientSide() ? LogicalSide.CLIENT : LogicalSide.SERVER;
     BlockableEventLoop<?> executor = LogicalSidedProvider.WORKQUEUE.get(side);
 
     if (this.ammoProvider.getMagazine().map(Magazine::getSize).orElse(0) <= 0) {
       if (side.isServer()) {
         executor.execute(() -> {
-          living.getEntity().playSound(ModSoundEvents.DRY_FIRE.get(), 1.0F, 1.0F);
+          living.entity().playSound(ModSoundEvents.DRY_FIRE.get(), 1.0F, 1.0F);
           this.ammoProvider.reload(living);
         });
       }
@@ -411,24 +411,24 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
   }
 
   protected boolean canShoot(LivingExtension<?, ?> living) {
-    return !living.getActionObserver().isPresent() && !living.getEntity().isSprinting()
-        && !living.getEntity().isSpectator()
+    return !living.getActionObserver().isPresent() && !living.entity().isSprinting()
+        && !living.entity().isSpectator()
         && !(living instanceof PlayerExtension<?> player && player.isHandcuffed());
   }
 
   protected abstract int getRoundsPerShot();
 
   protected void processShot(LivingExtension<?, ?> living) {
-    var entity = living.getEntity();
-    var level = living.getLevel();
+    var entity = living.entity();
+    var level = living.level();
     var random = entity.getRandom();
 
     MinecraftForge.EVENT_BUS.post(new GunEvent.Shoot(this, this.itemStack, living));
 
     // Magazine size will be synced to clients so only decrement this on the server.
     if (!level.isClientSide()
-        && !(living.getEntity() instanceof Player
-            && ((Player) living.getEntity()).isCreative())) {
+        && !(living.entity() instanceof Player
+            && ((Player) living.entity()).isCreative())) {
       final int unbreakingLevel =
           EnchantmentHelper.getItemEnchantmentLevel(Enchantments.UNBREAKING, this.itemStack);
       if (!DigDurabilityEnchantment.shouldIgnoreDurabilityDrop(
@@ -492,10 +492,10 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
 
   private void hitEntity(LivingExtension<?, ?> living, Entity hitEntity, Vec3 hitPos,
       boolean playSound) {
-    final var entity = living.getEntity();
+    final var entity = living.entity();
     var damage = this.getDamage();
     if (CraftingDead.serverConfig.damageDropOffEnable.get()) {
-      var distance = hitEntity.distanceTo(living.getEntity());
+      var distance = hitEntity.distanceTo(living.entity());
       // Ensure minimum damage
       var minDamage =
           Math.min(damage, CraftingDead.serverConfig.damageDropOffMinimumDamage.get().floatValue());
@@ -552,7 +552,7 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
     headshot = event.isHeadshot();
 
     // Simulated client-side effects
-    if (living.getLevel().isClientSide()) {
+    if (living.level().isClientSide()) {
       this.getClient().handleHitEntityPost(living, hitEntity, hitPos, playSound, headshot);
       return;
     }
@@ -583,7 +583,7 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
 
   private void hitBlock(LivingExtension<?, ?> living, BlockHitResult result,
       BlockState blockState, boolean playSound) {
-    final var entity = living.getEntity();
+    final var entity = living.entity();
     final var block = blockState.getBlock();
     final var level = entity.getLevel();
     final var blockPos = result.getBlockPos();
@@ -671,19 +671,19 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
   public void setFireMode(LivingExtension<?, ?> living, FireMode fireMode, boolean sendUpdate) {
     this.fireMode = fireMode;
 
-    living.getEntity().playSound(ModSoundEvents.TOGGLE_FIRE_MODE.get(), 1.0F, 1.0F);
-    if (living.getEntity() instanceof Player player) {
+    living.entity().playSound(ModSoundEvents.TOGGLE_FIRE_MODE.get(), 1.0F, 1.0F);
+    if (living.entity() instanceof Player player) {
       player.displayClientMessage(new TranslatableComponent("message.switch_fire_mode",
           new TranslatableComponent(this.fireMode.getTranslationKey())), true);
     }
 
     if (sendUpdate) {
-      var target = living.getLevel().isClientSide()
+      var target = living.level().isClientSide()
           ? PacketDistributor.SERVER.noArg()
-          : PacketDistributor.TRACKING_ENTITY.with(living::getEntity);
+          : PacketDistributor.TRACKING_ENTITY.with(living::entity);
       NetworkChannel.PLAY
           .getSimpleChannel()
-          .send(target, new SetFireModeMessage(living.getEntity().getId(), this.fireMode));
+          .send(target, new SetFireModeMessage(living.entity().getId(), this.fireMode));
     }
   }
 
@@ -693,7 +693,7 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
   }
 
   protected boolean canPerformSecondaryAction(LivingExtension<?, ?> living) {
-    return !living.getEntity().isSprinting()
+    return !living.entity().isSprinting()
         && !(living instanceof PlayerExtension<?> player && player.isHandcuffed());
   }
 
@@ -707,16 +707,16 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
 
     this.performingSecondaryAction = performingAction;
 
-    if (living.getLevel().isClientSide()) {
+    if (living.level().isClientSide()) {
       this.getClient().handleToggleSecondaryAction(living);
     }
 
     if (sendUpdate) {
-      var target = living.getLevel().isClientSide()
+      var target = living.level().isClientSide()
           ? PacketDistributor.SERVER.noArg()
-          : PacketDistributor.TRACKING_ENTITY.with(living::getEntity);
+          : PacketDistributor.TRACKING_ENTITY.with(living::entity);
       NetworkChannel.PLAY.getSimpleChannel().send(target,
-          new SecondaryActionMessage(living.getEntity().getId(),
+          new SecondaryActionMessage(living.entity().getId(),
               this.isPerformingSecondaryAction()));
     }
   }

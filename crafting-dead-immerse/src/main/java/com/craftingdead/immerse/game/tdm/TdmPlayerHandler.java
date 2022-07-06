@@ -72,7 +72,7 @@ public class TdmPlayerHandler<P extends Player> implements PlayerHandler {
   }
 
   public Optional<TdmTeam> getTeam() {
-    return this.game.getTeamModule().getPlayerTeam(this.player.getEntity().getUUID());
+    return this.game.getTeamModule().getPlayerTeam(this.player.entity().getUUID());
   }
 
   public int getRemainingBuyTimeSeconds() {
@@ -98,7 +98,7 @@ public class TdmPlayerHandler<P extends Player> implements PlayerHandler {
   }
 
   public TdmPlayerData getPlayerData() {
-    return this.game.getPlayerData(this.player.getEntity().getUUID());
+    return this.game.getPlayerData(this.player.entity().getUUID());
   }
 
   @Override

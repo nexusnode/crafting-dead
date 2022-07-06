@@ -47,7 +47,7 @@ public class SimpleScope implements Scope {
 
   @Override
   public boolean isScoping(LivingExtension<?, ?> living) {
-    return living.getEntity().getUseItem() == this.itemStack
+    return living.entity().getUseItem() == this.itemStack
         && !(living instanceof PlayerExtension<?> player && player.isHandcuffed());
   }
 

@@ -58,7 +58,7 @@ public final class EntityItemAction<T extends LivingExtension<?, ?>> extends Ite
     return ActionObserver.create(this, ProgressBar.create(this.getType(),
         this.performer == this.selectedTarget ? null
             : new TranslatableComponent("action.target",
-                this.selectedTarget.getEntity().getDisplayName().getString()),
+                this.selectedTarget.entity().getDisplayName().getString()),
         this::getProgress));
   }
 
@@ -66,15 +66,15 @@ public final class EntityItemAction<T extends LivingExtension<?, ?>> extends Ite
   public ActionObserver createTargetObserver() {
     return ActionObserver.create(this, ProgressBar.create(this.getType(),
         new TranslatableComponent("action.performer",
-            this.performer.getEntity().getDisplayName().getString()),
+            this.performer.entity().getDisplayName().getString()),
         this::getProgress));
   }
 
   @Override
   public boolean tick() {
     if (this.selectedTarget != this.performer) {
-      var result = RayTraceUtil.rayTraceEntities(this.performer.getEntity()).orElse(null);
-      if (result == null || result.getEntity() != this.selectedTarget.getEntity()) {
+      var result = RayTraceUtil.rayTraceEntities(this.performer.entity()).orElse(null);
+      if (result == null || result.getEntity() != this.selectedTarget.entity()) {
         this.performer.cancelAction(true);
         return false;
       }
@@ -86,21 +86,21 @@ public final class EntityItemAction<T extends LivingExtension<?, ?>> extends Ite
   public void stop(StopReason reason) {
     if (reason.isCompleted()) {
       if (this.type.getCustomAction() != null
-          && performer.getEntity().getRandom().nextFloat() < this.type.getCustomAction().chance()) {
+          && performer.entity().getRandom().nextFloat() < this.type.getCustomAction().chance()) {
         this.type.getCustomAction().consumer().accept(this.performer, this.selectedTarget);
       }
 
-      this.selectedTarget.getEntity().curePotionEffects(this.getItemStack());
+      this.selectedTarget.entity().curePotionEffects(this.getItemStack());
 
       for (var action : this.type.getEffects()) {
-        if (performer.getEntity().getRandom().nextFloat() < action.chance()) {
+        if (performer.entity().getRandom().nextFloat() < action.chance()) {
           var effectInstance = action.effect().get();
           if (effectInstance.getEffect().isInstantenous()) {
-            effectInstance.getEffect().applyInstantenousEffect(this.selectedTarget.getEntity(),
-                this.selectedTarget.getEntity(),
-                this.selectedTarget.getEntity(), effectInstance.getAmplifier(), 1.0D);
+            effectInstance.getEffect().applyInstantenousEffect(this.selectedTarget.entity(),
+                this.selectedTarget.entity(),
+                this.selectedTarget.entity(), effectInstance.getAmplifier(), 1.0D);
           } else {
-            this.selectedTarget.getEntity().addEffect(new MobEffectInstance(effectInstance));
+            this.selectedTarget.entity().addEffect(new MobEffectInstance(effectInstance));
           }
         }
       }

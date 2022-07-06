@@ -48,15 +48,15 @@ public class SurvivalActionTypes {
           () -> EntityItemActionType.builder(TargetSelector.SELF_ONLY)
               .forItem(CapabilityUtil.capabilityPresent(Clothing.CAPABILITY))
               .customAction((performer, target) -> {
-                var random = target.getRandom();
+                var random = target.random();
                 int randomRagAmount = random.nextInt(3) + 3;
 
                 for (int i = 0; i < randomRagAmount; i++) {
                   if (random.nextBoolean()) {
-                    target.getEntity().spawnAtLocation(
+                    target.entity().spawnAtLocation(
                         new ItemStack(SurvivalItems.CLEAN_RAG::get));
                   } else {
-                    target.getEntity().spawnAtLocation(
+                    target.entity().spawnAtLocation(
                         new ItemStack(SurvivalItems.DIRTY_RAG::get));
                   }
                 }
@@ -95,8 +95,8 @@ public class SurvivalActionTypes {
           () -> EntityItemActionType.builder(TargetSelector.OTHERS_ONLY.ofEntityType(Zombie.class))
               .forItem(ModItems.SYRINGE)
               .duration(16)
-              .customAction((performer, target) -> target.getEntity().hurt(
-                  DamageSource.mobAttack(target.getEntity()), 2.0F), 0.25F)
+              .customAction((performer, target) -> target.entity().hurt(
+                  DamageSource.mobAttack(target.entity()), 2.0F), 0.25F)
               .resultItem(SurvivalItems.RBI_SYRINGE)
               .build());
 

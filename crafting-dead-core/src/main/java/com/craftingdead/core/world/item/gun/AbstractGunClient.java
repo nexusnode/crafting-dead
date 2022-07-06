@@ -92,7 +92,7 @@ public abstract class AbstractGunClient<T extends AbstractGun> implements GunCli
   protected abstract long getSecondaryActionSoundRepeatDelayMs();
 
   public void handleTick(LivingExtension<?, ?> living) {
-    if (living.getEntity() instanceof LocalPlayer
+    if (living.entity() instanceof LocalPlayer
         && this.livingHitValidationBuffer.size() > 0
         && this.hitValidationTicks++ >= AbstractGun.HIT_VALIDATION_DELAY_TICKS) {
       this.hitValidationTicks = 0;
@@ -109,7 +109,7 @@ public abstract class AbstractGunClient<T extends AbstractGun> implements GunCli
           && repeatDelay > 0L
           && delta >= repeatDelay) {
         this.secondaryActionSoundStartTimeMs = Util.getMillis();
-        living.getEntity().playSound(sound, 1.0F, 1.0F);
+        living.entity().playSound(sound, 1.0F, 1.0F);
       }
     });
 
@@ -138,7 +138,7 @@ public abstract class AbstractGunClient<T extends AbstractGun> implements GunCli
   }
 
   public void handleShoot(LivingExtension<?, ?> living) {
-    Entity entity = living.getEntity();
+    Entity entity = living.entity();
 
     if (this.canFlash(living)) {
       this.remainingFlashTicks = MUZZLE_FLASH_DURATION_TICKS;
@@ -188,7 +188,7 @@ public abstract class AbstractGunClient<T extends AbstractGun> implements GunCli
 
   public void handleHitEntityPre(LivingExtension<?, ?> living, Entity hitEntity,
       Vec3 hitPos, long randomSeed) {
-    if (living.getEntity() instanceof LocalPlayer) {
+    if (living.entity() instanceof LocalPlayer) {
       hitEntity.getCapability(LivingExtension.CAPABILITY)
           .ifPresent(hitLiving -> {
             this.livingHitValidationBuffer.put(hitEntity.getId(),
@@ -219,7 +219,7 @@ public abstract class AbstractGunClient<T extends AbstractGun> implements GunCli
     }
 
     level.playSound(
-        living.getEntity() instanceof Player ? (Player) living.getEntity() : null,
+        living.entity() instanceof Player ? (Player) living.entity() : null,
         hitEntity.blockPosition(), ModSoundEvents.BULLET_IMPACT_FLESH.get(), SoundSource.PLAYERS,
         1.0F, 1.0F);
 
@@ -238,7 +238,7 @@ public abstract class AbstractGunClient<T extends AbstractGun> implements GunCli
 
   public void handleHitBlock(LivingExtension<?, ?> living,
       BlockHitResult result, BlockState blockState, boolean playSound) {
-    Entity entity = living.getEntity();
+    Entity entity = living.entity();
     Level level = entity.level;
     Vec3 location = result.getLocation();
 
@@ -272,7 +272,7 @@ public abstract class AbstractGunClient<T extends AbstractGun> implements GunCli
     this.getSecondaryActionSound().ifPresent(sound -> {
       if (this.gun.isPerformingSecondaryAction()) {
         this.secondaryActionSoundStartTimeMs = Util.getMillis();
-        living.getEntity().playSound(sound, 1.0F, 1.0F);
+        living.entity().playSound(sound, 1.0F, 1.0F);
       } else {
         this.minecraft.getSoundManager().stop(sound.getRegistryName(), SoundSource.PLAYERS);
       }

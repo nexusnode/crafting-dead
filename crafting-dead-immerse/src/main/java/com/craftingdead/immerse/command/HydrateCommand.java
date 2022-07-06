@@ -62,7 +62,7 @@ public class HydrateCommand {
     source.sendSuccess(
         hydrated.size() == 1
             ? new TranslatableComponent("commands.hydrate.success.single",
-                hydrated.get(0).getEntity().getDisplayName())
+                hydrated.get(0).entity().getDisplayName())
                     .withStyle(ChatFormatting.GREEN)
             : new TranslatableComponent("commands.hydrate.success.multiple", hydrated.size())
                 .withStyle(ChatFormatting.GREEN),
@@ -73,6 +73,6 @@ public class HydrateCommand {
 
   private static void hydrate(PlayerExtension<ServerPlayer> player) {
     player.getHandlerOrThrow(SurvivalPlayerHandler.TYPE).setWater(20);
-    player.getEntity().playNotifySound(SoundEvents.GENERIC_DRINK, SoundSource.NEUTRAL, 5.0F, 5.0F);
+    player.entity().playNotifySound(SoundEvents.GENERIC_DRINK, SoundSource.NEUTRAL, 5.0F, 5.0F);
   }
 }

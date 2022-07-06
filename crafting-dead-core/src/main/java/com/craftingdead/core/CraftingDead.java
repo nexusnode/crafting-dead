@@ -362,12 +362,12 @@ public class CraftingDead {
   public void handleLivingUpdate(LivingUpdateEvent event) {
     event.getEntityLiving().getCapability(LivingExtension.CAPABILITY).ifPresent(living -> {
       living.tick();
-      if (!living.getLevel().isClientSide() && living.requiresSync()) {
+      if (!living.level().isClientSide() && living.requiresSync()) {
         FriendlyByteBuf data = new FriendlyByteBuf(Unpooled.buffer());
         living.encode(data, false);
         NetworkChannel.PLAY.getSimpleChannel().send(
-            PacketDistributor.TRACKING_ENTITY_AND_SELF.with(living::getEntity),
-            new SyncLivingMessage(living.getEntity().getId(), data));
+            PacketDistributor.TRACKING_ENTITY_AND_SELF.with(living::entity),
+            new SyncLivingMessage(living.entity().getId(), data));
       }
     });
   }
@@ -423,7 +423,7 @@ public class CraftingDead {
       trackedLiving.encode(data, true);
       NetworkChannel.PLAY.getSimpleChannel().send(
           PacketDistributor.PLAYER.with(() -> playerEntity),
-          new SyncLivingMessage(trackedLiving.getEntity().getId(), data));
+          new SyncLivingMessage(trackedLiving.entity().getId(), data));
     });
   }
 }

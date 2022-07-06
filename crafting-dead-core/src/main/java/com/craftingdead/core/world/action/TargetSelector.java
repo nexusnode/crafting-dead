@@ -50,7 +50,7 @@ public interface TargetSelector<T extends LivingExtension<?, ?>> {
       EntityType<E> type) {
     Objects.requireNonNull(type);
     return (performer, target) -> this.select(performer, target)
-        .filter(living -> living.getEntity().getType() == type)
+        .filter(living -> living.entity().getType() == type)
         .map(living -> (LivingExtension<E, ?>) living);
   }
 
@@ -59,12 +59,12 @@ public interface TargetSelector<T extends LivingExtension<?, ?>> {
       Class<E> clazz) {
     Objects.requireNonNull(clazz);
     return (performer, target) -> this.select(performer, target)
-        .filter(living -> clazz.isInstance(living.getEntity()))
+        .filter(living -> clazz.isInstance(living.entity()))
         .map(living -> (LivingExtension<E, ?>) living);
   }
 
   default TargetSelector<?> hasEffect(Supplier<MobEffect> effect) {
-    return this.filter(living -> living.getEntity().hasEffect(effect.get()));
+    return this.filter(living -> living.entity().hasEffect(effect.get()));
   }
 
   default TargetSelector<T> filter(Predicate<T> predicate) {

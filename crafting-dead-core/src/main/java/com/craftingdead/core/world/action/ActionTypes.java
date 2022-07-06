@@ -74,16 +74,16 @@ public class ActionTypes {
               .builder((performer, target) -> {
                 if (target == null
                     || performer == target
-                    || target.getEntity() instanceof Skeleton) {
+                    || target.entity() instanceof Skeleton) {
                   return Optional.empty();
                 }
 
-                var targetEntity = target.getEntity();
+                var targetEntity = target.entity();
                 if (targetEntity.getHealth() > 4) {
                   return Optional.ofNullable(target);
                 }
 
-                if (performer.getEntity() instanceof Player player) {
+                if (performer.entity() instanceof Player player) {
                   player.displayClientMessage(
                       new TranslatableComponent("message.low_health",
                           targetEntity.getDisplayName()).withStyle(ChatFormatting.RED),
@@ -94,8 +94,8 @@ public class ActionTypes {
               })
               .forItem(ModItems.SYRINGE)
               .duration(16)
-              .customAction((performer, target) -> target.getEntity().hurt(
-                  DamageSource.mobAttack(target.getEntity()), 2.0F), 1.0F)
+              .customAction((performer, target) -> target.entity().hurt(
+                  DamageSource.mobAttack(target.entity()), 2.0F), 1.0F)
               .resultItem(ModItems.BLOOD_SYRINGE)
               .build());
 
@@ -142,10 +142,10 @@ public class ActionTypes {
               .filter(Predicates.not(PlayerExtension::isHandcuffed)))
               .forItem(ModItems.HANDCUFFS)
               .customAction((performer, target) -> {
-                target.setHandcuffs(performer.getMainHandItem().copy());
-                target.getEntity().displayClientMessage(
+                target.setHandcuffs(performer.mainHandItem().copy());
+                target.entity().displayClientMessage(
                     new TranslatableComponent("handcuffs.handcuffed",
-                        performer.getEntity().getDisplayName())
+                        performer.entity().getDisplayName())
                             .withStyle(ChatFormatting.RED, ChatFormatting.BOLD),
                     true);
               }, 1.0F)

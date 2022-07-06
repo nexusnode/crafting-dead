@@ -93,7 +93,7 @@ public class SurvivalPlayerHandler implements PlayerHandler {
 
   public Optional<LegacyBase> getBase() {
     return this.getBaseId()
-        .map(baseId -> LevelExtension.getOrThrow(this.player.getLevel())
+        .map(baseId -> LevelExtension.getOrThrow(this.player.level())
             .getLandManager().getLandOwner(baseId))
         .map(LegacyBase.class::cast);
   }
@@ -108,7 +108,7 @@ public class SurvivalPlayerHandler implements PlayerHandler {
 
   @Override
   public void tick() {
-    if (this.player.getEntity() instanceof ServerPlayer player) {
+    if (this.player.entity() instanceof ServerPlayer player) {
       int aliveTicks = player.getStats().getValue(Stats.CUSTOM.get(Stats.TIME_SINCE_DEATH));
       this.setDaysSurvived(aliveTicks / 20 / 60 / 20);
     }
@@ -116,13 +116,13 @@ public class SurvivalPlayerHandler implements PlayerHandler {
 
   @Override
   public void playerTick() {
-    if (!this.player.getLevel().isClientSide()) {
+    if (!this.player.level().isClientSide()) {
       this.updateThirst();
     }
   }
 
   private void updateThirst() {
-    var entity = this.player.getEntity();
+    var entity = this.player.entity();
     if (this.game.isThirstEnabled()
         && entity.getLevel().getDifficulty() != Difficulty.PEACEFUL
         && !entity.getAbilities().invulnerable) {
@@ -213,7 +213,7 @@ public class SurvivalPlayerHandler implements PlayerHandler {
 
   @Override
   public boolean handleBlockBreak(BlockPos pos, BlockState block, MutableInt xp) {
-    LevelExtension.getOrThrow(player.getLevel()).getLandManager()
+    LevelExtension.getOrThrow(player.level()).getLandManager()
         .getLandOwnerAt(pos)
         .ifPresent(base -> base.playerRemovedBlock(player, pos));
     return false;
@@ -222,7 +222,7 @@ public class SurvivalPlayerHandler implements PlayerHandler {
   @Override
   public boolean handleBlockPlace(BlockSnapshot replacedBlock, BlockState placedBlock,
       BlockState placedAgainst) {
-    LevelExtension.getOrThrow(player.getLevel()).getLandManager()
+    LevelExtension.getOrThrow(player.level()).getLandManager()
         .getLandOwnerAt(replacedBlock.getPos())
         .ifPresent(base -> base.playerPlacedBlock(player, replacedBlock.getPos()));
     return false;
@@ -242,7 +242,7 @@ public class SurvivalPlayerHandler implements PlayerHandler {
 
     // Use the first replaced block as point of reference
     var refBlock = pos.get(0);
-    LevelExtension.getOrThrow(player.getLevel()).getLandManager()
+    LevelExtension.getOrThrow(player.level()).getLandManager()
         .getLandOwnerAt(refBlock)
         .ifPresent(base -> base.playerPlacedBlock(player, pos.toArray(new BlockPos[0])));
     return false;

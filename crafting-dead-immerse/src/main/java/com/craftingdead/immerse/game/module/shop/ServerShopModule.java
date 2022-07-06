@@ -44,7 +44,7 @@ public class ServerShopModule extends ShopModule implements ServerModule, GameMo
   public static final BiConsumer<PlayerExtension<?>, ItemStack> COMBAT_PURCHASE_HANDLER =
       (player, item) -> CombatSlot.getSlotType(item)
           .orElseThrow(() -> new IllegalStateException("Invalid item"))
-          .addToInventory(item, player.getEntity().getInventory(), true);
+          .addToInventory(item, player.entity().getInventory(), true);
 
   private static final MessageHandlerRegistry<ServerShopModule> messageHandlers =
       new MessageHandlerRegistry<>();
@@ -73,7 +73,7 @@ public class ServerShopModule extends ShopModule implements ServerModule, GameMo
       throw new IllegalArgumentException("Unknown item ID: " + itemId.toString());
     }
 
-    ShopUser user = this.users.get(player.getEntity().getUUID());
+    ShopUser user = this.users.get(player.entity().getUUID());
     if (user.money >= item.getPrice() && user.buyTimeSeconds != 0) {
       user.money -= item.getPrice();
       user.sync();
@@ -115,14 +115,14 @@ public class ServerShopModule extends ShopModule implements ServerModule, GameMo
   @Override
   public void addPlayer(PlayerExtension<ServerPlayer> player) {
     ShopUser user =
-        new ShopUser(player.getEntity().getGameProfile(), player.getEntity().connection.connection);
-    this.users.put(player.getEntity().getUUID(), user);
+        new ShopUser(player.entity().getGameProfile(), player.entity().connection.connection);
+    this.users.put(player.entity().getUUID(), user);
     user.sync();
   }
 
   @Override
   public void removePlayer(PlayerExtension<ServerPlayer> player) {
-    this.users.remove(player.getEntity().getUUID());
+    this.users.remove(player.entity().getUUID());
   }
 
   private class ShopUser {

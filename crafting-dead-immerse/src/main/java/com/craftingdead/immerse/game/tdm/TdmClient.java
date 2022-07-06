@@ -358,7 +358,7 @@ public class TdmClient extends TdmGame implements GameClient {
   @SubscribeEvent
   public void handleLivingLoad(LivingExtensionEvent.Load event) {
     if (event.getLiving() instanceof PlayerExtension<?> player
-        && player.getLevel().isClientSide()) {
+        && player.level().isClientSide()) {
       player.registerHandler(TdmPlayerHandler.TYPE, new TdmPlayerHandler<>(this, player));
     }
   }

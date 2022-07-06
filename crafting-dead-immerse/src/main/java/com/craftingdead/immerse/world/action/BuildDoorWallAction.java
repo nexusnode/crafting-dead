@@ -47,7 +47,7 @@ public class BuildDoorWallAction extends BuildAction {
 
   @Override
   protected List<Placement> createPlacements() {
-    var rotation = BlockUtil.getRotation(this.getPerformer().getEntity().getDirection());
+    var rotation = BlockUtil.getRotation(this.getPerformer().entity().getDirection());
     var clickedPos = this.getContext().getClickedPos();
 
     var placements = ImmutableList.<Placement>builder();

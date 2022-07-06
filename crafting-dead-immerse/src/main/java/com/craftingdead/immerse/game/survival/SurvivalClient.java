@@ -51,7 +51,7 @@ public class SurvivalClient extends SurvivalGame implements GameClient {
   @SubscribeEvent
   public void handleLivingExtensionLoad(LivingExtensionEvent.Load event) {
     if (event.getLiving() instanceof PlayerExtension<?> player
-        && player.getLevel().isClientSide()) {
+        && player.level().isClientSide()) {
       player.registerHandler(SurvivalPlayerHandler.TYPE, new SurvivalPlayerHandler(this, player));
     }
   }
@@ -86,8 +86,8 @@ public class SurvivalClient extends SurvivalGame implements GameClient {
     if (this.minecraft.gameMode.canHurtPlayer() && !player.isCombatModeEnabled()) {
       // Only render when air level is not being rendered
       if (this.isThirstEnabled()
-          && !player.getEntity().isEyeInFluid(FluidTags.WATER)
-          && player.getEntity().getAirSupply() == player.getEntity().getMaxAirSupply()) {
+          && !player.entity().isEyeInFluid(FluidTags.WATER)
+          && player.entity().getAirSupply() == player.entity().getMaxAirSupply()) {
         renderWater(width, height,
             (float) survivalPlayer.getWater() / (float) survivalPlayer.getMaxWater(), ICONS);
       }

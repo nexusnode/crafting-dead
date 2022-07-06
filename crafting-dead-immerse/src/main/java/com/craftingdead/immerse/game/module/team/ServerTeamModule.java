@@ -36,7 +36,7 @@ public class ServerTeamModule<T extends Enum<T> & Team> extends TeamModule<T>
 
   public void setPlayerTeam(PlayerExtension<ServerPlayer> player,
       @Nullable TeamInstance<T> teamInstance) {
-    UUID playerId = player.getEntity().getUUID();
+    UUID playerId = player.entity().getUUID();
     TeamInstance<T> oldTeamInstance =
         this.getPlayerTeam(playerId).map(this::getTeamInstance).orElse(null);
     if ((teamInstance == null || teamInstance != oldTeamInstance)

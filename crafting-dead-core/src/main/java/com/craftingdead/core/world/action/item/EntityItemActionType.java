@@ -63,7 +63,7 @@ public final class EntityItemActionType<T extends LivingExtension<?, ?>>
   @Override
   public void encode(EntityItemAction<T> action, FriendlyByteBuf out) {
     out.writeEnum(action.getHand());
-    out.writeVarInt(action.getSelectedTarget().getEntity().getId());
+    out.writeVarInt(action.getSelectedTarget().entity().getId());
   }
 
   @SuppressWarnings("unchecked")
@@ -71,7 +71,7 @@ public final class EntityItemActionType<T extends LivingExtension<?, ?>>
   public EntityItemAction<T> decode(LivingExtension<?, ?> performer, FriendlyByteBuf in) {
     var hand = in.readEnum(InteractionHand.class);
     var targetId = in.readVarInt();
-    var target = performer.getLevel().getEntity(targetId);
+    var target = performer.level().getEntity(targetId);
     if (target instanceof LivingEntity livingTarget) {
       return new EntityItemAction<>(hand, this, performer,
           (T) LivingExtension.getOrThrow(livingTarget));

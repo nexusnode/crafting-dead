@@ -218,7 +218,7 @@ public class TdmServer extends TdmGame implements GameServer, TeamHandler<TdmTea
 
   @Override
   public Optional<GlobalPos> getSpawnPoint(PlayerExtension<ServerPlayer> player) {
-    return this.getTeamModule().getPlayerTeam(player.getEntity().getUUID())
+    return this.getTeamModule().getPlayerTeam(player.entity().getUUID())
         .map(team -> team == TdmTeam.RED ? this.getRedSpawnPoint() : this.getBlueSpawnPoint());
   }
 
@@ -310,7 +310,7 @@ public class TdmServer extends TdmGame implements GameServer, TeamHandler<TdmTea
   @SubscribeEvent
   public void handleLivingExtensionLoad(LivingExtensionEvent.Load event) {
     if (event.getLiving() instanceof PlayerExtension<?> player
-        && !player.getLevel().isClientSide()) {
+        && !player.level().isClientSide()) {
       player.registerHandler(TdmPlayerHandler.TYPE,
           new TdmServerPlayerHandler(this, (PlayerExtension<ServerPlayer>) player));
     }
@@ -320,7 +320,7 @@ public class TdmServer extends TdmGame implements GameServer, TeamHandler<TdmTea
   public void addPlayer(PlayerExtension<ServerPlayer> player) {
     this.getTeamModule().setPlayerTeam(player, null);
     GameUtil.sendGameMessageToAll(
-        new TranslatableComponent("message.joined", player.getEntity().getDisplayName())
+        new TranslatableComponent("message.joined", player.entity().getDisplayName())
             .withStyle(ChatFormatting.WHITE),
         this.getMinecraftServer());
   }
@@ -331,10 +331,10 @@ public class TdmServer extends TdmGame implements GameServer, TeamHandler<TdmTea
 
     this.getTeamModule().setPlayerTeam(player, null);
 
-    this.deletePlayerData(player.getEntity().getUUID());
+    this.deletePlayerData(player.entity().getUUID());
 
     GameUtil.sendGameMessageToAll(
-        new TranslatableComponent("message.left", player.getEntity().getDisplayName())
+        new TranslatableComponent("message.left", player.entity().getDisplayName())
             .withStyle(ChatFormatting.WHITE),
         this.getMinecraftServer());
   }
@@ -433,7 +433,7 @@ public class TdmServer extends TdmGame implements GameServer, TeamHandler<TdmTea
           || stateInstance.getState() == TdmState.POST_GAME;
 
       if (scoresClose || tooLate) {
-        player.getEntity().sendMessage(GameUtil.formatMessage(NO_SWITCH_TEAM), Util.NIL_UUID);
+        player.entity().sendMessage(GameUtil.formatMessage(NO_SWITCH_TEAM), Util.NIL_UUID);
         return false;
       }
     }
@@ -445,15 +445,15 @@ public class TdmServer extends TdmGame implements GameServer, TeamHandler<TdmTea
       @Nullable TeamInstance<TdmTeam> oldTeam,
       @Nullable TeamInstance<TdmTeam> newTeam) {
     if (newTeam == null) {
-      player.getEntity().getInventory().clearContent();
-      player.getEntity().setGameMode(GameType.SPECTATOR);
+      player.entity().getInventory().clearContent();
+      player.entity().setGameMode(GameType.SPECTATOR);
     } else {
-      this.shopModule.resetBuyTime(player.getEntity().getUUID());
-      player.getEntity().setGameMode(GameType.ADVENTURE);
-      this.logicalServer.respawnPlayer((ServerPlayer) player.getEntity(), false);
+      this.shopModule.resetBuyTime(player.entity().getUUID());
+      player.entity().setGameMode(GameType.ADVENTURE);
+      this.logicalServer.respawnPlayer((ServerPlayer) player.entity(), false);
       GameUtil.sendGameMessageToAll(
           new TranslatableComponent("message.joined_team",
-              player.getEntity().getDisplayName().getString(),
+              player.entity().getDisplayName().getString(),
               newTeam.getTeam().getDisplayName().getString()),
           this.getMinecraftServer());
     }

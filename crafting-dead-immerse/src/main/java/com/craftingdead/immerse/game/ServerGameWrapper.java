@@ -50,7 +50,7 @@ public final class ServerGameWrapper extends GameWrapper<GameServer, ServerModul
       module.addPlayer(player);
     }
     this.getGame().addPlayer(player);
-    player.getEntity().connection.send(this.buildSyncPacket(true));
+    player.entity().connection.send(this.buildSyncPacket(true));
   }
 
   public void removePlayer(PlayerExtension<ServerPlayer> player, PlayerRemovalReason reason) {

@@ -40,7 +40,7 @@ public class BuildCuboidAction extends BuildAction {
   @Nullable
   @Override
   protected List<Placement> createPlacements() {
-    var rotation = BlockUtil.getRotation(this.getPerformer().getEntity().getDirection());
+    var rotation = BlockUtil.getRotation(this.getPerformer().entity().getDirection());
     var clickedPos = this.getContext().getClickedPos();
 
     var minPos = this.type.getMinOffset()

@@ -59,7 +59,7 @@ public abstract class BuildAction extends ItemAction {
     var context = BlockPlaceContext.at(this.getContext(), blockPos,
         this.getContext().getClickedFace());
     var blockState = block.getStateForPlacement(context);
-    var existingBlockState = this.getPerformer().getLevel().getBlockState(blockPos);
+    var existingBlockState = this.getPerformer().level().getBlockState(blockPos);
     return existingBlockState.canBeReplaced(context)
         && this.getType().getPlacementPredicate().test(this.performer, blockPos)
             ? new Placement(blockPos.immutable(), blockState, existingBlockState)
@@ -78,16 +78,16 @@ public abstract class BuildAction extends ItemAction {
       return true;
     }
 
-    if (!this.performer.getLevel().isClientSide() && this.performer.getEntity()
+    if (!this.performer.level().isClientSide() && this.performer.entity()
         .distanceToSqr(Vec3.atCenterOf(this.context.getClickedPos())) > 64.0D) {
       this.performer.cancelAction(true);
       return false;
     }
 
     if (this.getTicksUsingItem() % 10 == 0) {
-      this.getPerformer().getEntity().playSound(SoundEvents.WOOD_BREAK, 1.0F, 1.0F);
+      this.getPerformer().entity().playSound(SoundEvents.WOOD_BREAK, 1.0F, 1.0F);
       this.placements.forEach(placement -> {
-        var currentStae = this.getPerformer().getLevel().getBlockState(placement.blockPos());
+        var currentStae = this.getPerformer().level().getBlockState(placement.blockPos());
         if (placement.existingBlockState() != currentStae) {
           this.getPerformer().cancelAction(true);
         }
@@ -99,20 +99,20 @@ public abstract class BuildAction extends ItemAction {
   }
 
   public void addBuildEffects(BlockPos blockPos, BlockState blockState) {
-    this.getPerformer().getLevel().addDestroyBlockEffect(blockPos, blockState);
+    this.getPerformer().level().addDestroyBlockEffect(blockPos, blockState);
   }
 
   public boolean placeBlock(BlockPos blockPos, BlockState blockState) {
-    var level = this.getPerformer().getLevel();
+    var level = this.getPerformer().level();
 
     if (level.isClientSide() || !level.setBlockAndUpdate(blockPos, blockState)) {
       return false;
     }
 
     blockState.getBlock().setPlacedBy(level, blockPos, blockState,
-        this.getPerformer().getEntity(), this.getItemStack());
+        this.getPerformer().entity(), this.getItemStack());
     this.getType().getBlockPlacementHandler().accept(this.performer, blockPos);
-    if (this.performer.getEntity() instanceof ServerPlayer player) {
+    if (this.performer.entity() instanceof ServerPlayer player) {
       CriteriaTriggers.PLACED_BLOCK.trigger(player, blockPos, this.getItemStack());
     }
 

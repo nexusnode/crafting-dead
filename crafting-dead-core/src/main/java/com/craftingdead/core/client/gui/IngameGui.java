@@ -410,7 +410,7 @@ public class IngameGui {
 
   private void renderCombatMode(PlayerExtension<AbstractClientPlayer> player,
       PoseStack poseStack, int width, int height) {
-    final var inventory = player.getEntity().getInventory();
+    final var inventory = player.entity().getInventory();
 
     int boxX = width - 115;
     int boxWidth = 110;
@@ -500,8 +500,8 @@ public class IngameGui {
 
     final int healthBoxHeight = 25;
     // Render Health
-    final var health = player.getEntity().getHealth();
-    final var armour = player.getEntity().getArmorValue();
+    final var health = player.entity().getHealth();
+    final var armour = player.entity().getArmorValue();
 
     int healthWidth = 100;
     if (armour > 0) {
@@ -523,7 +523,7 @@ public class IngameGui {
         height - healthBoxHeight / 2 - this.minecraft.font.lineHeight / 2, 0xFFFFFFFF);
     RenderUtil.fill(poseStack, 42, height - healthBoxHeight / 2 - 5, 65, 10, 0x66000000);
     RenderUtil.fill(poseStack, 42, height - healthBoxHeight / 2 - 5,
-        Math.round(65 * (health / player.getEntity().getMaxHealth())), 10, 0xCCFFFFFF);
+        Math.round(65 * (health / player.entity().getMaxHealth())), 10, 0xCCFFFFFF);
 
     if (armour > 0) {
       final var armourX = healthWidth / 2 + 7;
