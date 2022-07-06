@@ -16,7 +16,7 @@
     "aim_transform": {
         "translation": [
             -9.47,
-            3.75,
+            4,
             -5
         ],
         "rotation": [
@@ -28,7 +28,7 @@
     "scope_aim_transform": {
         "translation": [
             -9.47,
-            3.75,
+            3.45,
             -5
         ],
         "rotation": [
@@ -99,7 +99,7 @@
         "craftingdead:red_dot_sight": {
             "translation": [
                 0.5,
-                4,
+                3.90,
                 8
             ]
         },

@@ -16,7 +16,7 @@
     "aim_transform": {
         "translation": [
             -9.95,
-            2.25,
+            4,
             2
         ],
         "rotation": [
@@ -28,7 +28,7 @@
     "scope_aim_transform": {
         "translation": [
             -9.95,
-            2.25,
+            3.25,
             2
         ],
         "rotation": [

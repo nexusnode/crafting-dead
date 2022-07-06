@@ -15,14 +15,16 @@
     },
     "aim_transform": {
         "translation": [
-            -9.5,
-            3.5,
-            3
-        ],
-        "rotation": [
-            2,
-            0.2,
-            0
+            -9.45,
+            3.35,
+            1.5
+        ]
+    },
+    "scope_aim_transform": {
+        "translation": [
+            -9.45,
+            2.05,
+            1.5
         ]
     },
     "hand_transforms": {
@@ -77,9 +79,9 @@
     "magazine_transforms": {
         "craftingdead:mk48mod_magazine": {
             "translation": [
-                5,
-                0,
-                4
+                -2,
+                -0.5,
+                0
             ]
         }
     },
@@ -87,8 +89,8 @@
         "craftingdead:red_dot_sight": {
             "translation": [
                 0.5,
-                6.8,
-                4
+                5.2,
+                1.505
             ]
         },
         "craftingdead:acog_sight": {
@@ -108,8 +110,8 @@
         "craftingdead:eotech_sight": {
             "translation": [
                 0.5,
-                4,
-                1
+                5.2,
+                1.505
             ]
         },
         "craftingdead:lp_scope": {

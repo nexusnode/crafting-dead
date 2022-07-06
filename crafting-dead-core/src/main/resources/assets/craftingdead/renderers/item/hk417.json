@@ -16,8 +16,8 @@
     "aim_transform": {
         "translation": [
             -9.5,
-            2.75,
-            0
+            3.5,
+            -2
         ]
     },
     "scope_aim_transform": {
@@ -96,8 +96,8 @@
         "craftingdead:acog_sight": {
             "translation": [
                 0.5,
-                2.5,
-                4
+                2.6,
+                3.3
             ]
         },
         "craftingdead:bipod": {

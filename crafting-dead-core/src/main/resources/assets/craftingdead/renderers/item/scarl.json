@@ -20,6 +20,13 @@
             0
         ]
     },
+    "scope_aim_transform": {
+        "translation": [
+            -9.5,
+            -2,
+            0
+        ]
+    },
     "hand_transforms": {
         "held_right_handed": {
             "right_hand": {
@@ -73,7 +80,7 @@
         "craftingdead:stanag_30_round_magazine": {
             "translation": [
                 0.2,
-                -2,
+                1,
                 -2
             ]
         },
@@ -81,37 +88,37 @@
             "translation": [
                 0.2,
                 1,
-                -2.75
+                -2
             ]
         },
         "craftingdead:stanag_drum_magazine": {
             "translation": [
-                0.55,
-                -1.2,
+                0.2,
+                1,
                 -2
             ]
         },
         "craftingdead:stanag_box_magazine": {
             "translation": [
-                0.75,
-                -0.7,
-                0.25
+                0.2,
+                1,
+                -2
             ]
         }
     },
     "attachment_transforms": {
         "craftingdead:red_dot_sight": {
             "translation": [
-                0.5,
+                0.505,
                 9,
                 -1
             ]
         },
         "craftingdead:acog_sight": {
             "translation": [
-                0.5,
+                0.505,
                 6.6,
-                1
+                2
             ]
         },
         "craftingdead:bipod": {

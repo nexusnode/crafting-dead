@@ -23,7 +23,7 @@
     "scope_aim_transform": {
         "translation": [
             -8.5,
-            -1,
+            -1.5,
             1.5
         ]
     },
@@ -97,7 +97,7 @@
             "translation": [
                 -0.5,
                 6.1,
-                0
+                1
             ]
         },
         "craftingdead:bipod": {

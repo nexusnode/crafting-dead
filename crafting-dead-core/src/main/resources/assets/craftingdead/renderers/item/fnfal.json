@@ -16,8 +16,8 @@
     "aim_transform": {
         "translation": [
             -9.5,
-            1.25,
-            0
+            2.5,
+            -3
         ]
     },
     "scope_aim_transform": {
@@ -81,22 +81,22 @@
             "translation": [
                 0,
                 1,
-                -2
+                0
             ]
         }
     },
     "attachment_transforms": {
         "craftingdead:red_dot_sight": {
             "translation": [
-                0.5,
-                6,
+                0.52,
+                5.5,
                 3
             ]
         },
         "craftingdead:acog_sight": {
             "translation": [
-                0.5,
-                3.5,
+                0.505,
+                3.4,
                 4
             ]
         },
@@ -118,7 +118,7 @@
             "translation": [
                 0.5,
                 5,
-                -2
+                -1.8
             ]
         },
         "craftingdead:suppressor": {
