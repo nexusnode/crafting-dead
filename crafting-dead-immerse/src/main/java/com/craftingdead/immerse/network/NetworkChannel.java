@@ -22,6 +22,7 @@ import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.network.login.AcknowledgeGameMessage;
 import com.craftingdead.immerse.network.login.LoginIndexedMessage;
 import com.craftingdead.immerse.network.login.SetupGameMessage;
+import com.craftingdead.immerse.network.play.AddKillFeedEntryMessage;
 import com.craftingdead.immerse.network.play.ChangeGameMessage;
 import com.craftingdead.immerse.network.play.DisplayKilledMessage;
 import com.craftingdead.immerse.network.play.RegisterLandOwnerMessage;
@@ -109,6 +110,12 @@ public enum NetworkChannel {
           .encoder(SyncLandManagerMessage::encode)
           .decoder(SyncLandManagerMessage::decode)
           .consumer(SyncLandManagerMessage::handle)
+          .add();
+      simpleChannel
+          .messageBuilder(AddKillFeedEntryMessage.class, 0x08, NetworkDirection.PLAY_TO_CLIENT)
+          .encoder(AddKillFeedEntryMessage::encode)
+          .decoder(AddKillFeedEntryMessage::decode)
+          .consumer(AddKillFeedEntryMessage::handle)
           .add();
     }
   };

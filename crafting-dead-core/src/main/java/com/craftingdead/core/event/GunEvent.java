@@ -62,7 +62,7 @@ public abstract class GunEvent extends Event {
       this.living = living;
     }
 
-    public LivingExtension<?, ?> getLiving() {
+    public LivingExtension<?, ?> living() {
       return living;
     }
   }
@@ -163,27 +163,27 @@ public abstract class GunEvent extends Event {
       this.headshot = headshot;
     }
 
-    public Entity getTarget() {
-      return target;
+    public Entity target() {
+      return this.target;
     }
 
-    public Vec3 getHitPos() {
-      return hitPos;
+    public Vec3 hitPos() {
+      return this.hitPos;
     }
 
-    public boolean isHeadshot() {
-      return headshot;
+    public boolean headshot() {
+      return this.headshot;
     }
 
-    public void setHeadshot(boolean headshot) {
+    public void headshot(boolean headshot) {
       this.headshot = headshot;
     }
 
-    public float getDamage() {
-      return damage;
+    public float damage() {
+      return this.damage;
     }
 
-    public void setDamage(float damage) {
+    public void damage(float damage) {
       this.damage = damage;
     }
   }

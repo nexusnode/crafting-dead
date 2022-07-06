@@ -20,13 +20,12 @@ package com.craftingdead.core.world.entity.extension;
 
 import java.util.Collection;
 import java.util.function.Consumer;
+import org.apache.commons.lang3.mutable.MutableInt;
 import com.craftingdead.core.event.OpenEquipmentMenuEvent;
 import com.craftingdead.core.network.NetworkChannel;
 import com.craftingdead.core.network.SynchedData;
-import com.craftingdead.core.network.message.play.AddKillFeedEntryMessage;
 import com.craftingdead.core.network.message.play.EnableCombatModeMessage;
 import com.craftingdead.core.world.action.Action;
-import com.craftingdead.core.world.damagesource.KillFeedProvider;
 import com.craftingdead.core.world.inventory.EquipmentMenu;
 import com.craftingdead.core.world.inventory.ModEquipmentSlot;
 import com.craftingdead.core.world.inventory.storage.Storage;
@@ -52,8 +51,6 @@ import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.Event;
-import net.minecraftforge.network.PacketDistributor;
-import org.apache.commons.lang3.mutable.MutableInt;
 
 final class PlayerExtensionImpl<E extends Player>
     extends BaseLivingExtension<E, PlayerHandler> implements PlayerExtension<E> {
@@ -242,17 +239,6 @@ final class PlayerExtensionImpl<E extends Player>
     storageStack.getCapability(Storage.CAPABILITY)
         .ifPresent(storage -> this.entity().openMenu(
             new SimpleMenuProvider(storage, storageStack.getHoverName())));
-  }
-
-  @Override
-  public boolean handleDeath(DamageSource source) {
-    if (super.handleDeath(source)) {
-      return true;
-    } else if (source instanceof KillFeedProvider provider) {
-      NetworkChannel.PLAY.getSimpleChannel().send(PacketDistributor.ALL.noArg(),
-          new AddKillFeedEntryMessage(provider.createKillFeedEntry(this.entity())));
-    }
-    return false;
   }
 
   @Override
