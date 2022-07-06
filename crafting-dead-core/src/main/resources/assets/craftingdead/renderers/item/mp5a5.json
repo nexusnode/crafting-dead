@@ -18,11 +18,13 @@
             -9.4,
             1.75,
             6
-        ],
-        "rotation": [
-            2,
-            0,
-            0
+        ]
+    },
+    "scope_aim_transform": {
+        "translation": [
+            -9.4,
+            1.75,
+            6
         ]
     },
     "hand_transforms": {
@@ -75,20 +77,27 @@
         }
     },
     "magazine_transforms": {
-        "craftingdead:mp5a5_magazine": {
+        "craftingdead:mp5a5_21_round_magazine": {
             "translation": [
                 0,
                 1.49,
-                -4.5
+                -8
+            ]
+        },
+        "craftingdead:mp5a5_35_round_magazine": {
+            "translation": [
+                0,
+                1.49,
+                -8
             ]
         }
     },
     "attachment_transforms": {
         "craftingdead:red_dot_sight": {
             "translation": [
-                0.5,
+                0.495,
                 5.6,
-                -4.5
+                -4
             ]
         },
         "craftingdead:acog_sight": {

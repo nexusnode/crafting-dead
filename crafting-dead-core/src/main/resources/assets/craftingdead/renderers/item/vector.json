@@ -16,6 +16,18 @@
     "aim_transform": {
         "translation": [
             -9.5,
+            2.5,
+            -3
+        ],
+        "rotation": [
+            1,
+            0,
+            0
+        ]
+    },
+    "scope_aim_transform": {
+        "translation": [
+            -9.5,
             1.5,
             0
         ],
@@ -87,14 +99,14 @@
         "craftingdead:red_dot_sight": {
             "translation": [
                 0.5,
-                6,
+                5.9,
                 3
             ]
         },
         "craftingdead:acog_sight": {
             "translation": [
                 0.5,
-                3.5,
+                3.6,
                 4
             ]
         },

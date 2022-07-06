@@ -20,6 +20,13 @@
             2
         ]
     },
+    "scope_aim_transform": {
+        "translation": [
+            -9.5,
+            0,
+            2
+        ]
+    },
     "hand_transforms": {
         "held_right_handed": {
             "right_hand": {
@@ -72,9 +79,9 @@
     "magazine_transforms": {
         "craftingdead:mpt55_magazine": {
             "translation": [
-                0.5,
+                0,
                 -1,
-                2.5
+                1
             ]
         }
     },

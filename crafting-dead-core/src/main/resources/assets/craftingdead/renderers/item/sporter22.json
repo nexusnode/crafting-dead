@@ -16,6 +16,13 @@
     "aim_transform": {
         "translation": [
             -8.5,
+            4.75,
+            -1
+        ]
+    },
+    "scope_aim_transform": {
+        "translation": [
+            -8.5,
             3.75,
             -1
         ]
@@ -73,8 +80,8 @@
         "craftingdead:sporter22_magazine": {
             "translation": [
                 6.5,
-                2.5,
-                6
+                0,
+                -9
             ]
         }
     },
@@ -124,9 +131,9 @@
         },
         "craftingdead:tactical_grip": {
             "translation": [
-                -0.5,
-                -2,
-                -7
+                -0.495,
+                -2.90,
+                -5
             ]
         },
         "craftingdead:hp_scope": {

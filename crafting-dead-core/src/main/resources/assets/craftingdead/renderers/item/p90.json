@@ -16,6 +16,18 @@
     "aim_transform": {
         "translation": [
             -9,
+            4,
+            2
+        ],
+        "rotation": [
+            -1.5,
+            0,
+            0
+        ]
+    },
+    "scope_aim_transform": {
+        "translation": [
+            -9,
             1.75,
             4
         ],
