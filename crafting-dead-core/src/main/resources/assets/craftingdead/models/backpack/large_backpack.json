@@ -1,11 +1,101 @@
 {
-	"loader":"forge:obj",
-	"model":"craftingdead:models/backpack/large_backpack.obj",
-	"flip-v":true,
-	"ambientToFullbright": false,
+	"credit": "Made with Blockbench",
+	"texture_size": [64, 32],
+	"elements": [
+		{
+			"name": "Shape1",
+			"from": [5, 14, 8],
+			"to": [11, 24, 12],
+			"shade": false,
+			"color": 7,
+			"faces": {
+				"north": {"uv": [2.5, 2, 1, 7], "texture": "#base"},
+				"east": {"uv": [3.5, 2, 2.5, 7], "texture": "#base"},
+				"south": {"uv": [5, 2, 3.5, 7], "texture": "#base"},
+				"west": {"uv": [1, 2, 0, 7], "texture": "#base"},
+				"up": {"uv": [1, 2, 2.5, 0], "texture": "#base"},
+				"down": {"uv": [2.5, 0, 4, 2], "texture": "#base"}
+			}
+		},
+		{
+			"name": "Shape2",
+			"from": [11, 15, 9],
+			"to": [12, 19, 12],
+			"shade": false,
+			"color": 0,
+			"faces": {
+				"north": {"uv": [1, 9, 0.75, 11], "texture": "#base"},
+				"east": {"uv": [1.75, 9, 1, 11], "texture": "#base"},
+				"south": {"uv": [2, 9, 1.75, 11], "texture": "#base"},
+				"west": {"uv": [0.75, 9, 0, 11], "texture": "#base"},
+				"up": {"uv": [0.75, 9, 1, 7.5], "texture": "#base"},
+				"down": {"uv": [1, 7.5, 1.25, 9], "texture": "#base"}
+			}
+		},
+		{
+			"name": "Shape3",
+			"from": [4, 15, 9],
+			"to": [5, 19, 12],
+			"shade": false,
+			"color": 5,
+			"faces": {
+				"north": {"uv": [1, 9, 0.75, 11], "texture": "#base"},
+				"east": {"uv": [1.75, 9, 1, 11], "texture": "#base"},
+				"south": {"uv": [2, 9, 1.75, 11], "texture": "#base"},
+				"west": {"uv": [0.75, 9, 0, 11], "texture": "#base"},
+				"up": {"uv": [0.75, 9, 1, 7.5], "texture": "#base"},
+				"down": {"uv": [1, 7.5, 1.25, 9], "texture": "#base"}
+			}
+		},
+		{
+			"name": "Shape4",
+			"from": [6, 15, 7],
+			"to": [10, 19, 8],
+			"shade": false,
+			"color": 3,
+			"faces": {
+				"north": {"uv": [1.25, 12, 0.25, 14], "texture": "#base"},
+				"east": {"uv": [1.5, 12, 1.25, 14], "texture": "#base"},
+				"south": {"uv": [2.5, 12, 1.5, 14], "texture": "#base"},
+				"west": {"uv": [0.25, 12, 0, 14], "texture": "#base"},
+				"up": {"uv": [0.25, 12, 1.25, 11.5], "texture": "#base"},
+				"down": {"uv": [1.25, 11.5, 2.25, 12], "texture": "#base"}
+			}
+		},
+		{
+			"name": "Shape5",
+			"from": [7, 19, 7],
+			"to": [9, 20, 8],
+			"shade": false,
+			"color": 3,
+			"faces": {
+				"north": {"uv": [0.75, 15, 0.25, 15.5], "texture": "#base"},
+				"east": {"uv": [1, 15, 0.75, 15.5], "texture": "#base"},
+				"south": {"uv": [1.5, 15, 1, 15.5], "texture": "#base"},
+				"west": {"uv": [0.25, 15, 0, 15.5], "texture": "#base"},
+				"up": {"uv": [0.25, 15, 0.75, 14.5], "texture": "#base"},
+				"down": {"uv": [0.75, 14.5, 1.25, 15], "texture": "#base"}
+			}
+		},
+		{
+			"name": "Shape6",
+			"from": [7, 24, 10],
+			"to": [9, 25, 11],
+			"shade": false,
+			"color": 4,
+			"faces": {
+				"north": {"uv": [6, 0.5, 5.5, 1], "texture": "#base"},
+				"east": {"uv": [6.25, 0.5, 6, 1], "texture": "#base"},
+				"south": {"uv": [6.75, 0.5, 6.25, 1], "texture": "#base"},
+				"west": {"uv": [5.5, 0.5, 5.25, 1], "texture": "#base"},
+				"up": {"uv": [5.5, 0.5, 6, 0], "texture": "#base"},
+				"down": {"uv": [6, 0, 6.5, 0.5], "texture": "#base"}
+			}
+		}
+	],
 	"transform": {
-		"rotation":  [ 180, 0, 0 ],
-		"translation":  [ 0.5, 0.03, -1.125 ],
-		"scale":  [ 1, 1, 1 ]
+		"rotation":  [ 0, 0, 0 ],
+		"translation": [ 0, 0.02, -0.63 ],
+		"scale":  [ 1, -1, -1 ]
 	}
 }

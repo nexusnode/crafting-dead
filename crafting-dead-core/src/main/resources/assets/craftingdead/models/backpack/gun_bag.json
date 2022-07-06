@@ -1,11 +1,116 @@
 {
-	"loader":"forge:obj",
-	"model":"craftingdead:models/backpack/gun_bag.obj",
-	"flip-v":true,
-	"ambientToFullbright": false,
+	"credit": "Made with Blockbench",
+	"texture_size": [64, 32],
+	"elements": [
+		{
+			"name": "Shape1",
+			"from": [5, 14, 8],
+			"to": [12, 24, 12],
+			"shade": false,
+			"color": 5,
+			"faces": {
+				"north": {"uv": [2.75, 2, 1, 7], "texture": "#base"},
+				"east": {"uv": [3.75, 2, 2.75, 7], "texture": "#base"},
+				"south": {"uv": [5.5, 2, 3.75, 7], "texture": "#base"},
+				"west": {"uv": [1, 2, 0, 7], "texture": "#base"},
+				"up": {"uv": [1, 2, 2.75, 0], "texture": "#base"},
+				"down": {"uv": [2.75, 0, 4.5, 2], "texture": "#base"}
+			}
+		},
+		{
+			"name": "Shape2",
+			"from": [9, 24, 8.5],
+			"to": [12, 30, 11.5],
+			"shade": false,
+			"color": 4,
+			"faces": {
+				"north": {"uv": [1.5, 13, 0.75, 16], "texture": "#base"},
+				"east": {"uv": [2.25, 13, 1.5, 16], "texture": "#base"},
+				"south": {"uv": [3, 13, 2.25, 16], "texture": "#base"},
+				"west": {"uv": [0.75, 13, 0, 16], "texture": "#base"},
+				"up": {"uv": [0.75, 13, 1.5, 11.5], "texture": "#base"},
+				"down": {"uv": [1.5, 11.5, 2.25, 13], "texture": "#base"}
+			}
+		},
+		{
+			"name": "Shape3",
+			"from": [9, 11, 8.5],
+			"to": [12, 14, 11.5],
+			"shade": false,
+			"color": 1,
+			"faces": {
+				"north": {"uv": [7, 14.5, 6.25, 16], "texture": "#base"},
+				"east": {"uv": [7.75, 14.5, 7, 16], "texture": "#base"},
+				"south": {"uv": [8.5, 14.5, 7.75, 16], "texture": "#base"},
+				"west": {"uv": [6.25, 14.5, 5.5, 16], "texture": "#base"},
+				"up": {"uv": [6.25, 14.5, 7, 13], "texture": "#base"},
+				"down": {"uv": [7, 13, 7.75, 14.5], "texture": "#base"}
+			}
+		},
+		{
+			"name": "Shape4",
+			"from": [11.5, 12, 8.5],
+			"to": [12.5, 26, 11.5],
+			"shade": false,
+			"color": 4,
+			"faces": {
+				"north": {"uv": [4.25, 9, 4, 16], "texture": "#base"},
+				"east": {"uv": [5, 9, 4.25, 16], "texture": "#base"},
+				"south": {"uv": [5.25, 9, 5, 16], "texture": "#base"},
+				"west": {"uv": [4, 9, 3.25, 16], "texture": "#base"},
+				"up": {"uv": [4, 9, 4.25, 7.5], "texture": "#base"},
+				"down": {"uv": [4.25, 7.5, 4.5, 9], "texture": "#base"}
+			}
+		},
+		{
+			"name": "Shape5",
+			"from": [6, 15, 6],
+			"to": [11, 18, 8],
+			"shade": false,
+			"color": 5,
+			"faces": {
+				"north": {"uv": [10.75, 1, 9.5, 2.5], "texture": "#base"},
+				"east": {"uv": [11.25, 1, 10.75, 2.5], "texture": "#base"},
+				"south": {"uv": [12.5, 1, 11.25, 2.5], "texture": "#base"},
+				"west": {"uv": [9.5, 1, 9, 2.5], "texture": "#base"},
+				"up": {"uv": [9.5, 1, 10.75, 0], "texture": "#base"},
+				"down": {"uv": [10.75, 0, 12, 1], "texture": "#base"}
+			}
+		},
+		{
+			"name": "Shape6",
+			"from": [6, 18, 7],
+			"to": [11, 23, 8],
+			"shade": false,
+			"color": 5,
+			"faces": {
+				"north": {"uv": [7.25, 0.5, 6, 3], "texture": "#base"},
+				"east": {"uv": [7.5, 0.5, 7.25, 3], "texture": "#base"},
+				"south": {"uv": [8.75, 0.5, 7.5, 3], "texture": "#base"},
+				"west": {"uv": [6, 0.5, 5.75, 3], "texture": "#base"},
+				"up": {"uv": [6, 0.5, 7.25, 0], "texture": "#base"},
+				"down": {"uv": [7.25, 0, 8.5, 0.5], "texture": "#base"}
+			}
+		},
+		{
+			"name": "Shape7",
+			"from": [4.5, 15, 8.5],
+			"to": [5.5, 23, 11.5],
+			"shade": false,
+			"color": 0,
+			"faces": {
+				"north": {"uv": [13.75, 1.5, 13.5, 5.5], "texture": "#base"},
+				"east": {"uv": [14.5, 1.5, 13.75, 5.5], "texture": "#base"},
+				"south": {"uv": [14.75, 1.5, 14.5, 5.5], "texture": "#base"},
+				"west": {"uv": [13.5, 1.5, 12.75, 5.5], "texture": "#base"},
+				"up": {"uv": [13.5, 1.5, 13.75, 0], "texture": "#base"},
+				"down": {"uv": [13.75, 0, 14, 1.5], "texture": "#base"}
+			}
+		}
+	],
 	"transform": {
-		"rotation":  [ 180, 0, 180 ],
-		"translation":  [ -1.5, -0.3, -1.2 ],
-		"scale":  [ 1, 1, 1 ]
+		"rotation":  [ 0, 0, 0 ],
+		"translation": [ -0.03, 0.02, -0.63 ],
+		"scale":  [ 1, -1, -1 ]
 	}
 }

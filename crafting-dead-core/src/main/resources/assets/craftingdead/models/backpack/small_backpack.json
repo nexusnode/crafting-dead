@@ -1,11 +1,71 @@
 {
-	"loader":"forge:obj",
-	"model":"craftingdead:models/backpack/small_backpack.obj",
-	"flip-v":true,
-	"ambientToFullbright": false,
+	"credit": "Made with Blockbench",
+	"texture_size": [64, 32],
+	"elements": [
+		{
+			"name": "Shape1",
+			"from": [5, 20, 8],
+			"to": [12, 24, 11],
+			"shade": false,
+			"color": 2,
+			"faces": {
+				"north": {"uv": [2.5, 1.5, 0.75, 3.5], "texture": "#base"},
+				"east": {"uv": [3.25, 1.5, 2.5, 3.5], "texture": "#base"},
+				"south": {"uv": [5, 1.5, 3.25, 3.5], "texture": "#base"},
+				"west": {"uv": [0.75, 1.5, 0, 3.5], "texture": "#base"},
+				"up": {"uv": [0.75, 1.5, 2.5, 0], "texture": "#base"},
+				"down": {"uv": [2.5, 0, 4.25, 1.5], "texture": "#base"}
+			}
+		},
+		{
+			"name": "Shape2",
+			"from": [6, 24, 8],
+			"to": [11, 26, 11],
+			"shade": false,
+			"color": 6,
+			"faces": {
+				"north": {"uv": [2, 8, 0.75, 9], "texture": "#base"},
+				"east": {"uv": [2.75, 8, 2, 9], "texture": "#base"},
+				"south": {"uv": [4, 8, 2.75, 9], "texture": "#base"},
+				"west": {"uv": [0.75, 8, 0, 9], "texture": "#base"},
+				"up": {"uv": [0.75, 8, 2, 6.5], "texture": "#base"},
+				"down": {"uv": [2, 6.5, 3.25, 8], "texture": "#base"}
+			}
+		},
+		{
+			"name": "Shape3",
+			"from": [7, 26, 8],
+			"to": [10, 27, 11],
+			"shade": false,
+			"color": 5,
+			"faces": {
+				"north": {"uv": [1.5, 11, 0.75, 11.5], "texture": "#base"},
+				"east": {"uv": [2.25, 11, 1.5, 11.5], "texture": "#base"},
+				"south": {"uv": [3, 11, 2.25, 11.5], "texture": "#base"},
+				"west": {"uv": [0.75, 11, 0, 11.5], "texture": "#base"},
+				"up": {"uv": [0.75, 11, 1.5, 9.5], "texture": "#base"},
+				"down": {"uv": [1.5, 9.5, 2.25, 11], "texture": "#base"}
+			}
+		},
+		{
+			"name": "Shape4",
+			"from": [6, 21, 7],
+			"to": [11, 24, 8],
+			"shade": false,
+			"color": 6,
+			"faces": {
+				"north": {"uv": [1.5, 4.5, 0.25, 6], "texture": "#base"},
+				"east": {"uv": [1.75, 4.5, 1.5, 6], "texture": "#base"},
+				"south": {"uv": [3, 4.5, 1.75, 6], "texture": "#base"},
+				"west": {"uv": [0.25, 4.5, 0, 6], "texture": "#base"},
+				"up": {"uv": [0.25, 4.5, 1.5, 4], "texture": "#base"},
+				"down": {"uv": [1.5, 4, 2.75, 4.5], "texture": "#base"}
+			}
+		}
+	],
 	"transform": {
-		"rotation":  [ 180, 0, 0 ],
-		"translation":  [ 0.475, 0.2, -1.2 ],
-		"scale":  [ 1, 1, 1 ]
+		"rotation":  [ 0, 0, 0 ],
+		"translation": [ -0.03, 0.22, -0.7 ],
+		"scale":  [ 1, -1, -1 ]
 	}
 }
