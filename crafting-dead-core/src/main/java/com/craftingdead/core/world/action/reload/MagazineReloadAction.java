@@ -78,11 +78,11 @@ public class MagazineReloadAction extends AbstractReloadAction {
     this.ammoProvider.setMagazineStack(this.newMagazineStack);
     if (!displayOnly
         && !this.oldMagazineStack.isEmpty()
-        && this.getPerformer().getEntity() instanceof Player
+        && this.getPerformer().entity() instanceof Player
         && !(this.oldMagazineStack.getCapability(Magazine.CAPABILITY).map(Magazine::isEmpty)
             .orElse(true)
             && CraftingDead.serverConfig.reloadDestroyMagWhenEmpty.get())) {
-      ((Player) this.getPerformer().getEntity()).addItem(this.oldMagazineStack);
+      ((Player) this.getPerformer().entity()).addItem(this.oldMagazineStack);
     }
   }
 
@@ -91,7 +91,7 @@ public class MagazineReloadAction extends AbstractReloadAction {
     this.ammoProvider.setMagazineStack(this.oldMagazineStack);
     var remainingStack = this.magazineLocation.itemHandler().insertItem(
         this.magazineLocation.slot(), this.newMagazineStack, false);
-    this.getPerformer().getEntity().spawnAtLocation(remainingStack);
+    this.getPerformer().entity().spawnAtLocation(remainingStack);
   }
 
   private List<IItemHandler> collectItemHandlers(LivingExtension<?, ?> living) {
@@ -110,7 +110,7 @@ public class MagazineReloadAction extends AbstractReloadAction {
         .getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).ifPresent(builder::add);
 
     // Inventory - third
-    living.getEntity().getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
+    living.entity().getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
         .ifPresent(builder::add);
 
     return builder.build();

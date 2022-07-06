@@ -107,13 +107,13 @@ public class LegacyBase implements LandOwner {
 
   @Override
   public void playerPlacedBlock(LivingExtension<?, ?> player, BlockPos... blocks) {
-    player.getLevel().getBlockEntity(this.getBlockPos(), ImmerseBlockEntityTypes.BASE_CENTER.get())
+    player.level().getBlockEntity(this.getBlockPos(), ImmerseBlockEntityTypes.BASE_CENTER.get())
         .ifPresent(base -> base.playerPlacedBlock(player, blocks));
   }
 
   @Override
   public void playerRemovedBlock(LivingExtension<?, ?> player, BlockPos... blocks) {
-    player.getLevel().getBlockEntity(this.getBlockPos(), ImmerseBlockEntityTypes.BASE_CENTER.get())
+    player.level().getBlockEntity(this.getBlockPos(), ImmerseBlockEntityTypes.BASE_CENTER.get())
         .ifPresent(base -> base.playerRemovedBlock(player, blocks));
   }
 

@@ -38,7 +38,7 @@ public record TriggerPressedMessage(int entityId, boolean triggerPressed) {
   public boolean handle(Supplier<NetworkEvent.Context> ctx) {
     ctx.get().enqueueWork(() -> NetworkUtil.getEntityOrSender(ctx.get(), this.entityId)
         .getCapability(LivingExtension.CAPABILITY)
-        .ifPresent(extension -> extension.getMainHandGun()
+        .ifPresent(extension -> extension.mainHandGun()
             .ifPresent(gun -> gun.setTriggerPressed(extension, this.triggerPressed,
                 ctx.get().getDirection().getReceptionSide().isServer()))));
     return true;

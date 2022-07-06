@@ -36,13 +36,13 @@ import net.minecraft.world.item.context.UseOnContext;
 public abstract class BuildActionType extends ItemActionType<BuildAction> {
 
   public static final BiPredicate<LivingExtension<?, ?>, BlockPos> WITHIN_BASE =
-      (performer, blockPos) -> LevelExtension.getOrThrow(performer.getLevel()).getLandManager()
+      (performer, blockPos) -> LevelExtension.getOrThrow(performer.level()).getLandManager()
           .getLandOwnerAt(blockPos)
-          .map(owner -> owner.isAllowedToBuild(performer.getEntity(), blockPos))
+          .map(owner -> owner.isAllowedToBuild(performer.entity(), blockPos))
           .orElse(false);
 
   public static final BiPredicate<LivingExtension<?, ?>, BlockPos> NOT_CLAIMED =
-      (performer, blockPos) -> !LevelExtension.getOrThrow(performer.getLevel()).getLandManager()
+      (performer, blockPos) -> !LevelExtension.getOrThrow(performer.level()).getLandManager()
           .isLandClaimed(blockPos);
 
   public static final BiPredicate<LivingExtension<?, ?>, BlockPos> DONT_OWN_BASE =
@@ -51,7 +51,7 @@ public abstract class BuildActionType extends ItemActionType<BuildAction> {
           .orElse(true);
 
   public static final BiConsumer<LivingExtension<?, ?>, BlockPos> NOTIFY_BASE =
-      (performer, blockPos) -> LevelExtension.getOrThrow(performer.getLevel()).getLandManager()
+      (performer, blockPos) -> LevelExtension.getOrThrow(performer.level()).getLandManager()
           .getLandOwnerAt(blockPos)
           .ifPresent(base -> base.playerPlacedBlock(performer, blockPos));
 
@@ -86,9 +86,9 @@ public abstract class BuildActionType extends ItemActionType<BuildAction> {
   public BuildAction decode(LivingExtension<?, ?> performer, FriendlyByteBuf in) {
     var hand = in.readEnum(InteractionHand.class);
     var hitResult = in.readBlockHitResult();
-    var context = new BlockPlaceContext(performer.getLevel(),
-        performer.getEntity() instanceof Player player ? player : null, hand,
-        performer.getEntity().getItemInHand(hand), hitResult);
+    var context = new BlockPlaceContext(performer.level(),
+        performer.entity() instanceof Player player ? player : null, hand,
+        performer.entity().getItemInHand(hand), hitResult);
     return this.create(performer, context);
   }
 

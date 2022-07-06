@@ -69,7 +69,7 @@ public class TdmServerPlayerHandler extends TdmPlayerHandler<ServerPlayer> {
 
     if (this.ghost && this.pendingSpectate != null) {
       if (this.pendingSpectate.isAlive() && !this.pendingSpectate.isSpectator()) {
-        ((ServerPlayer) this.getPlayer().getEntity()).setCamera(this.pendingSpectate);
+        this.getPlayer().entity().setCamera(this.pendingSpectate);
       }
       this.pendingSpectate = null;
     }
@@ -79,11 +79,10 @@ public class TdmServerPlayerHandler extends TdmPlayerHandler<ServerPlayer> {
       if (this.ghost) {
         if (this.dataManager.compute(REMAINING_GHOST_TIME_SECONDS, ghostTime -> --ghostTime) <= 0) {
           this.ghost = false;
-          this.getPlayer().getEntity().setGameMode(GameType.ADVENTURE);
-          ((TdmServer) this.game).getLogicalServer()
-              .respawnPlayer((ServerPlayer) this.getPlayer().getEntity(), false);
+          this.getPlayer().entity().setGameMode(GameType.ADVENTURE);
+          this.game.getLogicalServer().respawnPlayer(this.getPlayer().entity(), false);
         }
-      } else if (!this.getPlayer().getEntity().isSpectator()) {
+      } else if (!this.getPlayer().entity().isSpectator()) {
         this.dataManager.compute(REMAINING_BUY_TIME_SECONDS,
             buyTime -> buyTime > 0 ? --buyTime : buyTime);
         this.dataManager.compute(REMAINING_SPAWN_PROTECTION_SECONDS,
@@ -100,18 +99,16 @@ public class TdmServerPlayerHandler extends TdmPlayerHandler<ServerPlayer> {
       return true;
     }
 
-    if (source.getEntity() instanceof Player) {
-      Player playerEntity = (Player) source.getEntity();
-
-      if (playerEntity.getMainHandItem().isEmpty()) {
+    if (source.getEntity() instanceof Player player) {
+      if (player.getMainHandItem().isEmpty()) {
         return true;
       }
 
-      if (amount > this.getPlayer().getEntity().getMaxHealth() * ASSIST_DAMAGE_PCT) {
-        this.lastSignificantDamage = playerEntity;
+      if (amount > this.getPlayer().entity().getMaxHealth() * ASSIST_DAMAGE_PCT) {
+        this.lastSignificantDamage = player;
       }
 
-      if (playerEntity.getCapability(LivingExtension.CAPABILITY)
+      if (player.getCapability(LivingExtension.CAPABILITY)
           .resolve()
           .flatMap(e -> e.getHandler(TYPE))
           .map(extension -> extension.getTeam().orElse(null) == this
@@ -127,42 +124,39 @@ public class TdmServerPlayerHandler extends TdmPlayerHandler<ServerPlayer> {
   @Override
   public boolean handleKill(Entity target) {
     if (target instanceof ServerPlayer) {
-      TdmPlayerData playerData = this.getPlayerData();
+      var playerData = this.getPlayerData();
       playerData.incrementKills();
       playerData.incrementScore();
-      this.getTeam().map(this.game.getTeamModule()::getTeamInstance)
+      this.getTeam()
+          .map(this.game.getTeamModule()::getTeamInstance)
           .ifPresent(TdmTeam::incrementScore);
 
       NetworkChannel.PLAY.getSimpleChannel().send(
           PacketDistributor.PLAYER.with(() -> (ServerPlayer) target),
-          new DisplayKilledMessage(this.getPlayer().getEntity().getId(),
-              this.getPlayer().getEntity().getMainHandItem()));
+          new DisplayKilledMessage(this.getPlayer().entity().getId(),
+              this.getPlayer().entity().getMainHandItem()));
     }
     return false;
   }
 
   @Override
   public boolean handleDeath(DamageSource cause) {
-    if (this.getPlayer().getEntity() instanceof ServerPlayer) {
-      ServerPlayer playerEntity = (ServerPlayer) this.getPlayer().getEntity();
+    this.getPlayerData().incrementDeaths();
 
-      this.getPlayerData().incrementDeaths();
-
-      if (this.lastSignificantDamage != null
-          && this.lastSignificantDamage != cause.getEntity()) {
-        this.game.getPlayerData(this.lastSignificantDamage.getUUID()).incrementAssists();
-      }
-
-      this.ghost = true;
-      playerEntity.getLevel().addParticle(ParticleTypes.EXPLOSION,
-          playerEntity.getX(),
-          playerEntity.getY(),
-          playerEntity.getZ(), 0.0D, 0.0D, 0.0D);
-      playerEntity.setGameMode(GameType.SPECTATOR);
-      if (cause.getEntity() instanceof ServerPlayer) {
-        this.pendingSpectate = (ServerPlayer) cause.getEntity();
-      }
+    if (this.lastSignificantDamage != null
+        && this.lastSignificantDamage != cause.getEntity()) {
+      this.game.getPlayerData(this.lastSignificantDamage.getUUID()).incrementAssists();
     }
+
+    this.ghost = true;
+    var player = this.getPlayer().entity();
+    player.getLevel().addParticle(ParticleTypes.EXPLOSION,
+        player.getX(), player.getY(), player.getZ(), 0.0D, 0.0D, 0.0D);
+    player.setGameMode(GameType.SPECTATOR);
+    if (cause.getEntity() instanceof ServerPlayer) {
+      this.pendingSpectate = (ServerPlayer) cause.getEntity();
+    }
+
     return false;
   }
 

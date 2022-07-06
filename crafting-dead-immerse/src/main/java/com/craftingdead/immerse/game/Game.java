@@ -43,16 +43,6 @@ public interface Game extends Synched {
   default void unload() {}
 
   /**
-   * Called before each 'round' therefore <i>can</i> be called multiple times.
-   */
-  default void started() {}
-
-  /**
-   * Called after each 'round' therefore <i>can</i> be called multiple times.
-   */
-  default void ended() {}
-
-  /**
    * Perform any updates.
    */
   default void tick() {}

@@ -2,7 +2,7 @@
   "parent": "minecraft:recipes/root",
   "rewards": {
     "recipes": [
-      "craftingdeadimmerse:open_canned_corn"
+      "craftingdeadimmerse:open_canned_sweetcorn"
     ]
   },
   "criteria": {
@@ -12,7 +12,7 @@
         "items": [
           {
             "items": [
-              "craftingdeadimmerse:canned_corn"
+              "craftingdeadimmerse:canned_sweetcorn"
             ]
           }
         ]
@@ -21,7 +21,7 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "craftingdeadimmerse:open_canned_corn"
+        "recipe": "craftingdeadimmerse:open_canned_sweetcorn"
       }
     }
   },

@@ -45,7 +45,7 @@ public class RemoveMagazineAction extends TimedAction {
 
   public RemoveMagazineAction(LivingExtension<?, ?> performer) {
     this.performer = performer;
-    this.gun = performer.getMainHandGun()
+    this.gun = performer.mainHandGun()
         .orElseThrow(() -> new IllegalStateException("Performer not holding gun"));
     AmmoProvider ammoProvider = this.gun.getAmmoProvider();
     if (!(ammoProvider instanceof MagazineAmmoProvider)) {
@@ -67,7 +67,7 @@ public class RemoveMagazineAction extends TimedAction {
 
   @Override
   public boolean start(boolean simulate) {
-    if (this.getPerformer().getEntity().isSprinting() || this.oldMagazineStack.isEmpty()) {
+    if (this.getPerformer().entity().isSprinting() || this.oldMagazineStack.isEmpty()) {
       return false;
     }
 
@@ -79,7 +79,7 @@ public class RemoveMagazineAction extends TimedAction {
       this.gun.setPerformingSecondaryAction(this.getPerformer(), false, false);
     }
 
-    if (this.getPerformer().getLevel().isClientSide()) {
+    if (this.getPerformer().level().isClientSide()) {
       this.animation = this.gun.getClient().getAnimation(GunAnimationEvent.RELOAD);
       this.gun.getClient().getAnimationController().addAnimation(this.animation);
     }
@@ -89,9 +89,9 @@ public class RemoveMagazineAction extends TimedAction {
 
   @Override
   public boolean tick() {
-    if (!this.performer.getLevel().isClientSide()
-        && !this.performer.getMainHandItem().is(this.gun.getItemStack().getItem())
-        || this.getPerformer().getEntity().isSprinting()) {
+    if (!this.performer.level().isClientSide()
+        && !this.performer.mainHandItem().is(this.gun.getItemStack().getItem())
+        || this.getPerformer().entity().isSprinting()) {
       this.getPerformer().cancelAction(true);
       return false;
     }
@@ -103,14 +103,14 @@ public class RemoveMagazineAction extends TimedAction {
     super.stop(reason);
 
     if (reason.isCompleted()) {
-      if (!this.getPerformer().getLevel().isClientSide()) {
+      if (!this.getPerformer().level().isClientSide()) {
         // This will be synced to the client by the gun.
         this.ammoProvider.setMagazineStack(ItemStack.EMPTY);
         if (!this.oldMagazineStack.isEmpty()
-            && this.getPerformer().getEntity() instanceof Player
+            && this.getPerformer().entity() instanceof Player
             && !(this.oldMagazineStack.getCapability(Magazine.CAPABILITY).map(Magazine::isEmpty).orElse(true)
             && CraftingDead.serverConfig.reloadDestroyMagWhenEmpty.get())) {
-          ((Player) this.getPerformer().getEntity()).addItem(this.oldMagazineStack);
+          ((Player) this.getPerformer().entity()).addItem(this.oldMagazineStack);
         }
       }
       return;

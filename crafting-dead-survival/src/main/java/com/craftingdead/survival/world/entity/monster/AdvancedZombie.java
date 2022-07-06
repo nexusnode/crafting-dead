@@ -243,7 +243,7 @@ public class AdvancedZombie extends Zombie implements RangedAttackMob {
     super.tick();
     if (!this.level.isClientSide()) {
       this.getCapability(LivingExtension.CAPABILITY)
-          .ifPresent(living -> living.getMainHandGun().ifPresent(gun -> {
+          .ifPresent(living -> living.mainHandGun().ifPresent(gun -> {
             if (gun.isTriggerPressed()
                 && (!this.rangedAttackGoal.canContinueToUse() || (Util.getMillis()
                     - this.triggerPressedStartTime > 1000 + this.random.nextInt(2000)))) {
@@ -257,7 +257,7 @@ public class AdvancedZombie extends Zombie implements RangedAttackMob {
   public void performRangedAttack(LivingEntity livingEntity, float distance) {
     if (!this.level.isClientSide()) {
       this.getCapability(LivingExtension.CAPABILITY)
-          .ifPresent(living -> living.getMainHandGun().ifPresent(gun -> {
+          .ifPresent(living -> living.mainHandGun().ifPresent(gun -> {
             this.triggerPressedStartTime = Util.getMillis();
             gun.setTriggerPressed(living, true, true);
           }));

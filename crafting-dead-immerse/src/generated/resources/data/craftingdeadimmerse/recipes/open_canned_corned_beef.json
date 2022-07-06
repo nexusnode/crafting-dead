@@ -2,7 +2,7 @@
   "type": "minecraft:crafting_shapeless",
   "ingredients": [
     {
-      "item": "craftingdeadimmerse:canned_corn"
+      "item": "craftingdeadimmerse:canned_corned_beef"
     },
     [
       {
@@ -17,6 +17,6 @@
     ]
   ],
   "result": {
-    "item": "craftingdeadimmerse:open_canned_corn"
+    "item": "craftingdeadimmerse:open_canned_corned_beef"
   }
 }

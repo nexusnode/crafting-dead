@@ -113,13 +113,14 @@ public class TextView extends View {
             .setDynamicFontManager(FontMgr.getDefault());
         var builder = new ParagraphBuilder(paragraphStyle, fontCollection)) {
       this.text.visit((style, content) -> {
+        var color = style.getColor() == null
+            ? this.getStyle().color.get().valueHex()
+            : style.getColor().getValue() + (255 << 24);
         try (var textStyle = new TextStyle()
             .setFontSize(this.getStyle().fontSize.get() * this.graphicsContext.scale())
             .setFontFamilies(this.getStyle().fontFamily.get())
             .addShadows(this.getStyle().textShadow.get())
-            .setColor(style.getColor() == null
-                ? this.getStyle().color.get().valueHex()
-                : style.getColor().getValue() + (255 << 24))
+            .setColor(color)
             .setFontStyle(style.isBold() && style.isItalic()
                 ? FontStyle.BOLD_ITALIC
                 : style.isBold()
@@ -129,7 +130,8 @@ public class TextView extends View {
                         : FontStyle.NORMAL)
             .setDecorationStyle(DecorationStyle.NONE
                 .withUnderline(style.isUnderlined())
-                .withLineThrough(style.isStrikethrough()))) {
+                .withLineThrough(style.isStrikethrough())
+                .withColor(color))) {
           builder.pushStyle(textStyle);
           builder.addText(content);
           this.textCount += content.length();
@@ -157,9 +159,10 @@ public class TextView extends View {
     switch (widthMode) {
       case UNDEFINED:
       case AT_MOST:
-        this.paragraph.layout(widthMode == MeasureMode.UNDEFINED ? Float.MAX_VALUE
+        this.paragraph.layout(widthMode == MeasureMode.UNDEFINED
+            ? Float.MAX_VALUE
             : width * this.graphicsContext.scale());
-        width = (this.paragraph.getMaxIntrinsicWidth()) / this.graphicsContext.scale();
+        width = this.paragraph.getMaxIntrinsicWidth() / this.graphicsContext.scale();
         break;
       default:
         this.paragraph.layout(width * this.graphicsContext.scale());

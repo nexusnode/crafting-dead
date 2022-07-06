@@ -134,9 +134,9 @@ public class ClientDist implements ModDist {
         // Only draw in survival
         if (this.minecraft.gameMode.canHurtPlayer() && !player.isCombatModeEnabled()) {
           float healthPercentage =
-              player.getEntity().getHealth() / player.getEntity().getMaxHealth();
+              player.entity().getHealth() / player.entity().getMaxHealth();
           if (clientConfig.displayBlood.get() && healthPercentage < 1.0F
-              && player.getEntity().hasEffect(SurvivalMobEffects.BLEEDING.get())) {
+              && player.entity().hasEffect(SurvivalMobEffects.BLEEDING.get())) {
             renderBlood(event.getWindow().getGuiScaledWidth(),
                 event.getWindow().getGuiScaledHeight(), healthPercentage);
           }

@@ -1,4 +1,7 @@
 {
+    "death.attack.dehydration":"%1$s died of dehydration",
+    "effect.craftingdeadimmerse.dehydration": "Dehydration",
+
     "block.craftingdeadimmerse.base_center": "Base Center",
 
     "action.craftingdeadimmerse.build_base_center.message": "Building base center",
@@ -22,6 +25,7 @@
     "action.craftingdeadimmerse.build_jungle_plank_platform.message": "Building jungle plank platform",
     "action.craftingdeadimmerse.build_acacia_plank_platform.message": "Building acacia plank platform",
     "action.craftingdeadimmerse.build_dark_oak_plank_platform.message": "Building dark oak plank platform",
+    "action.craftingdeadimmerse.fill_water_canteen.message": "Filling water canteen",
 
     "itemGroup.craftingdeadimmerse": "Crafting Dead Immerse",
 
@@ -46,8 +50,8 @@
     "item.craftingdeadimmerse.jungle_plank_platform_blueprint": "Jungle Plank Platform Blueprint",
     "item.craftingdeadimmerse.acacia_plank_platform_blueprint": "Acacia Plank Platform Blueprint",
     "item.craftingdeadimmerse.dark_oak_plank_platform_blueprint": "Dark Oak Plank Platform Blueprint",
-    "item.craftingdeadimmerse.canned_corn": "Canned Corn",
-    "item.craftingdeadimmerse.open_canned_corn": "Open Canned Corn",
+    "item.craftingdeadimmerse.canned_sweetcorn": "Canned Sweetcorn",
+    "item.craftingdeadimmerse.open_canned_sweetcorn": "Open Canned Sweetcorn",
     "item.craftingdeadimmerse.canned_beans": "Canned Beans",
     "item.craftingdeadimmerse.open_canned_beans": "Open Canned Beans",
     "item.craftingdeadimmerse.canned_tuna": "Canned Tuna",
@@ -56,8 +60,8 @@
     "item.craftingdeadimmerse.open_canned_peaches": "Open Canned Peaches",
     "item.craftingdeadimmerse.canned_pasta": "Canned Pasta",
     "item.craftingdeadimmerse.open_canned_pasta": "Open Canned Pasta",
-    "item.craftingdeadimmerse.canned_bacon": "Canned Bacon",
-    "item.craftingdeadimmerse.open_canned_bacon": "Open Canned Bacon",
+    "item.craftingdeadimmerse.canned_corned_beef": "Canned Corned Beef",
+    "item.craftingdeadimmerse.open_canned_corned_beef": "Open Canned Corned Beef",
     "item.craftingdeadimmerse.canned_custard": "Canned Custard",
     "item.craftingdeadimmerse.open_canned_custard": "Open Canned Custard",
     "item.craftingdeadimmerse.canned_pickles": "Canned Pickles",
@@ -99,8 +103,8 @@
     "item.craftingdeadimmerse.mre": "MRE",
     "item.craftingdeadimmerse.pear": "Pear",
     "item.craftingdeadimmerse.orange": "Orange",
-    "item.craftingdeadimmerse.empty_water_canteel": "Empty Water Canteel",
-    "item.craftingdeadimmerse.water_canteel": "Water Canteel",
+    "item.craftingdeadimmerse.empty_water_canteen": "Empty Water Canteen",
+    "item.craftingdeadimmerse.water_canteen": "Water Canteen",
     "item.craftingdeadimmerse.rotten_orange": "Rotten Orange",
     "item.craftingdeadimmerse.rotten_pear": "Rotten Pear",
     "item.craftingdeadimmerse.rotten_apple": "Rotten Apple",
@@ -129,6 +133,8 @@
     "toasts.error": "Rocket Error",
     "commands.game.restart":"Restarting game",
     "commands.game.reload_rotation":"Reloading game rotation",
+    "commands.hydrate.success.single": "%s was hydrated.",
+    "commands.hydrate.success.multiple": "%s players were hydrated.",
 
     "message.first_blood_drawn": "%s drew first blood",
     "message.joined": "%s has joined the game",

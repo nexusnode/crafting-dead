@@ -25,21 +25,22 @@ import java.nio.file.Path;
 import org.jetbrains.annotations.Nullable;
 import com.craftingdead.core.capability.CapabilityUtil;
 import com.craftingdead.immerse.client.ClientDist;
-import com.craftingdead.immerse.command.Commands;
+import com.craftingdead.immerse.command.ImmerseCommands;
 import com.craftingdead.immerse.data.models.ImmerseModelProvider;
 import com.craftingdead.immerse.data.recipes.ImmerseRecipeProvider;
 import com.craftingdead.immerse.game.Game;
 import com.craftingdead.immerse.game.GameTypes;
+import com.craftingdead.immerse.game.LogicalServer;
 import com.craftingdead.immerse.game.module.ModuleTypes;
 import com.craftingdead.immerse.game.network.GameNetworkChannel;
 import com.craftingdead.immerse.network.NetworkChannel;
 import com.craftingdead.immerse.network.play.SyncLandChunkMessage;
 import com.craftingdead.immerse.network.play.SyncLandManagerMessage;
-import com.craftingdead.immerse.server.LogicalServer;
 import com.craftingdead.immerse.server.ServerConfig;
 import com.craftingdead.immerse.server.ServerDist;
 import com.craftingdead.immerse.sounds.ImmerseSoundEvents;
 import com.craftingdead.immerse.world.action.ImmerseActionTypes;
+import com.craftingdead.immerse.world.effect.ImmerseMobEffects;
 import com.craftingdead.immerse.world.item.ImmerseItems;
 import com.craftingdead.immerse.world.level.block.ImmerseBlocks;
 import com.craftingdead.immerse.world.level.block.entity.ImmerseBlockEntityTypes;
@@ -146,6 +147,7 @@ public class CraftingDeadImmerse {
     ImmerseItems.deferredRegister.register(modEventBus);
     ImmerseBlockEntityTypes.deferredRegister.register(modEventBus);
     LandOwnerTypes.deferredRegister.register(modEventBus);
+    ImmerseMobEffects.deferredRegister.register(modEventBus);
 
     MinecraftForge.EVENT_BUS.register(this);
   }
@@ -217,25 +219,25 @@ public class CraftingDeadImmerse {
 
   @SubscribeEvent
   public void handleRegisterCommands(RegisterCommandsEvent event) {
-    Commands.register(event.getDispatcher());
+    ImmerseCommands.register(event.getDispatcher());
   }
 
   @SubscribeEvent
   public void handleServerAboutToStart(ServerAboutToStartEvent event) {
     this.logicalServer = this.modDist.createLogicalServer(event.getServer());
-    this.logicalServer.startLoading();
     MinecraftForge.EVENT_BUS.register(this.logicalServer);
   }
 
   @SubscribeEvent
   public void handleServerStarting(ServerStartingEvent event) {
-    this.logicalServer.finishLoading();
+    this.logicalServer.start();
   }
 
   @SubscribeEvent
   public void handleServerStopped(ServerStoppedEvent event) {
     // Server may not have fully started yet so could be null
     if (this.logicalServer != null) {
+      this.logicalServer.stop();
       MinecraftForge.EVENT_BUS.unregister(this.logicalServer);
       this.logicalServer = null;
     }

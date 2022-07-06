@@ -18,19 +18,14 @@
 
 package com.craftingdead.immerse.client.gui.screen.menu.play.list.server;
 
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.channels.AsynchronousFileChannel;
-import java.nio.channels.CompletionHandler;
-import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
-import java.util.concurrent.CompletableFuture;
-import java.util.stream.Stream;
-import com.google.common.collect.Streams;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 public class JsonServerList implements ServerList {
 
@@ -43,40 +38,12 @@ public class JsonServerList implements ServerList {
   }
 
   @Override
-  public CompletableFuture<Stream<ServerEntry>> load() {
-    CompletableFuture<Stream<ServerEntry>> future = new CompletableFuture<>();
-
-    AsynchronousFileChannel fileChannel;
-    try {
-      fileChannel = AsynchronousFileChannel.open(
-          this.serverListFile, StandardOpenOption.READ);
-    } catch (IOException e) {
-      future.completeExceptionally(e);
-      return future;
-    }
-
-    ByteBuffer buffer = ByteBuffer.allocate(1024);
-
-    fileChannel.read(buffer, 0, null, new CompletionHandler<Integer, Void>() {
-
-      @Override
-      public void completed(Integer result, Void attachment) {
-        buffer.flip();
-        byte[] bytes = new byte[buffer.limit()];
-        buffer.get(bytes);
-        String jsonString = new String(bytes, StandardCharsets.UTF_8).trim();
-        future.complete(Streams.stream(gson.fromJson(jsonString, JsonArray.class))
-            .map(JsonElement::getAsJsonObject)
-            .map(json -> new ServerEntry(json.get("map").getAsString(),
-                json.get("hostName").getAsString(), json.get("port").getAsInt())));
-      }
-
-      @Override
-      public void failed(Throwable exc, Void attachment) {
-        future.completeExceptionally(exc);
-      }
-    });
-
-    return future;
+  public Flux<ServerEntry> load() {
+    return Mono.fromCallable(() -> Files.readString(this.serverListFile))
+        .flatMapIterable(jsonString -> gson.fromJson(jsonString, JsonArray.class))
+        .map(JsonElement::getAsJsonObject)
+        .map(json -> new ServerEntry(json.get("map").getAsString(),
+            json.get("hostName").getAsString(), json.get("port").getAsInt()))
+        .subscribeOn(Schedulers.boundedElastic());
   }
 }

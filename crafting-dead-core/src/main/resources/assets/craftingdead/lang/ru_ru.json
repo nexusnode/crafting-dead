@@ -14,8 +14,8 @@
   "death.attack.bullet": "%1$s был застрелен",
   "death.attack.bullet.headshot": "%1$s был застрелен в голову",
 
-  "options.craftingdead.client.hit_marker_mode": "Режим отметки: Попадание",
-  "options.craftingdead.client.kill_sound_enabled": "Включить звук убийства",
+  "options.craftingdead.server.hit_marker_mode": "Режим отметки: Попадание",
+  "options.craftingdead.server.kill_sound_enabled": "Включить звук убийства",
   "options.craftingdead.client.crosshair": "Перекрестие",
   "options.craftingdead.client.kill_sound": "Звук убийства",
 

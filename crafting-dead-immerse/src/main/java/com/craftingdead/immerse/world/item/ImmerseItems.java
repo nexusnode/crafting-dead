@@ -18,6 +18,7 @@
 
 package com.craftingdead.immerse.world.item;
 
+import com.craftingdead.core.world.item.ActionItem;
 import com.craftingdead.core.world.item.ArbitraryTooltips;
 import com.craftingdead.core.world.item.MeleeWeaponItem;
 import com.craftingdead.core.world.item.ToolItem;
@@ -157,6 +158,23 @@ public class ImmerseItems {
           () -> new BlueprintItem(ImmerseActionTypes.BUILD_DARK_OAK_PLANK_PLATFORM,
               new Item.Properties().tab(TAB)));
 
+  public static final RegistryObject<Item> EMPTY_WATER_BOTTLE =
+      deferredRegister.register("empty_water_bottle",
+          () -> new Item(new Item.Properties().tab(TAB)));
+
+  public static final RegistryObject<Item> WATER_BOTTLE =
+      deferredRegister.register("water_bottle",
+          () -> new DrinkItem(new Item.Properties().tab(TAB), 8, EMPTY_WATER_BOTTLE));
+
+  public static final RegistryObject<Item> EMPTY_WATER_CANTEEN =
+      deferredRegister.register("empty_water_canteen",
+          () -> new ActionItem(ImmerseActionTypes.FILL_WATER_CANTEEN,
+              new Item.Properties().tab(TAB)));
+
+  public static final RegistryObject<Item> WATER_CANTEEN =
+      deferredRegister.register("water_canteen",
+          () -> new DrinkItem(new Item.Properties().tab(TAB), 9, EMPTY_WATER_CANTEEN));
+
   public static final RegistryObject<Item> POWER_BAR =
       deferredRegister.register("power_bar",
           () -> new Item(new Item.Properties().tab(TAB).food(ImmerseFoods.POWER_BAR)));
@@ -169,12 +187,12 @@ public class ImmerseItems {
       deferredRegister.register("cereal",
           () -> new Item(new Item.Properties().tab(TAB).food(ImmerseFoods.CEREAL)));
 
-  public static final RegistryObject<Item> CANNED_CORN =
-      deferredRegister.register("canned_corn",
+  public static final RegistryObject<Item> CANNED_SWEETCORN =
+      deferredRegister.register("canned_sweetcorn",
           () -> new Item(new Item.Properties().tab(TAB)));
 
-  public static final RegistryObject<Item> OPEN_CANNED_CORN =
-      deferredRegister.register("open_canned_corn",
+  public static final RegistryObject<Item> OPEN_CANNED_SWEETCORN =
+      deferredRegister.register("open_canned_sweetcorn",
           () -> new Item(new Item.Properties().tab(TAB).food(ImmerseFoods.CANNED_CORN)));
 
   public static final RegistryObject<Item> CANNED_BEANS =
@@ -209,12 +227,12 @@ public class ImmerseItems {
       deferredRegister.register("open_canned_pasta",
           () -> new Item(new Item.Properties().tab(TAB).food(ImmerseFoods.CANNED_PASTA)));
 
-  public static final RegistryObject<Item> CANNED_BACON =
-      deferredRegister.register("canned_bacon",
+  public static final RegistryObject<Item> CANNED_CORNED_BEEF =
+      deferredRegister.register("canned_corned_beef",
           () -> new Item(new Item.Properties().tab(TAB)));
 
-  public static final RegistryObject<Item> OPEN_CANNED_BACON =
-      deferredRegister.register("open_canned_bacon",
+  public static final RegistryObject<Item> OPEN_CANNED_CORNED_BEEF =
+      deferredRegister.register("open_canned_corned_beef",
           () -> new Item(new Item.Properties().tab(TAB).food(ImmerseFoods.CANNED_BACON)));
 
   public static final RegistryObject<Item> CANNED_CUSTARD =

@@ -95,7 +95,7 @@ public class BlueprintOutlineRenderer {
       BlueprintItem item, BlockHitResult hitResult) {
     return item.getActionType()
         .createBlockAction(player,
-            new UseOnContext(player.getEntity(), InteractionHand.MAIN_HAND, hitResult))
+            new UseOnContext(player.entity(), InteractionHand.MAIN_HAND, hitResult))
         .map(action -> action.start(true))
         .orElse(false);
   }
@@ -114,12 +114,12 @@ public class BlueprintOutlineRenderer {
       this.lastPos = hitResult.getBlockPos();
       valid = this.valid = this.validate(player, item, hitResult);
 
-      var context = new BlockPlaceContext(player.getEntity(), InteractionHand.MAIN_HAND,
-          player.getMainHandItem(), hitResult);
+      var context = new BlockPlaceContext(player.entity(), InteractionHand.MAIN_HAND,
+          player.mainHandItem(), hitResult);
       blockPos = this.blockPos = context.getClickedPos();
     }
 
-    var rotation = BlockUtil.getRotation(player.getEntity().getDirection());
+    var rotation = BlockUtil.getRotation(player.entity().getDirection());
 
     var position = camera.getPosition();
     var outlines = this.blueprintOutlines.get(item);

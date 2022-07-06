@@ -34,13 +34,13 @@ public class ImmerseRecipeProvider extends RecipeProvider {
 
   @Override
   protected void buildCraftingRecipes(Consumer<FinishedRecipe> consumer) {
-    ShapelessRecipeBuilder.shapeless(ImmerseItems.OPEN_CANNED_CORN.get())
-        .requires(ImmerseItems.CANNED_CORN.get())
+    ShapelessRecipeBuilder.shapeless(ImmerseItems.OPEN_CANNED_SWEETCORN.get())
+        .requires(ImmerseItems.CANNED_SWEETCORN.get())
         .requires(Ingredient.of(
             ImmerseItems.CAN_OPENER.get(),
             ImmerseItems.SCREWDRIVER.get(),
             ImmerseItems.MULTI_TOOL.get()))
-        .unlockedBy("has_canned_corn", has(ImmerseItems.CANNED_CORN.get()))
+        .unlockedBy("has_canned_corn", has(ImmerseItems.CANNED_SWEETCORN.get()))
         .save(consumer);
 
     ShapelessRecipeBuilder.shapeless(ImmerseItems.OPEN_CANNED_BEANS.get())
@@ -79,13 +79,13 @@ public class ImmerseRecipeProvider extends RecipeProvider {
         .unlockedBy("has_canned_pasta", has(ImmerseItems.CANNED_PASTA.get()))
         .save(consumer);
 
-    ShapelessRecipeBuilder.shapeless(ImmerseItems.OPEN_CANNED_BACON.get())
-        .requires(ImmerseItems.CANNED_BACON.get())
+    ShapelessRecipeBuilder.shapeless(ImmerseItems.OPEN_CANNED_CORNED_BEEF.get())
+        .requires(ImmerseItems.CANNED_CORNED_BEEF.get())
         .requires(Ingredient.of(
             ImmerseItems.CAN_OPENER.get(),
             ImmerseItems.SCREWDRIVER.get(),
             ImmerseItems.MULTI_TOOL.get()))
-        .unlockedBy("has_canned_bacon", has(ImmerseItems.CANNED_BACON.get()))
+        .unlockedBy("has_canned_corned_beef", has(ImmerseItems.CANNED_CORNED_BEEF.get()))
         .save(consumer);
 
     ShapelessRecipeBuilder.shapeless(ImmerseItems.OPEN_CANNED_CUSTARD.get())

@@ -22,14 +22,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.apache.commons.lang3.mutable.MutableInt;
 import org.jetbrains.annotations.Nullable;
 import com.craftingdead.core.network.SynchedData;
 import com.craftingdead.core.world.entity.extension.LivingHandlerType;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.core.world.entity.extension.PlayerHandler;
 import com.craftingdead.immerse.CraftingDeadImmerse;
+import com.craftingdead.immerse.world.ImmerseDamageSource;
 import com.craftingdead.immerse.world.level.extension.LegacyBase;
 import com.craftingdead.immerse.world.level.extension.LevelExtension;
+import net.minecraft.SharedConstants;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
@@ -38,16 +41,21 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.stats.Stats;
+import net.minecraft.util.Mth;
+import net.minecraft.world.Difficulty;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.util.BlockSnapshot;
-import org.apache.commons.lang3.mutable.MutableInt;
 
 public class SurvivalPlayerHandler implements PlayerHandler {
 
   public static final LivingHandlerType<SurvivalPlayerHandler> TYPE =
       new LivingHandlerType<>(new ResourceLocation(CraftingDeadImmerse.ID, "survival_player"));
+
+  private static final int WATER_DAMAGE_DELAY_TICKS = SharedConstants.TICKS_PER_SECOND * 6;
+
+  private static final int WATER_DELAY_TICKS = SharedConstants.TICKS_PER_SECOND * 40;
 
   private static final EntityDataAccessor<Integer> DAYS_SURVIVED =
       new EntityDataAccessor<>(0x00, EntityDataSerializers.INT);
@@ -58,21 +66,34 @@ public class SurvivalPlayerHandler implements PlayerHandler {
   private static final EntityDataAccessor<Optional<UUID>> BASE_ID =
       new EntityDataAccessor<>(0x03, EntityDataSerializers.OPTIONAL_UUID);
 
+  private static final EntityDataAccessor<Integer> WATER =
+      new EntityDataAccessor<>(0x04, EntityDataSerializers.INT);
+
+  private static final EntityDataAccessor<Integer> MAX_WATER =
+      new EntityDataAccessor<>(0x05, EntityDataSerializers.INT);
+
+  private final SurvivalGame game;
+
   private final PlayerExtension<?> player;
 
   private final SynchedData dataManager = new SynchedData();
 
-  public SurvivalPlayerHandler(PlayerExtension<?> player) {
+  private int waterTicks;
+
+  public SurvivalPlayerHandler(SurvivalGame game, PlayerExtension<?> player) {
+    this.game = game;
     this.player = player;
     this.dataManager.register(DAYS_SURVIVED, 0);
     this.dataManager.register(ZOMBIES_KILLED, 0);
     this.dataManager.register(PLAYERS_KILLED, 0);
     this.dataManager.register(BASE_ID, Optional.empty());
+    this.dataManager.register(WATER, 20);
+    this.dataManager.register(MAX_WATER, 20);
   }
 
   public Optional<LegacyBase> getBase() {
     return this.getBaseId()
-        .map(baseId -> LevelExtension.getOrThrow(this.player.getLevel())
+        .map(baseId -> LevelExtension.getOrThrow(this.player.level())
             .getLandManager().getLandOwner(baseId))
         .map(LegacyBase.class::cast);
   }
@@ -87,9 +108,37 @@ public class SurvivalPlayerHandler implements PlayerHandler {
 
   @Override
   public void tick() {
-    if (this.player.getEntity() instanceof ServerPlayer player) {
+    if (this.player.entity() instanceof ServerPlayer player) {
       int aliveTicks = player.getStats().getValue(Stats.CUSTOM.get(Stats.TIME_SINCE_DEATH));
       this.setDaysSurvived(aliveTicks / 20 / 60 / 20);
+    }
+  }
+
+  @Override
+  public void playerTick() {
+    if (!this.player.level().isClientSide()) {
+      this.updateThirst();
+    }
+  }
+
+  private void updateThirst() {
+    var entity = this.player.entity();
+    if (this.game.isThirstEnabled()
+        && entity.getLevel().getDifficulty() != Difficulty.PEACEFUL
+        && !entity.getAbilities().invulnerable) {
+      this.waterTicks++;
+      if (this.getWater() <= 0) {
+        if (this.waterTicks >= WATER_DAMAGE_DELAY_TICKS && this.getWater() == 0) {
+          entity.hurt(ImmerseDamageSource.DEHYDRATION, 1.0F);
+          this.waterTicks = 0;
+        }
+      } else if (this.waterTicks >= WATER_DELAY_TICKS) {
+        this.setWater(this.getWater() - 5);
+        if (entity.isSprinting()) {
+          this.setWater(this.getWater() - 5);
+        }
+        this.waterTicks = 0;
+      }
     }
   }
 
@@ -127,6 +176,22 @@ public class SurvivalPlayerHandler implements PlayerHandler {
     this.dataManager.set(PLAYERS_KILLED, playersKilled);
   }
 
+  public int getWater() {
+    return this.dataManager.get(WATER);
+  }
+
+  public void setWater(int water) {
+    this.dataManager.set(WATER, Mth.clamp(water, 0, this.getMaxWater()));
+  }
+
+  public int getMaxWater() {
+    return this.dataManager.get(MAX_WATER);
+  }
+
+  public void setMaxWater(int maxWater) {
+    this.dataManager.set(MAX_WATER, maxWater);
+  }
+
   @Override
   public boolean isCombatModeEnabled() {
     return false;
@@ -135,17 +200,20 @@ public class SurvivalPlayerHandler implements PlayerHandler {
   @Override
   public void copyFrom(PlayerExtension<ServerPlayer> that, boolean wasDeath) {
     if (!wasDeath) {
-      that.getHandler(TYPE).ifPresent(extension -> {
-        this.setDaysSurvived(extension.getDaysSurvived());
-        this.setZombiesKilled(extension.getZombiesKilled());
-        this.setPlayersKilled(extension.getPlayersKilled());
+      that.getHandler(TYPE).ifPresent(handler -> {
+        this.setDaysSurvived(handler.getDaysSurvived());
+        this.setZombiesKilled(handler.getZombiesKilled());
+        this.setPlayersKilled(handler.getPlayersKilled());
+        handler.getBaseId().ifPresent(this::setBaseId);
+        this.setWater(handler.getWater());
+        this.setMaxWater(handler.getMaxWater());
       });
     }
   }
 
   @Override
   public boolean handleBlockBreak(BlockPos pos, BlockState block, MutableInt xp) {
-    LevelExtension.getOrThrow(player.getLevel()).getLandManager()
+    LevelExtension.getOrThrow(player.level()).getLandManager()
         .getLandOwnerAt(pos)
         .ifPresent(base -> base.playerRemovedBlock(player, pos));
     return false;
@@ -154,7 +222,7 @@ public class SurvivalPlayerHandler implements PlayerHandler {
   @Override
   public boolean handleBlockPlace(BlockSnapshot replacedBlock, BlockState placedBlock,
       BlockState placedAgainst) {
-    LevelExtension.getOrThrow(player.getLevel()).getLandManager()
+    LevelExtension.getOrThrow(player.level()).getLandManager()
         .getLandOwnerAt(replacedBlock.getPos())
         .ifPresent(base -> base.playerPlacedBlock(player, replacedBlock.getPos()));
     return false;
@@ -165,7 +233,8 @@ public class SurvivalPlayerHandler implements PlayerHandler {
       BlockState placedAgainst) {
     var pos = new ArrayList<BlockPos>(replacedBlocks.size());
     for (BlockSnapshot block : replacedBlocks) {
-      // Work around neighbours updating their state when you place a block but not actually being replaced
+      // Work around neighbours updating their state when you place a block but not actually being
+      // replaced
       if (!block.getCurrentBlock().is(block.getReplacedBlock().getBlock())) {
         pos.add(block.getPos());
       }
@@ -173,7 +242,7 @@ public class SurvivalPlayerHandler implements PlayerHandler {
 
     // Use the first replaced block as point of reference
     var refBlock = pos.get(0);
-    LevelExtension.getOrThrow(player.getLevel()).getLandManager()
+    LevelExtension.getOrThrow(player.level()).getLandManager()
         .getLandOwnerAt(refBlock)
         .ifPresent(base -> base.playerPlacedBlock(player, pos.toArray(new BlockPos[0])));
     return false;
@@ -185,6 +254,8 @@ public class SurvivalPlayerHandler implements PlayerHandler {
     tag.putInt("zombiesKilled", this.getZombiesKilled());
     tag.putInt("playersKilled", this.getPlayersKilled());
     this.getBaseId().ifPresent(baseId -> tag.putUUID("baseId", baseId));
+    tag.putInt("water", this.getWater());
+    tag.putInt("maxWater", this.getMaxWater());
     return tag;
   }
 
@@ -195,6 +266,8 @@ public class SurvivalPlayerHandler implements PlayerHandler {
     if (tag.hasUUID("baseId")) {
       this.setBaseId(tag.getUUID("baseId"));
     }
+    this.setWater(tag.getInt("water"));
+    this.setMaxWater(tag.getInt("maxWater"));
   }
 
   @Override

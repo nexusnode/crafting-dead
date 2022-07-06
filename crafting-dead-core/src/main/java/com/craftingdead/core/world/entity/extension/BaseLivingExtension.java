@@ -95,7 +95,7 @@ class BaseLivingExtension<E extends LivingEntity, H extends LivingHandler>
 
         @Override
         public void onContentsChanged(int slot) {
-          if (!BaseLivingExtension.this.getLevel().isClientSide()) {
+          if (!BaseLivingExtension.this.level().isClientSide()) {
             BaseLivingExtension.this.dirtySlots.add(slot);
           }
         }
@@ -143,6 +143,11 @@ class BaseLivingExtension<E extends LivingEntity, H extends LivingHandler>
     }
   }
 
+  @Override
+  public <T extends H> void removeHandler(LivingHandlerType<T> type) {
+    this.handlers.remove(type);
+  }
+
   @SuppressWarnings("unchecked")
   @Override
   public <T extends LivingHandler> Optional<T> getHandler(LivingHandlerType<T> type) {
@@ -187,13 +192,13 @@ class BaseLivingExtension<E extends LivingEntity, H extends LivingHandler>
     action.getTarget().ifPresent(target -> target.setActionObserver(action.createTargetObserver()));
 
     if (sendUpdate) {
-      var target = this.getLevel().isClientSide()
+      var target = this.level().isClientSide()
           ? PacketDistributor.SERVER.noArg()
-          : PacketDistributor.TRACKING_ENTITY_AND_SELF.with(this::getEntity);
+          : PacketDistributor.TRACKING_ENTITY_AND_SELF.with(this::entity);
       var buf = new FriendlyByteBuf(Unpooled.buffer());
       ((ActionType<T>) action.getType()).encode(action, buf);
       NetworkChannel.PLAY.getSimpleChannel().send(target,
-          new PerformActionMessage(action.getType(), this.getEntity().getId(), buf));
+          new PerformActionMessage(action.getType(), this.entity().getId(), buf));
     }
     return true;
   }
@@ -205,11 +210,11 @@ class BaseLivingExtension<E extends LivingEntity, H extends LivingHandler>
     }
     this.stopAction(Action.StopReason.CANCELLED);
     if (sendUpdate) {
-      var target = this.getLevel().isClientSide()
+      var target = this.level().isClientSide()
           ? PacketDistributor.SERVER.noArg()
-          : PacketDistributor.TRACKING_ENTITY_AND_SELF.with(this::getEntity);
+          : PacketDistributor.TRACKING_ENTITY_AND_SELF.with(this::entity);
       NetworkChannel.PLAY.getSimpleChannel().send(target,
-          new CancelActionMessage(this.getEntity().getId()));
+          new CancelActionMessage(this.entity().getId()));
     }
   }
 
@@ -249,7 +254,7 @@ class BaseLivingExtension<E extends LivingEntity, H extends LivingHandler>
 
   @Override
   public void tick() {
-    var heldStack = this.getMainHandItem();
+    var heldStack = this.mainHandItem();
     if (heldStack != this.lastHeldStack) {
       if (this.lastHeldStack != null) {
         this.lastHeldStack.getCapability(Gun.CAPABILITY)
@@ -371,7 +376,7 @@ class BaseLivingExtension<E extends LivingEntity, H extends LivingHandler>
       if (CraftingDead.serverConfig.backstabEnabled.get()) {
         var usedMeleeWeapon = player.getItemInHand(player.getUsedItemHand())
             .getItem() instanceof MeleeWeaponItem;
-        if (usedMeleeWeapon && !EntityUtil.canSee(this.getEntity(), player, 90F)) {
+        if (usedMeleeWeapon && !EntityUtil.canSee(this.entity(), player, 90F)) {
           damage *= CraftingDead.serverConfig.backstabBonusDamage.get().floatValue();
         }
       }
@@ -398,7 +403,11 @@ class BaseLivingExtension<E extends LivingEntity, H extends LivingHandler>
 
   @Override
   public boolean handleDeath(DamageSource cause) {
-    return this.handlers.values().stream().anyMatch(e -> e.handleDeath(cause));
+    if (this.handlers.values().stream().anyMatch(e -> e.handleDeath(cause))) {
+      return true;
+    }
+    this.cancelAction(true);
+    return false;
   }
 
   @Override
@@ -414,9 +423,9 @@ class BaseLivingExtension<E extends LivingEntity, H extends LivingHandler>
         var itemStack = this.itemHandler.extractItem(i, Integer.MAX_VALUE, false);
         var dropChance = this.equipmentDropChances[i];
         if (!itemStack.isEmpty()
-            && Math.max(this.getRandom().nextFloat() - (lootingLevel * 0.01F), 0.0F) < dropChance) {
-          var itemEntity = new ItemEntity(this.getLevel(), this.getEntity().getX(),
-              this.getEntity().getY(), this.getEntity().getZ(), itemStack);
+            && Math.max(this.random().nextFloat() - (lootingLevel * 0.01F), 0.0F) < dropChance) {
+          var itemEntity = new ItemEntity(this.level(), this.entity().getX(),
+              this.entity().getY(), this.entity().getZ(), itemStack);
           itemEntity.setDefaultPickUpDelay();
           drops.add(itemEntity);
         }
@@ -484,16 +493,16 @@ class BaseLivingExtension<E extends LivingEntity, H extends LivingHandler>
     }
     this.crouching = crouching;
     if (sendUpdate) {
-      var target = this.getLevel().isClientSide()
+      var target = this.level().isClientSide()
           ? PacketDistributor.SERVER.noArg()
-          : PacketDistributor.TRACKING_ENTITY_AND_SELF.with(this::getEntity);
+          : PacketDistributor.TRACKING_ENTITY_AND_SELF.with(this::entity);
       NetworkChannel.PLAY.getSimpleChannel().send(target,
-          new CrouchMessage(this.getEntity().getId(), crouching));
+          new CrouchMessage(this.entity().getId(), crouching));
     }
   }
 
   @Override
-  public E getEntity() {
+  public E entity() {
     return this.entity;
   }
 
@@ -570,7 +579,7 @@ class BaseLivingExtension<E extends LivingEntity, H extends LivingHandler>
   public boolean equals(Object obj) {
     return super.equals(obj)
         || (obj instanceof LivingExtension<?, ?> extension
-            && extension.getEntity().equals(this.entity));
+            && extension.entity().equals(this.entity));
   }
 
   @Override

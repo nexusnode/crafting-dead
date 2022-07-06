@@ -94,10 +94,17 @@ public interface LivingExtension<E extends LivingEntity, H extends LivingHandler
   /**
    * Register a handler.
    * 
-   * @param id - the handler's ID
+   * @param type - the handler's type
    * @param handler - the handler to attach
    */
   <T extends H> void registerHandler(LivingHandlerType<T> type, T handler);
+
+  /**
+   * Remove a handler.
+   * 
+   * @param type - the handler's type
+   */
+  <T extends H> void removeHandler(LivingHandlerType<T> type);
 
   Optional<Action> getAction();
 
@@ -201,13 +208,6 @@ public interface LivingExtension<E extends LivingEntity, H extends LivingHandler
   void setCrouching(boolean crouching, boolean sendUpdate);
 
   /**
-   * Get the {@link LivingEntity} associated with this {@link LivingExtension}.
-   * 
-   * @return the {@link LivingEntity}
-   */
-  E getEntity();
-
-  /**
    * Get the drop chance for the entity equipment slots. The array indexes will be in correlation
    * with {@link ModEquipmentSlot}
    *
@@ -265,12 +265,19 @@ public interface LivingExtension<E extends LivingEntity, H extends LivingHandler
   void setEquipmentDropChance(ModEquipmentSlot slot, float chance);
 
   /**
+   * Get the {@link LivingEntity} associated with this {@link LivingExtension}.
+   * 
+   * @return the {@link LivingEntity}
+   */
+  E entity();
+
+  /**
    * Shorthand for {@link LivingEntity#getLevel()}.
    * 
    * @return the {@link Level}
    */
-  default Level getLevel() {
-    return this.getEntity().getLevel();
+  default Level level() {
+    return this.entity().getLevel();
   }
 
   /**
@@ -278,8 +285,8 @@ public interface LivingExtension<E extends LivingEntity, H extends LivingHandler
    * 
    * @return the {@link Random}
    */
-  default Random getRandom() {
-    return this.getEntity().getRandom();
+  default Random random() {
+    return this.entity().getRandom();
   }
 
   /**
@@ -287,8 +294,8 @@ public interface LivingExtension<E extends LivingEntity, H extends LivingHandler
    * 
    * @return the main hand {@link ItemStack}
    */
-  default ItemStack getMainHandItem() {
-    final var item = this.getEntity().getMainHandItem();
+  default ItemStack mainHandItem() {
+    final var item = this.entity().getMainHandItem();
     return item.isEmpty() ? ItemStack.EMPTY : item;
   }
 
@@ -297,17 +304,17 @@ public interface LivingExtension<E extends LivingEntity, H extends LivingHandler
    * 
    * @return a {@link LazyOptional} gun.
    */
-  default LazyOptional<Gun> getMainHandGun() {
-    return this.getMainHandItem().getCapability(Gun.CAPABILITY);
+  default LazyOptional<Gun> mainHandGun() {
+    return this.mainHandItem().getCapability(Gun.CAPABILITY);
   }
 
   default void breakItem(ItemStack itemStack) {
     if (!itemStack.isEmpty()) {
-      if (!this.getEntity().isSilent()) {
-        this.getLevel().playLocalSound(this.getEntity().getX(), this.getEntity().getY(),
-            this.getEntity().getZ(), SoundEvents.ITEM_BREAK,
-            this.getEntity().getSoundSource(), 0.8F,
-            0.8F + this.getLevel().getRandom().nextFloat() * 0.4F, false);
+      if (!this.entity().isSilent()) {
+        this.level().playLocalSound(this.entity().getX(), this.entity().getY(),
+            this.entity().getZ(), SoundEvents.ITEM_BREAK,
+            this.entity().getSoundSource(), 0.8F,
+            0.8F + this.level().getRandom().nextFloat() * 0.4F, false);
       }
 
       this.spawnItemParticles(itemStack, 5);
@@ -316,22 +323,22 @@ public interface LivingExtension<E extends LivingEntity, H extends LivingHandler
 
   default void spawnItemParticles(ItemStack itemStack, int count) {
     for (int i = 0; i < count; ++i) {
-      var velocity = new Vec3((this.getRandom().nextFloat() - 0.5D) * 0.1D,
+      var velocity = new Vec3((this.random().nextFloat() - 0.5D) * 0.1D,
           Math.random() * 0.1D + 0.1D, 0.0D);
-      velocity = velocity.xRot(-this.getEntity().getXRot() * ((float) Math.PI / 180F));
-      velocity = velocity.yRot(-this.getEntity().getYRot() * ((float) Math.PI / 180F));
-      var yPos = -this.getRandom().nextFloat() * 0.6D - 0.3D;
-      var pos = new Vec3((this.getRandom().nextFloat() - 0.5D) * 0.3D, yPos, 0.6D);
-      pos = pos.xRot(-this.getEntity().getXRot() * ((float) Math.PI / 180F));
-      pos = pos.yRot(-this.getEntity().getYRot() * ((float) Math.PI / 180F));
+      velocity = velocity.xRot(-this.entity().getXRot() * ((float) Math.PI / 180F));
+      velocity = velocity.yRot(-this.entity().getYRot() * ((float) Math.PI / 180F));
+      var yPos = -this.random().nextFloat() * 0.6D - 0.3D;
+      var pos = new Vec3((this.random().nextFloat() - 0.5D) * 0.3D, yPos, 0.6D);
+      pos = pos.xRot(-this.entity().getXRot() * ((float) Math.PI / 180F));
+      pos = pos.yRot(-this.entity().getYRot() * ((float) Math.PI / 180F));
       pos =
-          pos.add(this.getEntity().getX(), this.getEntity().getEyeY(), this.getEntity().getZ());
-      if (this.getLevel() instanceof ServerLevel level) {
+          pos.add(this.entity().getX(), this.entity().getEyeY(), this.entity().getZ());
+      if (this.level() instanceof ServerLevel level) {
         level.sendParticles(
             new ItemParticleOption(ParticleTypes.ITEM, itemStack), pos.x, pos.y, pos.z, 1,
             velocity.x, velocity.y + 0.05D, velocity.z, 0.0D);
       } else {
-        this.getLevel().addParticle(new ItemParticleOption(ParticleTypes.ITEM, itemStack), pos.x,
+        this.level().addParticle(new ItemParticleOption(ParticleTypes.ITEM, itemStack), pos.x,
             pos.y, pos.z, velocity.x, velocity.y + 0.05D, velocity.z);
       }
     }
@@ -339,12 +346,12 @@ public interface LivingExtension<E extends LivingEntity, H extends LivingHandler
 
   default Vec3 getVelocity() {
     // 0.98 is a magic number used in Minecraft's movement calculations.
-    var gravity = this.getEntity().getAttributeValue(ForgeMod.ENTITY_GRAVITY.get()) * 0.98F;
-    return this.getEntity().getDeltaMovement().add(0, gravity, 0);
+    var gravity = this.entity().getAttributeValue(ForgeMod.ENTITY_GRAVITY.get()) * 0.98F;
+    return this.entity().getDeltaMovement().add(0, gravity, 0);
   }
 
   default EntitySnapshot makeSnapshot(float partialTick) {
-    var entity = this.getEntity();
+    var entity = this.entity();
     return new EntitySnapshot(entity.getPosition(partialTick),
         entity.getBoundingBox(),
         new Vec2(entity.getViewXRot(partialTick), entity.getViewYRot(partialTick)),

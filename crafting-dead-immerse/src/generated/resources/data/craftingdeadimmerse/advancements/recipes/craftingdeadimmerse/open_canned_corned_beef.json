@@ -2,17 +2,17 @@
   "parent": "minecraft:recipes/root",
   "rewards": {
     "recipes": [
-      "craftingdeadimmerse:open_canned_bacon"
+      "craftingdeadimmerse:open_canned_corned_beef"
     ]
   },
   "criteria": {
-    "has_canned_bacon": {
+    "has_canned_corned_beef": {
       "trigger": "minecraft:inventory_changed",
       "conditions": {
         "items": [
           {
             "items": [
-              "craftingdeadimmerse:canned_bacon"
+              "craftingdeadimmerse:canned_corned_beef"
             ]
           }
         ]
@@ -21,13 +21,13 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "craftingdeadimmerse:open_canned_bacon"
+        "recipe": "craftingdeadimmerse:open_canned_corned_beef"
       }
     }
   },
   "requirements": [
     [
-      "has_canned_bacon",
+      "has_canned_corned_beef",
       "has_the_recipe"
     ]
   ]

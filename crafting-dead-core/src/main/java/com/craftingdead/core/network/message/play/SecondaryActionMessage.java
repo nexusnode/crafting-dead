@@ -38,7 +38,7 @@ public record SecondaryActionMessage(int entityId, boolean performing) {
   public boolean handle(Supplier<NetworkEvent.Context> ctx) {
     ctx.get().enqueueWork(() -> NetworkUtil.getEntityOrSender(ctx.get(), this.entityId)
         .getCapability(LivingExtension.CAPABILITY)
-        .ifPresent(living -> living.getMainHandGun()
+        .ifPresent(living -> living.mainHandGun()
             .ifPresent(gun -> gun.setPerformingSecondaryAction(living, this.performing,
                 ctx.get().getDirection().getReceptionSide().isServer()))));
     return true;

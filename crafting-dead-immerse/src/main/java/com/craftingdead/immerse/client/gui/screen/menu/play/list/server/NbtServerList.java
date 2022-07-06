@@ -18,17 +18,20 @@
 
 package com.craftingdead.immerse.client.gui.screen.menu.play.list.server;
 
-import java.io.File;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import net.minecraft.Util;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.nbt.Tag;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 public class NbtServerList implements MutableServerList {
 
@@ -39,58 +42,59 @@ public class NbtServerList implements MutableServerList {
   }
 
   @Override
-  public CompletableFuture<Stream<ServerEntry>> load() {
+  public Flux<ServerEntry> load() {
     return this.read()
-        .thenApply(tag -> tag.getList("servers", Tag.TAG_COMPOUND).stream()
-            .filter(CompoundTag.class::isInstance)
-            .map(CompoundTag.class::cast)
-            .map(serverTag -> new ServerEntry(
-                serverTag.contains("map") ? serverTag.getString("map") : null,
-                serverTag.getString("host"), serverTag.getInt("port"))));
+        .flatMapIterable(tag -> tag.getList("servers", Tag.TAG_COMPOUND))
+        .cast(CompoundTag.class)
+        .map(serverTag -> new ServerEntry(
+            serverTag.contains("map") ? serverTag.getString("map") : null,
+            serverTag.getString("host"), serverTag.getInt("port")));
   }
 
   @Override
-  public CompletableFuture<Void> save(Stream<ServerEntry> servers) {
-    CompoundTag tag = new CompoundTag();
-    tag.put("servers", servers
+  public Mono<Void> save(Flux<ServerEntry> servers) {
+    return servers
         .map(server -> {
-          CompoundTag serverTag = new CompoundTag();
-          server.getMap().ifPresent(map -> serverTag.putString("map", map));
-          serverTag.putString("host", server.getHostName());
-          serverTag.putInt("port", server.getPort());
+          var serverTag = new CompoundTag();
+          if (server.map() != null) {
+            serverTag.putString("map", server.map());
+          }
+          serverTag.putString("host", server.host());
+          serverTag.putInt("port", server.port());
           return serverTag;
         })
-        .collect(Collectors.toCollection(ListTag::new)));
-    return this.save(tag);
+        .collect(Collectors.toCollection(ListTag::new))
+        .map(serversTag -> {
+          var tag = new CompoundTag();
+          tag.put("servers", serversTag);
+          return tag;
+        })
+        .flatMap(this::save);
   }
 
-  private CompletableFuture<CompoundTag> read() {
-    CompletableFuture<CompoundTag> future = new CompletableFuture<>();
-    Util.backgroundExecutor().execute(() -> {
-      try {
-        CompoundTag tag = NbtIo.read(this.serverListFile.toFile());
-        future.complete(tag == null ? new CompoundTag() : tag);
+  private Mono<CompoundTag> read() {
+    return Mono.<CompoundTag>create(sink -> {
+      try (var input = new DataInputStream(Files.newInputStream(this.serverListFile))) {
+        sink.success(NbtIo.read(input));
       } catch (IOException e) {
-        future.completeExceptionally(e);
+        sink.error(e);
       }
-    });
-    return future;
+    }).subscribeOn(Schedulers.boundedElastic());
   }
 
-  private CompletableFuture<Void> save(CompoundTag tag) {
-    CompletableFuture<Void> future = new CompletableFuture<>();
-    Util.backgroundExecutor().execute(() -> {
+  private Mono<Void> save(CompoundTag tag) {
+    return Mono.<Void>create(sink -> {
       try {
-        File tempFile =
-            File.createTempFile("servers", ".dat", this.serverListFile.getParent().toFile());
-        NbtIo.write(tag, tempFile);
-        File oldFile = new File(this.serverListFile.getParent().toString(), "servers.dat_old");
-        Util.safeReplaceFile(this.serverListFile.toFile(), tempFile, oldFile);
-        future.complete(null);
+        var tempFile = Files.createTempFile(this.serverListFile.getParent(), "servers", ".dat");
+        try (var output = new DataOutputStream(Files.newOutputStream(tempFile))) {
+          NbtIo.write(tag, output);
+          var oldFile = this.serverListFile.resolveSibling("servers.dat_old");
+          Util.safeReplaceFile(this.serverListFile, tempFile, oldFile);
+          sink.success();
+        }
       } catch (IOException e) {
-        future.completeExceptionally(e);
+        sink.error(e);
       }
-    });
-    return future;
+    }).subscribeOn(Schedulers.boundedElastic());
   }
 }

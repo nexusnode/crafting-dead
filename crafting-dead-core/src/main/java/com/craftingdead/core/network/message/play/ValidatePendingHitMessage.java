@@ -67,9 +67,9 @@ public record ValidatePendingHitMessage(Map<Integer, Collection<PendingHit>> hit
   public boolean handle(Supplier<NetworkEvent.Context> ctx) {
     ctx.get().enqueueWork(() -> {
       var player = PlayerExtension.getOrThrow(ctx.get().getSender());
-      player.getMainHandGun().ifPresent(gun -> {
+      player.mainHandGun().ifPresent(gun -> {
         for (var hit : this.hits.entrySet()) {
-          Optional.ofNullable(player.getLevel().getEntity(hit.getKey()))
+          Optional.ofNullable(player.level().getEntity(hit.getKey()))
               .flatMap(entity -> entity.getCapability(LivingExtension.CAPABILITY).resolve())
               .ifPresent(hitLiving -> {
                 for (var value : hit.getValue()) {

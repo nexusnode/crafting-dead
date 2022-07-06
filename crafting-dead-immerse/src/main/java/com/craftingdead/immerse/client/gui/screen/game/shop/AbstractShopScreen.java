@@ -174,7 +174,7 @@ public abstract class AbstractShopScreen extends Screen {
         mx + 100, my - 75 + inventoryYOffset, 0xFFFFFFFF);
 
 
-    var inventory = this.player.getEntity().getInventory();
+    var inventory = this.player.entity().getInventory();
     for (int i = 0; i < 7; i++) {
       var itemStack = inventory.getItem(i);
       com.craftingdead.core.client.util.RenderUtil.renderGuiItem(itemStack, mx + 120,

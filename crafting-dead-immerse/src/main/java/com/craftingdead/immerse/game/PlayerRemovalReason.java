@@ -16,14 +16,17 @@
  * https://craftingdead.net/terms.php
  */
 
-package com.craftingdead.immerse.command;
+package com.craftingdead.immerse.game;
 
-import com.mojang.brigadier.CommandDispatcher;
-import net.minecraft.commands.CommandSourceStack;
+public enum PlayerRemovalReason {
 
-public class Commands {
+  LOGGED_OUT, GAME_UNLOADED;
 
-  public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
-    GameCommand.register(dispatcher);
+  public boolean isLoggedOut() {
+    return this == LOGGED_OUT;
+  }
+
+  public boolean isGameUnloaded() {
+    return this == GAME_UNLOADED;
   }
 }

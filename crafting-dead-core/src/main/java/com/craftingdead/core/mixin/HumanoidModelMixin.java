@@ -49,7 +49,7 @@ public class HumanoidModelMixin<T extends LivingEntity> {
 
           model.leftArm.xRot = xRot;
           model.leftArm.zRot = zRot;
-        } else if (player.getMainHandItem().is(ModItems.MINIGUN.get())) {
+        } else if (player.mainHandItem().is(ModItems.MINIGUN.get())) {
           model.rightArm.xRot = 31F;
           model.leftArm.xRot = 30.5F;
         }

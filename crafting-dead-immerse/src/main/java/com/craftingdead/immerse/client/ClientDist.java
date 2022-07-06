@@ -40,11 +40,10 @@ import com.craftingdead.immerse.client.renderer.entity.layer.TeamClothingLayer;
 import com.craftingdead.immerse.client.shader.RectShader;
 import com.craftingdead.immerse.client.shader.RoundedRectShader;
 import com.craftingdead.immerse.client.shader.RoundedTexShader;
-import com.craftingdead.immerse.client.util.ServerPinger;
 import com.craftingdead.immerse.game.ClientGameWrapper;
 import com.craftingdead.immerse.game.GameClient;
 import com.craftingdead.immerse.game.GameType;
-import com.craftingdead.immerse.server.LogicalServer;
+import com.craftingdead.immerse.game.LogicalServer;
 import com.craftingdead.immerse.world.item.BlueprintItem;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
@@ -351,10 +350,8 @@ public class ClientDist implements ModDist {
           this.gameWrapper.tick();
         }
 
-        ServerPinger.INSTANCE.pingPendingNetworks();
-
         if (this.minecraft.player != null) {
-          boolean worldFocused = !this.minecraft.isPaused() && this.minecraft.getOverlay() == null
+          var worldFocused = !this.minecraft.isPaused() && this.minecraft.getOverlay() == null
               && (this.minecraft.screen == null);
 
           if (this.minecraft.player.isSpectator()) {
@@ -391,7 +388,7 @@ public class ClientDist implements ModDist {
   public void handleDrawHighlightBlock(DrawSelectionEvent.HighlightBlock event) {
     var cameraPlayer = CraftingDead.getInstance().getClientDist().getCameraPlayer();
     if (cameraPlayer != null
-        && cameraPlayer.getMainHandItem().getItem() instanceof BlueprintItem blueprint) {
+        && cameraPlayer.mainHandItem().getItem() instanceof BlueprintItem blueprint) {
       event.setCanceled(true);
       this.blueprintOutlineRenderer.render(cameraPlayer, blueprint, event.getTarget(),
           event.getCamera(), event.getPoseStack(), event.getMultiBufferSource());

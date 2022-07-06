@@ -278,9 +278,9 @@ public class ClientDist implements ModDist {
   }
 
   public void handleHit(Vec3 hitPos, boolean dead) {
-    clientConfig.hitMarkerMode.get().createHitMarker(hitPos, dead)
+    CraftingDead.serverConfig.hitMarkerMode.get().createHitMarker(hitPos, dead)
         .ifPresent(this.ingameGui::setHitMarker);
-    if (dead && ClientDist.clientConfig.killSoundEnabled.get()) {
+    if (dead && CraftingDead.serverConfig.killSoundEnabled.get()) {
       // Plays a sound that follows the player
       SoundEvent soundEvent = ForgeRegistries.SOUND_EVENTS.getValue(
           new ResourceLocation(ClientDist.clientConfig.killSound.get()));
@@ -462,14 +462,14 @@ public class ClientDist implements ModDist {
       case START:
         var player = this.getPlayerExtension().orElse(null);
         if (player != null) {
-          var gun = player.getMainHandGun().orElse(null);
+          var gun = player.mainHandGun().orElse(null);
 
           var levelFocused = !this.minecraft.isPaused() && this.minecraft.getOverlay() == null
               && (this.minecraft.screen == null);
 
           this.cameraManager.tick();
 
-          if (!levelFocused || player.getEntity().isSpectator()) {
+          if (!levelFocused || player.entity().isSpectator()) {
             // Stop gun actions if level not focused.
             if (gun != null) {
               if (gun.isTriggerPressed()) {
@@ -549,8 +549,8 @@ public class ClientDist implements ModDist {
   public void handleRawMouse(InputEvent.RawMouseEvent event) {
     var player = this.getPlayerExtension().orElse(null);
     if (player != null && this.minecraft.getOverlay() == null
-        && this.minecraft.screen == null && !player.getEntity().isSpectator()) {
-      var gun = player.getMainHandGun().orElse(null);
+        && this.minecraft.screen == null && !player.entity().isSpectator()) {
+      var gun = player.mainHandGun().orElse(null);
       if (this.minecraft.options.keyAttack.matchesMouse(event.getButton())) {
         var triggerPressed = event.getAction() == GLFW.GLFW_PRESS;
         if (gun != null) {
@@ -616,7 +616,7 @@ public class ClientDist implements ModDist {
         || overlay == ForgeIngameGui.ARMOR_LEVEL_ELEMENT) {
       event.setCanceled(player.isCombatModeEnabled());
     } else if (overlay == ForgeIngameGui.CROSSHAIR_ELEMENT) {
-      var aiming = player.getMainHandItem().getCapability(Scope.CAPABILITY)
+      var aiming = player.mainHandItem().getCapability(Scope.CAPABILITY)
           .map(scope -> scope.isScoping(player))
           .orElse(false);
       if (player.getActionObserver()
@@ -626,7 +626,7 @@ public class ClientDist implements ModDist {
         return;
       }
 
-      player.getMainHandGun().ifPresent(gun -> {
+      player.mainHandGun().ifPresent(gun -> {
         event.setCanceled(true);
         if (gun.getClient().isCrosshairEnabled()) {
           this.ingameGui.renderCrosshairs(event.getMatrixStack(),
@@ -645,7 +645,7 @@ public class ClientDist implements ModDist {
       return;
     }
 
-    var heldStack = player.getMainHandItem();
+    var heldStack = player.mainHandItem();
     var gun = heldStack.getCapability(Gun.CAPABILITY).orElse(null);
     switch (event.getType()) {
       case ALL -> {
@@ -683,7 +683,7 @@ public class ClientDist implements ModDist {
   public void handeFOVModifier(FOVModifierEvent event) {
     var player = this.getCameraPlayer();
     if (player != null) {
-      var scope = player.getEntity().getMainHandItem().getCapability(Scope.CAPABILITY).orElse(null);
+      var scope = player.entity().getMainHandItem().getCapability(Scope.CAPABILITY).orElse(null);
       if (scope != null && scope.isScoping(player)) {
         event.setNewfov(1.0F / scope.getZoomMultiplier(player));
       }
@@ -703,6 +703,9 @@ public class ClientDist implements ModDist {
       case END -> {
         if (this.minecraft.player != null) {
           this.updateAdrenalineShader(event.renderTickTime);
+          this.ingameGui.renderFlashBangOverlay(this.minecraft.player, new PoseStack(),
+              this.minecraft.getWindow().getGuiScaledWidth(),
+              this.minecraft.getWindow().getGuiScaledHeight(), event.renderTickTime);
         }
       }
     }

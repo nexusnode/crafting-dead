@@ -35,7 +35,7 @@ public interface GameServer extends Game {
 
   default void addPlayer(PlayerExtension<ServerPlayer> player) {}
 
-  default void removePlayer(PlayerExtension<ServerPlayer> player) {}
+  default void removePlayer(PlayerExtension<ServerPlayer> player, PlayerRemovalReason reason) {}
 
   /**
    * Determine if the game has finished.

@@ -43,11 +43,15 @@ public class ImmerseItemModelGenerators {
   }
 
   public void run() {
+    this.generateFlatItem(ImmerseItems.EMPTY_WATER_BOTTLE.get(), ModelTemplates.FLAT_ITEM);
+    this.generateFlatItem(ImmerseItems.WATER_BOTTLE.get(), ModelTemplates.FLAT_ITEM);
+    this.generateFlatItem(ImmerseItems.EMPTY_WATER_CANTEEN.get(), ModelTemplates.FLAT_ITEM);
+    this.generateFlatItem(ImmerseItems.WATER_CANTEEN.get(), ModelTemplates.FLAT_ITEM);
     this.generateFlatItem(ImmerseItems.POWER_BAR.get(), ModelTemplates.FLAT_ITEM);
     this.generateFlatItem(ImmerseItems.CANDY_BAR.get(), ModelTemplates.FLAT_ITEM);
     this.generateFlatItem(ImmerseItems.CEREAL.get(), ModelTemplates.FLAT_ITEM);
-    this.generateFlatItem(ImmerseItems.CANNED_CORN.get(), ModelTemplates.FLAT_ITEM);
-    this.generateFlatItem(ImmerseItems.OPEN_CANNED_CORN.get(), ModelTemplates.FLAT_ITEM);
+    this.generateFlatItem(ImmerseItems.CANNED_SWEETCORN.get(), ModelTemplates.FLAT_ITEM);
+    this.generateFlatItem(ImmerseItems.OPEN_CANNED_SWEETCORN.get(), ModelTemplates.FLAT_ITEM);
     this.generateFlatItem(ImmerseItems.CANNED_BEANS.get(), ModelTemplates.FLAT_ITEM);
     this.generateFlatItem(ImmerseItems.OPEN_CANNED_BEANS.get(), ModelTemplates.FLAT_ITEM);
     this.generateFlatItem(ImmerseItems.CANNED_TUNA.get(), ModelTemplates.FLAT_ITEM);
@@ -56,8 +60,8 @@ public class ImmerseItemModelGenerators {
     this.generateFlatItem(ImmerseItems.OPEN_CANNED_PEACHES.get(), ModelTemplates.FLAT_ITEM);
     this.generateFlatItem(ImmerseItems.CANNED_PASTA.get(), ModelTemplates.FLAT_ITEM);
     this.generateFlatItem(ImmerseItems.OPEN_CANNED_PASTA.get(), ModelTemplates.FLAT_ITEM);
-    this.generateFlatItem(ImmerseItems.CANNED_BACON.get(), ModelTemplates.FLAT_ITEM);
-    this.generateFlatItem(ImmerseItems.OPEN_CANNED_BACON.get(), ModelTemplates.FLAT_ITEM);
+    this.generateFlatItem(ImmerseItems.CANNED_CORNED_BEEF.get(), ModelTemplates.FLAT_ITEM);
+    this.generateFlatItem(ImmerseItems.OPEN_CANNED_CORNED_BEEF.get(), ModelTemplates.FLAT_ITEM);
     this.generateFlatItem(ImmerseItems.CANNED_CUSTARD.get(), ModelTemplates.FLAT_ITEM);
     this.generateFlatItem(ImmerseItems.OPEN_CANNED_CUSTARD.get(), ModelTemplates.FLAT_ITEM);
     this.generateFlatItem(ImmerseItems.CANNED_PICKLES.get(), ModelTemplates.FLAT_ITEM);

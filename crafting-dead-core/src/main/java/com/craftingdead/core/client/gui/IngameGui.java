@@ -30,8 +30,8 @@ import com.craftingdead.core.world.damagesource.KillFeedEntry;
 import com.craftingdead.core.world.effect.ModMobEffects;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.core.world.item.GrenadeItem;
-import com.craftingdead.core.world.item.gun.Gun;
 import com.craftingdead.core.world.item.GunItem;
+import com.craftingdead.core.world.item.gun.Gun;
 import com.craftingdead.core.world.item.gun.ammoprovider.AmmoProvider;
 import com.craftingdead.core.world.item.gun.magazine.Magazine;
 import com.craftingdead.core.world.item.scope.Scope;
@@ -49,7 +49,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
-import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
 public class IngameGui {
@@ -146,39 +146,41 @@ public class IngameGui {
     });
   }
 
+  public void renderFlashBangOverlay(Player player, PoseStack poseStack, int width, int height,
+      float partialTick) {
+    // Draws Flashbang effect
+    var flashEffect = player.getEffect(ModMobEffects.FLASH_BLINDNESS.get());
+    if (flashEffect != null) {
+      int alpha = (int) (255F
+          * (Mth.clamp(flashEffect.getDuration() - partialTick, 0, 20) / 20F));
+      int flashColour = 0x00FFFFFF | (alpha & 255) << 24;
+      RenderUtil.fillGradient(poseStack, 0, 0, width, height, flashColour, flashColour);
+    }
+
+  }
+
   public void renderOverlay(PlayerExtension<AbstractClientPlayer> player, ItemStack heldStack,
-      @Nullable Gun gun, PoseStack poseStack, int width, int height, float partialTicks) {
+      @Nullable Gun gun, PoseStack poseStack, int width, int height, float partialTick) {
     if (this.hitMarker != null) {
-      if (this.hitMarker.render(poseStack, width, height, partialTicks)) {
+      if (this.hitMarker.render(poseStack, width, height, partialTick)) {
         this.hitMarker = null;
       }
     }
 
-    this.renderKillFeed(poseStack, partialTicks);
+    this.renderKillFeed(poseStack, partialTick);
 
     heldStack.getCapability(Scope.CAPABILITY)
         .filter(scope -> scope.isScoping(player))
         .ifPresent(scope -> renderScopeOverlay(player, scope, width, height));
 
-    // Draws Flashbang effect
-    MobEffectInstance flashEffect =
-        player.getEntity()
-            .getEffect(ModMobEffects.FLASH_BLINDNESS.get());
-    if (flashEffect != null) {
-      int alpha = (int) (255F
-          * (Mth.clamp(flashEffect.getDuration() - partialTicks, 0, 20) / 20F));
-      int flashColour = 0x00FFFFFF | (alpha & 255) << 24;
-      RenderUtil.fillGradient(poseStack, 0, 0, width, height, flashColour, flashColour);
-    }
-
     player.getActionObserver()
         .flatMap(ActionObserver::getProgressBar)
         .ifPresent(observer -> renderProgress(poseStack, this.minecraft.font, width,
             height, observer.getMessage(), observer.getSubMessage().orElse(null),
-            observer.getProgress(partialTicks)));
+            observer.getProgress(partialTick)));
 
     if (gun != null) {
-      this.renderGunFlash(poseStack, gun, width, height, partialTicks);
+      this.renderGunFlash(poseStack, gun, width, height, partialTick);
     }
 
     // Needs to render after blood or else it causes Z level issues
@@ -408,7 +410,7 @@ public class IngameGui {
 
   private void renderCombatMode(PlayerExtension<AbstractClientPlayer> player,
       PoseStack poseStack, int width, int height) {
-    final var inventory = player.getEntity().getInventory();
+    final var inventory = player.entity().getInventory();
 
     int boxX = width - 115;
     int boxWidth = 110;
@@ -498,8 +500,8 @@ public class IngameGui {
 
     final int healthBoxHeight = 25;
     // Render Health
-    final var health = player.getEntity().getHealth();
-    final var armour = player.getEntity().getArmorValue();
+    final var health = player.entity().getHealth();
+    final var armour = player.entity().getArmorValue();
 
     int healthWidth = 100;
     if (armour > 0) {
@@ -521,7 +523,7 @@ public class IngameGui {
         height - healthBoxHeight / 2 - this.minecraft.font.lineHeight / 2, 0xFFFFFFFF);
     RenderUtil.fill(poseStack, 42, height - healthBoxHeight / 2 - 5, 65, 10, 0x66000000);
     RenderUtil.fill(poseStack, 42, height - healthBoxHeight / 2 - 5,
-        Math.round(65 * (health / player.getEntity().getMaxHealth())), 10, 0xCCFFFFFF);
+        Math.round(65 * (health / player.entity().getMaxHealth())), 10, 0xCCFFFFFF);
 
     if (armour > 0) {
       final var armourX = healthWidth / 2 + 7;

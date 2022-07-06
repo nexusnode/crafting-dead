@@ -18,10 +18,9 @@
 
 package com.craftingdead.immerse.client.gui.screen.menu.play.list.server;
 
-import java.util.concurrent.CompletableFuture;
-import java.util.stream.Stream;
+import reactor.core.publisher.Flux;
 
 public interface ServerList {
 
-  CompletableFuture<Stream<ServerEntry>> load();
+  Flux<ServerEntry> load();
 }

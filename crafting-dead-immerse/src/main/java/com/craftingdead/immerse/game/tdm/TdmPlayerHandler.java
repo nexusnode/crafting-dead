@@ -72,7 +72,7 @@ public class TdmPlayerHandler<P extends Player> implements PlayerHandler {
   }
 
   public Optional<TdmTeam> getTeam() {
-    return this.game.getTeamModule().getPlayerTeam(this.player.getEntity().getUUID());
+    return this.game.getTeamModule().getPlayerTeam(this.player.entity().getUUID());
   }
 
   public int getRemainingBuyTimeSeconds() {
@@ -93,12 +93,13 @@ public class TdmPlayerHandler<P extends Player> implements PlayerHandler {
 
   @Override
   public Visibility getVisibility() {
-    return this.getRemainingSpawnProtectionSeconds() > 0 ? Visibility.PARTIALLY_VISIBLE
+    return this.getRemainingSpawnProtectionSeconds() > 0
+        ? Visibility.PARTIALLY_VISIBLE
         : Visibility.VISIBLE;
   }
 
   public TdmPlayerData getPlayerData() {
-    return this.game.getPlayerData(this.player.getEntity().getUUID());
+    return this.game.getPlayerData(this.player.entity().getUUID());
   }
 
   @Override
@@ -112,7 +113,8 @@ public class TdmPlayerHandler<P extends Player> implements PlayerHandler {
   }
 
   @Override
-  public boolean handleDeathLoot(DamageSource cause, Collection<ItemEntity> drops, int lootingLevel) {
+  public boolean handleDeathLoot(DamageSource cause, Collection<ItemEntity> drops,
+      int lootingLevel) {
     return true;
   }
 

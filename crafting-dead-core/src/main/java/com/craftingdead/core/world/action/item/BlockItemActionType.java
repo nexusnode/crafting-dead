@@ -20,24 +20,34 @@ package com.craftingdead.core.world.action.item;
 
 import java.util.Optional;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import com.craftingdead.core.world.action.Action;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.FluidState;
 
 public class BlockItemActionType extends ItemActionType<BlockItemAction> {
 
   private final Predicate<BlockState> predicate;
+  private final double maxDistanceSquared;
 
   protected BlockItemActionType(Builder builder) {
     super(builder);
     this.predicate = builder.predicate;
+    this.maxDistanceSquared = builder.maxDistanceSquared;
   }
 
   public Predicate<BlockState> getPredicate() {
     return this.predicate;
+  }
+
+  public double getMaxDistanceSquared() {
+    return this.maxDistanceSquared;
   }
 
   @Override
@@ -64,9 +74,31 @@ public class BlockItemActionType extends ItemActionType<BlockItemAction> {
   public static final class Builder extends ItemActionType.Builder<Builder> {
 
     private Predicate<BlockState> predicate;
+    private double maxDistanceSquared = 4.0D;
 
     public Builder forBlock(Predicate<BlockState> predicate) {
       this.predicate = predicate;
+      return this;
+    }
+
+    public Builder forFluid(Predicate<FluidState> predicate) {
+      return this.forBlock(blockState -> predicate.test(blockState.getFluidState()));
+    }
+
+    public Builder forFluid(Supplier<Fluid> fluid) {
+      return this.forFluid(fluidState -> fluidState.is(fluid.get()));
+    }
+
+    public Builder forFluid(Fluid fluid) {
+      return this.forFluid(fluidState -> fluidState.is(fluid));
+    }
+
+    public Builder forFluid(TagKey<Fluid> fluidTag) {
+      return this.forFluid(fluidState -> fluidState.is(fluidTag));
+    }
+
+    public Builder maxDistance(double maxDistance) {
+      this.maxDistanceSquared = maxDistance * maxDistance;
       return this;
     }
 

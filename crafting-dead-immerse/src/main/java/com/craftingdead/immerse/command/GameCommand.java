@@ -24,11 +24,17 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.network.chat.TranslatableComponent;
-import net.minecraftforge.server.permission.PermissionAPI;
 
 public class GameCommand {
+
+  public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
+    dispatcher
+        .register(Commands.literal("game")
+            .requires(source -> ImmerseCommands.hasPermission(source, Permissions.GAME_OP))
+            .then(Commands.literal("restart").executes(GameCommand::restart))
+            .then(Commands.literal("reload_rotation").executes(GameCommand::reloadRotation)));
+  }
 
   private static int restart(CommandContext<CommandSourceStack> context) {
     context.getSource().sendSuccess(
@@ -42,15 +48,5 @@ public class GameCommand {
         new TranslatableComponent("commands.game.reload_rotation"), true);
     CraftingDeadImmerse.getInstance().getLogicalServer().reloadGameRotation();
     return 0;
-  }
-
-  public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
-    dispatcher
-        .register(Commands.literal("game")
-            .requires(context -> context.hasPermission(4)
-                || (context.getEntity()instanceof ServerPlayer player
-                    && PermissionAPI.getPermission(player, Permissions.GAME_OP)))
-            .then(Commands.literal("restart").executes(GameCommand::restart))
-            .then(Commands.literal("reload_rotation").executes(GameCommand::reloadRotation)));
   }
 }
