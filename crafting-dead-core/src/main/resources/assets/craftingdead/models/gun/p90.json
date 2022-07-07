@@ -2,8 +2,8 @@
 	"credit": "Made with Blockbench",
 	"texture_size": [64, 64],
 	"textures": {
-		"gun": "craftingdead:gun/p90",
-		"particle": "craftingdead:gun/p90"
+		"particle": "craftingdead:gun/p90",
+		"gun": "craftingdead:gun/p90"
 	},
 	"elements": [
 		{
@@ -223,9 +223,9 @@
 			"translation": [0, -1.5, 0]
 		},
 		"gui": {
-			"rotation": [62, -44.5, 47.25],
-			"translation": [0.5, 1.75, 0],
-			"scale": [0.78711, 0.78711, 0.78711]
+			"rotation": [0, 90, 0],
+			"translation": [-10, 2.75, 0],
+			"scale": [1.5, 1.5, 1.5]
 		},
 		"head": {
 			"rotation": [-90, -179.5, 0],

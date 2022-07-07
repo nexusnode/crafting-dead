@@ -2,8 +2,8 @@
 	"credit": "Made with Blockbench",
 	"texture_size": [64, 64],
 	"textures": {
-		"gun": "craftingdead:gun/mac10",
-		"particle": "craftingdead:gun/mac10"
+		"particle": "craftingdead:gun/mac10",
+		"gun": "craftingdead:gun/mac10"
 	},
 	"elements": [
 		{
@@ -494,9 +494,9 @@
 			"translation": [0, -2.5, 0]
 		},
 		"gui": {
-			"rotation": [62, -48.75, 44.25],
-			"translation": [1, -0.25, 0],
-			"scale": [0.76758, 0.76758, 0.76758]
+			"rotation": [0, 90, 0],
+			"translation": [-4.75, -1.75, 0],
+			"scale": [1.5, 1.5, 1.5]
 		},
 		"head": {
 			"rotation": [-90, 0, 0.25],

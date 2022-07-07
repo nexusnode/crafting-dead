@@ -122,7 +122,7 @@ public class GunRenderer implements CombatSlotItemRenderer {
   public void renderInCombatSlot(ItemStack itemStack, PoseStack poseStack, float partialTick,
       MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
     var gun = CapabilityUtil.getOrThrow(Gun.CAPABILITY, itemStack, Gun.class);
-    this.renderGun(false, itemStack.hasFoil(), gun, 0.0F,
+    this.renderGun(gun, false, true, itemStack.hasFoil(), 0.0F,
         ItemTransforms.TransformType.GUI, partialTick, poseStack, bufferSource, packedLight,
         packedOverlay);
   }
@@ -177,13 +177,13 @@ public class GunRenderer implements CombatSlotItemRenderer {
         case THIRD_PERSON_LEFT_HAND:
         case THIRD_PERSON_RIGHT_HAND:
           gun.getClient().getAnimationController().apply(partialTick, poseStack);
-          this.renderGun(true, itemStack.hasFoil(), gun, 0.0F,
+          this.renderGun(gun, true, false, itemStack.hasFoil(), 0.0F,
               transformType, partialTick, poseStack, bufferSource, packedLight,
               packedOverlay);
           break;
         case HEAD:
           this.properties.backTransform().push(poseStack);
-          this.renderGun(true, itemStack.hasFoil(), gun, 0.0F,
+          this.renderGun(gun, true, false, itemStack.hasFoil(), 0.0F,
               transformType, partialTick, poseStack, bufferSource, packedLight,
               packedOverlay);
           poseStack.popPose();
@@ -194,7 +194,7 @@ public class GunRenderer implements CombatSlotItemRenderer {
           poseStack.mulPose(Vector3f.ZP.rotationDegrees(180.0F));
           poseStack.mulPose(Vector3f.XP.rotationDegrees(180.0F));
         default:
-          this.renderGun(true, itemStack.hasFoil(), gun, 0.0F,
+          this.renderGun(gun, true, false, itemStack.hasFoil(), 0.0F,
               transformType, partialTick, poseStack, bufferSource, packedLight,
               packedOverlay);
           break;
@@ -404,21 +404,22 @@ public class GunRenderer implements CombatSlotItemRenderer {
 
       gun.getClient().getAnimationController().apply(partialTicks, poseStack);
 
-      this.renderGun(true, itemStack.hasFoil(), gun, aimingPct, transformType,
+      this.renderGun(gun, false, true, itemStack.hasFoil(), aimingPct, transformType,
           partialTicks, poseStack, renderTypeBuffer, packedLight, packedOverlay);
     }
     poseStack.popPose();
   }
 
   private void renderGun(
-      boolean renderAttachments,
-      boolean foil,
       Gun gun,
+      boolean renderAttachments,
+      boolean renderDefaultMagazine,
+      boolean foil,
       float aimingPct,
       ItemTransforms.TransformType transformType,
       float partialTick,
       PoseStack poseStack,
-      MultiBufferSource renderTypeBuffer,
+      MultiBufferSource bufferSource,
       int packedLight,
       int packedOverlay) {
 
@@ -453,18 +454,19 @@ public class GunRenderer implements CombatSlotItemRenderer {
     perspectiveTransform.push(poseStack);
     {
       this.renderBakedModel(bakedModel, foil, color, transformType,
-          poseStack, renderTypeBuffer, packedLight, packedOverlay);
+          poseStack, bufferSource, packedLight, packedOverlay);
 
-      poseStack.pushPose();
-      {
-        this.renderMagazine(gun, skinTextureLocation, color, foil, transformType,
-            poseStack, renderTypeBuffer, packedLight, packedOverlay);
+      var magazineStack = renderDefaultMagazine
+          ? gun.getDefaultMagazineStack()
+          : gun.getAmmoProvider().getMagazineStack();
+      if (!magazineStack.isEmpty()) {
+        this.renderMagazine(magazineStack, skinTextureLocation, color, foil, transformType,
+            poseStack, bufferSource, packedLight, packedOverlay);
       }
-      poseStack.popPose();
 
       if (renderAttachments) {
         this.renderAttachments(gun, skinTextureLocation, color, foil, transformType,
-            partialTick, poseStack, renderTypeBuffer, packedLight, packedOverlay);
+            partialTick, poseStack, bufferSource, packedLight, packedOverlay);
       }
     }
     poseStack.popPose();
@@ -552,34 +554,30 @@ public class GunRenderer implements CombatSlotItemRenderer {
   }
 
   private void renderMagazine(
-      Gun gun,
+      ItemStack magazineStack,
       @Nullable ResourceLocation skinTextureLocation,
-      int colour,
+      int color,
       boolean foil,
       ItemTransforms.TransformType transformType,
-      PoseStack matrixStack,
+      PoseStack poseStack,
       MultiBufferSource renderTypeBuffer,
       int packedLight,
       int packedOverlay) {
+    var transform = this.properties.magazineTransforms()
+        .getOrDefault(magazineStack.getItem().getRegistryName(), Transformation.identity());
+    transform.push(poseStack);
+    {
+      var modelLocation = getMagazineModelLocation(magazineStack.getItem().getRegistryName());
 
-    var magazineStack = gun.getAmmoProvider().getMagazineStack();
-    if (!magazineStack.isEmpty()) {
-      var transform = this.properties.magazineTransforms()
-          .getOrDefault(magazineStack.getItem().getRegistryName(), Transformation.identity());
-      transform.push(matrixStack);
-      {
-        var modelLocation = getMagazineModelLocation(magazineStack.getItem().getRegistryName());
+      var magazineBakedModel = this.getBakedModel(modelLocation,
+          Map.of(GUN_TEXTURE_REFERENCE, Either.left(skinTextureLocation == null
+              ? this.getGunRenderMaterial()
+              : new Material(InventoryMenu.BLOCK_ATLAS, skinTextureLocation))));
 
-        var magazineBakedModel = this.getBakedModel(modelLocation,
-            Map.of(GUN_TEXTURE_REFERENCE, Either.left(skinTextureLocation == null
-                ? this.getGunRenderMaterial()
-                : new Material(InventoryMenu.BLOCK_ATLAS, skinTextureLocation))));
-
-        this.renderBakedModel(magazineBakedModel, foil, colour, transformType, matrixStack,
-            renderTypeBuffer, packedLight, packedOverlay);
-      }
-      matrixStack.popPose();
+      this.renderBakedModel(magazineBakedModel, foil, color, transformType, poseStack,
+          renderTypeBuffer, packedLight, packedOverlay);
     }
+    poseStack.popPose();
   }
 
   private Material getGunRenderMaterial() {

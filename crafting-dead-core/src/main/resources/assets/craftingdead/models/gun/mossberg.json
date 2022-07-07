@@ -2,8 +2,8 @@
 	"credit": "Made with Blockbench",
 	"texture_size": [128, 128],
 	"textures": {
-		"gun": "craftingdead:gun/mossberg",
-		"particle": "craftingdead:gun/mossberg"
+		"particle": "craftingdead:gun/mossberg",
+		"gun": "craftingdead:gun/mossberg"
 	},
 	"elements": [
 		{
@@ -262,9 +262,9 @@
 			"translation": [0, -1.75, 0]
 		},
 		"gui": {
-			"rotation": [29.5, -34, 21.5],
-			"translation": [1.5, 0.25, 0],
-			"scale": [0.58789, 0.58789, 0.58789]
+			"rotation": [0, 90, 0],
+			"translation": [-27.25, -0.25, 0],
+			"scale": [1.5, 1.5, 1.5]
 		},
 		"head": {
 			"rotation": [-90, -180, 0],

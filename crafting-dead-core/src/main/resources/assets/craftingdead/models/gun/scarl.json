@@ -2,8 +2,8 @@
 	"credit": "Made with Blockbench",
 	"texture_size": [128, 128],
 	"textures": {
-		"gun": "craftingdead:gun/scarl",
-		"particle": "craftingdead:gun/scarl"
+		"particle": "craftingdead:gun/scarl",
+		"gun": "craftingdead:gun/scarl"
 	},
 	"elements": [
 		{
@@ -275,9 +275,9 @@
 			"translation": [0, -1.25, 0]
 		},
 		"gui": {
-			"rotation": [40.25, -38.5, 51.75],
-			"translation": [1, -2, 0],
-			"scale": [0.56836, 0.56836, 0.56836]
+			"rotation": [0, 90, 0],
+			"translation": [-19, -4, 0],
+			"scale": [1.5, 1.5, 1.5]
 		},
 		"head": {
 			"rotation": [90, 0, -180],

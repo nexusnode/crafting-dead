@@ -2,8 +2,8 @@
 	"credit": "Made with Blockbench",
 	"texture_size": [128, 128],
 	"textures": {
-		"gun": "craftingdead:gun/mpt55",
-		"particle": "craftingdead:gun/mpt55"
+		"particle": "craftingdead:gun/mpt55",
+		"gun": "craftingdead:gun/mpt55"
 	},
 	"elements": [
 		{
@@ -262,9 +262,9 @@
 			"translation": [0, -1.5, 0]
 		},
 		"gui": {
-			"rotation": [41.5, -38, 47.5],
-			"translation": [-0.25, -1, 0],
-			"scale": [0.51563, 0.51563, 0.51563]
+			"rotation": [0, 90, 0],
+			"translation": [-19, -0.25, 0],
+			"scale": [1.5, 1.5, 1.5]
 		},
 		"head": {
 			"rotation": [-90, -179.75, 0],

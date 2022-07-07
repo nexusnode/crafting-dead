@@ -2,8 +2,8 @@
 	"credit": "Made with Blockbench",
 	"texture_size": [128, 128],
 	"textures": {
-		"gun": "craftingdead:gun/rpk",
-		"particle": "craftingdead:gun/rpk"
+		"particle": "craftingdead:gun/rpk",
+		"gun": "craftingdead:gun/rpk"
 	},
 	"elements": [
 		{
@@ -405,9 +405,9 @@
 			"translation": [0, 2.75, 0]
 		},
 		"gui": {
-			"rotation": [51.25, -35.75, 36.75],
-			"translation": [-0.75, -0.25, 0],
-			"scale": [0.45703, 0.45703, 0.45703]
+			"rotation": [0, 90, 0],
+			"translation": [-25, -1, 0],
+			"scale": [1.5, 1.5, 1.5]
 		},
 		"head": {
 			"rotation": [90, 0, -180],

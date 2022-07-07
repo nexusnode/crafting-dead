@@ -2,8 +2,8 @@
 	"credit": "Made with Blockbench",
 	"texture_size": [64, 64],
 	"textures": {
-		"gun": "craftingdead:gun/minigun",
-		"particle": "craftingdead:gun/minigun"
+		"particle": "craftingdead:gun/minigun",
+		"gun": "craftingdead:gun/minigun"
 	},
 	"elements": [
 		{
@@ -287,9 +287,9 @@
 			"translation": [0, -0.25, 0]
 		},
 		"gui": {
-			"rotation": [-177.32, 34.82, -151.04],
-			"translation": [1.5, 0, 0],
-			"scale": [0.77539, 0.77539, 0.77539]
+			"rotation": [0, 90, 0],
+			"translation": [-5.5, -1.5, 0],
+			"scale": [1.5, 1.5, 1.5]
 		},
 		"head": {
 			"rotation": [90, -180, 0],

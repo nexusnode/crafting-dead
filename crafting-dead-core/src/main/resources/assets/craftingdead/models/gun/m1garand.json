@@ -2,8 +2,8 @@
 	"credit": "Made with Blockbench",
 	"texture_size": [64, 64],
 	"textures": {
-		"gun": "craftingdead:gun/m1garand",
-		"particle": "craftingdead:gun/m1garand"
+		"particle": "craftingdead:gun/m1garand",
+		"gun": "craftingdead:gun/m1garand"
 	},
 	"elements": [
 		{
@@ -368,9 +368,9 @@
 			"translation": [0, -1, 0]
 		},
 		"gui": {
-			"rotation": [45, -39.75, 44.25],
-			"translation": [-0.5, -0.25, 0],
-			"scale": [0.56445, 0.56445, 0.56445]
+			"rotation": [0, 90, 0],
+			"translation": [-18, 1, 0],
+			"scale": [1.5, 1.5, 1.5]
 		},
 		"head": {
 			"rotation": [90, 0, 176],

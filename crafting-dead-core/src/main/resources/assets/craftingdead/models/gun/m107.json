@@ -2,8 +2,8 @@
 	"credit": "Made with Blockbench",
 	"texture_size": [128, 128],
 	"textures": {
-		"gun": "craftingdead:gun/m107",
-		"particle": "craftingdead:gun/m107"
+		"particle": "craftingdead:gun/m107",
+		"gun": "craftingdead:gun/m107"
 	},
 	"elements": [
 		{
@@ -267,9 +267,9 @@
 			"translation": [0, -2.25, 0]
 		},
 		"gui": {
-			"rotation": [39, -34.25, 23.25],
-			"translation": [0, 0.5, 0],
-			"scale": [0.49766, 0.49766, 0.49766]
+			"rotation": [0, 90, 0],
+			"translation": [-28, 4.25, 0],
+			"scale": [1.5, 1.5, 1.5]
 		},
 		"head": {
 			"rotation": [-90, -179.25, 0],

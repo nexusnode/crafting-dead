@@ -2,8 +2,8 @@
 	"credit": "Made with Blockbench",
 	"texture_size": [128, 128],
 	"textures": {
-		"gun": "craftingdead:gun/trench_gun",
-		"particle": "craftingdead:gun/trench_gun"
+		"particle": "craftingdead:gun/trench_gun",
+		"gun": "craftingdead:gun/trench_gun"
 	},
 	"elements": [
 		{
@@ -288,9 +288,9 @@
 			"translation": [0, -1.75, 0]
 		},
 		"gui": {
-			"rotation": [36.25, -37.75, 33.5],
-			"translation": [0.25, 0.25, 0],
-			"scale": [0.54102, 0.54102, 0.54102]
+			"rotation": [0, 90, 0],
+			"translation": [-23.25, 1.25, 0],
+			"scale": [1.5, 1.5, 1.5]
 		},
 		"head": {
 			"rotation": [90, 0, -180],

@@ -270,7 +270,7 @@ public class IngameGui {
 
     int currentItemIndex = inventory.selected;
 
-    var rightPadding = 3;
+    var rightPadding = 15;
     var topPadding = 3;
 
     // Render primary
@@ -279,8 +279,7 @@ public class IngameGui {
       RenderUtil.fill(poseStack, boxX + 1, boxY + 1, boxWidth - 2, boxHeight - 2, 0xCCFFFFFF);
     }
     RenderUtil.fill(poseStack, boxX, boxY, boxWidth, boxHeight, 0x66000000);
-    this.minecraft.font.drawShadow(poseStack, "1", boxX + 5, boxY + 5,
-        0xFFFFFFFF);
+    this.minecraft.font.drawShadow(poseStack, "1", boxX + boxWidth - 10, boxY + 5, 0xFFFFFFFF);
     this.renderItemInCombatSlot(primaryStack,
         boxX + boxWidth - rightPadding, boxY + topPadding, poseStack, partialTick);
 
@@ -292,8 +291,7 @@ public class IngameGui {
       RenderUtil.fill(poseStack, boxX + 1, boxY + 1, boxWidth - 2, boxHeight - 2, 0xCCFFFFFF);
     }
     RenderUtil.fill(poseStack, boxX, boxY, boxWidth, boxHeight, 0x66000000);
-    this.minecraft.font.drawShadow(poseStack, "2", boxX + 5, boxY + 5,
-        0xFFFFFFFF);
+    this.minecraft.font.drawShadow(poseStack, "2", boxX + boxWidth - 10, boxY + 5, 0xFFFFFFFF);
     this.renderItemInCombatSlot(secondaryStack,
         boxX + boxWidth - rightPadding, boxY + topPadding, poseStack, partialTick);
 
@@ -304,8 +302,7 @@ public class IngameGui {
       RenderUtil.fill(poseStack, boxX + 1, boxY + 1, boxWidth - 2, boxHeight - 2, 0xCCFFFFFF);
     }
     RenderUtil.fill(poseStack, boxX, boxY, boxWidth, boxHeight, 0x66000000);
-    this.minecraft.font.drawShadow(poseStack, "3", boxX + 5, boxY + 5,
-        0xFFFFFFFF);
+    this.minecraft.font.drawShadow(poseStack, "3", boxX + boxWidth - 10, boxY + 5, 0xFFFFFFFF);
     this.renderItemInCombatSlot(meleeStack,
         boxX + boxWidth - rightPadding, boxY + topPadding, poseStack, partialTick);
 
@@ -319,7 +316,7 @@ public class IngameGui {
         RenderUtil.fill(poseStack, boxX + 1, boxY + 1, boxWidth - 2, boxHeight - 2, 0xCCFFFFFF);
       }
       RenderUtil.fill(poseStack, boxX, boxY, boxWidth, boxHeight, 0x66000000);
-      this.minecraft.font.drawShadow(poseStack, String.valueOf(4 + i), boxX + 1,
+      this.minecraft.font.drawShadow(poseStack, String.valueOf(4 + i), boxX + boxWidth - 7,
           boxY + 1, 0xFFFFFFFF);
 
       RenderUtil.renderGuiItem(poseStack, extraStack, boxX + boxWidth / 2 - 16 / 2,
@@ -390,8 +387,9 @@ public class IngameGui {
       bufferSource.endBatch();
       Lighting.setupFor3DItems();
     } else {
+      poseStack.translate(-8, -4, 0);
       RenderUtil.renderGuiItem(poseStack, itemStack, 0, 0, 0xFFFFFFFF,
-          ItemTransforms.TransformType.FIXED);
+          ItemTransforms.TransformType.GUI);
     }
     poseStack.popPose();
   }
