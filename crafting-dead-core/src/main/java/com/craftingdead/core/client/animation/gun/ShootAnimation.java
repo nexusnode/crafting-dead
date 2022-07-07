@@ -75,11 +75,11 @@ public class ShootAnimation extends TimedAnimation {
   public void applyCamera(float partialTick, Vector3f rotations) {}
 
   public static ShootAnimation rifle() {
-    return new ShootAnimation(5, 3.0F, 0.5F);
+    return new ShootAnimation(5, 2.0F, 0.25F);
   }
 
   public static ShootAnimation submachineGun() {
-    return new ShootAnimation(5, 2.0F, 0.25F);
+    return new ShootAnimation(5, 2.0F, 0.15F);
   }
 
   public static ShootAnimation pistol() {
