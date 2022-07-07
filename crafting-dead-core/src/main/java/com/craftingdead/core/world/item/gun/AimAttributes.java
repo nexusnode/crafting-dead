@@ -20,16 +20,23 @@ package com.craftingdead.core.world.item.gun;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import java.util.Collections;
+import java.util.Map;
+import net.minecraft.resources.ResourceLocation;
 
 /**
- * @param boltAction - Whether the gun has bolt action
+ * @param boltAction         - Whether the gun has bolt action
+ * @param scopingPitchOffset - Pitch offset applied when aiming with the specified attachment
  */
-public record AimAttributes(boolean boltAction) {
+public record AimAttributes(boolean boltAction, Map<ResourceLocation, Float> scopingPitchOffset) {
 
   public static final Codec<AimAttributes> CODEC =
       RecordCodecBuilder.create(instance -> instance
           .group(Codec.BOOL
-              .optionalFieldOf("bolt_action", false)
-              .forGetter(AimAttributes::boltAction))
+                  .optionalFieldOf("bolt_action", false)
+                  .forGetter(AimAttributes::boltAction),
+              Codec.unboundedMap(ResourceLocation.CODEC, Codec.FLOAT)
+                  .optionalFieldOf("scoping_pitch_offset", Collections.emptyMap())
+                  .forGetter(AimAttributes::scopingPitchOffset))
           .apply(instance, AimAttributes::new));
 }

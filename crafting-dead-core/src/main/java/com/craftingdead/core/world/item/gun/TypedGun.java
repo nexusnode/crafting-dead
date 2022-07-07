@@ -18,14 +18,14 @@
 
 package com.craftingdead.core.world.item.gun;
 
-import java.util.Optional;
-import java.util.Set;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.item.GunItem;
 import com.craftingdead.core.world.item.combatslot.CombatSlot;
 import com.craftingdead.core.world.item.gun.ammoprovider.AmmoProvider;
 import com.craftingdead.core.world.item.gun.attachment.AttachmentLike;
+import java.util.Optional;
+import java.util.Set;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -134,5 +134,10 @@ public abstract class TypedGun extends AbstractGun {
   @Override
   protected float getDamage() {
     return this.configuration.getDamage();
+  }
+
+  @Override
+  public float getPitchOffset() {
+    return 0;
   }
 }

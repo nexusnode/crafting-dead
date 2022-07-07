@@ -18,21 +18,26 @@
 
 package com.craftingdead.core.world.item.gun;
 
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Supplier;
-import org.jetbrains.annotations.Nullable;
 import com.craftingdead.core.util.FunctionalUtil;
 import com.craftingdead.core.world.item.gun.Gun.SecondaryActionTrigger;
+import com.craftingdead.core.world.item.gun.attachment.Attachment;
 import com.google.common.collect.ImmutableSet;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Supplier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.ForgeRegistryEntry;
+import net.minecraftforge.registries.RegistryObject;
 
 public class GunConfiguration extends ForgeRegistryEntry<GunConfiguration> {
 
@@ -286,8 +291,9 @@ public class GunConfiguration extends ForgeRegistryEntry<GunConfiguration> {
     /*
      * Aim attributes
      */
-    @Nullable
-    private AimAttributes aimAttributes;
+    private boolean aimable;
+    private boolean boltAction;
+    private Map<ResourceLocation, Float> pitchOffset = new HashMap<>();
 
     /*
      * Sounds
@@ -351,7 +357,14 @@ public class GunConfiguration extends ForgeRegistryEntry<GunConfiguration> {
     }
 
     public Builder aimable(boolean boltAction) {
-      this.aimAttributes = new AimAttributes(boltAction);
+      this.aimable = true;
+      this.boltAction = boltAction;
+      return this;
+    }
+
+    public Builder addScopingOffset(RegistryObject<Attachment> attachment, float offset) {
+      this.aimable = true;
+      this.pitchOffset.put(attachment.getId(), offset);
       return this;
     }
 
@@ -387,6 +400,12 @@ public class GunConfiguration extends ForgeRegistryEntry<GunConfiguration> {
     }
 
     public GunConfiguration build() {
+      AimAttributes aimAttributes = null;
+      if (this.aimable) {
+        aimAttributes = new AimAttributes(
+            this.boltAction,
+            Collections.unmodifiableMap(this.pitchOffset));
+      }
       return new GunConfiguration(
           this.fireDelayMs,
           this.damage,
@@ -398,7 +417,7 @@ public class GunConfiguration extends ForgeRegistryEntry<GunConfiguration> {
           this.crosshairEnabled,
           this.rightMouseActionTriggerType,
           this.fireModes,
-          Optional.ofNullable(this.aimAttributes),
+          Optional.ofNullable(aimAttributes),
           new Sounds(this.shootSound,
               this.distantShootSound,
               this.silencedShootSound,

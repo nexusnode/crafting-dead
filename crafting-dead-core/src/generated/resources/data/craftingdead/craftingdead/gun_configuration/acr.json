@@ -3,7 +3,12 @@
     "auto",
     "semi"
   ],
-  "aim_settings": {},
+  "aim_settings": {
+    "scoping_pitch_offset": {
+      "craftingdead:red_dot_sight": 1.0,
+      "craftingdead:eotech_sight": 0.3
+    }
+  },
   "sounds": {
     "reload_sound": "craftingdead:m4a1_reload",
     "shoot_sound": "craftingdead:acr_shoot",

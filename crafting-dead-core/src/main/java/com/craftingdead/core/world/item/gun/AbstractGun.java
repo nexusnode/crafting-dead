@@ -18,21 +18,8 @@
 
 package com.craftingdead.core.world.item.gun;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
-import java.util.Set;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
-import org.jetbrains.annotations.Nullable;
-import org.slf4j.Logger;
 import com.craftingdead.core.CraftingDead;
+import com.craftingdead.core.client.gui.HitMarker;
 import com.craftingdead.core.event.GunEvent;
 import com.craftingdead.core.network.NetworkChannel;
 import com.craftingdead.core.network.SynchedData;
@@ -62,6 +49,18 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.mojang.logging.LogUtils;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
+import java.util.Random;
+import java.util.Set;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 import net.minecraft.Util;
 import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
@@ -112,6 +111,8 @@ import net.minecraftforge.common.util.LogicalSidedProvider;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.network.PacketDistributor;
+import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
 
 public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> {
 
@@ -331,7 +332,7 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
       random.setSeed(pendingHit.randomSeed());
       rayTrace(player.level(), playerSnapshot, hitSnapshot, this.getRange(),
           this.getAccuracy(playerSnapshot.velocity(), playerSnapshot.crouching()),
-          pendingHit.shotCount(), random)
+          this.getPitchOffset(), pendingHit.shotCount(), random)
               .ifPresent(hitPos -> this.hitEntity(player, hitLiving.entity(), hitPos, false));
     }
   }
@@ -441,13 +442,21 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
     boolean hitEntity = false;
     Set<BlockState> blocksHit = new HashSet<>();
 
+    if (CraftingDead.serverConfig.hitMarkerMode.get() == HitMarker.Mode.DEBUG
+        && entity instanceof ServerPlayer player) {
+      rayTrace(entity, this.getRange(), 1.0F,
+          1.0F, this.getPitchOffset(), 1, new Random()).ifPresent(
+          hitResult -> this.sendDebugHit(player, hitResult));
+    }
+
     for (int i = 0; i < this.getRoundsPerShot(); i++) {
       final long randomSeed = level.getGameTime() + i;
       random.setSeed(randomSeed);
 
       var partialTick = level.isClientSide() ? this.getClient().getPartialTick() : 1.0F;
       var hitResult = rayTrace(entity, this.getRange(), partialTick,
-          this.getAccuracy(living), this.getShotCount(), random).orElse(null);
+          this.getAccuracy(living), this.getPitchOffset(), this.getShotCount(), random).orElse(
+          null);
 
       if (hitResult != null) {
         switch (hitResult.getType()) {
@@ -875,14 +884,15 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
   }
 
   public static Optional<? extends HitResult> rayTrace(Entity fromEntity,
-      double distance, float partialTick, float accuracy, int shotCount, Random random) {
+      double distance, float partialTick, float accuracy, float pitchOffset,
+      int shotCount, Random random) {
     return RayTraceUtil.rayTrace(fromEntity, distance, partialTick,
-        getAccuracyOffset(accuracy, shotCount, random),
+        getAccuracyOffset(accuracy, shotCount, random) + pitchOffset,
         getAccuracyOffset(accuracy, shotCount, random));
   }
 
   public static Optional<Vec3> rayTrace(Level level, EntitySnapshot fromSnapshot,
-      EntitySnapshot targetSnapshot, double distance, float accuracy,
+      EntitySnapshot targetSnapshot, double distance, float accuracy, float pitchOffset,
       int shotCount, Random random) {
     if (!fromSnapshot.complete() || !targetSnapshot.complete()) {
       return Optional.empty();
@@ -890,7 +900,7 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
 
     var startPos = fromSnapshot.position().add(0.0D, fromSnapshot.eyeHeight(), 0.0D);
     var look = RayTraceUtil.calculateViewVector(
-        fromSnapshot.rotation().x + getAccuracyOffset(accuracy, shotCount, random),
+        fromSnapshot.rotation().x + getAccuracyOffset(accuracy, shotCount, random) + pitchOffset,
         fromSnapshot.rotation().y + getAccuracyOffset(accuracy, shotCount, random));
 
     var blockRayTraceResult = RayTraceUtil.rayTraceBlocks(startPos, distance, look, level);
@@ -914,5 +924,13 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
         * (Math.min(20, shotCount + 1) / 2.0F)
         * (random.nextInt(5) % 2 == 0 ? -1.0F : 1.0F))
         + ((1.0F - accuracy) * (random.nextInt(9) + 1));
+  }
+
+  public abstract float getPitchOffset();
+
+  private void sendDebugHit(ServerPlayer player, HitResult hitResult) {
+    NetworkChannel.PLAY.getSimpleChannel().send(
+        PacketDistributor.PLAYER.with(() -> player),
+        new HitMessage(hitResult.getLocation(), false));
   }
 }

@@ -18,14 +18,14 @@
 
 package com.craftingdead.core.client.gui;
 
-import java.util.Optional;
-import java.util.function.BiFunction;
 import com.craftingdead.core.client.util.RenderUtil;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexFormat;
+import java.util.Optional;
+import java.util.function.BiFunction;
 import net.minecraft.Util;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.util.Mth;
@@ -133,7 +133,7 @@ public class HitMarker {
 
   public enum Type {
 
-    HIT(0xFFFFFFFF), KILL(0xFFB30C00);
+    HIT(0xFFFFFFFF), KILL(0xFFB30C00), DEBUG(0xFFFFCC00);
 
     private final int colour;
 
@@ -148,7 +148,9 @@ public class HitMarker {
     KILL((pos, kill) -> kill
         ? Optional.of(new HitMarker(pos, Type.KILL))
         : Optional.empty()),
-    HIT_AND_KILL((pos, kill) -> Optional.of(new HitMarker(pos, kill ? Type.KILL : Type.HIT)));
+    HIT_AND_KILL((pos, kill) -> Optional.of(new HitMarker(pos, kill ? Type.KILL : Type.HIT))),
+    DEBUG((pos, kill) -> Optional.of(new HitMarker(pos, Type.DEBUG)));
+
 
     private final BiFunction<Vec3, Boolean, Optional<HitMarker>> factory;
 

@@ -18,15 +18,16 @@
 
 package com.craftingdead.core.world.item.gun.aimable;
 
-import java.util.Optional;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
+import com.craftingdead.core.world.inventory.GunCraftSlotType;
 import com.craftingdead.core.world.item.GunItem;
 import com.craftingdead.core.world.item.gun.AbstractGunClient;
 import com.craftingdead.core.world.item.gun.AimAttributes;
 import com.craftingdead.core.world.item.gun.TypedGun;
 import com.craftingdead.core.world.item.gun.attachment.Attachment;
 import com.craftingdead.core.world.item.scope.Scope;
+import java.util.Optional;
 import net.minecraft.Util;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
@@ -113,5 +114,18 @@ public class AimableGun extends TypedGun implements Scope {
   @Override
   public int getOverlayTextureHeight() {
     return 512;
+  }
+
+  @Override
+  public float getPitchOffset() {
+    if (!this.hasIronSight() && this.isPerformingSecondaryAction()) {
+      for (Attachment attachmentItem : this.getAttachments()) {
+        if (attachmentItem.getInventorySlot() == GunCraftSlotType.OVERBARREL_ATTACHMENT) {
+          return this.getConfiguration().getAimSettings().map(AimAttributes::scopingPitchOffset)
+              .map(map -> map.get(attachmentItem.getRegistryName())).orElse(super.getPitchOffset());
+        }
+      }
+    }
+    return super.getPitchOffset();
   }
 }

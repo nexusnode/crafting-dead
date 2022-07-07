@@ -18,9 +18,10 @@
 
 package com.craftingdead.core.world.item.gun;
 
-import java.util.function.Supplier;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.sounds.ModSoundEvents;
+import com.craftingdead.core.world.item.gun.attachment.Attachments;
+import java.util.function.Supplier;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -123,6 +124,8 @@ public class GunConfigurations {
       deferredRegister.register("acr",
           () -> GunConfiguration.builder()
               .aimable(false)
+              .addScopingOffset(Attachments.RED_DOT_SIGHT, 1F)
+              .addScopingOffset(Attachments.EOTECH_SIGHT, 0.3F)
               .setFireDelayMs(92)
               .setDamage(7)
               .setReloadDurationTicks(20 * 4)
