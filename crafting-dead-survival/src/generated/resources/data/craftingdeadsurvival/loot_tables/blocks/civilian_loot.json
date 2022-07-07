@@ -258,7 +258,7 @@
         {
           "type": "minecraft:item",
           "weight": 25,
-          "name": "craftingdead:magnum_magazine"
+          "name": "craftingdead:magnum_ammunition"
         },
         {
           "type": "minecraft:item",
@@ -283,7 +283,7 @@
         {
           "type": "minecraft:item",
           "weight": 15,
-          "name": "craftingdead:m1garand_magazine"
+          "name": "craftingdead:m1garand_ammunition"
         },
         {
           "type": "minecraft:item",

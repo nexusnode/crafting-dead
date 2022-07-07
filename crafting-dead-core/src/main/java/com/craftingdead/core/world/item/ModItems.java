@@ -323,8 +323,8 @@ public class ModItems {
               .stacksTo(1)
               .tab(COMBAT_TAB)));
 
-  public static final RegistryObject<MagazineItem> MAGNUM_MAGAZINE =
-      deferredRegister.register("magnum_magazine",
+  public static final RegistryObject<MagazineItem> MAGNUM_AMMUNITION =
+      deferredRegister.register("magnum_ammunition",
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(6)
               .setArmorPenetration(0.65F)
@@ -410,8 +410,8 @@ public class ModItems {
               .stacksTo(1)
               .tab(COMBAT_TAB)));
 
-  public static final RegistryObject<MagazineItem> M1GARAND_MAGAZINE =
-      deferredRegister.register("m1garand_magazine",
+  public static final RegistryObject<MagazineItem> M1GARAND_AMMUNITION =
+      deferredRegister.register("m1garand_ammunition",
           () -> new MagazineItem((MagazineItem.Properties) new MagazineItem.Properties()
               .setSize(8)
               .setArmorPenetration(0.95F)
@@ -677,7 +677,7 @@ public class ModItems {
               .putAnimation(GunAnimationEvent.SHOOT, ShootAnimation::rifle)
               .putReloadAnimation(ReloadAnimation::new)
               .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
-              .setDefaultMagazine(ModItems.M1GARAND_MAGAZINE)
+              .setDefaultMagazine(ModItems.M1GARAND_AMMUNITION)
               .addAcceptedAttachment(Attachments.LP_SCOPE)
               .addAcceptedAttachment(Attachments.HP_SCOPE)
               .addAcceptedAttachment(Attachments.BIPOD)
@@ -845,7 +845,7 @@ public class ModItems {
               .putAnimation(GunAnimationEvent.SHOOT, ShootAnimation::pistol)
               .putReloadAnimation(ReloadAnimation::new)
               .putAnimation(GunAnimationEvent.INSPECT, InspectAnimation::new)
-              .setDefaultMagazine(ModItems.MAGNUM_MAGAZINE)
+              .setDefaultMagazine(ModItems.MAGNUM_AMMUNITION)
               .build());
 
   public static final RegistryObject<GunItem> FN57 =

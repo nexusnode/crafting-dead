@@ -404,7 +404,7 @@ public class GunRenderer implements CombatSlotItemRenderer {
 
       gun.getClient().getAnimationController().apply(partialTicks, poseStack);
 
-      this.renderGun(gun, false, true, itemStack.hasFoil(), aimingPct, transformType,
+      this.renderGun(gun, true, false, itemStack.hasFoil(), aimingPct, transformType,
           partialTicks, poseStack, renderTypeBuffer, packedLight, packedOverlay);
     }
     poseStack.popPose();

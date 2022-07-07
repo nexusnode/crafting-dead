@@ -201,9 +201,9 @@ public class CraftingDeadSurvival {
   @SubscribeEvent
   public void handlePerformAction(LivingExtensionEvent.PerformAction<EntityItemAction<?>> event) {
     var action = event.getAction();
-    LivingExtension<?, ?> target = action.getSelectedTarget();
+    var target = action.getSelectedTarget();
     if (!event.getLiving().level().isClientSide()
-        && action.getType() == ActionTypes.USE_SYRINGE.get()) {
+        && action.type() == ActionTypes.USE_SYRINGE.get()) {
       SurvivalActionTypes.USE_SYRINGE_ON_ZOMBIE.get()
           .createEntityAction(event.getLiving(), target, action.getHand())
           .ifPresent(newAction -> {
