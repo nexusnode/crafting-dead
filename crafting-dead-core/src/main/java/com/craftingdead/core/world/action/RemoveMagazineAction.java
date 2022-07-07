@@ -56,7 +56,7 @@ public class RemoveMagazineAction extends TimedAction {
   }
 
   @Override
-  public ActionType<?> getType() {
+  public ActionType<?> type() {
     return ActionTypes.REMOVE_MAGAZINE.get();
   }
 
@@ -67,7 +67,7 @@ public class RemoveMagazineAction extends TimedAction {
 
   @Override
   public boolean start(boolean simulate) {
-    if (this.getPerformer().entity().isSprinting() || this.oldMagazineStack.isEmpty()) {
+    if (this.performer().entity().isSprinting() || this.oldMagazineStack.isEmpty()) {
       return false;
     }
 
@@ -76,10 +76,10 @@ public class RemoveMagazineAction extends TimedAction {
     }
 
     if (this.gun.isPerformingSecondaryAction()) {
-      this.gun.setPerformingSecondaryAction(this.getPerformer(), false, false);
+      this.gun.setPerformingSecondaryAction(this.performer(), false, false);
     }
 
-    if (this.getPerformer().level().isClientSide()) {
+    if (this.performer().level().isClientSide()) {
       this.animation = this.gun.getClient().getAnimation(GunAnimationEvent.RELOAD);
       this.gun.getClient().getAnimationController().addAnimation(this.animation);
     }
@@ -91,8 +91,8 @@ public class RemoveMagazineAction extends TimedAction {
   public boolean tick() {
     if (!this.performer.level().isClientSide()
         && !this.performer.mainHandItem().is(this.gun.getItemStack().getItem())
-        || this.getPerformer().entity().isSprinting()) {
-      this.getPerformer().cancelAction(true);
+        || this.performer().entity().isSprinting()) {
+      this.performer().cancelAction(true);
       return false;
     }
     return super.tick();
@@ -103,14 +103,14 @@ public class RemoveMagazineAction extends TimedAction {
     super.stop(reason);
 
     if (reason.isCompleted()) {
-      if (!this.getPerformer().level().isClientSide()) {
+      if (!this.performer().level().isClientSide()) {
         // This will be synced to the client by the gun.
         this.ammoProvider.setMagazineStack(ItemStack.EMPTY);
         if (!this.oldMagazineStack.isEmpty()
-            && this.getPerformer().entity() instanceof Player
+            && this.performer().entity() instanceof Player
             && !(this.oldMagazineStack.getCapability(Magazine.CAPABILITY).map(Magazine::isEmpty).orElse(true)
             && CraftingDead.serverConfig.reloadDestroyMagWhenEmpty.get())) {
-          ((Player) this.getPerformer().entity()).addItem(this.oldMagazineStack);
+          ((Player) this.performer().entity()).addItem(this.oldMagazineStack);
         }
       }
       return;
@@ -124,7 +124,7 @@ public class RemoveMagazineAction extends TimedAction {
   }
 
   @Override
-  public LivingExtension<?, ?> getPerformer() {
+  public LivingExtension<?, ?> performer() {
     return this.performer;
   }
 }

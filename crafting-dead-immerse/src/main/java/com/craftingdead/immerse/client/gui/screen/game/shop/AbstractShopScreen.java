@@ -29,7 +29,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.GameRenderer;
-import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
@@ -105,7 +104,7 @@ public abstract class AbstractShopScreen extends Screen {
   }
 
   @Override
-  public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTicks) {
+  public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
     this.renderBackground(poseStack);
 
     int mx = this.width / 2;
@@ -136,7 +135,7 @@ public abstract class AbstractShopScreen extends Screen {
     RenderSystem.setShader(GameRenderer::getPositionColorShader);
     RenderUtil.fillWithShadow(poseStack, mx - 150, my - 80, 120, bh + 15, 0x80000000);
 
-    super.render(poseStack, mouseX, mouseY, partialTicks);
+    super.render(poseStack, mouseX, mouseY, partialTick);
 
     // render info of item over
     RenderSystem.setShader(GameRenderer::getPositionColorShader);
@@ -147,7 +146,7 @@ public abstract class AbstractShopScreen extends Screen {
 
     for (var shopButton : this.shopButtons) {
       if (shopButton instanceof InfoPanel infoPanel && shopButton.isHoveredOrFocused()) {
-        infoPanel.renderInfo(mx, my, poseStack, mouseX, mouseY, partialTicks);
+        infoPanel.renderInfo(this.minecraft.level, mx, my, poseStack, mouseX, mouseY, partialTick);
       }
     }
 
@@ -177,9 +176,8 @@ public abstract class AbstractShopScreen extends Screen {
     var inventory = this.player.entity().getInventory();
     for (int i = 0; i < 7; i++) {
       var itemStack = inventory.getItem(i);
-      com.craftingdead.core.client.util.RenderUtil.renderGuiItem(poseStack, itemStack, mx + 120,
-          my - 60 + inventoryYOffset + (i * 21), 0xFFFFFFFF,
-          ItemTransforms.TransformType.FIXED);
+      com.craftingdead.core.client.util.RenderUtil.renderItemInCombatSlot(itemStack, mx + 160,
+          my - 60 + inventoryYOffset + (i * 21), poseStack, partialTick);
     }
   }
 }

@@ -40,15 +40,15 @@ public abstract class ItemAction implements Action {
   }
 
   public ItemStack getItemStack() {
-    return this.getPerformer().entity().getItemInHand(this.hand);
+    return this.performer().entity().getItemInHand(this.hand);
   }
 
   public int getTicksUsingItem() {
-    return this.getPerformer().entity().getTicksUsingItem();
+    return this.performer().entity().getTicksUsingItem();
   }
 
   private boolean checkHeldItem() {
-    return this.getType().getHeldItemPredicate().test(this.getItemStack());
+    return this.type().getHeldItemPredicate().test(this.getItemStack());
   }
 
   @Override
@@ -56,8 +56,8 @@ public abstract class ItemAction implements Action {
     if (this.checkHeldItem()) {
       if (!simulate) {
         this.originalStack = getItemStack();
-        if (!this.getPerformer().level().isClientSide()) {
-          this.getPerformer().entity().startUsingItem(this.hand);
+        if (!this.performer().level().isClientSide()) {
+          this.performer().entity().startUsingItem(this.hand);
         }
       }
       return true;
@@ -67,70 +67,70 @@ public abstract class ItemAction implements Action {
 
   @Override
   public void stop(StopReason reason) {
-    this.getPerformer().entity().stopUsingItem();
+    this.performer().entity().stopUsingItem();
     if (!reason.isCompleted()) {
       return;
     }
 
     final var heldStack = this.getItemStack();
 
-    final var resultStack = this.getResultItem(this.getPerformer())
+    final var resultStack = this.getResultItem(this.performer())
         .map(Item::getDefaultInstance)
         .orElse(ItemStack.EMPTY);
 
-    if (this.shouldConsumeItem(this.getPerformer())) {
+    if (this.shouldConsumeItem(this.performer())) {
       heldStack.shrink(1);
     }
 
     if (!resultStack.isEmpty()) {
       if (heldStack.isEmpty()) {
-        this.getPerformer().entity().setItemInHand(this.hand, resultStack);
-      } else if (this.getPerformer().entity() instanceof Player player
+        this.performer().entity().setItemInHand(this.hand, resultStack);
+      } else if (this.performer().entity() instanceof Player player
           && player.getInventory().add(resultStack)) {
-        this.getPerformer().entity().spawnAtLocation(resultStack);
+        this.performer().entity().spawnAtLocation(resultStack);
       }
     }
 
-    this.getType().getFinishSound().ifPresent(
-        sound -> this.getPerformer().entity().playSound(sound, 1.0F, 1.0F));
+    this.type().getFinishSound().ifPresent(
+        sound -> this.performer().entity().playSound(sound, 1.0F, 1.0F));
   }
 
   protected boolean shouldConsumeItem(LivingExtension<?, ?> performer) {
-    return this.getType().shouldConsumeItem() &&
+    return this.type().shouldConsumeItem() &&
         !(performer.entity() instanceof Player player && player.isCreative())
-        || this.getType().shouldConsumeItemInCreative();
+        || this.type().shouldConsumeItemInCreative();
   }
 
   protected Optional<Item> getResultItem(LivingExtension<?, ?> performer) {
-    return (!this.getType().useResultItemInCreative()
+    return (!this.type().useResultItemInCreative()
         && performer.entity() instanceof Player player
-        && player.isCreative()) ? Optional.empty() : this.getType().getResultItem();
+        && player.isCreative()) ? Optional.empty() : this.type().getResultItem();
   }
 
   @Override
   public boolean tick() {
-    if (!this.getPerformer().entity().isUsingItem()
+    if (!this.performer().entity().isUsingItem()
         || this.originalStack != this.getItemStack()) {
-      this.getPerformer().cancelAction(true);
+      this.performer().cancelAction(true);
       return false;
     }
 
-    if (this.getType().isFreezeMovement()) {
-      this.getPerformer().setMovementBlocked(true);
+    if (this.type().isFreezeMovement()) {
+      this.performer().setMovementBlocked(true);
     }
 
-    return this.getPerformer().entity().getUseItemRemainingTicks() == 1;
+    return this.performer().entity().getUseItemRemainingTicks() == 1;
   }
 
   public float getProgress(float partialTicks) {
-    if (!this.getPerformer().entity().isUsingItem()) {
+    if (!this.performer().entity().isUsingItem()) {
       return 0.0F;
     } else {
-      return (float) (this.getPerformer().entity().getTicksUsingItem() + partialTicks)
-          / this.getType().getDurationTicks();
+      return (float) (this.performer().entity().getTicksUsingItem() + partialTicks)
+          / this.type().getDurationTicks();
     }
   }
 
   @Override
-  public abstract ItemActionType<?> getType();
+  public abstract ItemActionType<?> type();
 }

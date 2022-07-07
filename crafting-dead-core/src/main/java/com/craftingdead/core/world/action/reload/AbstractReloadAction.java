@@ -48,7 +48,7 @@ public abstract class AbstractReloadAction extends TimedAction {
   }
 
   @Override
-  public LivingExtension<?, ?> getPerformer() {
+  public LivingExtension<?, ?> performer() {
     return this.performer;
   }
 
@@ -59,7 +59,7 @@ public abstract class AbstractReloadAction extends TimedAction {
 
   @Override
   public boolean start(boolean simulate) {
-    if (this.getPerformer().entity().isSprinting()) {
+    if (this.performer().entity().isSprinting() || this.performer().isCrouching()) {
       return false;
     }
 
@@ -68,14 +68,14 @@ public abstract class AbstractReloadAction extends TimedAction {
     }
 
     if (this.gun.isPerformingSecondaryAction()) {
-      this.gun.setPerformingSecondaryAction(this.getPerformer(), false, false);
+      this.gun.setPerformingSecondaryAction(this.performer(), false, false);
     }
 
     this.gun.getReloadSound()
-        .ifPresent(sound -> this.getPerformer().level().playSound(null,
-            this.getPerformer().entity(), sound, SoundSource.PLAYERS, 1.0F, 1.0F));
+        .ifPresent(sound -> this.performer().level().playSound(null,
+            this.performer().entity(), sound, SoundSource.PLAYERS, 1.0F, 1.0F));
 
-    if (this.getPerformer().level().isClientSide()) {
+    if (this.performer().level().isClientSide()) {
       this.animation = this.gun.getClient().getAnimation(GunAnimationEvent.RELOAD);
       this.gun.getClient().getAnimationController().addAnimation(this.animation);
     }
@@ -87,10 +87,10 @@ public abstract class AbstractReloadAction extends TimedAction {
 
   @Override
   public boolean tick() {
-    if (!this.getPerformer().level().isClientSide()
+    if (!this.performer().level().isClientSide()
         && !this.performer.mainHandItem().is(this.gun.getItemStack().getItem())
-        || this.getPerformer().entity().isSprinting()) {
-      this.getPerformer().cancelAction(true);
+        || this.performer().entity().isSprinting()) {
+      this.performer().cancelAction(true);
       return false;
     }
     return super.tick();
@@ -101,7 +101,7 @@ public abstract class AbstractReloadAction extends TimedAction {
     super.stop(reason);
 
     if (reason.isCompleted()) {
-      if (this.getPerformer().level().isClientSide()) {
+      if (this.performer().level().isClientSide()) {
         return;
       }
       // This will be synced to the client by the gun.
@@ -109,7 +109,7 @@ public abstract class AbstractReloadAction extends TimedAction {
       return;
     }
 
-    if (this.getPerformer().level().isClientSide()) {
+    if (this.performer().level().isClientSide()) {
       if (this.gun.getReloadSound().isPresent()) {
         // Stop reload sound
         Minecraft.getInstance().getSoundManager()

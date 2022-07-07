@@ -19,15 +19,12 @@
 package com.craftingdead.immerse.game.module.shop;
 
 import java.util.UUID;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
 
-public class ShopItem {
-
-  private final UUID id;
-  private final ItemStack itemStack;
-  private final int price;
+public record ShopItem(UUID id, ItemStack itemStack, int price) {
 
   public ShopItem(Item item) {
     this(UUID.randomUUID(), item, 0);
@@ -41,21 +38,13 @@ public class ShopItem {
     this(id, item.asItem().getDefaultInstance(), price);
   }
 
-  public ShopItem(UUID id, ItemStack itemStack, int price) {
-    this.id = id;
-    this.itemStack = itemStack;
-    this.price = price;
+  public void encode(FriendlyByteBuf out) {
+    out.writeUUID(this.id);
+    out.writeItemStack(this.itemStack, true);
+    out.writeVarInt(this.price);
   }
 
-  public UUID getId() {
-    return this.id;
-  }
-
-  public ItemStack getItemStack() {
-    return this.itemStack;
-  }
-
-  public int getPrice() {
-    return this.price;
+  public static ShopItem decode(FriendlyByteBuf in) {
+    return new ShopItem(in.readUUID(), in.readItem(), in.readVarInt());
   }
 }

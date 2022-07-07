@@ -59,9 +59,9 @@ public abstract class BuildAction extends ItemAction {
     var context = BlockPlaceContext.at(this.getContext(), blockPos,
         this.getContext().getClickedFace());
     var blockState = block.getStateForPlacement(context);
-    var existingBlockState = this.getPerformer().level().getBlockState(blockPos);
+    var existingBlockState = this.performer().level().getBlockState(blockPos);
     return existingBlockState.canBeReplaced(context)
-        && this.getType().getPlacementPredicate().test(this.performer, blockPos)
+        && this.type().getPlacementPredicate().test(this.performer, blockPos)
             ? new Placement(blockPos.immutable(), blockState, existingBlockState)
             : null;
   }
@@ -85,11 +85,11 @@ public abstract class BuildAction extends ItemAction {
     }
 
     if (this.getTicksUsingItem() % 10 == 0) {
-      this.getPerformer().entity().playSound(SoundEvents.WOOD_BREAK, 1.0F, 1.0F);
+      this.performer().entity().playSound(SoundEvents.WOOD_BREAK, 1.0F, 1.0F);
       this.placements.forEach(placement -> {
-        var currentStae = this.getPerformer().level().getBlockState(placement.blockPos());
+        var currentStae = this.performer().level().getBlockState(placement.blockPos());
         if (placement.existingBlockState() != currentStae) {
-          this.getPerformer().cancelAction(true);
+          this.performer().cancelAction(true);
         }
         this.addBuildEffects(placement.blockPos(), placement.blockState());
       });
@@ -99,19 +99,19 @@ public abstract class BuildAction extends ItemAction {
   }
 
   public void addBuildEffects(BlockPos blockPos, BlockState blockState) {
-    this.getPerformer().level().addDestroyBlockEffect(blockPos, blockState);
+    this.performer().level().addDestroyBlockEffect(blockPos, blockState);
   }
 
   public boolean placeBlock(BlockPos blockPos, BlockState blockState) {
-    var level = this.getPerformer().level();
+    var level = this.performer().level();
 
     if (level.isClientSide() || !level.setBlockAndUpdate(blockPos, blockState)) {
       return false;
     }
 
     blockState.getBlock().setPlacedBy(level, blockPos, blockState,
-        this.getPerformer().entity(), this.getItemStack());
-    this.getType().getBlockPlacementHandler().accept(this.performer, blockPos);
+        this.performer().entity(), this.getItemStack());
+    this.type().getBlockPlacementHandler().accept(this.performer, blockPos);
     if (this.performer.entity() instanceof ServerPlayer player) {
       CriteriaTriggers.PLACED_BLOCK.trigger(player, blockPos, this.getItemStack());
     }
@@ -121,16 +121,16 @@ public abstract class BuildAction extends ItemAction {
 
   @Override
   public ActionObserver createPerformerObserver() {
-    return ActionObserver.create(this, ProgressBar.create(this.getType(), null, this::getProgress));
+    return ActionObserver.create(this, ProgressBar.create(this.type(), null, this::getProgress));
   }
 
   @Override
-  public LivingExtension<?, ?> getPerformer() {
+  public LivingExtension<?, ?> performer() {
     return this.performer;
   }
 
   @Override
-  public abstract BuildActionType getType();
+  public abstract BuildActionType type();
 
   @Override
   public void stop(StopReason reason) {

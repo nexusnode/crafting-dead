@@ -27,10 +27,10 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.item.TooltipFlag.Default;
+import net.minecraft.world.level.Level;
 
 public class ItemButton extends GameButton implements InfoPanel {
 
@@ -40,14 +40,14 @@ public class ItemButton extends GameButton implements InfoPanel {
   private final ShopItem item;
 
   public ItemButton(ClientShopModule shop, ShopItem item) {
-    super(0, 0, 0, 0, item.getItemStack().getDisplayName(), btn -> shop.buyItem(item.getId()));
+    super(0, 0, 0, 0, item.itemStack().getHoverName(), btn -> shop.buyItem(item.id()));
     this.shop = shop;
     this.item = item;
   }
 
   private Component getFormattedPrice() {
-    return new TextComponent("$" + this.item.getPrice())
-        .withStyle(this.shop.canAfford(this.item.getPrice())
+    return new TextComponent("$" + this.item.price())
+        .withStyle(this.shop.canAfford(this.item.price())
             ? ChatFormatting.GREEN
             : ChatFormatting.RED);
   }
@@ -55,33 +55,25 @@ public class ItemButton extends GameButton implements InfoPanel {
   @Override
   public void renderButton(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
     super.renderButton(poseStack, mouseX, mouseY, partialTick);
-    if (this.item.getPrice() > 0) {
+    if (this.item.price() > 0) {
       RenderUtil.renderTextRight(this.font, poseStack, x + this.width - 2, y + 7,
           this.getFormattedPrice(), 0, true);
     }
   }
 
   @Override
-  public void renderInfo(int x, int y, PoseStack poseStack, int mouseX, int mouseY,
-      float partialTick) {
+  public void renderInfo(Level level, int x, int y, PoseStack poseStack,
+      int mouseX, int mouseY, float partialTick) {
     this.font.drawShadow(poseStack, this.getMessage(), x - 20, y - 65, 0xFFFFFFFF);
 
     drawCenteredString(poseStack, this.font, this.getFormattedPrice(), x + 53, y - 75, 0);
 
-    poseStack.pushPose();
-    {
-      poseStack.translate(x + 10, y - 40, 0);
-      var scale = 1.2F;
-      poseStack.scale(scale, scale, scale);
-      com.craftingdead.core.client.util.RenderUtil.renderGuiItem(poseStack,
-          this.item.getItemStack(), 0, 0,
-          0xFFFFFFFF, ItemTransforms.TransformType.FIXED);
-    }
-    poseStack.popPose();
+    com.craftingdead.core.client.util.RenderUtil.renderItemInCombatSlot(this.item.itemStack(),
+        x + this.width / 2 + 8, y - 40, poseStack, partialTick);
 
     List<Component> itemInfo = new ArrayList<>();
-    this.item.getItemStack().getItem().appendHoverText(this.item.getItemStack(), null, itemInfo,
-        Default.NORMAL);
+    this.item.itemStack().getItem().appendHoverText(
+        this.item.itemStack(), level, itemInfo, Default.NORMAL);
 
     for (int i = 0; i < itemInfo.size(); i++) {
       var info = itemInfo.get(i);

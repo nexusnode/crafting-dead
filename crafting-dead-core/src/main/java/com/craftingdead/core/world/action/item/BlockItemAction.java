@@ -64,7 +64,7 @@ public class BlockItemAction extends ItemAction {
 
   @Override
   public ActionObserver createPerformerObserver() {
-    return ActionObserver.create(this, ProgressBar.create(this.getType(), null, this::getProgress));
+    return ActionObserver.create(this, ProgressBar.create(this.type(), null, this::getProgress));
   }
 
   @Override
@@ -90,12 +90,12 @@ public class BlockItemAction extends ItemAction {
   }
 
   @Override
-  public LivingExtension<?, ?> getPerformer() {
+  public LivingExtension<?, ?> performer() {
     return this.performer;
   }
 
   @Override
-  public ItemActionType<?> getType() {
+  public ItemActionType<?> type() {
     return this.type;
   }
 }

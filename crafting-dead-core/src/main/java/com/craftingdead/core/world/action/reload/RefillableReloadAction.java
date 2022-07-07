@@ -39,7 +39,7 @@ public class RefillableReloadAction extends AbstractReloadAction {
   }
 
   @Override
-  public ActionType<?> getType() {
+  public ActionType<?> type() {
     return ActionTypes.REFILLABLE_RELOAD.get();
   }
 

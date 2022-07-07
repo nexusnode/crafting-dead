@@ -204,7 +204,7 @@ public class IngameGui {
           poseStack.translate(4, 1, 0);
         }
 
-        RenderUtil.renderGuiItem(poseStack, entry.weaponStack(), 0, 0, 0xFFFFFF + (opacity << 24));
+        RenderUtil.renderGuiItem(poseStack, entry.weaponStack(), alpha);
       }
       poseStack.popPose();
     }

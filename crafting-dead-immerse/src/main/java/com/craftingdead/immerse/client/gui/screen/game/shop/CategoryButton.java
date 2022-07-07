@@ -23,22 +23,24 @@ import com.craftingdead.immerse.game.module.shop.ShopCategory;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.level.Level;
 
 public class CategoryButton extends GameButton implements InfoPanel {
 
   private final Component info;
 
-  public CategoryButton(AbstractShopScreen screen, PlayerExtension<?> player, ShopCategory category) {
-    super(0, 0, 0, 0, category.getDisplayName(),
+  public CategoryButton(AbstractShopScreen screen, PlayerExtension<?> player,
+      ShopCategory category) {
+    super(0, 0, 0, 0, category.displayName(),
         btn -> Minecraft.getInstance()
             .setScreen(new CategoryScreen(screen, player, category)));
-    this.info = category.getInfo();
+    this.info = category.info();
   }
 
   @Override
-  public void renderInfo(int x, int y, PoseStack matrixStack, int mouseX, int mouseY,
-      float partialTicks) {
-    this.font.drawShadow(matrixStack, this.getMessage(), x - 20, y - 65, 0xFFFFFFFF);
+  public void renderInfo(Level level, int x, int y, PoseStack poseStack,
+      int mouseX, int mouseY, float partialTick) {
+    this.font.drawShadow(poseStack, this.getMessage(), x - 20, y - 65, 0xFFFFFFFF);
     this.font.drawWordWrap(this.info, x - 20, y - 45, 90, 0xFFFFFFFF);
   }
 }

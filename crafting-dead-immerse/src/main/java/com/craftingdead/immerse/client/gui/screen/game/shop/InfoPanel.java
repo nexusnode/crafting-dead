@@ -19,9 +19,10 @@
 package com.craftingdead.immerse.client.gui.screen.game.shop;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.world.level.Level;
 
 public interface InfoPanel {
 
-  void renderInfo(int x, int y, PoseStack matrixStack, int mouseX, int mouseY,
-      float partialTicks);
+  void renderInfo(Level level, int x, int y, PoseStack poseStack,
+      int mouseX, int mouseY, float partialTick);
 }

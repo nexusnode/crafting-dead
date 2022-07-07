@@ -43,9 +43,9 @@ public interface Action {
     return () -> this;
   }
 
-  LivingExtension<?, ?> getPerformer();
+  LivingExtension<?, ?> performer();
 
-  default Optional<LivingExtension<?, ?>> getTarget() {
+  default Optional<LivingExtension<?, ?>> target() {
     return Optional.empty();
   }
 
@@ -53,7 +53,7 @@ public interface Action {
     return () -> this;
   }
 
-  ActionType<?> getType();
+  ActionType<?> type();
 
   enum StopReason {
 

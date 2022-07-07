@@ -86,8 +86,8 @@ public class KilledMessage {
       poseStack.translate(x + 110, y + 50, 0);
       var scale = 1.2F;
       poseStack.scale(scale, scale, scale);
-      com.craftingdead.core.client.util.RenderUtil.renderGuiItem(poseStack, this.itemStack, 0, 0,
-          0xFFFFFFFF, ItemTransforms.TransformType.FIXED);
+      com.craftingdead.core.client.util.RenderUtil.renderGuiItem(poseStack, this.itemStack,
+          1.0F, ItemTransforms.TransformType.FIXED);
     }
     poseStack.popPose();
   }

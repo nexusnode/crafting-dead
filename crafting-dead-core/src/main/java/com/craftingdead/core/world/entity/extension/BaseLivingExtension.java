@@ -177,7 +177,7 @@ class BaseLivingExtension<E extends LivingEntity, H extends LivingHandler>
     }
 
     if (this.isObservingAction()
-        || action.getTarget().map(LivingExtension::isObservingAction).orElse(false)) {
+        || action.target().map(LivingExtension::isObservingAction).orElse(false)) {
       return false;
     }
 
@@ -189,16 +189,16 @@ class BaseLivingExtension<E extends LivingEntity, H extends LivingHandler>
     this.action = action;
     this.setActionObserver(action.createPerformerObserver());
 
-    action.getTarget().ifPresent(target -> target.setActionObserver(action.createTargetObserver()));
+    action.target().ifPresent(target -> target.setActionObserver(action.createTargetObserver()));
 
     if (sendUpdate) {
       var target = this.level().isClientSide()
           ? PacketDistributor.SERVER.noArg()
           : PacketDistributor.TRACKING_ENTITY_AND_SELF.with(this::entity);
       var buf = new FriendlyByteBuf(Unpooled.buffer());
-      ((ActionType<T>) action.getType()).encode(action, buf);
+      ((ActionType<T>) action.type()).encode(action, buf);
       NetworkChannel.PLAY.getSimpleChannel().send(target,
-          new PerformActionMessage(action.getType(), this.entity().getId(), buf));
+          new PerformActionMessage(action.type(), this.entity().getId(), buf));
     }
     return true;
   }
@@ -231,7 +231,7 @@ class BaseLivingExtension<E extends LivingEntity, H extends LivingHandler>
   private void stopAction(Action.StopReason reason) {
     if (this.action != null) {
       this.action.stop(reason);
-      this.action.getTarget().ifPresent(target -> target.setActionObserver(null));
+      this.action.target().ifPresent(target -> target.setActionObserver(null));
       this.setActionObserver(null);
       this.action = null;
     }

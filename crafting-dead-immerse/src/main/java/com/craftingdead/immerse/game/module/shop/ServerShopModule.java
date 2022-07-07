@@ -71,10 +71,10 @@ public class ServerShopModule extends ShopModule implements ServerModule, GameMo
     }
 
     var user = this.users.get(player.entity().getUUID());
-    if (user.money >= item.getPrice() && user.buyTimeSeconds != 0) {
-      user.money -= item.getPrice();
+    if (user.money >= item.price() && user.buyTimeSeconds != 0) {
+      user.money -= item.price();
       user.sync();
-      this.purchaseHandler.accept(player, item.getItemStack());
+      this.purchaseHandler.accept(player, item.itemStack());
     }
   }
 

@@ -19,29 +19,35 @@
 package com.craftingdead.immerse.game.module.shop;
 
 import java.util.List;
+import java.util.UUID;
+import java.util.function.Function;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 
-public class ShopCategory {
+public record ShopCategory(Component displayName, Component info, List<ShopItem> items) {
 
-  private final Component displayName;
-  private final Component info;
-  private final List<ShopItem> items;
-
-  public ShopCategory(Component displayName, Component info, List<ShopItem> items) {
-    this.displayName = displayName;
-    this.info = info;
-    this.items = items;
+  public void encode(FriendlyByteBuf out) {
+    out.writeComponent(this.displayName);
+    out.writeComponent(this.info);
+    out.writeVarInt(this.items.size());
+    for (var item : this.items) {
+      out.writeUUID(item.id());
+    }
   }
 
-  public Component getDisplayName() {
-    return this.displayName;
-  }
-
-  public Component getInfo() {
-    return this.info;
-  }
-
-  public List<ShopItem> getItems() {
-    return this.items;
+  public static ShopCategory decode(FriendlyByteBuf in, Function<UUID, ShopItem> itemLookup) {
+    var displayName = in.readComponent();
+    var info = in.readComponent();
+    int categoryItemsSize = in.readVarInt();
+    var items = new ShopItem[categoryItemsSize];
+    for (int j = 0; j < categoryItemsSize; j++) {
+      var itemId = in.readUUID();
+      var item = itemLookup.apply(itemId);
+      if (item == null) {
+        throw new IllegalStateException("Unknown item with ID: " + itemId.toString());
+      }
+      items[j] = item;
+    }
+    return new ShopCategory(displayName, info, List.of(items));
   }
 }

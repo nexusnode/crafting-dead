@@ -22,7 +22,6 @@ import java.util.Random;
 import org.jetbrains.annotations.Nullable;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.client.ClientDist;
-import com.craftingdead.core.client.renderer.item.CombatSlotItemRenderer;
 import com.craftingdead.core.client.util.RenderUtil;
 import com.craftingdead.core.world.action.ActionObserver;
 import com.craftingdead.core.world.effect.ModMobEffects;
@@ -31,7 +30,6 @@ import com.craftingdead.core.world.item.gun.Gun;
 import com.craftingdead.core.world.item.gun.ammoprovider.AmmoProvider;
 import com.craftingdead.core.world.item.gun.magazine.Magazine;
 import com.craftingdead.core.world.item.scope.Scope;
-import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.ChatFormatting;
@@ -39,8 +37,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.player.AbstractClientPlayer;
-import net.minecraft.client.renderer.block.model.ItemTransforms;
-import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
@@ -280,7 +276,7 @@ public class IngameGui {
     }
     RenderUtil.fill(poseStack, boxX, boxY, boxWidth, boxHeight, 0x66000000);
     this.minecraft.font.drawShadow(poseStack, "1", boxX + boxWidth - 10, boxY + 5, 0xFFFFFFFF);
-    this.renderItemInCombatSlot(primaryStack,
+    RenderUtil.renderItemInCombatSlot(primaryStack,
         boxX + boxWidth - rightPadding, boxY + topPadding, poseStack, partialTick);
 
 
@@ -292,7 +288,7 @@ public class IngameGui {
     }
     RenderUtil.fill(poseStack, boxX, boxY, boxWidth, boxHeight, 0x66000000);
     this.minecraft.font.drawShadow(poseStack, "2", boxX + boxWidth - 10, boxY + 5, 0xFFFFFFFF);
-    this.renderItemInCombatSlot(secondaryStack,
+    RenderUtil.renderItemInCombatSlot(secondaryStack,
         boxX + boxWidth - rightPadding, boxY + topPadding, poseStack, partialTick);
 
     // Render melee
@@ -303,7 +299,7 @@ public class IngameGui {
     }
     RenderUtil.fill(poseStack, boxX, boxY, boxWidth, boxHeight, 0x66000000);
     this.minecraft.font.drawShadow(poseStack, "3", boxX + boxWidth - 10, boxY + 5, 0xFFFFFFFF);
-    this.renderItemInCombatSlot(meleeStack,
+    RenderUtil.renderItemInCombatSlot(meleeStack,
         boxX + boxWidth - rightPadding, boxY + topPadding, poseStack, partialTick);
 
     // Render extras
@@ -319,8 +315,13 @@ public class IngameGui {
       this.minecraft.font.drawShadow(poseStack, String.valueOf(4 + i), boxX + boxWidth - 7,
           boxY + 1, 0xFFFFFFFF);
 
-      RenderUtil.renderGuiItem(poseStack, extraStack, boxX + boxWidth / 2 - 16 / 2,
-          boxY + (boxHeight / 2) - 6, 0xFFFFFFFF);
+      poseStack.pushPose();
+      {
+        poseStack.translate(boxX + boxWidth / 2 - 16 / 2,
+            boxY + (boxHeight / 2) - 6, 0.0D);
+        RenderUtil.renderGuiItem(poseStack, extraStack, 1.0F);
+      }
+      poseStack.popPose();
 
       boxX += 28;
     }
@@ -369,33 +370,8 @@ public class IngameGui {
     }
   }
 
-  private void renderItemInCombatSlot(ItemStack itemStack, int x, int y, PoseStack poseStack,
-      float partialTick) {
-    poseStack.pushPose();
-
-    var halfItemWidth = 8.0F;
-    poseStack.translate(x - halfItemWidth, y + halfItemWidth, 0);
-
-    var renderer = this.client.getItemRendererManager().getItemRenderer(itemStack.getItem());
-    if (renderer instanceof CombatSlotItemRenderer combatSlotRenderer) {
-      RenderUtil.setupItemRendering(poseStack);
-      Lighting.setupForFlatItems();
-      var bufferSource = this.minecraft.renderBuffers().bufferSource();
-      combatSlotRenderer.renderInCombatSlot(itemStack, poseStack, partialTick,
-          bufferSource, RenderUtil.FULL_LIGHT,
-          OverlayTexture.NO_OVERLAY);
-      bufferSource.endBatch();
-      Lighting.setupFor3DItems();
-    } else {
-      poseStack.translate(-8, -4, 0);
-      RenderUtil.renderGuiItem(poseStack, itemStack, 0, 0, 0xFFFFFFFF,
-          ItemTransforms.TransformType.GUI);
-    }
-    poseStack.popPose();
-  }
-
-  public void renderCrosshairs(PoseStack poseStack, float accuracy, float partialTicks, int width,
-      int height) {
+  public void renderCrosshairs(PoseStack poseStack, float accuracy, float partialTick,
+      int width, int height) {
     final var imageWidth = 16.0F;
     final var imageHeight = 16.0F;
 

@@ -29,7 +29,6 @@ import com.craftingdead.immerse.game.module.GameModule;
 import com.craftingdead.immerse.game.module.ModuleType;
 import com.craftingdead.immerse.game.module.ModuleTypes;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.chat.Component;
 
 class ShopModule implements GameModule, Synched {
 
@@ -41,8 +40,8 @@ class ShopModule implements GameModule, Synched {
   }
 
   public void addCategory(ShopCategory category) {
-    for (ShopItem item : category.getItems()) {
-      this.items.put(item.getId(), item);
+    for (var item : category.items()) {
+      this.items.put(item.id(), item);
     }
     this.categories.add(category);
   }
@@ -51,25 +50,14 @@ class ShopModule implements GameModule, Synched {
   public void encode(FriendlyByteBuf out, boolean writeAll) {
     if (writeAll) {
       out.writeVarInt(this.items.size());
-      for (ShopItem item : this.items.values()) {
-        out.writeUUID(item.getId());
-        out.writeItemStack(item.getItemStack(), true);
-        out.writeVarInt(item.getPrice());
-      }
+      this.items.values().forEach(item -> item.encode(out));
     } else {
       out.writeVarInt(-1);
     }
 
     if (writeAll) {
       out.writeVarInt(this.categories.size());
-      for (ShopCategory category : this.categories) {
-        out.writeComponent(category.getDisplayName());
-        out.writeComponent(category.getInfo());
-        out.writeVarInt(category.getItems().size());
-        for (ShopItem item : category.getItems()) {
-          out.writeUUID(item.getId());
-        }
-      }
+      this.categories.forEach(category -> category.encode(out));
     } else {
       out.writeVarInt(-1);
     }
@@ -81,8 +69,8 @@ class ShopModule implements GameModule, Synched {
     if (itemsSize > 0) {
       this.items.clear();
       for (int i = 0; i < itemsSize; i++) {
-        ShopItem item = new ShopItem(in.readUUID(), in.readItem(), in.readVarInt());
-        this.items.put(item.getId(), item);
+        var item = ShopItem.decode(in);
+        this.items.put(item.id(), item);
       }
     }
 
@@ -90,19 +78,7 @@ class ShopModule implements GameModule, Synched {
     if (categoriesSize > 0) {
       this.categories.clear();
       for (int i = 0; i < categoriesSize; i++) {
-        Component displayName = in.readComponent();
-        Component info = in.readComponent();
-        List<ShopItem> items = new ArrayList<>();
-        int categoryItemsSize = in.readVarInt();
-        for (int j = 0; j < categoryItemsSize; j++) {
-          UUID itemId = in.readUUID();
-          ShopItem item = this.items.get(itemId);
-          if (item == null) {
-            throw new IllegalStateException("Unknown item with ID: " + itemId.toString());
-          }
-          items.add(item);
-        }
-        this.categories.add(new ShopCategory(displayName, info, items));
+        this.categories.add(ShopCategory.decode(in, this.items::get));
       }
     }
   }

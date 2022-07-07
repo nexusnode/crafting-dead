@@ -55,7 +55,7 @@ public final class EntityItemAction<T extends LivingExtension<?, ?>> extends Ite
 
   @Override
   public ActionObserver createPerformerObserver() {
-    return ActionObserver.create(this, ProgressBar.create(this.getType(),
+    return ActionObserver.create(this, ProgressBar.create(this.type(),
         this.performer == this.selectedTarget ? null
             : new TranslatableComponent("action.target",
                 this.selectedTarget.entity().getDisplayName().getString()),
@@ -64,7 +64,7 @@ public final class EntityItemAction<T extends LivingExtension<?, ?>> extends Ite
 
   @Override
   public ActionObserver createTargetObserver() {
-    return ActionObserver.create(this, ProgressBar.create(this.getType(),
+    return ActionObserver.create(this, ProgressBar.create(this.type(),
         new TranslatableComponent("action.performer",
             this.performer.entity().getDisplayName().getString()),
         this::getProgress));
@@ -110,19 +110,19 @@ public final class EntityItemAction<T extends LivingExtension<?, ?>> extends Ite
   }
 
   @Override
-  public LivingExtension<?, ?> getPerformer() {
+  public LivingExtension<?, ?> performer() {
     return this.performer;
   }
 
   @Override
-  public Optional<LivingExtension<?, ?>> getTarget() {
+  public Optional<LivingExtension<?, ?>> target() {
     return this.selectedTarget == this.performer
         ? Optional.empty()
         : Optional.ofNullable(this.selectedTarget);
   }
 
   @Override
-  public ItemActionType<?> getType() {
+  public ItemActionType<?> type() {
     return this.type;
   }
 }
