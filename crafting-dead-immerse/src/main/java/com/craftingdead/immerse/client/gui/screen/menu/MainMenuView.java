@@ -163,7 +163,7 @@ public class MainMenuView extends ParentView {
     super.added();
     AtomicReference<RolePayload> primaryRole = new AtomicReference<>();
     this.listener = Rocket.getGameClientGatewayFeed()
-        .flatMap(gateway -> gateway.getGameProfileFeed(gateway.user().id())
+        .flatMap(gateway -> gateway.getGameProfileFeed()
             .doOnNext(__ -> primaryRole.set(null))
             .flatMapIterable(GameProfilePayload::roles)
             .flatMap(gateway::getRoleFeed)
