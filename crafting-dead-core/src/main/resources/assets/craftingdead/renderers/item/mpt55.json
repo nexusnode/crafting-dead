@@ -21,11 +21,20 @@
         ]
     },
     "scope_aim_transform": {
-        "translation": [
-            -9.5,
-            0,
-            2
-        ]
+        "craftingdead:red_dot_sight": {
+            "translation": [
+                -9.5,
+                0.1,
+                2
+            ]
+        },
+        "craftingdead:acog_sight": {
+            "translation": [
+                -9.5,
+                0.4,
+                2
+            ]
+        }
     },
     "hand_transforms": {
         "held_right_handed": {

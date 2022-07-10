@@ -25,18 +25,6 @@
             0
         ]
     },
-    "scope_aim_transform": {
-        "translation": [
-            -9,
-            5.75,
-            2
-        ],
-        "rotation": [
-            1,
-            0,
-            0
-        ]
-    },
     "hand_transforms": {
         "held_right_handed": {
             "right_hand": {

@@ -19,6 +19,7 @@
 package com.craftingdead.core.client.renderer.item;
 
 
+import com.craftingdead.core.world.inventory.GunCraftSlotType;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -28,6 +29,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import net.minecraftforge.registries.ForgeRegistryEntry;
 import org.jetbrains.annotations.Nullable;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.capability.CapabilityUtil;
@@ -447,7 +449,10 @@ public class GunRenderer implements CombatSlotItemRenderer {
         ? TransformationHelper.slerp(normalTransform,
             gun.hasIronSight()
                 ? this.properties.aimTransform()
-                : this.properties.scopeAimTransform(),
+                : this.properties.scopeAimTransform().getOrDefault(gun.getAttachments().stream()
+                    .filter(attachment -> attachment.getInventorySlot() == GunCraftSlotType.OVERBARREL_ATTACHMENT)
+                    .map(ForgeRegistryEntry::getRegistryName)
+                    .findAny().orElse(null), this.properties.aimTransform()),
             aimingPct)
         : normalTransform;
 
