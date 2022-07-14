@@ -764,7 +764,6 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
     tag.put("ammoProvider", this.ammoProvider.serializeNBT());
     var attachmentsTag = this.attachments.values().stream()
         .map(Attachment::getRegistryName)
-        .filter(Objects::nonNull) // Is this? it removes the null warning - juanmuscaria
         .map(ResourceLocation::toString)
         .map(StringTag::valueOf)
         .collect(ListTag::new, ListTag::add, List::addAll);
@@ -790,7 +789,6 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
         .map(Tag::getAsString)
         .map(ResourceLocation::new)
         .map(Attachments.registry.get()::getValue)
-        .filter(Objects::nonNull)
         .collect(Collectors.toMap(Attachment::getInventorySlot, v -> v)));
     this.setPaintStack(ItemStack.of(tag.getCompound("paintStack")));
     this.skin = Skin.CODEC.parse(NbtOps.INSTANCE, tag.get("skin")).result().orElse(null);
