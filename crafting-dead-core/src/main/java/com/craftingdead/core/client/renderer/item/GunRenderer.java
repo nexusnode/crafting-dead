@@ -19,24 +19,13 @@
 package com.craftingdead.core.client.renderer.item;
 
 
-import com.craftingdead.core.world.inventory.GunCraftSlotType;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import net.minecraftforge.registries.ForgeRegistryEntry;
-import org.jetbrains.annotations.Nullable;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.capability.CapabilityUtil;
 import com.craftingdead.core.client.model.geom.ModModelLayers;
 import com.craftingdead.core.client.util.RenderUtil;
 import com.craftingdead.core.util.EasingFunction;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
+import com.craftingdead.core.world.inventory.GunCraftSlotType;
 import com.craftingdead.core.world.item.GunItem;
 import com.craftingdead.core.world.item.gun.Gun;
 import com.craftingdead.core.world.item.gun.attachment.Attachment;
@@ -50,6 +39,15 @@ import com.mojang.datafixers.util.Pair;
 import com.mojang.math.Transformation;
 import com.mojang.math.Vector3f;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.geom.ModelLayerLocation;
@@ -81,6 +79,7 @@ import net.minecraftforge.client.model.ForgeModelBakery;
 import net.minecraftforge.client.model.SimpleModelState;
 import net.minecraftforge.client.model.data.EmptyModelData;
 import net.minecraftforge.common.model.TransformationHelper;
+import org.jetbrains.annotations.Nullable;
 
 public class GunRenderer implements CombatSlotItemRenderer {
 
@@ -322,7 +321,7 @@ public class GunRenderer implements CombatSlotItemRenderer {
       var x = transform.getTranslation().x();
       var y = transform.getTranslation().y();
       var z = transform.getTranslation().z();
-      if (gun.getAttachments().contains(Attachments.SUPPRESSOR.get())) {
+      if (gun.getAttachments().containsValue(Attachments.SUPPRESSOR.get())) {
         z -= 0.4;
       }
 
@@ -449,10 +448,8 @@ public class GunRenderer implements CombatSlotItemRenderer {
         ? TransformationHelper.slerp(normalTransform,
             gun.hasIronSight()
                 ? this.properties.aimTransform()
-                : this.properties.scopeAimTransform().getOrDefault(gun.getAttachments().stream()
-                    .filter(attachment -> attachment.getInventorySlot() == GunCraftSlotType.OVERBARREL_ATTACHMENT)
-                    .map(ForgeRegistryEntry::getRegistryName)
-                    .findAny().orElse(null), this.properties.aimTransform()),
+                : this.properties.scopeAimTransform().getOrDefault(gun.getAttachments()
+                    .get(GunCraftSlotType.OVERBARREL_ATTACHMENT).getRegistryName(), this.properties.aimTransform()),
             aimingPct)
         : normalTransform;
 
@@ -544,7 +541,7 @@ public class GunRenderer implements CombatSlotItemRenderer {
       }
     }
 
-    for (var attachment : gun.getAttachments()) {
+    for (var attachment : gun.getAttachments().values()) {
       var transform = this.properties.attachmentTransforms()
           .getOrDefault(attachment.getRegistryName(), Transformation.identity());
       transform.push(matrixStack);

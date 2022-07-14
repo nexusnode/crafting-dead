@@ -104,7 +104,7 @@ public interface Gun extends CombatSlotProvider, Synched {
    * 
    * @return the attachments
    */
-  Set<Attachment> getAttachments();
+  Map<GunCraftSlotType, Attachment> getAttachments();
 
   /**
    * Get the combined attachment multiplier of the specified {@link MultiplierType}.
@@ -113,7 +113,7 @@ public interface Gun extends CombatSlotProvider, Synched {
    * @return the combined multiplier
    */
   default float getAttachmentMultiplier(Attachment.MultiplierType multiplierType) {
-    return this.getAttachments().stream()
+    return this.getAttachments().values().stream()
         .map(attachment -> attachment.getMultiplier(multiplierType))
         .reduce(1.0F, (x, y) -> x * y);
   }
@@ -123,7 +123,7 @@ public interface Gun extends CombatSlotProvider, Synched {
    * 
    * @param attachments - the attachments to set
    */
-  void setAttachments(Set<Attachment> attachments);
+  void setAttachments(Map<GunCraftSlotType, Attachment> attachments);
 
   /**
    * If the gun has an iron sight (no over-barrel attachments).
@@ -131,12 +131,7 @@ public interface Gun extends CombatSlotProvider, Synched {
    * @return <code>true</code> if the gun has an iron sight, <code>false</code> otherwise
    */
   default boolean hasIronSight() {
-    for (Attachment attachmentItem : this.getAttachments()) {
-      if (attachmentItem.getInventorySlot() == GunCraftSlotType.OVERBARREL_ATTACHMENT) {
-        return false;
-      }
-    }
-    return true;
+    return !this.getAttachments().containsKey(GunCraftSlotType.OVERBARREL_ATTACHMENT);
   }
 
   /**

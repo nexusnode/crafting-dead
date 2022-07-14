@@ -18,19 +18,20 @@
 
 package com.craftingdead.core.event;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
+import com.craftingdead.core.world.inventory.GunCraftSlotType;
 import com.craftingdead.core.world.item.gun.Gun;
 import com.craftingdead.core.world.item.gun.ammoprovider.AmmoProvider;
 import com.craftingdead.core.world.item.gun.attachment.Attachment;
-import net.minecraft.world.level.block.state.BlockState;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.level.Level;
 import net.minecraftforge.eventbus.api.Cancelable;
 import net.minecraftforge.eventbus.api.Event;
 
@@ -77,13 +78,13 @@ public abstract class GunEvent extends Event {
 
   public static class Initialize extends GunEvent {
 
-    private final Set<Attachment> attachments = new HashSet<>();
+    private final Map<GunCraftSlotType, Attachment> attachments = new HashMap<>();
     private AmmoProvider ammoProvider;
 
     public Initialize(Gun gun, ItemStack itemStack,
-        Set<Attachment> attachments, AmmoProvider ammoProvider) {
+        Map<GunCraftSlotType, Attachment> attachments, AmmoProvider ammoProvider) {
       super(gun, itemStack);
-      this.attachments.addAll(attachments);
+      this.attachments.putAll(attachments);
       this.ammoProvider = ammoProvider;
     }
 
@@ -96,11 +97,11 @@ public abstract class GunEvent extends Event {
     }
 
     public void addAttachment(Attachment attachment) {
-      this.attachments.add(attachment);
+      this.attachments.put(attachment.getInventorySlot(), attachment);
     }
 
-    public Set<Attachment> getAttachments() {
-      return Collections.unmodifiableSet(this.attachments);
+    public Map<GunCraftSlotType, Attachment> getAttachments() {
+      return Collections.unmodifiableMap(this.attachments);
     }
   }
 

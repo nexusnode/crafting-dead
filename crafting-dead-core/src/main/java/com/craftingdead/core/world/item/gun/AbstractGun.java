@@ -18,20 +18,6 @@
 
 package com.craftingdead.core.world.item.gun;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
-import java.util.Set;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
-import org.jetbrains.annotations.Nullable;
-import org.slf4j.Logger;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.event.GunEvent;
 import com.craftingdead.core.network.NetworkChannel;
@@ -46,6 +32,7 @@ import com.craftingdead.core.world.damagesource.ModDamageSource;
 import com.craftingdead.core.world.entity.extension.EntitySnapshot;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
+import com.craftingdead.core.world.inventory.GunCraftSlotType;
 import com.craftingdead.core.world.inventory.ModEquipmentSlot;
 import com.craftingdead.core.world.item.enchantment.ModEnchantments;
 import com.craftingdead.core.world.item.gun.ammoprovider.AmmoProvider;
@@ -58,10 +45,24 @@ import com.craftingdead.core.world.item.gun.skin.Paint;
 import com.craftingdead.core.world.item.gun.skin.Skin;
 import com.craftingdead.core.world.item.hat.Hat;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.mojang.logging.LogUtils;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Random;
+import java.util.Set;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 import net.minecraft.Util;
 import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
@@ -112,6 +113,8 @@ import net.minecraftforge.common.util.LogicalSidedProvider;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.network.PacketDistributor;
+import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
 
 public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> {
 
@@ -161,7 +164,7 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
   /**
    * Immutable set of attachments.
    */
-  private Set<Attachment> attachments;
+  private Map<GunCraftSlotType, Attachment> attachments;
   private boolean attachmentsDirty;
 
   private Iterator<FireMode> fireModeInfiniteIterator;
@@ -205,12 +208,12 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
     this.initialized = true;
 
     var event = new GunEvent.Initialize(this, this.itemStack,
-        this.attachments == null ? Set.of() : this.attachments,
+        this.attachments == null ? Map.of() : this.attachments,
         this.ammoProvider == null ? this.createAmmoProvider() : this.ammoProvider);
     MinecraftForge.EVENT_BUS.post(event);
 
     this.setAmmoProvider(event.getAmmoProvider());
-    this.attachments = Set.copyOf(event.getAttachments());
+    this.attachments = Map.copyOf(event.getAttachments());
 
     this.fireModeInfiniteIterator = Iterables.cycle(Iterables.filter(this.getFireModes(),
         (mode) -> mode != FireMode.BURST || CraftingDead.serverConfig.burstfireEnabled.get()))
@@ -627,13 +630,13 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
   }
 
   @Override
-  public Set<Attachment> getAttachments() {
+  public Map<GunCraftSlotType, Attachment> getAttachments() {
     return this.attachments;
   }
 
   @Override
-  public void setAttachments(Set<Attachment> attachments) {
-    this.attachments = Set.copyOf(attachments);
+  public void setAttachments(Map<GunCraftSlotType, Attachment> attachments) {
+    this.attachments = Map.copyOf(attachments);
   }
 
   @Override
@@ -759,8 +762,9 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
     }
     tag.putString("ammoProviderType", this.ammoProvider.getType().getRegistryName().toString());
     tag.put("ammoProvider", this.ammoProvider.serializeNBT());
-    var attachmentsTag = this.attachments.stream()
+    var attachmentsTag = this.attachments.values().stream()
         .map(Attachment::getRegistryName)
+        .filter(Objects::nonNull) // Is this? it removes the null warning - juanmuscaria
         .map(ResourceLocation::toString)
         .map(StringTag::valueOf)
         .collect(ListTag::new, ListTag::add, List::addAll);
@@ -786,7 +790,8 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
         .map(Tag::getAsString)
         .map(ResourceLocation::new)
         .map(Attachments.registry.get()::getValue)
-        .collect(Collectors.toSet()));
+        .filter(Objects::nonNull)
+        .collect(Collectors.toMap(Attachment::getInventorySlot, v -> v)));
     this.setPaintStack(ItemStack.of(tag.getCompound("paintStack")));
     this.skin = Skin.CODEC.parse(NbtOps.INSTANCE, tag.get("skin")).result().orElse(null);
   }
@@ -798,7 +803,7 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
         : this.dataManager.packDirty(), out);
     if (writeAll || this.attachmentsDirty) {
       out.writeVarInt(this.attachments.size());
-      this.attachments.forEach(out::writeRegistryId);
+      this.attachments.values().forEach(out::writeRegistryId);
     } else {
       out.writeVarInt(-1);
     }
@@ -833,9 +838,10 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
 
     int size = in.readVarInt();
     if (size > -1) {
-      var builder = ImmutableSet.<Attachment>builderWithExpectedSize(size);
+      var builder = ImmutableMap.<GunCraftSlotType, Attachment>builderWithExpectedSize(size);
       for (int i = 0; i < size; i++) {
-        builder.add(in.readRegistryIdSafe(Attachment.class));
+        var attachment = in.readRegistryIdSafe(Attachment.class);
+        builder.put(attachment.getInventorySlot(), attachment);
       }
       this.attachments = builder.build();
     }

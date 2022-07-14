@@ -18,14 +18,14 @@
 
 package com.craftingdead.core.world.inventory;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-import com.craftingdead.core.world.item.gun.Gun;
 import com.craftingdead.core.world.item.GunItem;
+import com.craftingdead.core.world.item.gun.Gun;
 import com.craftingdead.core.world.item.gun.attachment.Attachment;
 import com.craftingdead.core.world.item.gun.attachment.AttachmentLike;
 import com.craftingdead.core.world.item.gun.skin.Paint;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ResultContainer;
@@ -51,9 +51,9 @@ public class GunCraftSlot extends Slot {
   public void set(ItemStack itemStack) {
     itemStack.getCapability(Gun.CAPABILITY).ifPresent(gun -> {
       gun.getAttachments().forEach(
-          attachment -> this.craftingInventory.setItem(attachment.getInventorySlot().getIndex(),
+          (type, attachment) -> this.craftingInventory.setItem(type.getIndex(),
               new ItemStack(attachment)));
-      gun.setAttachments(Collections.emptySet());
+      gun.setAttachments(Collections.emptyMap());
 
       this.craftingInventory.setItem(GunCraftSlotType.PAINT.getIndex(),
           gun.getPaintStack());
@@ -66,11 +66,12 @@ public class GunCraftSlot extends Slot {
   public void onTake(Player playerEntity, ItemStack gunStack) {
     gunStack.getCapability(Gun.CAPABILITY).ifPresent(gun -> {
       gun.setPaintStack(ItemStack.EMPTY);
-      Set<Attachment> attachments = new HashSet<>();
+      Map<GunCraftSlotType, Attachment> attachments = new HashMap<>();
       for (int i = 0; i < this.craftingInventory.getContainerSize(); i++) {
         ItemStack itemStack = this.craftingInventory.getItem(i);
         if (gun.isAcceptedAttachment(itemStack) && itemStack.getItem() instanceof AttachmentLike) {
-          attachments.add(((AttachmentLike) itemStack.getItem()).asAttachment());
+          var attachment = ((AttachmentLike) itemStack.getItem()).asAttachment();
+          attachments.put(attachment.getInventorySlot(), attachment);
           this.craftingInventory.setItem(i, ItemStack.EMPTY);
         } else if (Paint.isValid(gunStack, itemStack)) {
           gun.setPaintStack(itemStack);
