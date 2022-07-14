@@ -18,14 +18,14 @@
 
 package com.craftingdead.core.event;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.inventory.GunCraftSlotType;
 import com.craftingdead.core.world.item.gun.Gun;
 import com.craftingdead.core.world.item.gun.ammoprovider.AmmoProvider;
 import com.craftingdead.core.world.item.gun.attachment.Attachment;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;

@@ -18,14 +18,14 @@
 
 package com.craftingdead.core.world.inventory;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import com.craftingdead.core.world.item.GunItem;
 import com.craftingdead.core.world.item.gun.Gun;
 import com.craftingdead.core.world.item.gun.attachment.Attachment;
 import com.craftingdead.core.world.item.gun.attachment.AttachmentLike;
 import com.craftingdead.core.world.item.gun.skin.Paint;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ResultContainer;

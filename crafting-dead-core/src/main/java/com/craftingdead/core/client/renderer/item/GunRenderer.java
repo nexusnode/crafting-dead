@@ -19,6 +19,16 @@
 package com.craftingdead.core.client.renderer.item;
 
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import org.jetbrains.annotations.Nullable;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.capability.CapabilityUtil;
 import com.craftingdead.core.client.model.geom.ModModelLayers;
@@ -39,15 +49,6 @@ import com.mojang.datafixers.util.Pair;
 import com.mojang.math.Transformation;
 import com.mojang.math.Vector3f;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.geom.ModelLayerLocation;
@@ -79,7 +80,6 @@ import net.minecraftforge.client.model.ForgeModelBakery;
 import net.minecraftforge.client.model.SimpleModelState;
 import net.minecraftforge.client.model.data.EmptyModelData;
 import net.minecraftforge.common.model.TransformationHelper;
-import org.jetbrains.annotations.Nullable;
 
 public class GunRenderer implements CombatSlotItemRenderer {
 

@@ -18,6 +18,21 @@
 
 package com.craftingdead.core.world.item.gun;
 
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Random;
+import java.util.Set;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
+import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.event.GunEvent;
 import com.craftingdead.core.network.NetworkChannel;
@@ -49,20 +64,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.mojang.logging.LogUtils;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Random;
-import java.util.Set;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 import net.minecraft.Util;
 import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
@@ -113,8 +114,6 @@ import net.minecraftforge.common.util.LogicalSidedProvider;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.network.PacketDistributor;
-import org.jetbrains.annotations.Nullable;
-import org.slf4j.Logger;
 
 public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> {
 
