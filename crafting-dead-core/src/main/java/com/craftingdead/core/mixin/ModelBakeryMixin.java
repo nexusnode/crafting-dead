@@ -42,9 +42,14 @@ public abstract class ModelBakeryMixin {
       target = "Lnet/minecraft/client/resources/model/ModelBakery;loadTopLevel(Lnet/minecraft/client/resources/model/ModelResourceLocation;)V",
       ordinal = 0))
   public void prepare(ProfilerFiller profiler, int mipLevel, CallbackInfo callbackInfo) {
-    CraftingDead.getInstance().getClientDist().getItemRendererManager()
-        .gatherItemRenderers(this.resourceManager, profiler)
-        .forEach(this::invokeAddModelToCache);
+    // If some mod crashed during the game initialization the mod instance may be null.
+    // This null check is necessary to avoid another crash obscuring the original crash
+    var craftingDead = CraftingDead.getInstance();
+    if (craftingDead != null) {
+      craftingDead.getClientDist().getItemRendererManager()
+          .gatherItemRenderers(this.resourceManager, profiler)
+          .forEach(this::invokeAddModelToCache);
+    }
   }
 
   @Invoker
