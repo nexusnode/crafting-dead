@@ -167,7 +167,7 @@ public abstract class AbstractGunClient<T extends AbstractGun> implements GunCli
     @Nullable
     final SoundEvent shootSound;
     boolean amplifyDistantSound = this.getDistantShootSound().isPresent();
-    if (this.gun.getAttachments().stream().anyMatch(Attachment::isSoundSuppressor)) {
+    if (this.gun.getAttachments().values().stream().anyMatch(Attachment::isSoundSuppressor)) {
       shootSound = farAway
           ? null
           : this.getSilencedShootSound().orElse(defaultShootSound);

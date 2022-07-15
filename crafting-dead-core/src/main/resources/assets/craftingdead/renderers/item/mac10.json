@@ -26,16 +26,18 @@
         ]
     },
     "scope_aim_transform": {
-        "translation": [
-            -9.6,
-            1,
-            0
-        ],
-        "rotation": [
-            0,
-            0.75,
-            0
-        ]
+        "craftingdead:red_dot_sight": {
+            "translation": [
+                -9.6,
+                1.1,
+                0
+            ],
+            "rotation": [
+                0,
+                0.75,
+                0
+            ]
+        }
     },
     "hand_transforms": {
         "held_right_handed": {

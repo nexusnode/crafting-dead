@@ -35,6 +35,7 @@ import com.craftingdead.core.client.model.geom.ModModelLayers;
 import com.craftingdead.core.client.util.RenderUtil;
 import com.craftingdead.core.util.EasingFunction;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
+import com.craftingdead.core.world.inventory.GunCraftSlotType;
 import com.craftingdead.core.world.item.GunItem;
 import com.craftingdead.core.world.item.gun.Gun;
 import com.craftingdead.core.world.item.gun.attachment.Attachment;
@@ -320,7 +321,7 @@ public class GunRenderer implements CombatSlotItemRenderer {
       var x = transform.getTranslation().x();
       var y = transform.getTranslation().y();
       var z = transform.getTranslation().z();
-      if (gun.getAttachments().contains(Attachments.SUPPRESSOR.get())) {
+      if (gun.getAttachments().containsValue(Attachments.SUPPRESSOR.get())) {
         z -= 0.4;
       }
 
@@ -447,7 +448,8 @@ public class GunRenderer implements CombatSlotItemRenderer {
         ? TransformationHelper.slerp(normalTransform,
             gun.hasIronSight()
                 ? this.properties.aimTransform()
-                : this.properties.scopeAimTransform(),
+                : this.properties.scopeAimTransform().getOrDefault(gun.getAttachments()
+                    .get(GunCraftSlotType.OVERBARREL_ATTACHMENT).getRegistryName(), this.properties.aimTransform()),
             aimingPct)
         : normalTransform;
 
@@ -539,7 +541,7 @@ public class GunRenderer implements CombatSlotItemRenderer {
       }
     }
 
-    for (var attachment : gun.getAttachments()) {
+    for (var attachment : gun.getAttachments().values()) {
       var transform = this.properties.attachmentTransforms()
           .getOrDefault(attachment.getRegistryName(), Transformation.identity());
       transform.push(matrixStack);

@@ -225,7 +225,7 @@ public abstract class GunItem extends ProjectileWeaponItem {
           .withStyle(ChatFormatting.GRAY)
           .append(ammoCount));
 
-      for (var attachment : gun.getAttachments()) {
+      for (var attachment : gun.getAttachments().values()) {
         Component attachmentName = attachment.getDescription()
             .plainCopy()
             .withStyle(ChatFormatting.RED);
