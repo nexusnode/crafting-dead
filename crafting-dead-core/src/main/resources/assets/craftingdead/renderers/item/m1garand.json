@@ -1,138 +1,137 @@
 {
-    "type": "craftingdead:gun",
-    "model": "craftingdead:gun/m1garand",
-    "muzzle_flash_transform": {
+  "type": "craftingdead:gun",
+  "model": "craftingdead:gun/m1garand",
+  "muzzle_flash_transform": {
+    "translation": [
+      3,
+      0,
+      -40
+    ],
+    "scale": [
+      1.2,
+      1.2,
+      1.2
+    ]
+  },
+  "aim_transform": {
+    "translation": [
+      -9.5,
+      3.75,
+      0
+    ],
+    "rotation": [
+      2,
+      0.26,
+      0
+    ]
+  },
+  "hand_transforms": {
+    "held_right_handed": {
+      "right_hand": {
         "translation": [
-            3,
-            0,
-            -40
-        ],
-        "scale": [
-            1.2,
-            1.2,
-            1.2
+          -1.2,
+          1.75,
+          1.75
         ]
-    },
-    "aim_transform": {
+      },
+      "left_hand": {
         "translation": [
-            -9.5,
-            3.75,
-            0
+          1.5,
+          -3,
+          -10
         ],
         "rotation": [
-            2,
-            0.26,
-            0
+          0,
+          25,
+          0
+        ],
+        "scale": [
+          1.75,
+          1.5,
+          1.5
         ]
+      }
     },
-    "hand_transforms": {
-        "held_right_handed": {
-            "right_hand": {
-                "translation": [
-                    -1.2,
-                    1.75,
-                    1.75
-                ]
-            },
-            "left_hand": {
-                "translation": [
-                    1.5,
-                    -3,
-                    -10
-                ],
-                "rotation": [
-                    0,
-                    25,
-                    0
-                ],
-                "scale": [
-                    1.75,
-                    1.5,
-                    1.5
-                ]
-            }
-        },
-        "aiming_right_handed": {
-            "left_hand": {
-                "translation": [
-                    -15,
-                    2,
-                    0.25
-                ],
-                "rotation": [
-                    0,
-                    20,
-                    0
-                ]
-            },
-            "right_hand": {
-                "translation": [
-                    -15,
-                    2,
-                    0.25
-                ]
-            }
-        }
+    "aiming_right_handed": {
+      "left_hand": {
+        "translation": [
+          -15,
+          2,
+          0.25
+        ],
+        "rotation": [
+          0,
+          20,
+          0
+        ]
+      },
+      "right_hand": {
+        "translation": [
+          -15,
+          2,
+          0.25
+        ]
+      }
+    }
+  },
+  "attachment_transforms": {
+    "craftingdead:red_dot_sight": {
+      "translation": [
+        0.5,
+        7,
+        0
+      ]
     },
-    "attachment_transforms": {
-        "craftingdead:red_dot_sight": {
-            "translation": [
-                0.5,
-                7,
-                0
-            ]
-        },
-        "craftingdead:acog_sight": {
-            "translation": [
-                0.5,
-                4.5,
-                2
-            ]
-        },
-        "craftingdead:bipod": {
-            "translation": [
-                0.5,
-                0,
-                -18
-            ]
-        },
-        "craftingdead:eotech_sight": {
-            "translation": [
-                0.5,
-                5,
-                1
-            ]
-        },
-        "craftingdead:lp_scope": {
-            "translation": [
-                0.495,
-                4.05,
-                -3.3
-            ]
-        },
-        "craftingdead:suppressor": {
-            "translation": [
-                0.5,
-                3.5,
-                -24
-        
-            ]
-        },
-        "craftingdead:tactical_grip": {
-            "translation": [
-                0.5,
-                -1,
-                -7
-            ]
-        },
-        "craftingdead:hp_scope": {
-            "translation": [
-              0.495,
-              3.05,
-              -1
-            ]
-        }
+    "craftingdead:acog_sight": {
+      "translation": [
+        0.5,
+        4.5,
+        2
+      ]
     },
+    "craftingdead:bipod": {
+      "translation": [
+        0.5,
+        0,
+        -18
+      ]
+    },
+    "craftingdead:eotech_sight": {
+      "translation": [
+        0.5,
+        5,
+        1
+      ]
+    },
+    "craftingdead:lp_scope": {
+      "translation": [
+        0.495,
+        4.05,
+        -3.3
+      ]
+    },
+    "craftingdead:suppressor": {
+      "translation": [
+        0.5,
+        3.5,
+        -24
+      ]
+    },
+    "craftingdead:tactical_grip": {
+      "translation": [
+        0.5,
+        -1,
+        -7
+      ]
+    },
+    "craftingdead:hp_scope": {
+      "translation": [
+        0.495,
+        3.05,
+        -1
+      ]
+    }
+  },
   "back_transform": {
     "scale": [
       0.5,

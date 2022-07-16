@@ -1,98 +1,98 @@
 {
-    "type": "craftingdead:gun",
-    "model": "craftingdead:gun/taser",
-    "muzzle_flash_transform": {
+  "type": "craftingdead:gun",
+  "model": "craftingdead:gun/taser",
+  "muzzle_flash_transform": {
+    "translation": [
+      3,
+      1,
+      -12
+    ],
+    "scale": [
+      0.75,
+      0.75,
+      0.75
+    ]
+  },
+  "aim_transform": {
+    "translation": [
+      -9.5,
+      8.25,
+      2
+    ],
+    "rotation": [
+      0.5,
+      0,
+      0
+    ]
+  },
+  "hand_transforms": {
+    "held_right_handed": {
+      "right_hand": {
         "translation": [
-            3,
-            1,
-            -12
+          -2.5,
+          4.75,
+          4
         ],
         "scale": [
-            0.75,
-            0.75,
-            0.75
+          0.75,
+          0.75,
+          0.75
         ]
-    },
-    "aim_transform": {
+      },
+      "left_hand": {
         "translation": [
-            -9.5,
-            8.25,
-            2
+          -2,
+          4,
+          6
         ],
         "rotation": [
-            0.5,
-            0,
-            0
+          -5,
+          10,
+          0
+        ],
+        "scale": [
+          0.75,
+          0.75,
+          0.75
         ]
+      }
     },
-    "hand_transforms": {
-        "held_right_handed": {
-            "right_hand": {
-                "translation": [
-                    -2.5,
-                    4.75,
-                    4
-                ],
-                "scale": [
-                    0.75,
-                    0.75,
-                    0.75
-                ]
-            },
-            "left_hand": {
-                "translation": [
-                    -2,
-                    4,
-                    6
-                ],
-                "rotation": [
-                    -5,
-                    10,
-                    0
-                ],
-                "scale": [
-                    0.75,
-                    0.75,
-                    0.75
-                ]
-            }
-        },
-        "aiming_right_handed": {
-            "right_hand": {
-                "translation": [
-                    -14,
-                    7,
-                    7.25
-                ],
-                "rotation": [
-                    0,
-                    15,
-                    0
-                ]
-            },
-            "left_hand": {
-                "translation": [
-                    -15.25,
-                    6.4,
-                    11.25
-                ],
-                "rotation": [
-                    0,
-                    32.5,
-                    0
-                ]
-            }
-        }
-    },
-    "magazine_transforms": {
-        "craftingdead:taser_magazine": {
-            "translation": [
-              0,
-              0,
-              0
-            ]
-        }
-    },
+    "aiming_right_handed": {
+      "right_hand": {
+        "translation": [
+          -14,
+          7,
+          7.25
+        ],
+        "rotation": [
+          0,
+          15,
+          0
+        ]
+      },
+      "left_hand": {
+        "translation": [
+          -15.25,
+          6.4,
+          11.25
+        ],
+        "rotation": [
+          0,
+          32.5,
+          0
+        ]
+      }
+    }
+  },
+  "magazine_transforms": {
+    "craftingdead:taser_magazine": {
+      "translation": [
+        0,
+        0,
+        0
+      ]
+    }
+  },
   "back_transform": {
     "scale": [
       0.5,

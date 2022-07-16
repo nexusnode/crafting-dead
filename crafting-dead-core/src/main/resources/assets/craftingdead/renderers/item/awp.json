@@ -1,118 +1,118 @@
 {
-    "type": "craftingdead:gun",
-    "model": "craftingdead:gun/awp",
-    "muzzle_flash_transform": {
+  "type": "craftingdead:gun",
+  "model": "craftingdead:gun/awp",
+  "muzzle_flash_transform": {
+    "translation": [
+      1.6,
+      0,
+      -52
+    ],
+    "scale": [
+      1.5,
+      1.5,
+      1.5
+    ]
+  },
+  "aim_transform": {
+    "translation": [
+      -8.45,
+      4.8,
+      -3
+    ],
+    "rotation": [
+      1,
+      0,
+      0
+    ]
+  },
+  "hand_transforms": {
+    "held_right_handed": {
+      "right_hand": {
         "translation": [
-            1.6,
-            0,
-            -52
-        ],
-        "scale": [
-            1.5,
-            1.5,
-            1.5
+          -3,
+          2.75,
+          5
         ]
-    },
-    "aim_transform": {
+      },
+      "left_hand": {
         "translation": [
-            -8.45,
-            4.8,
-            -3
+          -1.5,
+          -2,
+          -12.5
         ],
         "rotation": [
-            1,
-            0,
-            0
+          5,
+          25,
+          0
+        ],
+        "scale": [
+          1.5,
+          1.5,
+          1.5
         ]
+      }
     },
-    "hand_transforms": {
-        "held_right_handed": {
-            "right_hand": {
-                "translation": [
-                    -3,
-                    2.75,
-                    5
-                ]
-            },
-            "left_hand": {
-                "translation": [
-                    -1.5,
-                    -2,
-                    -12.5
-                ],
-                "rotation": [
-                    5,
-                    25,
-                    0
-                ],
-                "scale": [
-                    1.5,
-                    1.5,
-                    1.5
-                ]
-            }
-        },
-        "aiming_right_handed": {
-            "left_hand": {
-                "translation": [
-                    -15,
-                    2,
-                    0.25
-                ],
-                "rotation": [
-                    0,
-                    20,
-                    0
-                ]
-            },
-            "right_hand": {
-                "translation": [
-                    -15,
-                    2,
-                    0.25
-                ]
-            }
-        }
+    "aiming_right_handed": {
+      "left_hand": {
+        "translation": [
+          -15,
+          2,
+          0.25
+        ],
+        "rotation": [
+          0,
+          20,
+          0
+        ]
+      },
+      "right_hand": {
+        "translation": [
+          -15,
+          2,
+          0.25
+        ]
+      }
+    }
+  },
+  "magazine_transforms": {
+    "craftingdead:awp_magazine": {
+      "translation": [
+        0,
+        -2,
+        0
+      ]
+    }
+  },
+  "attachment_transforms": {
+    "craftingdead:lp_scope": {
+      "translation": [
+        -0.5,
+        2.6,
+        2
+      ]
     },
-    "magazine_transforms": {
-        "craftingdead:awp_magazine": {
-            "translation": [
-                0,
-                -2,
-                0
-            ]
-        }
+    "craftingdead:hp_scope": {
+      "translation": [
+        -0.5,
+        1.6,
+        3.2
+      ]
     },
-    "attachment_transforms": {
-        "craftingdead:lp_scope": {
-            "translation": [
-                -0.5,
-                2.6,
-                2
-            ]
-        },
-        "craftingdead:hp_scope": {
-            "translation": [
-                -0.5,
-                1.6,
-                3.2
-            ]
-        },
-        "craftingdead:suppressor": {
-            "translation": [
-                -0.5,
-                1.5,
-                -19.99
-            ]
-        },
-        "craftingdead:bipod": {
-            "translation": [
-              -0.5,
-              -0,
-              -11
-            ]
-        }
+    "craftingdead:suppressor": {
+      "translation": [
+        -0.5,
+        1.5,
+        -19.99
+      ]
     },
+    "craftingdead:bipod": {
+      "translation": [
+        -0.5,
+        -0,
+        -11
+      ]
+    }
+  },
   "back_transform": {
     "scale": [
       0.5,

@@ -1,186 +1,185 @@
 {
-    "type": "craftingdead:gun",
-    "model": "craftingdead:gun/m4a1",
-    "muzzle_flash_transform": {
+  "type": "craftingdead:gun",
+  "model": "craftingdead:gun/m4a1",
+  "muzzle_flash_transform": {
+    "translation": [
+      4,
+      0,
+      -40
+    ],
+    "scale": [
+      1.2,
+      1.2,
+      1.2
+    ]
+  },
+  "aim_transform": {
+    "translation": [
+      -9.5,
+      0.5,
+      1.5
+    ]
+  },
+  "scope_aim_transform": {
+    "craftingdead:red_dot_sight": {
+      "translation": [
+        -9.5,
+        0.1,
+        1.5
+      ]
+    },
+    "craftingdead:eotech_sight": {
+      "translation": [
+        -9.5,
+        0.2,
+        1.5
+      ]
+    },
+    "craftingdead:acog_sight": {
+      "translation": [
+        -9.5,
+        0.3,
+        1.5
+      ]
+    }
+  },
+  "hand_transforms": {
+    "held_right_handed": {
+      "right_hand": {
         "translation": [
-            4,
-            0,
-            -40
+          0.5,
+          0,
+          3
+        ]
+      },
+      "left_hand": {
+        "translation": [
+          3.75,
+          -3,
+          -13
+        ],
+        "rotation": [
+          0,
+          20,
+          0
         ],
         "scale": [
-            1.2,
-            1.2,
-            1.2
+          1.75,
+          1.5,
+          1.5
         ]
+      }
     },
-    "aim_transform": {
+    "aiming_right_handed": {
+      "left_hand": {
         "translation": [
-            -9.5,
-            0.5,
-            1.5
+          -15,
+          2,
+          0.25
+        ],
+        "rotation": [
+          0,
+          20,
+          0
         ]
+      },
+      "right_hand": {
+        "translation": [
+          -15,
+          2,
+          0.25
+        ]
+      }
+    }
+  },
+  "magazine_transforms": {
+    "craftingdead:stanag_30_round_magazine": {
+      "translation": [
+        0,
+        -2,
+        -2
+      ]
     },
-    "scope_aim_transform": {
-        "craftingdead:red_dot_sight": {
-            "translation": [
-                -9.5,
-                0.1,
-                1.5
-            ]
-        },
-        "craftingdead:eotech_sight": {
-            "translation": [
-                -9.5,
-                0.2,
-                1.5
-            ]
-        },
-        "craftingdead:acog_sight": {
-            "translation": [
-                -9.5,
-                0.3,
-                1.5
-            ]
-        }
+    "craftingdead:stanag_20_round_magazine": {
+      "translation": [
+        0,
+        -0.9,
+        -2.75
+      ]
     },
-    "hand_transforms": {
-        "held_right_handed": {
-            "right_hand": {
-                "translation": [
-                    0.5,
-                    0,
-                    3
-                ]
-            },
-            "left_hand": {
-                "translation": [
-                    3.75,
-                    -3,
-                    -13
-                ],
-                "rotation": [
-                    0,
-                    20,
-                    0
-                ],
-                "scale": [
-                    1.75,
-                    1.5,
-                    1.5
-                ]
-            }
-        },
-        "aiming_right_handed": {
-            "left_hand": {
-                "translation": [
-                    -15,
-                    2,
-                    0.25
-                ],
-                "rotation": [
-                    0,
-                    20,
-                    0
-                ]
-            },
-            "right_hand": {
-                "translation": [
-                    -15,
-                    2,
-                    0.25
-                ]
-            }
-        }
+    "craftingdead:stanag_drum_magazine": {
+      "translation": [
+        0,
+        -1.2,
+        -2
+      ]
     },
-    "magazine_transforms": {
-        "craftingdead:stanag_30_round_magazine": {
-            "translation": [
-                0,
-                -2,
-                -2
-            ]
-        },
-        "craftingdead:stanag_20_round_magazine": {
-            "translation": [
-                0,
-                -0.9,
-                -2.75
-            ]
-        },
-        "craftingdead:stanag_drum_magazine": {
-            "translation": [
-                0,
-                -1.2,
-                -2
-            ]
-        },
-        "craftingdead:stanag_box_magazine": {
-            "translation": [
-                0.75,
-                -0.7,
-                0.25
-            ]
-        }
+    "craftingdead:stanag_box_magazine": {
+      "translation": [
+        0.75,
+        -0.7,
+        0.25
+      ]
+    }
+  },
+  "attachment_transforms": {
+    "craftingdead:red_dot_sight": {
+      "translation": [
+        0.5,
+        7,
+        -1
+      ]
     },
-    "attachment_transforms": {
-        "craftingdead:red_dot_sight": {
-            "translation": [
-                0.5,
-                7,
-                -1
-            ]
-        },
-        "craftingdead:acog_sight": {
-            "translation": [
-                0.5,
-                4.5,
-                1
-            ]
-        },
-        "craftingdead:bipod": {
-            "translation": [
-                0.5,
-                1,
-                -18
-            ]
-        },
-        "craftingdead:eotech_sight": {
-            "translation": [
-                0.5,
-                7,
-                -1
-            ]
-        },
-        "craftingdead:lp_scope": {
-            "translation": [
-                0.5,
-                6,
-                -1
-            ]
-        },
-        "craftingdead:suppressor": {
-            "translation": [
-                0.5,
-                3,
-                -22
-        
-            ]
-        },
-        "craftingdead:tactical_grip": {
-            "translation": [
-                -0.505,
-                -1,
-                -8
-            ]
-        },
-        "craftingdead:hp_scope": {
-            "translation": [
-              0.5,
-              5,
-              0
-            ]
-        }
+    "craftingdead:acog_sight": {
+      "translation": [
+        0.5,
+        4.5,
+        1
+      ]
     },
+    "craftingdead:bipod": {
+      "translation": [
+        0.5,
+        1,
+        -18
+      ]
+    },
+    "craftingdead:eotech_sight": {
+      "translation": [
+        0.5,
+        7,
+        -1
+      ]
+    },
+    "craftingdead:lp_scope": {
+      "translation": [
+        0.5,
+        6,
+        -1
+      ]
+    },
+    "craftingdead:suppressor": {
+      "translation": [
+        0.5,
+        3,
+        -22
+      ]
+    },
+    "craftingdead:tactical_grip": {
+      "translation": [
+        -0.505,
+        -1,
+        -8
+      ]
+    },
+    "craftingdead:hp_scope": {
+      "translation": [
+        0.5,
+        5,
+        0
+      ]
+    }
+  },
   "back_transform": {
     "scale": [
       0.5,
