@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.IntFunction;
@@ -34,6 +35,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.client.animation.Animation;
+import com.craftingdead.core.client.animation.AnimationProperties;
 import com.craftingdead.core.world.item.combatslot.CombatSlot;
 import com.craftingdead.core.world.item.gun.FireMode;
 import com.craftingdead.core.world.item.gun.Gun;
@@ -67,7 +69,7 @@ public abstract class GunItem extends ProjectileWeaponItem {
 
   private final ResourceKey<GunConfiguration> configurationKey;
 
-  private final Map<GunAnimationEvent, Function<Gun, Animation>> animations;
+  private final Map<GunAnimationEvent, BiFunction<Gun, AnimationProperties, Animation>> animations;
 
   /**
    * A set of magazines that are supported by this gun.
@@ -113,7 +115,7 @@ public abstract class GunItem extends ProjectileWeaponItem {
   public abstract ICapabilityProvider initCapabilities(ItemStack itemStack,
       @Nullable CompoundTag nbt);
 
-  public Map<GunAnimationEvent, Function<Gun, Animation>> getAnimations() {
+  public Map<GunAnimationEvent, BiFunction<Gun, AnimationProperties, Animation>> getAnimations() {
     return this.animations;
   }
 
@@ -269,7 +271,7 @@ public abstract class GunItem extends ProjectileWeaponItem {
 
     private final Set<FireMode> fireModes = EnumSet.noneOf(FireMode.class);
 
-    private final Map<GunAnimationEvent, Function<Gun, Animation>> animations =
+    private final Map<GunAnimationEvent, BiFunction<Gun, AnimationProperties, Animation>> animations =
         new EnumMap<>(GunAnimationEvent.class);
 
     private final Set<Supplier<? extends Item>> acceptedMagazines = new HashSet<>();
@@ -298,15 +300,16 @@ public abstract class GunItem extends ProjectileWeaponItem {
     }
 
     public SELF putAnimation(GunAnimationEvent event, Supplier<Animation> animation) {
-      return this.putAnimation(event, __ -> animation.get());
+      return this.putAnimation(event, (__, ___) -> animation.get());
     }
 
     public SELF putReloadAnimation(IntFunction<Animation> animation) {
       return this.putAnimation(GunAnimationEvent.RELOAD,
-          gun -> animation.apply(gun.getReloadDurationTicks()));
+          (gun, properties) -> animation.apply(gun.getReloadDurationTicks()));
     }
 
-    public SELF putAnimation(GunAnimationEvent event, Function<Gun, Animation> animation) {
+    public SELF putAnimation(GunAnimationEvent event,
+        BiFunction<Gun, AnimationProperties, Animation> animation) {
       this.animations.put(event, animation);
       return this.self();
     }

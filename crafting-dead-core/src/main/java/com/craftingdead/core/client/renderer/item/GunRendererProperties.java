@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import com.craftingdead.core.client.animation.AnimationProperties;
 import com.craftingdead.core.client.util.RenderUtil;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.math.Quaternion;
@@ -34,7 +35,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.StringRepresentable;
 
-public record GunRendererProperties( 
+public record GunRendererProperties(
     ResourceLocation modelLocation,
     Transformation muzzleFlashTransform,
     Transformation aimTransform,
@@ -44,7 +45,8 @@ public record GunRendererProperties(
     Map<ResourceLocation, Transformation> attachmentTransforms,
     Map<ResourceLocation, Transformation> magazineTransforms,
     Map<HandTransform, Pair<Transformation, Transformation>> handTransforms,
-    List<Pair<ResourceLocation, Transformation>> ironSights) implements ItemRendererProperties {
+    List<Pair<ResourceLocation, Transformation>> ironSights,
+    AnimationProperties animationProperties) implements ItemRendererProperties {
 
   private static final Transformation DEFAULT_SPRINTING_TRANSFORM =
       new Transformation(
@@ -92,7 +94,10 @@ public record GunRendererProperties(
                   .forGetter(GunRendererProperties::handTransforms),
               Codec.compoundList(ResourceLocation.CODEC, RenderUtil.TRANSFORMATION_MATRIX_CODEC)
                   .optionalFieldOf("iron_sights", Collections.emptyList())
-                  .forGetter(GunRendererProperties::ironSights))
+                  .forGetter(GunRendererProperties::ironSights),
+              AnimationProperties.CODEC
+                  .optionalFieldOf("animation_properties", new AnimationProperties(5, 2.0F, 0.25F))
+                  .forGetter(GunRendererProperties::animationProperties))
           .apply(instance, GunRendererProperties::new));
 
   @Override
@@ -127,4 +132,5 @@ public record GunRendererProperties(
       return BY_NAME.get(name);
     }
   }
+
 }

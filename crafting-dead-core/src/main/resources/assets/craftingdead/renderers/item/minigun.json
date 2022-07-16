@@ -94,15 +94,32 @@
     "magazine_transforms": {
         "craftingdead:minigun_magazine": {
             "translation": [
-                1.5,
-                3.5,
-                6.5
+              1.5,
+              3.5,
+              6.5
             ]
         }
     },
-    "back_transform": {
-        "scale": [0.5, 0.5, 0.5],
-        "rotation": [0, 90, 180],
-        "translation": [-5, 0, -1.5]
-    }
+  "back_transform": {
+    "scale": [
+      0.5,
+      0.5,
+      0.5
+    ],
+    "rotation": [
+      0,
+      90,
+      180
+    ],
+    "translation": [
+      -5,
+      0,
+      -1.5
+    ]
+  },
+  "animation_properties": {
+    "shoot_animation_length": 5,
+    "shoot_animation_bounce": 2.0,
+    "shoot_animation_kickback": 0.15
+  }
 }

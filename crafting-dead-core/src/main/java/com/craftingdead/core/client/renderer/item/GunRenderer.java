@@ -659,4 +659,8 @@ public class GunRenderer implements CombatSlotItemRenderer {
         PartPose.offsetAndRotation(0F, 0F, -15F, 0F, 0F, -2.373648F));
     return LayerDefinition.create(mesh, 64, 64);
   }
+
+  public GunRendererProperties getProperties() {
+    return this.properties;
+  }
 }

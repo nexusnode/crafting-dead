@@ -19,7 +19,10 @@
 package com.craftingdead.core.world.item.gun;
 
 import java.util.Optional;
+import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.client.animation.Animation;
+import com.craftingdead.core.client.renderer.item.GunRenderer;
+
 import net.minecraft.sounds.SoundEvent;
 
 public class TypedGunClient<T extends TypedGun> extends AbstractGunClient<T> {
@@ -65,6 +68,13 @@ public class TypedGunClient<T extends TypedGun> extends AbstractGunClient<T> {
 
   @Override
   public Animation getAnimation(GunAnimationEvent event) {
-    return this.gun.getItem().getAnimations().get(event).apply(this.gun);
+    var properties = this.getRenderer().getProperties();
+    return this.gun.getItem().getAnimations().get(event).apply(this.gun,
+        properties.animationProperties());
+  }
+
+  private GunRenderer getRenderer() {
+    return (GunRenderer) CraftingDead.getInstance().getClientDist().getItemRendererManager()
+        .getItemRenderer(this.gun.getItem());
   }
 }

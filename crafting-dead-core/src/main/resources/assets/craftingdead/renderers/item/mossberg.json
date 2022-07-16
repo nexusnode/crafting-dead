@@ -63,15 +63,32 @@
             "right_hand": {
                 "translation": [
                     -15,
-                    2,
-                    0.25
+                  2,
+                  0.25
                 ]
             }
         }
     },
-    "back_transform": {
-        "scale": [0.5, 0.5, 0.5],
-        "rotation": [0, 0, 180],
-        "translation": [2, 0, -0.1]
-    }
+  "back_transform": {
+    "scale": [
+      0.5,
+      0.5,
+      0.5
+    ],
+    "rotation": [
+      0,
+      0,
+      180
+    ],
+    "translation": [
+      2,
+      0,
+      -0.1
+    ]
+  },
+  "animation_properties": {
+    "shoot_animation_length": 7,
+    "shoot_animation_bounce": 3.5,
+    "shoot_animation_kickback": 0.5
+  }
 }

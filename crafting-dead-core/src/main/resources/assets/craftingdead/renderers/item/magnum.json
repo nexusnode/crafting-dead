@@ -160,14 +160,19 @@
         
         ]
     },
-    "magazine_transforms": {
-        "craftingdead:g18_magazine": {
-            "translation": [
-                7.5,
-                0.4578,
-                10.8013
-            ]
-        }
+  "magazine_transforms": {
+    "craftingdead:g18_magazine": {
+      "translation": [
+        7.5,
+        0.4578,
+        10.8013
+      ]
     }
-}
+  }
+},
+  "animation_properties": {
+    "shoot_animation_length": 7,
+    "shoot_animation_bounce": 3.5,
+    "shoot_animation_kickback": 0.5
+  }
 }

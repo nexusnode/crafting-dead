@@ -127,15 +127,32 @@
         },
         "craftingdead:hp_scope": {
             "translation": [
-                0.495,
-                3.05,
-                -1
+              0.495,
+              3.05,
+              -1
             ]
-        }        
-    },      
-    "back_transform": {
-        "scale": [0.5, 0.5, 0.5],
-        "rotation": [0, 0, 180],
-        "translation": [2, 0, -0.1]
-    }
+        }
+    },
+  "back_transform": {
+    "scale": [
+      0.5,
+      0.5,
+      0.5
+    ],
+    "rotation": [
+      0,
+      0,
+      180
+    ],
+    "translation": [
+      2,
+      0,
+      -0.1
+    ]
+  },
+  "animation_properties": {
+    "shoot_animation_length": 5,
+    "shoot_animation_bounce": 2.0,
+    "shoot_animation_kickback": 0.25
+  }
 }
