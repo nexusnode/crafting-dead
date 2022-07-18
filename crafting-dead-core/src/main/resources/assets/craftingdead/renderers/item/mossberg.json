@@ -1,94 +1,94 @@
 {
-  "type": "craftingdead:gun",
-  "model": "craftingdead:gun/mossberg",
-  "muzzle_flash_transform": {
-    "translation": [
-      6.5,
-      1,
-      -40
-    ],
-    "scale": [
-      1.2,
-      1.2,
-      1.2
-    ]
-  },
-  "aim_transform": {
-    "translation": [
-      -8.475,
-      3,
-      3
-    ]
-  },
-  "hand_transforms": {
-    "held_right_handed": {
-      "right_hand": {
+    "type": "craftingdead:gun",
+    "model": "craftingdead:gun/mossberg",
+    "muzzle_flash_transform": {
         "translation": [
-          -0.6,
-          1.75,
-          4
-        ]
-      },
-      "left_hand": {
-        "translation": [
-          4.5,
-          -4,
-          -15
-        ],
-        "rotation": [
-          0,
-          25,
-          0
+            6.5,
+            1,
+            -40
         ],
         "scale": [
-          1.75,
-          1.5,
-          1.5
+            1.2,
+            1.2,
+            1.2
         ]
-      }
     },
-    "aiming_right_handed": {
-      "left_hand": {
+    "aim_transform": {
         "translation": [
-          -15,
-          2,
-          0.25
+            -8.475,
+            3,
+            3
+        ]
+    },
+    "hand_transforms": {
+        "held_right_handed": {
+            "right_hand": {
+                "translation": [
+                    -0.6,
+                    1.75,
+                    4
+                ]
+            },
+            "left_hand": {
+                "translation": [
+                    4.5,
+                    -4,
+                    -15
+                ],
+                "rotation": [
+                    0,
+                    25,
+                    0
+                ],
+                "scale": [
+                    1.75,
+                    1.5,
+                    1.5
+                ]
+            }
+        },
+        "aiming_right_handed": {
+            "left_hand": {
+                "translation": [
+                    -15,
+                    2,
+                    0.25
+                ],
+                "rotation": [
+                    0,
+                    20,
+                    0
+                ]
+            },
+            "right_hand": {
+                "translation": [
+                    -15,
+                    2,
+                    0.25
+                ]
+            }
+        }
+    },
+    "back_transform": {
+        "scale": [
+            0.5,
+            0.5,
+            0.5
         ],
         "rotation": [
-          0,
-          20,
-          0
-        ]
-      },
-      "right_hand": {
+            0,
+            0,
+            180
+        ],
         "translation": [
-          -15,
-          2,
-          0.25
+            2,
+            0,
+            -0.1
         ]
-      }
+    },
+    "animation_properties": {
+        "shoot_animation_length": 7,
+        "shoot_animation_bounce": 3.5,
+        "shoot_animation_kickback": 0.5
     }
-  },
-  "back_transform": {
-    "scale": [
-      0.5,
-      0.5,
-      0.5
-    ],
-    "rotation": [
-      0,
-      0,
-      180
-    ],
-    "translation": [
-      2,
-      0,
-      -0.1
-    ]
-  },
-  "animation_properties": {
-    "shoot_animation_length": 7,
-    "shoot_animation_bounce": 3.5,
-    "shoot_animation_kickback": 0.5
-  }
 }

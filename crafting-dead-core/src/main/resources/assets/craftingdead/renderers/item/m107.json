@@ -1,176 +1,175 @@
 {
-  "type": "craftingdead:gun",
-  "model": "craftingdead:gun/m107",
-  "muzzle_flash_transform": {
-    "translation": [
-      1.6,
-      -1,
-      -52
-    ],
-    "scale": [
-      1.5,
-      1.5,
-      1.5
-    ]
-  },
-  "aim_transform": {
-    "translation": [
-      -9.47,
-      4,
-      -5
-    ],
-    "rotation": [
-      0,
-      0,
-      0
-    ]
-  },
-  "scope_aim_transform": {
-    "craftingdead:red_dot_sight": {
-      "translation": [
-        -9.47,
-        3.2,
-        -5
-      ]
-    },
-    "craftingdead:acog_sight": {
-      "translation": [
-        -9.47,
-        3.4,
-        -5
-      ]
-    }
-  },
-  "hand_transforms": {
-    "held_right_handed": {
-      "left_hand": {
+    "type": "craftingdead:gun",
+    "model": "craftingdead:gun/m107",
+    "muzzle_flash_transform": {
         "translation": [
-          -0.8,
-          -2,
-          -12
-        ],
-        "rotation": [
-          5,
-          25,
-          0
+            1.6,
+            -1,
+            -52
         ],
         "scale": [
-          1.5,
-          1.5,
-          1.5
+            1.5,
+            1.5,
+            1.5
         ]
-      },
-      "right_hand": {
-        "translation": [
-          -1.5,
-          1.75,
-          3
-        ]
-      }
     },
-    "aiming_right_handed": {
-      "left_hand": {
+    "aim_transform": {
         "translation": [
-          -15,
-          2,
-          0.25
+            -9.47,
+            4,
+            -5
         ],
         "rotation": [
-          0,
-          20,
-          0
+            0,
+            0,
+            0
         ]
-      },
-      "right_hand": {
+    },
+    "scope_aim_transform": {
+        "craftingdead:red_dot_sight": {
+            "translation": [
+                -9.47,
+                3.2,
+                -5
+            ]
+        },
+        "craftingdead:acog_sight": {
+            "translation": [
+                -9.47,
+                3.4,
+                -5
+            ]
+        }
+    },
+    "hand_transforms": {
+        "held_right_handed": {
+            "left_hand": {
+                "translation": [
+                    -0.8,
+                    -2,
+                    -12
+                ],
+                "rotation": [
+                    5,
+                    25,
+                    0
+                ],
+                "scale": [
+                    1.5,
+                    1.5,
+                    1.5
+                ]
+            },
+            "right_hand": {
+                "translation": [
+                    -1.5,
+                    1.75,
+                    3
+                ]
+            }
+        },
+        "aiming_right_handed": {
+            "left_hand": {
+                "translation": [
+                    -15,
+                    2,
+                    0.25
+                ],
+                "rotation": [
+                    0,
+                    20,
+                    0
+                ]
+            },
+            "right_hand": {
+                "translation": [
+                    -15,
+                    2,
+                    0.25
+                ]
+            }
+        }
+    },
+    "magazine_transforms": {
+        "craftingdead:m107_magazine": {
+            "translation": [
+                0,
+                0,
+                0
+            ]
+        }
+    },
+    "attachment_transforms": {
+        "craftingdead:red_dot_sight": {
+            "translation": [
+                0.5,
+                3.90,
+                8
+            ]
+        },
+        "craftingdead:lp_scope": {
+            "translation": [
+                0.5,
+                3,
+                5
+            ]
+        },
+        "craftingdead:acog_sight": {
+            "translation": [
+                0.5,
+                1.5,
+                10
+            ]
+        },
+        "craftingdead:hp_scope": {
+            "translation": [
+                0.5,
+                2,
+                7
+            ]
+        },
+        "craftingdead:suppressor": {
+            "translation": [
+                -0.5,
+                1.5,
+                -19.99
+            ]
+        },
+        "craftingdead:tactical_grip": {
+            "translation": [
+                0.5,
+                -4,
+                -2
+            ]
+        },
+        "craftingdead:bipod": {
+            "translation": [
+                0.5,
+                -1,
+                -11
+            ]
+        }
+    },
+    "back_transform": {
+        "scale": [
+            0.5,
+            0.5,
+            0.5
+        ],
+        "rotation": [
+            0,
+            0,
+            180
+        ],
         "translation": [
-          -15,
-          2,
-          0.25
+            2,
+            0,
+            -0.1
         ]
-      }
+    },
+    "animation_properties": {
+        "shoot_animation_length": 5,
+        "shoot_animation_bounce": 2.0,
+        "shoot_animation_kickback": 0.25
     }
-  },
-  "magazine_transforms": {
-    "craftingdead:m107_magazine": {
-      "translation": [
-        0,
-        0,
-        0
-      ]
-    }
-  },
-  "attachment_transforms": {
-    "craftingdead:red_dot_sight": {
-      "translation": [
-        0.5,
-        3.90,
-        8
-      ]
-    },
-    "craftingdead:lp_scope": {
-      "translation": [
-        0.5,
-        3,
-        5
-      ]
-    },
-    "craftingdead:acog_sight": {
-      "translation": [
-        0.5,
-        1.5,
-        10
-      ]
-    },
-    "craftingdead:hp_scope": {
-      "translation": [
-        0.5,
-        2,
-        7
-      ]
-    },
-    "craftingdead:suppressor": {
-      "translation": [
-        -0.5,
-        1.5,
-        -19.99
-      ]
-    },
-    "craftingdead:tactical_grip": {
-      "translation": [
-        0.5,
-        -4,
-        -2
-      ]
-    },
-    "craftingdead:bipod": {
-      "translation": [
-        0.5,
-        -1,
-        -11
-      ]
-    }
-  },
-  "back_transform": {
-    "scale": [
-      0.5,
-      0.5,
-      0.5
-    ],
-    "rotation": [
-      0,
-      0,
-      180
-    ],
-    "translation": [
-      2,
-      0,
-      -0.1
-    ]
-  },
-  "animation_properties": {
-    "shoot_animation_length": 5,
-    "shoot_animation_bounce": 2.0,
-    "shoot_animation_kickback": 0.25
-  }
 }
-    

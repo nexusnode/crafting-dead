@@ -1,169 +1,168 @@
 {
-  "type": "craftingdead:gun",
-  "model": "craftingdead:gun/dmr",
-  "muzzle_flash_transform": {
-    "translation": [
-      1,
-      -0.5,
-      -52
-    ],
-    "scale": [
-      1.5,
-      1.5,
-      1.5
-    ]
-  },
-  "aim_transform": {
-    "translation": [
-      -8.47,
-      4.5,
-      -2
-    ],
-    "rotation": [
-      0,
-      0,
-      0
-    ]
-  },
-  "scope_aim_transform": {
-    "craftingdead:acog_sight": {
-      "translation": [
-        -8.47,
-        4.4,
-        -2
-      ]
-    }
-  },
-  "hand_transforms": {
-    "held_right_handed": {
-      "right_hand": {
+    "type": "craftingdead:gun",
+    "model": "craftingdead:gun/dmr",
+    "muzzle_flash_transform": {
         "translation": [
-          -3,
-          1.75,
-          4
-        ]
-      },
-      "left_hand": {
-        "translation": [
-          -2.5,
-          -2,
-          -12.5
-        ],
-        "rotation": [
-          5,
-          25,
-          0
+            1,
+            -0.5,
+            -52
         ],
         "scale": [
-          1.5,
-          1.5,
-          1.5
+            1.5,
+            1.5,
+            1.5
         ]
-      }
     },
-    "aiming_right_handed": {
-      "left_hand": {
+    "aim_transform": {
         "translation": [
-          -15,
-          2,
-          0.25
+            -8.47,
+            4.5,
+            -2
         ],
         "rotation": [
-          0,
-          20,
-          0
+            0,
+            0,
+            0
         ]
-      },
-      "right_hand": {
+    },
+    "scope_aim_transform": {
+        "craftingdead:acog_sight": {
+            "translation": [
+                -8.47,
+                4.4,
+                -2
+            ]
+        }
+    },
+    "hand_transforms": {
+        "held_right_handed": {
+            "right_hand": {
+                "translation": [
+                    -3,
+                    1.75,
+                    4
+                ]
+            },
+            "left_hand": {
+                "translation": [
+                    -2.5,
+                    -2,
+                    -12.5
+                ],
+                "rotation": [
+                    5,
+                    25,
+                    0
+                ],
+                "scale": [
+                    1.5,
+                    1.5,
+                    1.5
+                ]
+            }
+        },
+        "aiming_right_handed": {
+            "left_hand": {
+                "translation": [
+                    -15,
+                    2,
+                    0.25
+                ],
+                "rotation": [
+                    0,
+                    20,
+                    0
+                ]
+            },
+            "right_hand": {
+                "translation": [
+                    -15,
+                    2,
+                    0.25
+                ]
+            }
+        }
+    },
+    "magazine_transforms": {
+        "craftingdead:dmr_magazine": {
+            "translation": [
+                0,
+                0,
+                0
+            ]
+        }
+    },
+    "attachment_transforms": {
+        "craftingdead:lp_scope": {
+            "translation": [
+                -0.501,
+                2,
+                4
+            ]
+        },
+        "craftingdead:acog_sight": {
+            "translation": [
+                -0.5,
+                0.45,
+                6
+            ]
+        },
+        "craftingdead:hp_scope": {
+            "translation": [
+                -0.5,
+                1.1,
+                5
+            ]
+        },
+        "craftingdead:red_dot_sight": {
+            "translation": [
+                0.5,
+                4,
+                7
+            ]
+        },
+        "craftingdead:suppressor": {
+            "translation": [
+                -0.5,
+                0,
+                -21
+            ]
+        },
+        "craftingdead:tactical_grip": {
+            "translation": [
+                0.5,
+                -4,
+                -2
+            ]
+        },
+        "craftingdead:bipod": {
+            "translation": [
+                -0.5,
+                -1.5,
+                -15
+            ]
+        }
+    },
+    "back_transform": {
+        "scale": [
+            0.5,
+            0.5,
+            0.5
+        ],
+        "rotation": [
+            0,
+            0,
+            180
+        ],
         "translation": [
-          -15,
-          2,
-          0.25
+            2,
+            0,
+            -0.1
         ]
-      }
+    },
+    "animation_properties": {
+        "shoot_animation_length": 5,
+        "shoot_animation_bounce": 2.0,
+        "shoot_animation_kickback": 0.25
     }
-  },
-  "magazine_transforms": {
-    "craftingdead:dmr_magazine": {
-      "translation": [
-        0,
-        0,
-        0
-      ]
-    }
-  },
-  "attachment_transforms": {
-    "craftingdead:lp_scope": {
-      "translation": [
-        -0.501,
-        2,
-        4
-      ]
-    },
-    "craftingdead:acog_sight": {
-      "translation": [
-        -0.5,
-        0.45,
-        6
-      ]
-    },
-    "craftingdead:hp_scope": {
-      "translation": [
-        -0.5,
-        1.1,
-        5
-      ]
-    },
-    "craftingdead:red_dot_sight": {
-      "translation": [
-        0.5,
-        4,
-        7
-      ]
-    },
-    "craftingdead:suppressor": {
-      "translation": [
-        -0.5,
-        0,
-        -21
-      ]
-    },
-    "craftingdead:tactical_grip": {
-      "translation": [
-        0.5,
-        -4,
-        -2
-      ]
-    },
-    "craftingdead:bipod": {
-      "translation": [
-        -0.5,
-        -1.5,
-        -15
-      ]
-    }
-  },
-  "back_transform": {
-    "scale": [
-      0.5,
-      0.5,
-      0.5
-    ],
-    "rotation": [
-      0,
-      0,
-      180
-    ],
-    "translation": [
-      2,
-      0,
-      -0.1
-    ]
-  },
-  "animation_properties": {
-    "shoot_animation_length": 5,
-    "shoot_animation_bounce": 2.0,
-    "shoot_animation_kickback": 0.25
-  }
 }
-    
