@@ -156,6 +156,7 @@
     "message.already_own_base": "You already own a base at: %s",
 
     "key.switch_teams": "Switch Teams",
+    "key.toggle_stats": "Toggle Stats",
 
     "gui.killed_message.killed_by": "Killed by %s",
     "gui.killed_message.hp": "HP: %s",

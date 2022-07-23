@@ -58,6 +58,7 @@ import net.minecraft.client.player.RemotePlayer;
 import net.minecraft.client.renderer.ShaderInstance;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.client.ClientRegistry;
 import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
 import net.minecraftforge.client.event.DrawSelectionEvent;
@@ -72,6 +73,7 @@ import net.minecraftforge.client.settings.KeyModifier;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.Event;
+import net.minecraftforge.eventbus.api.Event.Result;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -92,6 +94,9 @@ public class ClientDist implements ModDist {
   public static final KeyMapping SWITCH_TEAMS =
       new KeyMapping("key.switch_teams", KeyConflictContext.UNIVERSAL, KeyModifier.NONE,
           InputConstants.Type.KEYSYM.getOrCreate(GLFW.GLFW_KEY_M), "key.categories.gameplay");
+  public static final KeyMapping TOGGLE_STATS =
+      new KeyMapping("key.toggle_stats", KeyConflictContext.UNIVERSAL, KeyModifier.NONE,
+          InputConstants.Type.KEYSYM.getOrCreate(GLFW.GLFW_KEY_UNKNOWN), KeyMapping.CATEGORY_MISC);
 
   public static final ResourceLocation BLUR_SHADER =
       new ResourceLocation(CraftingDeadImmerse.ID, "shaders/post/fade_in_blur.json");
@@ -219,6 +224,7 @@ public class ClientDist implements ModDist {
     Bliss.initialize(this.graphicsContext, new MinecraftPlatform(this.minecraft));
 
     ClientRegistry.registerKeyBinding(SWITCH_TEAMS);
+    ClientRegistry.registerKeyBinding(TOGGLE_STATS);
 
     this.blueprintOutlineRenderer.register();
 
@@ -392,6 +398,24 @@ public class ClientDist implements ModDist {
       event.setCanceled(true);
       this.blueprintOutlineRenderer.render(cameraPlayer, blueprint, event.getTarget(),
           event.getCamera(), event.getPoseStack(), event.getMultiBufferSource());
+    }
+  }
+
+  @SubscribeEvent
+  public void handleNameplate(RenderNameplateEvent event) {
+    switch (CraftingDeadImmerse.serverConfig.nametagMode.get()) {
+      case LOOK -> {
+        if (event.getEntity() instanceof Player
+            && Minecraft.getInstance().crosshairPickEntity != event.getEntity()) {
+          event.setResult(Result.DENY);
+        }
+      }
+      case HIDE_PLAYER -> {
+        if (event.getEntity() instanceof Player) {
+          event.setResult(Result.DENY);
+        }
+      }
+      case HIDE_ALL -> event.setResult(Result.DENY);
     }
   }
 }
