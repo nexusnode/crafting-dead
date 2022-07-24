@@ -25,6 +25,7 @@ import net.minecraftforge.common.ForgeConfigSpec;
 public class ServerConfig {
 
   public final ForgeConfigSpec.ConfigValue<List<? extends String>> gameRotation;
+  public final ForgeConfigSpec.EnumValue<NametagMode> nametagMode;
 
   public ServerConfig(ForgeConfigSpec.Builder builder) {
     builder.push("server");
@@ -33,5 +34,22 @@ public class ServerConfig {
           .defineList("game_rotation", ImmutableList.of(), gameName -> true);
     }
     builder.pop();
+
+    builder.push("gameplay");
+    {
+      this.nametagMode = builder
+          .translation("options.craftingdeadimmerse.gameplay.nametag_mode")
+          .comment("Allows to define how nametags should be shown to the player.",
+              "DEFAULT: Default minecraft behaviour",
+              "LOOK: The player must be looking at another player to see it's nametag",
+              "HIDE_PLAYER: Hide player nametags",
+              "HIDE_ALL: Hide all nametags")
+          .defineEnum("nametag_mode", NametagMode.DEFAULT);
+    }
+    builder.pop();
+  }
+
+  public enum NametagMode {
+    DEFAULT, LOOK, HIDE_PLAYER, HIDE_ALL
   }
 }

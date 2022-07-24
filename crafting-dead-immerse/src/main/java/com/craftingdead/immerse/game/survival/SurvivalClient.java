@@ -22,6 +22,7 @@ import com.craftingdead.core.client.util.RenderUtil;
 import com.craftingdead.core.event.LivingExtensionEvent;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.immerse.CraftingDeadImmerse;
+import com.craftingdead.immerse.client.ClientDist;
 import com.craftingdead.immerse.game.GameClient;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -44,6 +45,8 @@ public class SurvivalClient extends SurvivalGame implements GameClient {
 
   private final Minecraft minecraft = Minecraft.getInstance();
 
+  private boolean showStats = true;
+
   public SurvivalClient() {
     super(false);
   }
@@ -59,37 +62,39 @@ public class SurvivalClient extends SurvivalGame implements GameClient {
   @Override
   public boolean renderOverlay(PlayerExtension<? extends AbstractClientPlayer> player,
       PoseStack poseStack, int width, int height, float partialTick) {
-    var survivalPlayer = player.getHandlerOrThrow(SurvivalPlayerHandler.TYPE);
-    int y = height / 2;
-    int x = 4;
+    if (this.showStats) {
+      var survivalPlayer = player.getHandlerOrThrow(SurvivalPlayerHandler.TYPE);
+      int y = height / 2;
+      int x = 4;
 
-    RenderSystem.enableBlend();
+      RenderSystem.enableBlend();
 
-    RenderSystem.setShaderTexture(0, DAYS_SURVIVED);
-    RenderUtil.blit(x, y - 20, 16, 16);
-    this.minecraft.font.drawShadow(poseStack,
-        String.valueOf(survivalPlayer.getDaysSurvived()), x + 20, y - 16, 0xFFFFFF);
+      RenderSystem.setShaderTexture(0, DAYS_SURVIVED);
+      RenderUtil.blit(x, y - 20, 16, 16);
+      this.minecraft.font.drawShadow(poseStack,
+          String.valueOf(survivalPlayer.getDaysSurvived()), x + 20, y - 16, 0xFFFFFF);
 
-    RenderSystem.setShaderTexture(0, ZOMBIES_KILLED);
-    RenderUtil.blit(x, y, 16, 16);
-    this.minecraft.font.drawShadow(poseStack,
-        String.valueOf(survivalPlayer.getZombiesKilled()), x + 20, y + 4, 0xFFFFFF);
+      RenderSystem.setShaderTexture(0, ZOMBIES_KILLED);
+      RenderUtil.blit(x, y, 16, 16);
+      this.minecraft.font.drawShadow(poseStack,
+          String.valueOf(survivalPlayer.getZombiesKilled()), x + 20, y + 4, 0xFFFFFF);
 
-    RenderSystem.setShaderTexture(0, PLAYERS_KILLED);
-    RenderUtil.blit(x, y + 20, 16, 16);
-    this.minecraft.font.drawShadow(poseStack,
-        String.valueOf(survivalPlayer.getPlayersKilled()), x + 20, y + 24, 0xFFFFFF);
+      RenderSystem.setShaderTexture(0, PLAYERS_KILLED);
+      RenderUtil.blit(x, y + 20, 16, 16);
+      this.minecraft.font.drawShadow(poseStack,
+          String.valueOf(survivalPlayer.getPlayersKilled()), x + 20, y + 24, 0xFFFFFF);
 
-    RenderSystem.disableBlend();
+      RenderSystem.disableBlend();
 
-    // Only draw in survival
-    if (this.minecraft.gameMode.canHurtPlayer() && !player.isCombatModeEnabled()) {
-      // Only render when air level is not being rendered
-      if (this.isThirstEnabled()
-          && !player.entity().isEyeInFluid(FluidTags.WATER)
-          && player.entity().getAirSupply() == player.entity().getMaxAirSupply()) {
-        renderWater(width, height,
-            (float) survivalPlayer.getWater() / (float) survivalPlayer.getMaxWater(), ICONS);
+      // Only draw in survival
+      if (this.minecraft.gameMode.canHurtPlayer() && !player.isCombatModeEnabled()) {
+        // Only render when air level is not being rendered
+        if (this.isThirstEnabled()
+            && !player.entity().isEyeInFluid(FluidTags.WATER)
+            && player.entity().getAirSupply() == player.entity().getMaxAirSupply()) {
+          renderWater(width, height,
+              (float) survivalPlayer.getWater() / (float) survivalPlayer.getMaxWater(), ICONS);
+        }
       }
     }
 
@@ -117,5 +122,13 @@ public class SurvivalClient extends SurvivalGame implements GameClient {
       }
     }
     RenderSystem.disableBlend();
+  }
+
+  @Override
+  public void tick() {
+    super.tick();
+    while (ClientDist.TOGGLE_STATS.consumeClick()) {
+      this.showStats = !this.showStats;
+    }
   }
 }
