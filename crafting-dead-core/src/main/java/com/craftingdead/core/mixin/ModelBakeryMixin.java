@@ -27,9 +27,11 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import com.craftingdead.core.CraftingDead;
 import net.minecraft.client.resources.model.ModelBakery;
-import net.minecraft.util.profiling.ProfilerFiller;
-import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.util.profiling.ProfilerFiller;
+import net.minecraftforge.fml.ModList;
+import net.minecraftforge.fml.ModLoadingStage;
 
 @Mixin(ModelBakery.class)
 public abstract class ModelBakeryMixin {
@@ -42,9 +44,15 @@ public abstract class ModelBakeryMixin {
       target = "Lnet/minecraft/client/resources/model/ModelBakery;loadTopLevel(Lnet/minecraft/client/resources/model/ModelResourceLocation;)V",
       ordinal = 0))
   public void prepare(ProfilerFiller profiler, int mipLevel, CallbackInfo callbackInfo) {
-    CraftingDead.getInstance().getClientDist().getItemRendererManager()
-        .gatherItemRenderers(this.resourceManager, profiler)
-        .forEach(this::invokeAddModelToCache);
+    // If some mod crashed during the game initialization Crafting Dead may not be completely
+    // initialized
+    ModList.get().getModContainerById(CraftingDead.ID).ifPresent(modContainer -> {
+      if (modContainer.getCurrentState() != ModLoadingStage.ERROR) {
+        CraftingDead.getInstance().getClientDist().getItemRendererManager()
+            .gatherItemRenderers(this.resourceManager, profiler)
+            .forEach(this::invokeAddModelToCache);
+      }
+    });
   }
 
   @Invoker
