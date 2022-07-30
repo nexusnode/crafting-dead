@@ -48,6 +48,10 @@ public class FlashGrenadeEntity extends Grenade {
     super(entityIn, worldIn);
   }
 
+  public FlashGrenadeEntity(Level worldIn) {
+    super(ModEntityTypes.FLASH_GRENADE.get(), worldIn);
+  }
+
   public FlashGrenadeEntity(LivingEntity thrower, Level worldIn) {
     super(ModEntityTypes.FLASH_GRENADE.get(), thrower, worldIn);
   }

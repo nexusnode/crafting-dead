@@ -18,13 +18,13 @@
 
 package com.craftingdead.core.world.entity.grenade;
 
+import java.util.Optional;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.world.entity.ExplosionSource;
 import com.craftingdead.core.world.entity.ModEntityTypes;
 import com.craftingdead.core.world.entity.grenade.FireGrenadeEntity.BounceSound;
 import com.craftingdead.core.world.item.GrenadeItem;
 import com.craftingdead.core.world.item.ModItems;
-import java.util.Optional;
 import net.minecraft.core.Direction;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.damagesource.DamageSource;
@@ -42,6 +42,10 @@ public class C4Explosive extends Grenade implements ExplosionSource {
 
   public C4Explosive(EntityType<? extends Grenade> entityIn, Level worldIn) {
     super(entityIn, worldIn);
+  }
+
+  public C4Explosive(Level worldIn) {
+    super(ModEntityTypes.C4_EXPLOSIVE.get(), worldIn);
   }
 
   public C4Explosive(LivingEntity thrower, Level worldIn) {

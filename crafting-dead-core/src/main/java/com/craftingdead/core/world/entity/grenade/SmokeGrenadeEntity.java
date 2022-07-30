@@ -45,6 +45,10 @@ public class SmokeGrenadeEntity extends Grenade {
     super(entityIn, worldIn);
   }
 
+  public SmokeGrenadeEntity(Level worldIn) {
+    super(ModEntityTypes.SMOKE_GRENADE.get(), worldIn);
+  }
+
   public SmokeGrenadeEntity(LivingEntity thrower, Level worldIn) {
     super(ModEntityTypes.SMOKE_GRENADE.get(), thrower, worldIn);
   }

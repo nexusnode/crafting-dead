@@ -42,6 +42,10 @@ public class FireGrenadeEntity extends Grenade implements ExplosionSource {
     super(entityIn, worldIn);
   }
 
+  public FireGrenadeEntity(Level worldIn) {
+    super(ModEntityTypes.FIRE_GRENADE.get(), worldIn);
+  }
+
   public FireGrenadeEntity(LivingEntity thrower, Level worldIn) {
     super(ModEntityTypes.FIRE_GRENADE.get(), thrower, worldIn);
   }

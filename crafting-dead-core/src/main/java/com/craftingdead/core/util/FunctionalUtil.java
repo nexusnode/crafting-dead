@@ -18,11 +18,13 @@
 
 package com.craftingdead.core.util;
 
-import com.google.common.base.Suppliers;
 import java.util.Optional;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.function.Supplier;
-import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import com.google.common.base.Suppliers;
 
 public class FunctionalUtil {
 
@@ -33,5 +35,20 @@ public class FunctionalUtil {
   // Java is not that smart with implicit casting the google commons supplier to java util supplier
   public static <T> Supplier<T> supplier(@NotNull T instance) {
     return Suppliers.ofInstance(instance);
+  }
+
+  public static <T> Supplier<T> supply(T value) {
+    return () -> value;
+  }
+
+  public static <T, U, R> BiFunction<@Nullable T, U, R> nullsafeFunction(
+      BiFunction<@NotNull T, U, R> original, Function<U, R> fallback) {
+    return (arg1, arg2) -> {
+      if (arg1 == null) {
+        return fallback.apply(arg2);
+      } else {
+        return original.apply(arg1, arg2);
+      }
+    };
   }
 }

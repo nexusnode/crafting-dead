@@ -138,6 +138,7 @@ public class ServerConfig {
   public final ForgeConfigSpec.IntValue explosivesDecoyGrenadeTicksBeforeDeactivation;
   public final ForgeConfigSpec.IntValue explosivesFlashGrenadeTicksBeforeDeactivation;
   public final ForgeConfigSpec.IntValue explosivesSmokeGrenadeTicksBeforeDeactivation;
+  public final ForgeConfigSpec.BooleanValue explosivesDispenseGrenades;
 
 
   ServerConfig(ForgeConfigSpec.Builder builder) {
@@ -467,6 +468,10 @@ public class ServerConfig {
           .translation("options.craftingdead.server.explosives.smoke_grenade.deactivation_tick")
           .comment("How long before the grenade deactivates automatically (Ticks)")
           .defineInRange("smokeGrenadeTicksBeforeDeactivation", 500, 0, 18000);
+      this.explosivesDispenseGrenades =
+          builder.translation("options.craftingdead.server.explosives.dispense_grenades")
+              .comment("Enables dispensers being able to throw grenades")
+              .define("dispenseGrenades", true);
     }
     builder.pop();
   }

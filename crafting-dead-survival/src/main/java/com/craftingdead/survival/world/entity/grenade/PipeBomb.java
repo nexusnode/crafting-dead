@@ -41,6 +41,10 @@ public class PipeBomb extends Grenade implements ExplosionSource {
     super(type, level);
   }
 
+  public PipeBomb(Level level) {
+    super(SurvivalEntityTypes.PIPE_BOMB.get(), level);
+  }
+
   public PipeBomb(LivingEntity thrower, Level level) {
     super(SurvivalEntityTypes.PIPE_BOMB.get(), thrower, level);
   }
