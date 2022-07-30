@@ -18,6 +18,7 @@
 
 package com.craftingdead.survival.world.item;
 
+import com.craftingdead.core.util.FunctionalUtil;
 import com.craftingdead.core.world.item.ActionItem;
 import com.craftingdead.core.world.item.GrenadeItem;
 import com.craftingdead.survival.CraftingDeadSurvival;
@@ -135,7 +136,7 @@ public class SurvivalItems {
 
   public static final RegistryObject<GrenadeItem> PIPE_BOMB = deferredRegister.register("pipe_bomb",
       () -> new GrenadeItem((GrenadeItem.Properties) new GrenadeItem.Properties()
-          .setGrenadeEntitySupplier(PipeBomb::new)
+          .setGrenadeEntitySupplier(FunctionalUtil.nullsafeFunction(PipeBomb::new, PipeBomb::new))
           .setEnabledSupplier(CraftingDeadSurvival.serverConfig.pipeBombEnabled::get)
           .stacksTo(3)
           .tab(TAB)));

@@ -43,6 +43,11 @@ public class DecoyGrenadeEntity extends Grenade {
     this.gunProperties = this.getRandomProperties();
   }
 
+  public DecoyGrenadeEntity(Level level) {
+    super(ModEntityTypes.DECOY_GRENADE.get(), level);
+    this.gunProperties = this.getRandomProperties();
+  }
+
   public DecoyGrenadeEntity(LivingEntity thrower, Level level) {
     super(ModEntityTypes.DECOY_GRENADE.get(), thrower, level);
     this.gunProperties = this.getRandomProperties();

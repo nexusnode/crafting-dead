@@ -34,6 +34,10 @@ public class FragGrenade extends Grenade implements ExplosionSource {
     super(entityIn, worldIn);
   }
 
+  public FragGrenade(Level worldIn) {
+    super(ModEntityTypes.FRAG_GRENADE.get(), worldIn);
+  }
+
   public FragGrenade(LivingEntity thrower, Level worldIn) {
     super(ModEntityTypes.FRAG_GRENADE.get(), thrower, worldIn);
   }

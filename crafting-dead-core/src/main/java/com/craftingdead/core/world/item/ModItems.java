@@ -22,6 +22,7 @@ import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.client.animation.gun.InspectAnimation;
 import com.craftingdead.core.client.animation.gun.ReloadAnimation;
 import com.craftingdead.core.client.animation.gun.ShootAnimation;
+import com.craftingdead.core.util.FunctionalUtil;
 import com.craftingdead.core.world.action.ActionTypes;
 import com.craftingdead.core.world.entity.grenade.C4Explosive;
 import com.craftingdead.core.world.entity.grenade.DecoyGrenadeEntity;
@@ -1002,7 +1003,8 @@ public class ModItems {
   public static final RegistryObject<GrenadeItem> FIRE_GRENADE =
       deferredRegister.register("fire_grenade",
           () -> new GrenadeItem((GrenadeItem.Properties) new GrenadeItem.Properties()
-              .setGrenadeEntitySupplier(FireGrenadeEntity::new)
+              .setGrenadeEntitySupplier(
+                  FunctionalUtil.nullsafeFunction(FireGrenadeEntity::new, FireGrenadeEntity::new))
               .setEnabledSupplier(CraftingDead.serverConfig.explosivesFireGrenadeEnabled::get)
               .stacksTo(3)
               .tab(COMBAT_TAB)));
@@ -1010,7 +1012,8 @@ public class ModItems {
   public static final RegistryObject<GrenadeItem> SMOKE_GRENADE =
       deferredRegister.register("smoke_grenade",
           () -> new GrenadeItem((GrenadeItem.Properties) new GrenadeItem.Properties()
-              .setGrenadeEntitySupplier(SmokeGrenadeEntity::new)
+              .setGrenadeEntitySupplier(
+                  FunctionalUtil.nullsafeFunction(SmokeGrenadeEntity::new, SmokeGrenadeEntity::new))
               .setEnabledSupplier(CraftingDead.serverConfig.explosivesSmokeGrenadeEnabled::get)
               .stacksTo(3)
               .tab(COMBAT_TAB)));
@@ -1018,7 +1021,8 @@ public class ModItems {
   public static final RegistryObject<GrenadeItem> FLASH_GRENADE =
       deferredRegister.register("flash_grenade",
           () -> new GrenadeItem((GrenadeItem.Properties) new GrenadeItem.Properties()
-              .setGrenadeEntitySupplier(FlashGrenadeEntity::new)
+              .setGrenadeEntitySupplier(
+                  FunctionalUtil.nullsafeFunction(FlashGrenadeEntity::new, FlashGrenadeEntity::new))
               .setEnabledSupplier(CraftingDead.serverConfig.explosivesFlashGrenadeEnabled::get)
               .stacksTo(3)
               .tab(COMBAT_TAB)));
@@ -1026,7 +1030,8 @@ public class ModItems {
   public static final RegistryObject<GrenadeItem> DECOY_GRENADE =
       deferredRegister.register("decoy_grenade",
           () -> new GrenadeItem((GrenadeItem.Properties) new GrenadeItem.Properties()
-              .setGrenadeEntitySupplier(DecoyGrenadeEntity::new)
+              .setGrenadeEntitySupplier(
+                  FunctionalUtil.nullsafeFunction(DecoyGrenadeEntity::new, DecoyGrenadeEntity::new))
               .setEnabledSupplier(CraftingDead.serverConfig.explosivesDecoyGrenadeEnabled::get)
               .stacksTo(3)
               .tab(COMBAT_TAB)));
@@ -1034,7 +1039,8 @@ public class ModItems {
   public static final RegistryObject<GrenadeItem> FRAG_GRENADE =
       deferredRegister.register("frag_grenade",
           () -> new GrenadeItem((GrenadeItem.Properties) new GrenadeItem.Properties()
-              .setGrenadeEntitySupplier(FragGrenade::new)
+              .setGrenadeEntitySupplier(
+                  FunctionalUtil.nullsafeFunction(FragGrenade::new, FragGrenade::new))
               .setEnabledSupplier(CraftingDead.serverConfig.explosivesFragGrenadeEnabled::get)
               .stacksTo(1)
               .tab(COMBAT_TAB)));
@@ -1042,7 +1048,8 @@ public class ModItems {
   public static final RegistryObject<GrenadeItem> C4_EXPLOSIVE =
       deferredRegister.register("c4_explosive",
           () -> new GrenadeItem((GrenadeItem.Properties) new GrenadeItem.Properties()
-              .setGrenadeEntitySupplier(C4Explosive::new)
+              .setGrenadeEntitySupplier(
+                  FunctionalUtil.nullsafeFunction(C4Explosive::new, C4Explosive::new))
               .setEnabledSupplier(CraftingDead.serverConfig.explosivesC4Enabled::get)
               .setThrowSpeed(0.75F)
               .stacksTo(1)
@@ -1051,7 +1058,8 @@ public class ModItems {
   public static final RegistryObject<GrenadeItem> STICKY_C4_EXPLOSIVE =
       deferredRegister.register("sticky_c4_explosive",
           () -> new GrenadeItem((GrenadeItem.Properties) new GrenadeItem.Properties()
-              .setGrenadeEntitySupplier(C4Explosive::new)
+              .setGrenadeEntitySupplier(
+                  FunctionalUtil.nullsafeFunction(C4Explosive::new, C4Explosive::new))
               .setEnabledSupplier(CraftingDead.serverConfig.explosivesC4Enabled::get)
               .setSticky(true)
               .setThrowSpeed(0.75F)

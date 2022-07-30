@@ -19,16 +19,19 @@
 package com.craftingdead.core.world.item;
 
 
+import java.util.List;
+import java.util.function.BiFunction;
+import java.util.function.BooleanSupplier;
+import org.jetbrains.annotations.Nullable;
+import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.capability.CapabilityUtil;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.core.world.entity.grenade.Grenade;
 import com.craftingdead.core.world.item.combatslot.CombatSlot;
 import com.craftingdead.core.world.item.combatslot.CombatSlotProvider;
-import java.util.List;
-import java.util.function.BiFunction;
-import java.util.function.BooleanSupplier;
-import org.jetbrains.annotations.Nullable;
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.BlockSource;
+import net.minecraft.core.dispenser.DefaultDispenseItemBehavior;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
@@ -43,11 +46,14 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.DispenserBlock;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 
 public class GrenadeItem extends Item {
 
-  private final BiFunction<LivingEntity, Level, Grenade> grenadeEntitySupplier;
+  public static final GrenadeDispenserBehaviour dispenserBehaviour =
+      new GrenadeDispenserBehaviour();
+  private final BiFunction<@Nullable LivingEntity, Level, Grenade> grenadeEntitySupplier;
   private final float throwSpeed;
   private final BooleanSupplier enabled;
   private final boolean isSticky;
@@ -58,6 +64,8 @@ public class GrenadeItem extends Item {
     this.throwSpeed = properties.throwSpeed;
     this.enabled = properties.enabled;
     this.isSticky = properties.isSticky;
+    // Should be safe to be called here, minecraft does the same with some items
+    DispenserBlock.registerBehavior(this, GrenadeItem.dispenserBehaviour);
   }
 
   @Override
@@ -111,13 +119,13 @@ public class GrenadeItem extends Item {
 
   public static class Properties extends Item.Properties {
 
-    private BiFunction<LivingEntity, Level, Grenade> grenadeEntitySupplier;
+    private BiFunction<@Nullable LivingEntity, Level, Grenade> grenadeEntitySupplier;
     private float throwSpeed = 1.45F;
     private BooleanSupplier enabled = () -> true;
     private boolean isSticky;
 
     public Properties setGrenadeEntitySupplier(
-        BiFunction<LivingEntity, Level, Grenade> grenadeEntitySupplier) {
+        BiFunction<@Nullable LivingEntity, Level, Grenade> grenadeEntitySupplier) {
       this.grenadeEntitySupplier = grenadeEntitySupplier;
       return this;
     }
@@ -135,6 +143,38 @@ public class GrenadeItem extends Item {
     public Properties setSticky(boolean isSticky) {
       this.isSticky = isSticky;
       return this;
+    }
+  }
+
+  public static class GrenadeDispenserBehaviour extends DefaultDispenseItemBehavior {
+    GrenadeDispenserBehaviour() {}
+
+    @Override
+    protected ItemStack execute(BlockSource source, ItemStack itemStack) {
+      if (CraftingDead.serverConfig.explosivesDispenseGrenades.get()
+          && itemStack.getItem()instanceof GrenadeItem grenadeItem) {
+        var direction = source.getBlockState().getValue(DispenserBlock.FACING);
+        var grenadeEntity = grenadeItem.grenadeEntitySupplier.apply(null, source.getLevel());
+        var position = DispenserBlock.getDispensePosition(source);
+
+        grenadeEntity.setPos(position.x(), position.y(), position.z());
+        grenadeEntity.shoot(direction.getStepX(), direction.getStepY(), direction.getStepZ(),
+            grenadeItem.throwSpeed, 1.0F);
+        grenadeEntity.setSticky(grenadeItem.isSticky);
+        source.getLevel().addFreshEntity(grenadeEntity);
+
+        itemStack.shrink(1);
+        return itemStack;
+      } else {
+        return super.execute(source, itemStack); // Drop the item instead
+      }
+    }
+
+    @Override
+    protected void playSound(BlockSource source) {
+      source.getLevel().playSound(null, source.x(), source.y(), source.z(),
+          SoundEvents.SNOWBALL_THROW, SoundSource.BLOCKS, 0.5F,
+          0.4F / (source.getLevel().getRandom().nextFloat() * 0.4F + 0.8F));
     }
   }
 }
