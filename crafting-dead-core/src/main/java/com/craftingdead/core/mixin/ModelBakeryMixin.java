@@ -30,8 +30,7 @@ import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.profiling.ProfilerFiller;
-import net.minecraftforge.fml.ModList;
-import net.minecraftforge.fml.ModLoadingStage;
+import net.minecraftforge.fml.ModLoader;
 
 @Mixin(ModelBakery.class)
 public abstract class ModelBakeryMixin {
@@ -46,13 +45,10 @@ public abstract class ModelBakeryMixin {
   public void prepare(ProfilerFiller profiler, int mipLevel, CallbackInfo callbackInfo) {
     // If some mod crashed during the game initialization Crafting Dead may not be completely
     // initialized
-    ModList.get().getModContainerById(CraftingDead.ID).ifPresent(modContainer -> {
-      if (modContainer.getCurrentState() != ModLoadingStage.ERROR) {
-        CraftingDead.getInstance().getClientDist().getItemRendererManager()
-            .gatherItemRenderers(this.resourceManager, profiler)
-            .forEach(this::invokeAddModelToCache);
-      }
-    });
+    if (ModLoader.isLoadingStateValid()) {
+      CraftingDead.getInstance().getClientDist().getItemRendererManager()
+          .gatherItemRenderers(this.resourceManager, profiler).forEach(this::invokeAddModelToCache);
+    }
   }
 
   @Invoker
