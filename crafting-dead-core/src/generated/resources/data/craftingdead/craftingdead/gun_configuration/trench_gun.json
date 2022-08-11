@@ -14,5 +14,5 @@
   "rounds_per_shot": 8,
   "fire_delay_ms": 1200,
   "damage": 2.0,
-  "reload_duration_ticks": 20
+  "reload_duration_ticks": 40
 }

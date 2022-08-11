@@ -18,7 +18,6 @@
 
 package com.craftingdead.core.world.item.gun;
 
-import java.util.function.Supplier;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.sounds.ModSoundEvents;
 import net.minecraft.core.Registry;
@@ -28,6 +27,8 @@ import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.RegistryBuilder;
 import net.minecraftforge.registries.RegistryObject;
+
+import java.util.function.Supplier;
 
 public class GunConfigurations {
 
@@ -479,7 +480,7 @@ public class GunConfigurations {
               .aimable(false)
               .setFireDelayMs(90)
               .setDamage(5)
-              .setReloadDurationTicks((int) (20 * 1.9F))
+              .setReloadDurationTicks(20 * 3)
               .setAccuracy(0.7F)
               .setRecoil(2.5F)
               .setRange(80.0D)

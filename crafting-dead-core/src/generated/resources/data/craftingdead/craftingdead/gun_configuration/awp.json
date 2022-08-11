@@ -13,7 +13,7 @@
   "secondary_action_trigger": "toggle",
   "accuracy_percent": 0.97,
   "recoil": 9.0,
-  "fire_delay_ms": 1200,
+  "fire_delay_ms": 1500,
   "damage": 20.0,
   "reload_duration_ticks": 60
 }

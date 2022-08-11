@@ -11,5 +11,5 @@
   "recoil": 8.0,
   "fire_delay_ms": 160,
   "damage": 7.0,
-  "reload_duration_ticks": 40
+  "reload_duration_ticks": 60
 }
