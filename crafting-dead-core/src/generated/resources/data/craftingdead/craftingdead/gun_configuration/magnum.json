@@ -2,7 +2,8 @@
   "aim_settings": {},
   "sounds": {
     "reload_sound": "craftingdead:magnum_reload",
-    "shoot_sound": "craftingdead:magnum_shoot"
+    "shoot_sound": "craftingdead:magnum_shoot",
+    "distant_shoot_sound": "craftingdead:magnum_distant_shoot"
   },
   "range": 80.0,
   "secondary_action_trigger": "toggle",

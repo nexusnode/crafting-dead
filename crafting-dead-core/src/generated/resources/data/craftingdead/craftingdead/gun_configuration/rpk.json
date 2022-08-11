@@ -6,6 +6,7 @@
   "sounds": {
     "reload_sound": "craftingdead:rpk_reload",
     "shoot_sound": "craftingdead:rpk_shoot",
+    "distant_shoot_sound": "craftingdead:rpk_distant_shoot",
     "silenced_shoot_sound": "craftingdead:silenced_m240b_shoot"
   },
   "range": 150.0,

@@ -4,7 +4,8 @@
   },
   "sounds": {
     "reload_sound": "craftingdead:m107_reload",
-    "shoot_sound": "craftingdead:m107_shoot"
+    "shoot_sound": "craftingdead:m107_shoot",
+    "distant_shoot_sound": "craftingdead:m107_distant_shoot"
   },
   "range": 400.0,
   "crosshair_enabled": false,

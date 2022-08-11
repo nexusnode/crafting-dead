@@ -4,7 +4,8 @@
   },
   "sounds": {
     "reload_sound": "craftingdead:shotgun_reload",
-    "shoot_sound": "craftingdead:trench_gun_shoot"
+    "shoot_sound": "craftingdead:trench_gun_shoot",
+    "distant_shoot_sound": "craftingdead:trench_gun_distant_shoot"
   },
   "range": 25.0,
   "secondary_action_trigger": "toggle",

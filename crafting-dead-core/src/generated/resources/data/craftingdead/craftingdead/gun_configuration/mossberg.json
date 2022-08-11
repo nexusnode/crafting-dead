@@ -4,7 +4,8 @@
   },
   "sounds": {
     "reload_sound": "craftingdead:mossberg_reload",
-    "shoot_sound": "craftingdead:mossberg_shoot"
+    "shoot_sound": "craftingdead:mossberg_shoot",
+    "distant_shoot_sound": "craftingdead:mossberg_distant_shoot"
   },
   "range": 20.0,
   "secondary_action_trigger": "toggle",

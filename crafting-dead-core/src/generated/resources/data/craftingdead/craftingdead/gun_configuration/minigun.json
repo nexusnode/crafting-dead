@@ -6,7 +6,8 @@
     "reload_sound": "craftingdead:m240b_reload",
     "secondary_action_sound": "craftingdead:minigun_barrel",
     "secondary_action_sound_repeat_delay": 177,
-    "shoot_sound": "craftingdead:minigun_shoot"
+    "shoot_sound": "craftingdead:minigun_shoot",
+    "distant_shoot_sound": "craftingdead:minigun_distant_shoot"
   },
   "range": 350.0,
   "secondary_action_trigger": "hold",

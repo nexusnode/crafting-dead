@@ -6,8 +6,9 @@
   ],
   "aim_settings": {},
   "sounds": {
-    "reload_sound": "craftingdead:m4a1_reload",
+    "reload_sound": "craftingdead:scarl_reload",
     "shoot_sound": "craftingdead:scarl_shoot",
+    "distant_shoot_sound": "craftingdead:scarl_distant_shoot",
     "silenced_shoot_sound": "craftingdead:silenced_m4a1_shoot"
   },
   "range": 300.0,

@@ -3,6 +3,7 @@
   "sounds": {
     "reload_sound": "craftingdead:m9_reload",
     "shoot_sound": "craftingdead:m9_shoot",
+    "distant_shoot_sound": "craftingdead:m9_distant_shoot",
     "silenced_shoot_sound": "craftingdead:silenced_m9_shoot"
   },
   "range": 50.0,

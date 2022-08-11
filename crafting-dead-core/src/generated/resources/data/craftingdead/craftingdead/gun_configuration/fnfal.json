@@ -1,7 +1,7 @@
 {
   "aim_settings": {},
   "sounds": {
-    "reload_sound": "craftingdead:m4a1_reload",
+    "reload_sound": "craftingdead:fnfal_reload",
     "shoot_sound": "craftingdead:fnfal_shoot",
     "distant_shoot_sound": "craftingdead:fnfal_distant_shoot",
     "silenced_shoot_sound": "craftingdead:silenced_rpk_shoot"
