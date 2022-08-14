@@ -1,6 +1,7 @@
 {
-  "parent": "minecraft:item/generated",
+  "parent": "craftingdeadimmerse:item/canned_food",
   "textures": {
-    "layer0": "craftingdeadimmerse:item/canned_beans"
+    "texture": "craftingdeadimmerse:item/canned_beans",
+    "particle": "craftingdeadimmerse:item/canned_beans"
   }
 }

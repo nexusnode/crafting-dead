@@ -21,11 +21,13 @@ package com.craftingdead.immerse.client;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
+
 import org.jdesktop.core.animation.timing.Animator;
 import org.jdesktop.core.animation.timing.sources.ManualTimingSource;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
+
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
@@ -40,14 +42,17 @@ import com.craftingdead.immerse.client.renderer.entity.layer.TeamClothingLayer;
 import com.craftingdead.immerse.client.shader.RectShader;
 import com.craftingdead.immerse.client.shader.RoundedRectShader;
 import com.craftingdead.immerse.client.shader.RoundedTexShader;
+import com.craftingdead.immerse.client.util.FontIcons;
 import com.craftingdead.immerse.game.ClientGameWrapper;
 import com.craftingdead.immerse.game.GameClient;
 import com.craftingdead.immerse.game.GameType;
 import com.craftingdead.immerse.game.LogicalServer;
 import com.craftingdead.immerse.world.item.BlueprintItem;
+import com.craftingdead.immerse.world.item.hydration.Hydration;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.logging.LogUtils;
+
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.TitleScreen;
@@ -56,6 +61,7 @@ import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.player.RemotePlayer;
 import net.minecraft.client.renderer.ShaderInstance;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.entity.player.Player;
@@ -72,6 +78,7 @@ import net.minecraftforge.client.settings.KeyConflictContext;
 import net.minecraftforge.client.settings.KeyModifier;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.Event.Result;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -417,5 +424,24 @@ public class ClientDist implements ModDist {
       }
       case HIDE_ALL -> event.setResult(Result.DENY);
     }
+  }
+
+  @SubscribeEvent
+  public void handleTooltipEvent(ItemTooltipEvent event) {
+    var item = event.getItemStack();
+    var food = item.getFoodProperties(event.getPlayer());
+    if (food != null) {
+      var nutrition = food.getNutrition();
+      event.getToolTip()
+          .add(new TextComponent(String.valueOf(FontIcons.HUNGER_FULL).repeat(nutrition / 2)
+              + ((nutrition & 1) == 0 ? "" : FontIcons.HUNGER_HALF)));
+    }
+    item.getCapability(Hydration.CAPABILITY).ifPresent(hydration -> {
+      // hydration effect implicitly adds an extra 1 water
+      var water = hydration.getWater(item) + 1;
+      event.getToolTip()
+          .add(new TextComponent(String.valueOf(FontIcons.THIRST_FULL).repeat(water / 2)
+              + ((water & 1) == 0 ? "" : FontIcons.THIRST_HALF)));
+    });
   }
 }

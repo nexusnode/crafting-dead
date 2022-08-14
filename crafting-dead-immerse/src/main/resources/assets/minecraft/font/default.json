@@ -1,0 +1,13 @@
+{
+  "providers": [
+    {
+      "type": "bitmap",
+      "file": "craftingdeadimmerse:font/immerseicons.png",
+      "height": 9,
+      "ascent": 9,
+      "chars": [
+        "\uefa0\uefa1\uefa2\uefa3"
+      ]
+    }
+  ]
+}

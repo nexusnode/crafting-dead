@@ -1,6 +1,7 @@
 {
-  "parent": "minecraft:item/generated",
+  "parent": "craftingdeadimmerse:item/fruit",
   "textures": {
-    "layer0": "craftingdeadimmerse:item/rotten_apple"
+    "texture": "craftingdeadimmerse:item/rotten_apple",
+    "particle": "craftingdeadimmerse:item/rotten_apple"
   }
 }

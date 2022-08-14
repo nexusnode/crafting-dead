@@ -1,6 +1,7 @@
 {
-  "parent": "minecraft:item/generated",
+  "parent": "craftingdeadimmerse:item/food_bar",
   "textures": {
-    "layer0": "craftingdeadimmerse:item/power_bar"
+    "texture": "craftingdeadimmerse:item/power_bar",
+    "particle": "craftingdeadimmerse:item/power_bar"
   }
 }

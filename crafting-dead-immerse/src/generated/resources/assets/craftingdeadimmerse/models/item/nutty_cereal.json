@@ -1,6 +1,7 @@
 {
-  "parent": "minecraft:item/generated",
+  "parent": "craftingdeadimmerse:item/food_box",
   "textures": {
-    "layer0": "craftingdeadimmerse:item/nutty_cereal"
+    "texture": "craftingdeadimmerse:item/nutty_cereal",
+    "particle": "craftingdeadimmerse:item/nutty_cereal"
   }
 }

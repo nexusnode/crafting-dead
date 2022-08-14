@@ -19,11 +19,14 @@
 package com.craftingdead.immerse.world.item;
 
 import java.util.function.Supplier;
+
 import javax.annotation.Nullable;
+
 import com.craftingdead.core.capability.CapabilityUtil;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.immerse.game.survival.SurvivalPlayerHandler;
 import com.craftingdead.immerse.world.item.hydration.Hydration;
+
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
@@ -100,7 +103,7 @@ public class DrinkItem extends Item {
   public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
     var handler =
         PlayerExtension.getOrThrow(player).getHandlerOrThrow(SurvivalPlayerHandler.TYPE);
-    return handler.getWater() < handler.getMaxWater()
+    return handler.needsWater()
         ? ItemUtils.startUsingInstantly(level, player, hand)
         : InteractionResultHolder.pass(player.getItemInHand(hand));
   }

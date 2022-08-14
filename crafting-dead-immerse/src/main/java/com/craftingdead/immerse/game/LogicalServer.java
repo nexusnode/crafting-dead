@@ -25,12 +25,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
 import org.apache.commons.lang3.tuple.Pair;
-import com.mojang.logging.LogUtils;
 import org.slf4j.Logger;
 import com.craftingdead.core.event.GunEvent;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.game.survival.SurvivalServer;
+import com.craftingdead.immerse.game.survival.ThirstProperties;
 import com.craftingdead.immerse.network.NetworkChannel;
 import com.craftingdead.immerse.network.login.SetupGameMessage;
 import com.craftingdead.immerse.network.play.AddKillFeedEntryMessage;
@@ -39,6 +39,7 @@ import com.craftingdead.immerse.world.KillFeedEntry;
 import com.google.common.base.Predicates;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
+import com.mojang.logging.LogUtils;
 import com.mojang.serialization.JsonOps;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
@@ -114,7 +115,8 @@ public class LogicalServer extends SavedData {
 
     if (gameRotation.isEmpty()) {
       logger.info("Game rotation empty, defaulting to survival...");
-      this.loadGame(new ServerGameWrapper(new SurvivalServer(false, false), this));
+      this.loadGame(
+          new ServerGameWrapper(new SurvivalServer(false, ThirstProperties.DEFAULT, false), this));
       return;
     }
 
