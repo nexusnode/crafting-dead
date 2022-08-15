@@ -4,7 +4,8 @@
   },
   "sounds": {
     "reload_sound": "craftingdead:m107_reload",
-    "shoot_sound": "craftingdead:m107_shoot"
+    "shoot_sound": "craftingdead:m107_shoot",
+    "distant_shoot_sound": "craftingdead:m107_distant_shoot"
   },
   "range": 400.0,
   "crosshair_enabled": false,
@@ -13,5 +14,5 @@
   "recoil": 12.0,
   "fire_delay_ms": 750,
   "damage": 20.0,
-  "reload_duration_ticks": 60
+  "reload_duration_ticks": 100
 }

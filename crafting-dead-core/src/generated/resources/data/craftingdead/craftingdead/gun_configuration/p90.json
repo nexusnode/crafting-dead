@@ -1,4 +1,4 @@
-{
+ {
   "fire_modes": [
     "auto"
   ],
@@ -15,5 +15,5 @@
   "recoil": 2.0,
   "fire_delay_ms": 80,
   "damage": 5.0,
-  "reload_duration_ticks": 44
+  "reload_duration_ticks": 80
 }

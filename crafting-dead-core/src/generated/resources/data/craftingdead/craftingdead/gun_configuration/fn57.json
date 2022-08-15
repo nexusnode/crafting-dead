@@ -3,6 +3,7 @@
   "sounds": {
     "reload_sound": "craftingdead:fn57_reload",
     "shoot_sound": "craftingdead:fn57_shoot",
+    "distant_shoot_sound": "craftingdead:fn57_distant_shoot",
     "silenced_shoot_sound": "craftingdead:silenced_m4a1_shoot"
   },
   "range": 50.0,
@@ -11,5 +12,5 @@
   "recoil": 3.5,
   "fire_delay_ms": 160,
   "damage": 8.0,
-  "reload_duration_ticks": 30
+  "reload_duration_ticks": 40
 }

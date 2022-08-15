@@ -6,6 +6,7 @@
   "sounds": {
     "reload_sound": "craftingdead:rpk_reload",
     "shoot_sound": "craftingdead:rpk_shoot",
+    "distant_shoot_sound": "craftingdead:rpk_distant_shoot",
     "silenced_shoot_sound": "craftingdead:silenced_m240b_shoot"
   },
   "range": 150.0,
@@ -14,5 +15,5 @@
   "recoil": 4.5,
   "fire_delay_ms": 92,
   "damage": 6.0,
-  "reload_duration_ticks": 60
+  "reload_duration_ticks": 100
 }

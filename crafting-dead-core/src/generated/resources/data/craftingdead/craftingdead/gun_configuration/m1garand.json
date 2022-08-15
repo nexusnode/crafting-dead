@@ -1,8 +1,9 @@
 {
   "aim_settings": {},
   "sounds": {
-    "reload_sound": "craftingdead:as50_reload",
-    "shoot_sound": "craftingdead:m1garand_shoot"
+    "reload_sound": "craftingdead:m1garand_reload",
+    "shoot_sound": "craftingdead:m1garand_shoot",
+    "distant_shoot_sound": "craftingdead:m1garand_distant_shoot"
   },
   "range": 200.0,
   "crosshair_enabled": false,
@@ -11,5 +12,5 @@
   "recoil": 7.0,
   "fire_delay_ms": 170,
   "damage": 10.0,
-  "reload_duration_ticks": 40
+  "reload_duration_ticks": 100
 }

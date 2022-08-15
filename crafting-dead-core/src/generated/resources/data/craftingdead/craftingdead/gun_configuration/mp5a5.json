@@ -7,6 +7,7 @@
   "sounds": {
     "reload_sound": "craftingdead:mp5a5_reload",
     "shoot_sound": "craftingdead:mp5a5_shoot",
+    "distant_shoot_sound": "craftingdead:mp5a5_distant_shoot",
     "silenced_shoot_sound": "craftingdead:silenced_mp5a5_shoot"
   },
   "range": 100.0,
@@ -15,5 +16,5 @@
   "recoil": 4.5,
   "fire_delay_ms": 85,
   "damage": 7.0,
-  "reload_duration_ticks": 44
+  "reload_duration_ticks": 60
 }

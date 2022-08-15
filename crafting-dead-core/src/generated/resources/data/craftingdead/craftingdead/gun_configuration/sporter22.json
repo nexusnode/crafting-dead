@@ -1,8 +1,9 @@
 {
   "aim_settings": {},
   "sounds": {
-    "reload_sound": "craftingdead:m107_reload",
+    "reload_sound": "craftingdead:sporter22_reload",
     "shoot_sound": "craftingdead:sporter22_shoot",
+    "distant_shoot_sound": "craftingdead:sporter22_distant_shoot",
     "silenced_shoot_sound": "craftingdead:silenced_rpk_shoot"
   },
   "range": 60.0,
@@ -12,5 +13,5 @@
   "recoil": 2.5,
   "fire_delay_ms": 200,
   "damage": 7.0,
-  "reload_duration_ticks": 30
+  "reload_duration_ticks": 60
 }

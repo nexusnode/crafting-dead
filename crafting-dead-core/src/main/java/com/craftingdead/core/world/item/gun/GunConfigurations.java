@@ -18,7 +18,6 @@
 
 package com.craftingdead.core.world.item.gun;
 
-import java.util.function.Supplier;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.sounds.ModSoundEvents;
 import net.minecraft.core.Registry;
@@ -28,6 +27,8 @@ import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.RegistryBuilder;
 import net.minecraftforge.registries.RegistryObject;
+
+import java.util.function.Supplier;
 
 public class GunConfigurations {
 
@@ -80,8 +81,9 @@ public class GunConfigurations {
               .addFireMode(FireMode.BURST)
               .addFireMode(FireMode.SEMI)
               .setShootSound(ModSoundEvents.SCARL_SHOOT)
+                  .setDistantShootSound(ModSoundEvents.SCARL_DISTANT_SHOOT)
               .setSilencedShootSound(ModSoundEvents.SILENCED_M4A1_SHOOT)
-              .setReloadSound(ModSoundEvents.M4A1_RELOAD)
+              .setReloadSound(ModSoundEvents.SCARL_RELOAD)
               .build());
 
   public static final RegistryObject<GunConfiguration> AK47 =
@@ -116,7 +118,7 @@ public class GunConfigurations {
               .setShootSound(ModSoundEvents.FNFAL_SHOOT)
               .setDistantShootSound(ModSoundEvents.FNFAL_DISTANT_SHOOT)
               .setSilencedShootSound(ModSoundEvents.SILENCED_RPK_SHOOT)
-              .setReloadSound(ModSoundEvents.M4A1_RELOAD)
+              .setReloadSound(ModSoundEvents.FNFAL_RELOAD)
               .build());
 
   public static final RegistryObject<GunConfiguration> ACR =
@@ -132,8 +134,9 @@ public class GunConfigurations {
               .addFireMode(FireMode.AUTO)
               .addFireMode(FireMode.SEMI)
               .setShootSound(ModSoundEvents.ACR_SHOOT)
+                  .setDistantShootSound(ModSoundEvents.ACR_DISTANT_SHOOT)
               .setSilencedShootSound(ModSoundEvents.SILENCED_M4A1_SHOOT)
-              .setReloadSound(ModSoundEvents.M4A1_RELOAD)
+              .setReloadSound(ModSoundEvents.ACR_RELOAD)
               .build());
 
   public static final RegistryObject<GunConfiguration> HK417 =
@@ -142,15 +145,16 @@ public class GunConfigurations {
               .aimable(false)
               .setFireDelayMs(100)
               .setDamage(8)
-              .setReloadDurationTicks((int) (20 * 2.1F))
+              .setReloadDurationTicks(20 * 4)
               .setAccuracy(0.85F)
               .setRecoil(3.5F)
               .setRange(130.0D)
               .addFireMode(FireMode.AUTO)
               .addFireMode(FireMode.SEMI)
               .setShootSound(ModSoundEvents.HK417_SHOOT)
+                  .setDistantShootSound(ModSoundEvents.HK417_DISTANT_SHOOT)
               .setSilencedShootSound(ModSoundEvents.SILENCED_RPK_SHOOT)
-              .setReloadSound(ModSoundEvents.M4A1_RELOAD)
+              .setReloadSound(ModSoundEvents.HK417_RELOAD)
               .build());
 
   public static final RegistryObject<GunConfiguration> MPT55 =
@@ -159,15 +163,16 @@ public class GunConfigurations {
               .aimable(false)
               .setFireDelayMs(70)
               .setDamage(6)
-              .setReloadDurationTicks(20 * 2)
+              .setReloadDurationTicks(20 * 4)
               .setAccuracy(0.8F)
               .setRecoil(2.0F)
               .setRange(180.0D)
               .addFireMode(FireMode.BURST)
               .addFireMode(FireMode.SEMI)
               .setShootSound(ModSoundEvents.MPT_SHOOT)
+                  .setDistantShootSound(ModSoundEvents.MPT_DISTANT_SHOOT)
               .setSilencedShootSound(ModSoundEvents.SILENCED_M4A1_SHOOT)
-              .setReloadSound(ModSoundEvents.M4A1_RELOAD)
+              .setReloadSound(ModSoundEvents.MPT_RELOAD)
               .build());
 
   public static final RegistryObject<GunConfiguration> M1GARAND =
@@ -176,14 +181,15 @@ public class GunConfigurations {
               .aimable(false)
               .setFireDelayMs(170)
               .setDamage(10)
-              .setReloadDurationTicks(20 * 2)
+              .setReloadDurationTicks(20 * 5)
               .setAccuracy(0.92F)
               .setRecoil(7.0F)
               .setRange(200.0D)
               .setCrosshairEnabled(false)
               .addFireMode(FireMode.SEMI)
               .setShootSound(ModSoundEvents.M1GARAND_SHOOT)
-              .setReloadSound(ModSoundEvents.AS50_RELOAD)
+                  .setDistantShootSound(ModSoundEvents.M1GARAND_DISTANT_SHOOT)
+              .setReloadSound(ModSoundEvents.M1GARAND_RELOAD)
               .build());
 
   public static final RegistryObject<GunConfiguration> SPORTER22 =
@@ -192,15 +198,16 @@ public class GunConfigurations {
               .aimable(false)
               .setFireDelayMs(200)
               .setDamage(7)
-              .setReloadDurationTicks((int) (20 * 1.5F))
+              .setReloadDurationTicks(20 * 3)
               .setAccuracy(0.7F)
               .setRecoil(2.5F)
               .setCrosshairEnabled(false)
               .setRange(60.0D)
               .addFireMode(FireMode.SEMI)
               .setShootSound(ModSoundEvents.SPORTER22_SHOOT)
+                  .setDistantShootSound(ModSoundEvents.SPORTER22_DISTANT_SHOOT)
               .setSilencedShootSound(ModSoundEvents.SILENCED_RPK_SHOOT)
-              .setReloadSound(ModSoundEvents.M107_RELOAD)
+              .setReloadSound(ModSoundEvents.SPORTER22_RELOAD)
               .build());
 
   public static final RegistryObject<GunConfiguration> G36C =
@@ -209,15 +216,16 @@ public class GunConfigurations {
               .aimable(false)
               .setFireDelayMs(92)
               .setDamage(8)
-              .setReloadDurationTicks((int) (20 * 2.2F))
+              .setReloadDurationTicks(20 * 4)
               .setAccuracy(0.91F)
               .setRecoil(2.0F)
               .setRange(80.0D)
               .addFireMode(FireMode.AUTO)
               .addFireMode(FireMode.SEMI)
               .setShootSound(ModSoundEvents.G36C_SHOOT)
+                  .setDistantShootSound(ModSoundEvents.G36C_DISTANT_SHOOT)
               .setSilencedShootSound(ModSoundEvents.SILENCED_M4A1_SHOOT)
-              .setReloadSound(ModSoundEvents.M4A1_RELOAD)
+              .setReloadSound(ModSoundEvents.G36C_RELOAD)
               .build());
 
   // ================================================================================
@@ -230,7 +238,7 @@ public class GunConfigurations {
               .aimable(false)
               .setFireDelayMs(85)
               .setDamage(8)
-              .setReloadDurationTicks(20 * 4)
+              .setReloadDurationTicks(20 * 10)
               .setAccuracy(0.79F)
               .setRecoil(6.0F)
               .setRange(260.0D)
@@ -247,12 +255,13 @@ public class GunConfigurations {
               .aimable(false)
               .setFireDelayMs(92)
               .setDamage(6)
-              .setReloadDurationTicks(20 * 3)
+              .setReloadDurationTicks(20 * 5)
               .setAccuracy(0.9F)
               .setRecoil(4.5F)
               .setRange(150.0D)
               .addFireMode(FireMode.AUTO)
               .setShootSound(ModSoundEvents.RPK_SHOOT)
+                  .setDistantShootSound(ModSoundEvents.RPK_DISTANT_SHOOT)
               .setSilencedShootSound(ModSoundEvents.SILENCED_M240B_SHOOT)
               .setReloadSound(ModSoundEvents.RPK_RELOAD)
               .build());
@@ -260,14 +269,15 @@ public class GunConfigurations {
   public static final RegistryObject<GunConfiguration> MINIGUN =
       deferredRegister.register("minigun",
           () -> GunConfiguration.builder()
-              .setFireDelayMs(75)
+              .setFireDelayMs(60)
               .setDamage(4)
-              .setReloadDurationTicks(20 * 5)
+              .setReloadDurationTicks(20 * 10)
               .setAccuracy(0.6F)
               .setRecoil(2.5F)
               .setRange(350.0D)
               .addFireMode(FireMode.AUTO)
               .setShootSound(ModSoundEvents.MINIGUN_SHOOT)
+                  .setDistantShootSound(ModSoundEvents.MINIGUN_DISTANT_SHOOT)
               .setReloadSound(ModSoundEvents.M240B_RELOAD)
               .setRightMouseActionTriggerType(Gun.SecondaryActionTrigger.HOLD)
               .setSecondaryActionSound(ModSoundEvents.MINIGUN_BARREL)
@@ -286,8 +296,9 @@ public class GunConfigurations {
               .setRange(260.0D)
               .addFireMode(FireMode.AUTO)
               .setShootSound(ModSoundEvents.MK48MOD_SHOOT)
+                  .setDistantShootSound(ModSoundEvents.MK48MOD_DISTANT_SHOOT)
               .setSilencedShootSound(ModSoundEvents.SILENCED_MK48MOD_SHOOT)
-              .setReloadSound(ModSoundEvents.M240B_RELOAD)
+              .setReloadSound(ModSoundEvents.MK48MOD_RELOAD)
               .build());
 
   // ================================================================================
@@ -331,7 +342,7 @@ public class GunConfigurations {
               .aimable(false)
               .setFireDelayMs(160)
               .setDamage(7)
-              .setReloadDurationTicks((int) (20 * 2.2F))
+              .setReloadDurationTicks(20 * 2)
               .setAccuracy(0.7F)
               .setRecoil(2.5F)
               .setRange(50.0D)
@@ -339,7 +350,7 @@ public class GunConfigurations {
               .setShootSound(ModSoundEvents.G18_SHOOT)
               .setDistantShootSound(ModSoundEvents.G18_DISTANT_SHOOT)
               .setSilencedShootSound(ModSoundEvents.SILENCED_RPK_SHOOT)
-              .setReloadSound(ModSoundEvents.M1911_RELOAD)
+              .setReloadSound(ModSoundEvents.G18_RELOAD)
               .build());
 
   public static final RegistryObject<GunConfiguration> M9 =
@@ -348,12 +359,13 @@ public class GunConfigurations {
               .aimable(false)
               .setFireDelayMs(160)
               .setDamage(7)
-              .setReloadDurationTicks((int) (20 * 1.5F))
+              .setReloadDurationTicks(20 * 2)
               .setAccuracy(0.7F)
               .setRecoil(2.0F)
               .setRange(50.0D)
               .addFireMode(FireMode.SEMI)
               .setShootSound(ModSoundEvents.M9_SHOOT)
+                  .setDistantShootSound(ModSoundEvents.M9_DISTANT_SHOOT)
               .setSilencedShootSound(ModSoundEvents.SILENCED_M9_SHOOT)
               .setReloadSound(ModSoundEvents.M9_RELOAD)
               .build());
@@ -371,7 +383,7 @@ public class GunConfigurations {
               .addFireMode(FireMode.SEMI)
               .setShootSound(ModSoundEvents.DESERT_EAGLE_SHOOT)
               .setDistantShootSound(ModSoundEvents.DESERT_EAGLE_DISTANT_SHOOT)
-              .setReloadSound(ModSoundEvents.M9_RELOAD)
+              .setReloadSound(ModSoundEvents.DESERT_EAGLE_RELOAD)
               .build());
 
   public static final RegistryObject<GunConfiguration> P250 =
@@ -380,7 +392,7 @@ public class GunConfigurations {
               .aimable(false)
               .setFireDelayMs(160)
               .setDamage(6)
-              .setReloadDurationTicks((int) (20 * 1.5F))
+              .setReloadDurationTicks(20 * 2)
               .setAccuracy(0.7F)
               .setRecoil(3.5F)
               .setRange(60.0D)
@@ -388,7 +400,7 @@ public class GunConfigurations {
               .setShootSound(ModSoundEvents.P250_SHOOT)
               .setDistantShootSound(ModSoundEvents.P250_DISTANT_SHOOT)
               .setSilencedShootSound(ModSoundEvents.SILENCED_M9_SHOOT)
-              .setReloadSound(ModSoundEvents.M9_RELOAD)
+              .setReloadSound(ModSoundEvents.P250_RELOAD)
               .build());
 
   public static final RegistryObject<GunConfiguration> MAGNUM =
@@ -397,12 +409,13 @@ public class GunConfigurations {
               .aimable(false)
               .setFireDelayMs(160)
               .setDamage(7)
-              .setReloadDurationTicks(20 * 2)
+              .setReloadDurationTicks(20 * 3)
               .setAccuracy(0.8F)
               .setRecoil(8.0F)
               .setRange(80.0D)
               .addFireMode(FireMode.SEMI)
               .setShootSound(ModSoundEvents.MAGNUM_SHOOT)
+                  .setDistantShootSound(ModSoundEvents.MAGNUM_DISTANT_SHOOT)
               .setReloadSound(ModSoundEvents.MAGNUM_RELOAD)
               .build());
 
@@ -412,12 +425,13 @@ public class GunConfigurations {
               .aimable(false)
               .setFireDelayMs(160)
               .setDamage(8)
-              .setReloadDurationTicks((int) (20 * 1.5F))
+              .setReloadDurationTicks(20 * 2)
               .setAccuracy(0.8F)
               .setRecoil(3.5F)
               .setRange(50.0D)
               .addFireMode(FireMode.SEMI)
               .setShootSound(ModSoundEvents.FN57_SHOOT)
+                  .setDistantShootSound(ModSoundEvents.FN57_DISTANT_SHOOT)
               .setSilencedShootSound(ModSoundEvents.SILENCED_M4A1_SHOOT)
               .setReloadSound(ModSoundEvents.FN57_RELOAD)
               .build());
@@ -432,7 +446,7 @@ public class GunConfigurations {
               .aimable(false)
               .setFireDelayMs(80)
               .setDamage(6)
-              .setReloadDurationTicks((int) (20 * 1.8F))
+              .setReloadDurationTicks(20 * 2)
               .setAccuracy(0.7F)
               .setRecoil(3.0F)
               .setRange(70.0D)
@@ -440,7 +454,7 @@ public class GunConfigurations {
               .setShootSound(ModSoundEvents.MAC10_SHOOT)
               .setDistantShootSound(ModSoundEvents.MAC10_DISTANT_SHOOT)
               .setSilencedShootSound(ModSoundEvents.SILENCED_M4A1_SHOOT)
-              .setReloadSound(ModSoundEvents.M4A1_RELOAD)
+              .setReloadSound(ModSoundEvents.MAC10_RELOAD)
               .build());
 
   public static final RegistryObject<GunConfiguration> P90 =
@@ -449,7 +463,7 @@ public class GunConfigurations {
               .aimable(false)
               .setFireDelayMs(80)
               .setDamage(5)
-              .setReloadDurationTicks((int) (20 * 2.2F))
+              .setReloadDurationTicks(20 * 4)
               .setAccuracy(0.75F)
               .setRecoil(2.0F)
               .setRange(100.0D)
@@ -466,7 +480,7 @@ public class GunConfigurations {
               .aimable(false)
               .setFireDelayMs(90)
               .setDamage(5)
-              .setReloadDurationTicks((int) (20 * 1.9F))
+              .setReloadDurationTicks(20 * 3)
               .setAccuracy(0.7F)
               .setRecoil(2.5F)
               .setRange(80.0D)
@@ -474,7 +488,7 @@ public class GunConfigurations {
               .setShootSound(ModSoundEvents.VECTOR_SHOOT)
               .setDistantShootSound(ModSoundEvents.VECTOR_DISTANT_SHOOT)
               .setSilencedShootSound(ModSoundEvents.SILENCED_M4A1_SHOOT)
-              .setReloadSound(ModSoundEvents.M4A1_RELOAD)
+              .setReloadSound(ModSoundEvents.VECTOR_RELOAD)
               .build());
 
   public static final RegistryObject<GunConfiguration> MP5A5 =
@@ -483,13 +497,14 @@ public class GunConfigurations {
               .aimable(false)
               .setFireDelayMs(85)
               .setDamage(7)
-              .setReloadDurationTicks((int) (20 * 2.2F))
+              .setReloadDurationTicks(20 * 3)
               .setAccuracy(0.7F)
               .setRecoil(4.5F)
               .setRange(100.0D)
               .addFireMode(FireMode.AUTO)
               .addFireMode(FireMode.SEMI)
               .setShootSound(ModSoundEvents.MP5A5_SHOOT)
+                  .setDistantShootSound(ModSoundEvents.MP5A5_DISTANT_SHOOT)
               .setSilencedShootSound(ModSoundEvents.SILENCED_MP5A5_SHOOT)
               .setReloadSound(ModSoundEvents.MP5A5_RELOAD)
               .build());
@@ -504,13 +519,14 @@ public class GunConfigurations {
               .aimable(true)
               .setFireDelayMs(750)
               .setDamage(20)
-              .setReloadDurationTicks(20 * 3)
+              .setReloadDurationTicks(20 * 5)
               .setAccuracy(0.9F)
               .setRecoil(12.0F)
               .setRange(400.0D)
               .setCrosshairEnabled(false)
               .addFireMode(FireMode.SEMI)
               .setShootSound(ModSoundEvents.M107_SHOOT)
+                  .setDistantShootSound(ModSoundEvents.M107_DISTANT_SHOOT)
               .setReloadSound(ModSoundEvents.M107_RELOAD)
               .build());
 
@@ -518,15 +534,16 @@ public class GunConfigurations {
       deferredRegister.register("as50",
           () -> GunConfiguration.builder()
               .aimable(false)
-              .setFireDelayMs(170)
+              .setFireDelayMs(750)
               .setDamage(14)
-              .setReloadDurationTicks((int) (20 * 3.5F))
+              .setReloadDurationTicks(20 * 5)
               .setAccuracy(0.9F)
               .setRecoil(8.5F)
               .setRange(400.0D)
               .setCrosshairEnabled(false)
               .addFireMode(FireMode.SEMI)
               .setShootSound(ModSoundEvents.AS50_SHOOT)
+                  .setDistantShootSound(ModSoundEvents.AS50_DISTANT_SHOOT)
               .setReloadSound(ModSoundEvents.AS50_RELOAD)
               .build());
 
@@ -534,7 +551,7 @@ public class GunConfigurations {
       deferredRegister.register("awp",
           () -> GunConfiguration.builder()
               .aimable(true)
-              .setFireDelayMs(1200)
+              .setFireDelayMs(1500)
               .setDamage(20)
               .setReloadDurationTicks(20 * 3)
               .setAccuracy(0.97F)
@@ -554,13 +571,14 @@ public class GunConfigurations {
               .aimable(false)
               .setFireDelayMs(170)
               .setDamage(15)
-              .setReloadDurationTicks(20 * 2)
+              .setReloadDurationTicks(20 * 4)
               .setAccuracy(0.9F)
               .setRecoil(7.0F)
               .setRange(300.0D)
               .setCrosshairEnabled(false)
               .addFireMode(FireMode.SEMI)
               .setShootSound(ModSoundEvents.DMR_SHOOT)
+                  .setDistantShootSound(ModSoundEvents.DMR_DISTANT_SHOOT)
               .setSilencedShootSound(ModSoundEvents.SILENCED_RPK_SHOOT)
               .setReloadSound(ModSoundEvents.DMR_RELOAD)
               .build());
@@ -576,12 +594,13 @@ public class GunConfigurations {
               .setFireDelayMs(1200)
               .setDamage(2)
               .setRoundsPerShot(8)
-              .setReloadDurationTicks(20 * 1)
+              .setReloadDurationTicks(20 * 2)
               .setAccuracy(0.7F)
               .setRecoil(9.0F)
               .setRange(25.0D)
               .addFireMode(FireMode.SEMI)
               .setShootSound(ModSoundEvents.TRENCH_GUN_SHOOT)
+                  .setDistantShootSound(ModSoundEvents.TRENCH_GUN_DISTANT_SHOOT)
               .setReloadSound(ModSoundEvents.SHOTGUN_RELOAD)
               .build());
 
@@ -598,6 +617,7 @@ public class GunConfigurations {
               .setRange(20.0D)
               .addFireMode(FireMode.SEMI)
               .setShootSound(ModSoundEvents.MOSSBERG_SHOOT)
+                  .setDistantShootSound(ModSoundEvents.MOSSBERG_DISTANT_SHOOT)
               .setReloadSound(ModSoundEvents.MOSSBERG_RELOAD)
               .build());
 }

@@ -4,8 +4,9 @@
   ],
   "aim_settings": {},
   "sounds": {
-    "reload_sound": "craftingdead:m240b_reload",
+    "reload_sound": "craftingdead:mk48mod_reload",
     "shoot_sound": "craftingdead:mk48mod_shoot",
+    "distant_shoot_sound": "craftingdead:mk48mod_distant_shoot",
     "silenced_shoot_sound": "craftingdead:silenced_mk48mod_shoot"
   },
   "range": 260.0,

@@ -1,7 +1,7 @@
 {
   "aim_settings": {},
   "sounds": {
-    "reload_sound": "craftingdead:m9_reload",
+    "reload_sound": "craftingdead:desert_eagle_reload",
     "shoot_sound": "craftingdead:desert_eagle_shoot",
     "distant_shoot_sound": "craftingdead:desert_eagle_distant_shoot"
   },

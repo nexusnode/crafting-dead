@@ -3,6 +3,7 @@
   "sounds": {
     "reload_sound": "craftingdead:dmr_reload",
     "shoot_sound": "craftingdead:dmr_shoot",
+    "distant_shoot_sound": "craftingdead:dmr_distant_shoot",
     "silenced_shoot_sound": "craftingdead:silenced_rpk_shoot"
   },
   "range": 300.0,
@@ -12,5 +13,5 @@
   "recoil": 7.0,
   "fire_delay_ms": 170,
   "damage": 15.0,
-  "reload_duration_ticks": 40
+  "reload_duration_ticks": 80
 }
