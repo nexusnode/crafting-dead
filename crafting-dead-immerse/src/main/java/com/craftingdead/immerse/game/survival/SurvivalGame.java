@@ -83,4 +83,9 @@ public abstract class SurvivalGame implements Game {
   public boolean requiresSync() {
     return this.data.isDirty();
   }
+
+  //TODO: Should the client be aware of all thirst configurations?
+  public ThirstProperties getThirstProperties() {
+    return ThirstProperties.DEFAULT;
+  }
 }

@@ -1,6 +1,7 @@
 {
-  "parent": "minecraft:item/generated",
+  "parent": "craftingdeadimmerse:item/food_bag",
   "textures": {
-    "layer0": "craftingdeadimmerse:item/salted_chips"
+    "texture": "craftingdeadimmerse:item/salted_chips",
+    "particle": "craftingdeadimmerse:item/salted_chips"
   }
 }

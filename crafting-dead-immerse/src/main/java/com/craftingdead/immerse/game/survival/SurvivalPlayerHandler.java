@@ -32,7 +32,6 @@ import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.world.ImmerseDamageSource;
 import com.craftingdead.immerse.world.level.extension.LegacyBase;
 import com.craftingdead.immerse.world.level.extension.LevelExtension;
-import net.minecraft.SharedConstants;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
@@ -53,10 +52,6 @@ public class SurvivalPlayerHandler implements PlayerHandler {
   public static final LivingHandlerType<SurvivalPlayerHandler> TYPE =
       new LivingHandlerType<>(new ResourceLocation(CraftingDeadImmerse.ID, "survival_player"));
 
-  private static final int WATER_DAMAGE_DELAY_TICKS = SharedConstants.TICKS_PER_SECOND * 6;
-
-  private static final int WATER_DELAY_TICKS = SharedConstants.TICKS_PER_SECOND * 40;
-
   private static final EntityDataAccessor<Integer> DAYS_SURVIVED =
       new EntityDataAccessor<>(0x00, EntityDataSerializers.INT);
   private static final EntityDataAccessor<Integer> ZOMBIES_KILLED =
@@ -65,12 +60,10 @@ public class SurvivalPlayerHandler implements PlayerHandler {
       new EntityDataAccessor<>(0x02, EntityDataSerializers.INT);
   private static final EntityDataAccessor<Optional<UUID>> BASE_ID =
       new EntityDataAccessor<>(0x03, EntityDataSerializers.OPTIONAL_UUID);
-
-  private static final EntityDataAccessor<Integer> WATER =
-      new EntityDataAccessor<>(0x04, EntityDataSerializers.INT);
-
-  private static final EntityDataAccessor<Integer> MAX_WATER =
-      new EntityDataAccessor<>(0x05, EntityDataSerializers.INT);
+  private static final EntityDataAccessor<Float> WATER =
+      new EntityDataAccessor<>(0x04, EntityDataSerializers.FLOAT);
+  private static final EntityDataAccessor<Float> MAX_WATER =
+      new EntityDataAccessor<>(0x05, EntityDataSerializers.FLOAT);
 
   private final SurvivalGame game;
 
@@ -87,8 +80,8 @@ public class SurvivalPlayerHandler implements PlayerHandler {
     this.dataManager.register(ZOMBIES_KILLED, 0);
     this.dataManager.register(PLAYERS_KILLED, 0);
     this.dataManager.register(BASE_ID, Optional.empty());
-    this.dataManager.register(WATER, 20);
-    this.dataManager.register(MAX_WATER, 20);
+    this.dataManager.register(WATER, 20F);
+    this.dataManager.register(MAX_WATER, 20F);
   }
 
   public Optional<LegacyBase> getBase() {
@@ -123,21 +116,23 @@ public class SurvivalPlayerHandler implements PlayerHandler {
 
   private void updateThirst() {
     var entity = this.player.entity();
-    if (this.game.isThirstEnabled()
-        && entity.getLevel().getDifficulty() != Difficulty.PEACEFUL
-        && !entity.getAbilities().invulnerable) {
+    if (canDehydrate()) {
       this.waterTicks++;
+
       if (this.getWater() <= 0) {
-        if (this.waterTicks >= WATER_DAMAGE_DELAY_TICKS && this.getWater() == 0) {
+        if (this.waterTicks >= this.game.getThirstProperties().thirstDamageDelayTicks()
+            && this.getWater() == 0) {
           entity.hurt(ImmerseDamageSource.DEHYDRATION, 1.0F);
           this.waterTicks = 0;
         }
-      } else if (this.waterTicks >= WATER_DELAY_TICKS) {
-        this.setWater(this.getWater() - 5);
-        if (entity.isSprinting()) {
-          this.setWater(this.getWater() - 5);
+      } else {
+        if (this.waterTicks >= this.game.getThirstProperties().idleDrainDelayTicks()) {
+          this.setWater(this.getWater() - this.game.getThirstProperties().idleDrain());
+          this.waterTicks = 0;
         }
-        this.waterTicks = 0;
+        if (entity.isSprinting()) {
+          this.setWater(this.getWater() - this.game.getThirstProperties().sprintDrain());
+        }
       }
     }
   }
@@ -176,20 +171,24 @@ public class SurvivalPlayerHandler implements PlayerHandler {
     this.dataManager.set(PLAYERS_KILLED, playersKilled);
   }
 
-  public int getWater() {
+  public float getWater() {
     return this.dataManager.get(WATER);
   }
 
-  public void setWater(int water) {
-    this.dataManager.set(WATER, Mth.clamp(water, 0, this.getMaxWater()));
+  public void setWater(float water) {
+    this.dataManager.set(WATER, Mth.clamp(water, 0F, this.getMaxWater()));
   }
 
-  public int getMaxWater() {
+  public float getMaxWater() {
     return this.dataManager.get(MAX_WATER);
   }
 
-  public void setMaxWater(int maxWater) {
+  public void setMaxWater(float maxWater) {
     this.dataManager.set(MAX_WATER, maxWater);
+  }
+
+  public boolean needsWater() {
+    return Math.ceil(this.getMaxWater()) > Math.ceil(this.getWater());
   }
 
   @Override
@@ -213,6 +212,9 @@ public class SurvivalPlayerHandler implements PlayerHandler {
 
   @Override
   public boolean handleBlockBreak(BlockPos pos, BlockState block, MutableInt xp) {
+    if (canDehydrate()) {
+      this.setWater(this.getWater() - this.game.getThirstProperties().miningDrain());
+    }
     LevelExtension.getOrThrow(player.level()).getLandManager()
         .getLandOwnerAt(pos)
         .ifPresent(base -> base.playerRemovedBlock(player, pos));
@@ -249,13 +251,21 @@ public class SurvivalPlayerHandler implements PlayerHandler {
   }
 
   @Override
+  public boolean handleAttack(Entity target) {
+    if (canDehydrate()) {
+      this.setWater(this.getWater() - this.game.getThirstProperties().attackDrain());
+    }
+    return false;
+  }
+
+  @Override
   public CompoundTag serializeNBT() {
     var tag = new CompoundTag();
     tag.putInt("zombiesKilled", this.getZombiesKilled());
     tag.putInt("playersKilled", this.getPlayersKilled());
     this.getBaseId().ifPresent(baseId -> tag.putUUID("baseId", baseId));
-    tag.putInt("water", this.getWater());
-    tag.putInt("maxWater", this.getMaxWater());
+    tag.putFloat("water", this.getWater());
+    tag.putFloat("maxWater", this.getMaxWater());
     return tag;
   }
 
@@ -266,8 +276,8 @@ public class SurvivalPlayerHandler implements PlayerHandler {
     if (tag.hasUUID("baseId")) {
       this.setBaseId(tag.getUUID("baseId"));
     }
-    this.setWater(tag.getInt("water"));
-    this.setMaxWater(tag.getInt("maxWater"));
+    this.setMaxWater(tag.getFloat("maxWater"));
+    this.setWater(tag.getFloat("water"));
   }
 
   @Override
@@ -285,5 +295,11 @@ public class SurvivalPlayerHandler implements PlayerHandler {
   @Override
   public boolean requiresSync() {
     return this.dataManager.isDirty();
+  }
+
+  private boolean canDehydrate() {
+    return this.game.isThirstEnabled()
+        && this.player.entity().getLevel().getDifficulty() != Difficulty.PEACEFUL
+        && !this.player.entity().getAbilities().invulnerable;
   }
 }

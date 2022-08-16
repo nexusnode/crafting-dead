@@ -93,7 +93,9 @@ public class SurvivalClient extends SurvivalGame implements GameClient {
             && !player.entity().isEyeInFluid(FluidTags.WATER)
             && player.entity().getAirSupply() == player.entity().getMaxAirSupply()) {
           renderWater(width, height,
-              (float) survivalPlayer.getWater() / (float) survivalPlayer.getMaxWater(), ICONS);
+              (float) Math.ceil(survivalPlayer.getWater())
+                  / (float) Math.ceil(survivalPlayer.getMaxWater()),
+              ICONS);
         }
       }
     }

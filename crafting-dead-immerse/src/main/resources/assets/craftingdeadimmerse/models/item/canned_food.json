@@ -1,0 +1,269 @@
+{
+  "credit": "Model by Zensuyo",
+  "elements": [
+    {
+      "name": "body1",
+      "from": [
+        6.5,
+        0,
+        6
+      ],
+      "to": [
+        9.5,
+        4,
+        9
+      ],
+      "rotation": {
+        "angle": 0,
+        "axis": "y",
+        "origin": [
+          8,
+          1.53033,
+          7.78033
+        ]
+      },
+      "faces": {
+        "north": {
+          "uv": [
+            3,
+            3,
+            6,
+            7
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            0,
+            3,
+            3,
+            7
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            9,
+            3,
+            12,
+            7
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            6,
+            3,
+            9,
+            7
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            6,
+            3,
+            3,
+            0
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            9,
+            0,
+            6,
+            3
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "body2",
+      "from": [
+        6.5,
+        4.13909,
+        6.89645
+      ],
+      "to": [
+        9.5,
+        7.13909,
+        6.89645
+      ],
+      "rotation": {
+        "angle": 45,
+        "axis": "x",
+        "origin": [
+          8,
+          1.53033,
+          7.78033
+        ]
+      },
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            7,
+            3,
+            10
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            0,
+            7,
+            0,
+            10
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            3,
+            7,
+            6,
+            10
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            3,
+            7,
+            3,
+            10
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            3,
+            7,
+            0,
+            7
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            6,
+            7,
+            3,
+            7
+          ],
+          "texture": "#texture"
+        }
+      }
+    }
+  ],
+  "display": {
+    "thirdperson_righthand": {
+      "translation": [
+        -1,
+        5.75,
+        0.5
+      ]
+    },
+    "thirdperson_lefthand": {
+      "translation": [
+        -1,
+        5.75,
+        0
+      ]
+    },
+    "firstperson_righthand": {
+      "rotation": [
+        0,
+        120,
+        0
+      ],
+      "translation": [
+        0,
+        8.5,
+        0
+      ]
+    },
+    "firstperson_lefthand": {
+      "rotation": [
+        0,
+        120,
+        0
+      ],
+      "translation": [
+        1.75,
+        8.5,
+        0
+      ]
+    },
+    "ground": {
+      "translation": [
+        0,
+        4,
+        0
+      ]
+    },
+    "gui": {
+      "rotation": [
+        -162,
+        35,
+        -180
+      ],
+      "translation": [
+        0.5,
+        8.75,
+        0
+      ],
+      "scale": [
+        1.6582,
+        1.6582,
+        1.6582
+      ]
+    },
+    "head": {
+      "rotation": [
+        -180,
+        0,
+        -180
+      ],
+      "translation": [
+        0,
+        -7.75,
+        -13.75
+      ],
+      "scale": [
+        1.8,
+        1.8,
+        1.8
+      ]
+    },
+    "fixed": {
+      "translation": [
+        0,
+        12.75,
+        -2.25
+      ],
+      "scale": [
+        2,
+        2,
+        2
+      ]
+    }
+  },
+  "groups": [
+    {
+      "name": "Anchor",
+      "origin": [
+        8,
+        8,
+        8
+      ],
+      "color": 0,
+      "children": [
+        0,
+        1
+      ]
+    }
+  ]
+}

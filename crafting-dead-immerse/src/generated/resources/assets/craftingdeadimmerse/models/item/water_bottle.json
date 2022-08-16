@@ -1,6 +1,7 @@
 {
-  "parent": "minecraft:item/generated",
+  "parent": "craftingdeadimmerse:item/drink_bottle_1",
   "textures": {
-    "layer0": "craftingdeadimmerse:item/water_bottle"
+    "texture": "craftingdeadimmerse:item/water_bottle",
+    "particle": "craftingdeadimmerse:item/water_bottle"
   }
 }

@@ -1,6 +1,7 @@
 {
-  "parent": "minecraft:item/generated",
+  "parent": "craftingdeadimmerse:item/food_box",
   "textures": {
-    "layer0": "craftingdeadimmerse:item/emerald_cereal"
+    "texture": "craftingdeadimmerse:item/emerald_cereal",
+    "particle": "craftingdeadimmerse:item/emerald_cereal"
   }
 }

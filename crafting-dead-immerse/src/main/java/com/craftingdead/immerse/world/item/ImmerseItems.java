@@ -217,7 +217,8 @@ public class ImmerseItems {
 
   public static final RegistryObject<Item> OPEN_CANNED_PEACHES =
       deferredRegister.register("open_canned_peaches",
-          () -> new Item(new Item.Properties().tab(TAB).food(ImmerseFoods.CANNED_PEACHES)));
+          () -> new HydratingFoodItem(
+              new Item.Properties().tab(TAB).food(ImmerseFoods.CANNED_PEACHES), 1));
 
   public static final RegistryObject<Item> CANNED_PASTA =
       deferredRegister.register("canned_pasta",
@@ -241,7 +242,8 @@ public class ImmerseItems {
 
   public static final RegistryObject<Item> OPEN_CANNED_CUSTARD =
       deferredRegister.register("open_canned_custard",
-          () -> new Item(new Item.Properties().tab(TAB).food(ImmerseFoods.CANNED_CUSTARD)));
+          () -> new HydratingFoodItem(
+              new Item.Properties().tab(TAB).food(ImmerseFoods.CANNED_CUSTARD), 3));
 
   public static final RegistryObject<Item> CANNED_PICKLES =
       deferredRegister.register("canned_pickles",
@@ -265,27 +267,30 @@ public class ImmerseItems {
 
   public static final RegistryObject<Item> OPEN_CANNED_TOMATO_SOUP =
       deferredRegister.register("open_canned_tomato_soup",
-          () -> new Item(new Item.Properties().tab(TAB).food(ImmerseFoods.CANNED_TOMATO_SOUP)));
+          () -> new HydratingFoodItem(
+              new Item.Properties().tab(TAB).food(ImmerseFoods.CANNED_TOMATO_SOUP), 2));
 
   public static final RegistryObject<Item> MRE =
       deferredRegister.register("mre",
-          () -> new Item(new Item.Properties().tab(TAB).food(ImmerseFoods.MRE)));
+          () -> new HydratingFoodItem(new Item.Properties().tab(TAB).food(ImmerseFoods.MRE), 7));
 
   public static final RegistryObject<Item> ORANGE =
       deferredRegister.register("orange",
-          () -> new Item(new Item.Properties().tab(TAB).food(ImmerseFoods.ORANGE)));
+          () -> new HydratingFoodItem(new Item.Properties().tab(TAB).food(ImmerseFoods.ORANGE), 1));
 
   public static final RegistryObject<Item> ROTTEN_ORANGE =
       deferredRegister.register("rotten_orange",
-          () -> new Item(new Item.Properties().tab(TAB).food(ImmerseFoods.ROTTEN_ORANGE)));
+          () -> new HydratingFoodItem(
+              new Item.Properties().tab(TAB).food(ImmerseFoods.ROTTEN_ORANGE), 0));
 
   public static final RegistryObject<Item> PEAR =
       deferredRegister.register("pear",
-          () -> new Item(new Item.Properties().tab(TAB).food(ImmerseFoods.PEAR)));
+          () -> new HydratingFoodItem(new Item.Properties().tab(TAB).food(ImmerseFoods.PEAR), 2));
 
   public static final RegistryObject<Item> ROTTEN_PEAR =
       deferredRegister.register("rotten_pear",
-          () -> new Item(new Item.Properties().tab(TAB).food(ImmerseFoods.ROTTEN_PEAR)));
+          () -> new HydratingFoodItem(new Item.Properties().tab(TAB).food(ImmerseFoods.ROTTEN_PEAR),
+              0));
 
   public static final RegistryObject<Item> RICE_BAG =
       deferredRegister.register("rice_bag",
@@ -293,31 +298,38 @@ public class ImmerseItems {
 
   public static final RegistryObject<Item> ROTTEN_APPLE =
       deferredRegister.register("rotten_apple",
-          () -> new Item(new Item.Properties().tab(TAB).food(ImmerseFoods.ROTTEN_APPLE)));
+          () -> new HydratingFoodItem(
+              new Item.Properties().tab(TAB).food(ImmerseFoods.ROTTEN_APPLE), 0));
 
   public static final RegistryObject<Item> NOODLES =
       deferredRegister.register("noodles",
-          () -> new Item(new Item.Properties().tab(TAB).food(ImmerseFoods.NOODLES)));
+          () -> new HydratingFoodItem(new Item.Properties().tab(TAB).food(ImmerseFoods.NOODLES),
+              3));
 
   public static final RegistryObject<Item> ROTTEN_MELON_SLICE =
       deferredRegister.register("rotten_melon_slice",
-          () -> new Item(new Item.Properties().tab(TAB).food(ImmerseFoods.ROTTEN_MELON_SLICE)));
+          () -> new HydratingFoodItem(
+              new Item.Properties().tab(TAB).food(ImmerseFoods.ROTTEN_MELON_SLICE), 1));
 
   public static final RegistryObject<Item> BLUEBERRY =
       deferredRegister.register("blueberry",
-          () -> new Item(new Item.Properties().tab(TAB).food(ImmerseFoods.BLUEBERRY)));
+          () -> new HydratingFoodItem(new Item.Properties().tab(TAB).food(ImmerseFoods.BLUEBERRY),
+              3));
 
   public static final RegistryObject<Item> ROTTEN_BLUEBERRY =
       deferredRegister.register("rotten_blueberry",
-          () -> new Item(new Item.Properties().tab(TAB).food(ImmerseFoods.ROTTEN_BLUEBERRY)));
+          () -> new HydratingFoodItem(
+              new Item.Properties().tab(TAB).food(ImmerseFoods.ROTTEN_BLUEBERRY), 1));
 
   public static final RegistryObject<Item> RASPBERRY =
       deferredRegister.register("raspberry",
-          () -> new Item(new Item.Properties().tab(TAB).food(ImmerseFoods.RASPBERRY)));
+          () -> new HydratingFoodItem(new Item.Properties().tab(TAB).food(ImmerseFoods.RASPBERRY),
+              3));
 
   public static final RegistryObject<Item> ROTTEN_RASPBERRY =
       deferredRegister.register("rotten_raspberry",
-          () -> new Item(new Item.Properties().tab(TAB).food(ImmerseFoods.ROTTEN_RASPBERRY)));
+          () -> new HydratingFoodItem(
+              new Item.Properties().tab(TAB).food(ImmerseFoods.ROTTEN_RASPBERRY), 1));
 
   public static final RegistryObject<Item> CHIPS =
       deferredRegister.register("chips",
