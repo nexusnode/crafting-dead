@@ -39,8 +39,7 @@ public class SurvivalServer extends SurvivalGame implements GameServer {
 
   public static final Codec<SurvivalServer> CODEC = RecordCodecBuilder.create(instance -> instance
       .group(
-          Codec.BOOL.fieldOf("thirst_enabled").forGetter(SurvivalGame::isThirstEnabled),
-          ThirstProperties.CODEC.optionalFieldOf("thirst_properties", ThirstProperties.DEFAULT)
+          ThirstProperties.CODEC.optionalFieldOf("thirst", ThirstProperties.DEFAULT)
               .forGetter(SurvivalServer::getThirstProperties),
           Codec.BOOL.fieldOf("kill_feed_enabled").forGetter(SurvivalServer::killFeedEnabled))
       .apply(instance, SurvivalServer::new));
@@ -48,9 +47,9 @@ public class SurvivalServer extends SurvivalGame implements GameServer {
   private final boolean killFeedEnabled;
   private final ThirstProperties thirstProperties;
 
-  public SurvivalServer(boolean thirstEnabled, ThirstProperties thirstProperties,
+  public SurvivalServer(ThirstProperties thirstProperties,
       boolean killFeedEnabled) {
-    super(thirstEnabled);
+    super(thirstProperties.enabled());
     this.killFeedEnabled = killFeedEnabled;
     this.thirstProperties = thirstProperties;
   }
@@ -135,6 +134,7 @@ public class SurvivalServer extends SurvivalGame implements GameServer {
     }
   }
 
+  @Override
   public ThirstProperties getThirstProperties() {
     return this.thirstProperties;
   }

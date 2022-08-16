@@ -115,25 +115,23 @@ public class SurvivalPlayerHandler implements PlayerHandler {
   }
 
   private void updateThirst() {
-    if (this.game instanceof SurvivalServer serverGame) {
-      var entity = this.player.entity();
-      if (canDehydrate()) {
-        this.waterTicks++;
+    var entity = this.player.entity();
+    if (canDehydrate()) {
+      this.waterTicks++;
 
-        if (this.getWater() <= 0) {
-          if (this.waterTicks >= serverGame.getThirstProperties().thirstDamageDelayTicks()
-              && this.getWater() == 0) {
-            entity.hurt(ImmerseDamageSource.DEHYDRATION, 1.0F);
-            this.waterTicks = 0;
-          }
-        } else {
-          if (this.waterTicks >= serverGame.getThirstProperties().idleDrainDelayTicks()) {
-            this.setWater(this.getWater() - serverGame.getThirstProperties().idleDrain());
-            this.waterTicks = 0;
-          }
-          if (entity.isSprinting()) {
-            this.setWater(this.getWater() - serverGame.getThirstProperties().sprintDrain());
-          }
+      if (this.getWater() <= 0) {
+        if (this.waterTicks >= this.game.getThirstProperties().thirstDamageDelayTicks()
+            && this.getWater() == 0) {
+          entity.hurt(ImmerseDamageSource.DEHYDRATION, 1.0F);
+          this.waterTicks = 0;
+        }
+      } else {
+        if (this.waterTicks >= this.game.getThirstProperties().idleDrainDelayTicks()) {
+          this.setWater(this.getWater() - this.game.getThirstProperties().idleDrain());
+          this.waterTicks = 0;
+        }
+        if (entity.isSprinting()) {
+          this.setWater(this.getWater() - this.game.getThirstProperties().sprintDrain());
         }
       }
     }
@@ -214,8 +212,8 @@ public class SurvivalPlayerHandler implements PlayerHandler {
 
   @Override
   public boolean handleBlockBreak(BlockPos pos, BlockState block, MutableInt xp) {
-    if (canDehydrate() && this.game instanceof SurvivalServer serverGame) {
-      this.setWater(this.getWater() - serverGame.getThirstProperties().miningDrain());
+    if (canDehydrate()) {
+      this.setWater(this.getWater() - this.game.getThirstProperties().miningDrain());
     }
     LevelExtension.getOrThrow(player.level()).getLandManager()
         .getLandOwnerAt(pos)
@@ -254,8 +252,8 @@ public class SurvivalPlayerHandler implements PlayerHandler {
 
   @Override
   public boolean handleAttack(Entity target) {
-    if (canDehydrate() && this.game instanceof SurvivalServer serverGame) {
-      this.setWater(this.getWater() - serverGame.getThirstProperties().attackDrain());
+    if (canDehydrate()) {
+      this.setWater(this.getWater() - this.game.getThirstProperties().attackDrain());
     }
     return false;
   }

@@ -20,10 +20,10 @@ package com.craftingdead.immerse.game.survival;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-
 import net.minecraft.SharedConstants;
 
 /**
+ * @param enabled - if thirst is enabled or not
  * @param thirstDamageDelayTicks - delay in ticks before dealing thirst damage
  * @param idleDrainDelayTicks - delay in ticks between natural thirst decay
  * @param idleDrain - how much hydration is drained from the player over natural dehydration
@@ -31,16 +31,18 @@ import net.minecraft.SharedConstants;
  * @param attackDrain - how much hydration is drained from the player when attacking
  * @param miningDrain - how much hydration is drained from the player when mining
  */
-public record ThirstProperties(int thirstDamageDelayTicks, int idleDrainDelayTicks, float idleDrain,
-    float sprintDrain, float attackDrain, float miningDrain) {
+public record ThirstProperties(boolean enabled, int thirstDamageDelayTicks, int idleDrainDelayTicks,
+    float idleDrain, float sprintDrain, float attackDrain, float miningDrain) {
+
   public static ThirstProperties DEFAULT =
-      new ThirstProperties(SharedConstants.TICKS_PER_SECOND * 6,
+      new ThirstProperties(false, SharedConstants.TICKS_PER_SECOND * 6,
           SharedConstants.TICKS_PER_SECOND * 6, 0.01F, 0.01F, 0.01F, 0.01F);
 
   public static final Codec<ThirstProperties> CODEC =
       RecordCodecBuilder.create(
           instance -> instance
               .group(
+                  Codec.BOOL.optionalFieldOf("enabled", false).forGetter(ThirstProperties::enabled),
                   Codec.INT
                       .optionalFieldOf("thirst_damage_delay_ticks",
                           DEFAULT.thirstDamageDelayTicks())
