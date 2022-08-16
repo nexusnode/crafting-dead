@@ -116,7 +116,7 @@ public class LogicalServer extends SavedData {
     if (gameRotation.isEmpty()) {
       logger.info("Game rotation empty, defaulting to survival...");
       this.loadGame(
-          new ServerGameWrapper(new SurvivalServer(false, ThirstProperties.DEFAULT, false), this));
+          new ServerGameWrapper(new SurvivalServer(ThirstProperties.DEFAULT, false), this));
       return;
     }
 
