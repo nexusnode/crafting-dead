@@ -62,12 +62,11 @@ public class SurvivalClient extends SurvivalGame implements GameClient {
   @Override
   public boolean renderOverlay(PlayerExtension<? extends AbstractClientPlayer> player,
       PoseStack poseStack, int width, int height, float partialTick) {
+    var survivalPlayer = player.getHandlerOrThrow(SurvivalPlayerHandler.TYPE);
+
     if (this.showStats) {
-      var survivalPlayer = player.getHandlerOrThrow(SurvivalPlayerHandler.TYPE);
       int y = height / 2;
       int x = 4;
-
-      RenderSystem.enableBlend();
 
       RenderSystem.setShaderTexture(0, DAYS_SURVIVED);
       RenderUtil.blit(x, y - 20, 16, 16);
@@ -83,18 +82,16 @@ public class SurvivalClient extends SurvivalGame implements GameClient {
       RenderUtil.blit(x, y + 20, 16, 16);
       this.minecraft.font.drawShadow(poseStack,
           String.valueOf(survivalPlayer.getPlayersKilled()), x + 20, y + 24, 0xFFFFFF);
+    }
 
-      RenderSystem.disableBlend();
-
-      // Only draw in survival
-      if (this.minecraft.gameMode.canHurtPlayer() && !player.isCombatModeEnabled()) {
-        // Only render when air level is not being rendered
-        if (this.isThirstEnabled()
-            && !player.entity().isEyeInFluid(FluidTags.WATER)
-            && player.entity().getAirSupply() == player.entity().getMaxAirSupply()) {
-          renderWater(width, height,
-              (float) survivalPlayer.getWater() / (float) survivalPlayer.getMaxWater(), ICONS);
-        }
+    // Only draw in survival
+    if (this.minecraft.gameMode.canHurtPlayer() && !player.isCombatModeEnabled()) {
+      // Only render when air level is not being rendered
+      if (this.isThirstEnabled()
+          && !player.entity().isEyeInFluid(FluidTags.WATER)
+          && player.entity().getAirSupply() == player.entity().getMaxAirSupply()) {
+        renderWater(width, height,
+            (float) survivalPlayer.getWater() / (float) survivalPlayer.getMaxWater(), ICONS);
       }
     }
 
