@@ -101,7 +101,7 @@ dependencies {
         }
     }
     skija_natives.each {
-        shaded_library group: 'io.github.humbleui', name: "${it}", version: '0.102.0'
+        shaded_library group: 'io.github.humbleui', name: "${it}", version: '0.106.0'
     }
 
 	shaded_library group: 'net.java.timingframework', name: 'timingframework-core', version: '7.3.1'
