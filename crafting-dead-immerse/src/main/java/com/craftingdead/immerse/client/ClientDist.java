@@ -416,6 +416,7 @@ public class ClientDist implements ModDist {
         }
       }
       case HIDE_ALL -> event.setResult(Result.DENY);
+      case DEFAULT -> {}
     }
   }
 }
