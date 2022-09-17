@@ -19,8 +19,6 @@
 package com.craftingdead.survival.world.level.block;
 
 import java.util.Random;
-import java.util.function.BooleanSupplier;
-import java.util.function.IntSupplier;
 import java.util.function.Supplier;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
@@ -43,12 +41,12 @@ public class LootGeneratorBlock extends AirBlock {
 
   private final Supplier<Block> lootBlock;
   private final Supplier<? extends ParticleOptions> particleOptions;
-  private final IntSupplier refreshDelayTicks;
-  private final BooleanSupplier enabled;
+  private final Supplier<Integer> refreshDelayTicks;
+  private final Supplier<Boolean> enabled;
 
   public LootGeneratorBlock(Properties properties, Supplier<Block> lootBlock,
-      Supplier<? extends ParticleOptions> particleOptions, IntSupplier refreshDelayTicks,
-      BooleanSupplier enabled) {
+      Supplier<? extends ParticleOptions> particleOptions, Supplier<Integer> refreshDelayTicks,
+      Supplier<Boolean> enabled) {
     super(properties);
     this.lootBlock = lootBlock;
     this.particleOptions = particleOptions;
@@ -88,11 +86,11 @@ public class LootGeneratorBlock extends AirBlock {
   @Override
   public void tick(BlockState blockState, ServerLevel level, BlockPos pos, Random random) {
     super.tick(blockState, level, pos, random);
-    if (!this.enabled.getAsBoolean()) {
+    if (!this.enabled.get()) {
       return;
     }
 
-    level.scheduleTick(pos, this, this.refreshDelayTicks.getAsInt());
+    level.scheduleTick(pos, this, this.refreshDelayTicks.get());
 
     BlockState lootBlockState = this.lootBlock.get().defaultBlockState();
 

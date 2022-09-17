@@ -18,11 +18,9 @@
 
 package com.craftingdead.survival.world.level.block;
 
+import java.util.function.Supplier;
 import com.craftingdead.survival.CraftingDeadSurvival;
 import com.craftingdead.survival.particles.SurvivalParticleTypes;
-import java.util.function.BooleanSupplier;
-import java.util.function.IntSupplier;
-import java.util.function.Supplier;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -69,37 +67,37 @@ public class SurvivalBlocks {
   public static final RegistryObject<Block> MILITARY_LOOT_GENERATOR =
       deferredRegister.register("military_loot_gen",
           () -> lootGenerator(MILITARY_LOOT, SurvivalParticleTypes.MILITARY_LOOT_GEN,
-              CraftingDeadSurvival.serverConfig.militaryLootRefreshDelayTicks::get,
-              CraftingDeadSurvival.serverConfig.militaryLootEnabled::get));
+              CraftingDeadSurvival.serverConfig.militaryLootRefreshDelayTicks,
+              CraftingDeadSurvival.serverConfig.militaryLootEnabled));
 
   public static final RegistryObject<Block> MEDICAL_LOOT_GENERATOR =
       deferredRegister.register("medic_loot_gen",
           () -> lootGenerator(MEDICAL_LOOT, SurvivalParticleTypes.MEDIC_LOOT_GEN,
-              CraftingDeadSurvival.serverConfig.medicalLootRefreshDelayTicks::get,
-              CraftingDeadSurvival.serverConfig.medicalLootEnabled::get));
+              CraftingDeadSurvival.serverConfig.medicalLootRefreshDelayTicks,
+              CraftingDeadSurvival.serverConfig.medicalLootEnabled));
 
   public static final RegistryObject<Block> CIVILIAN_LOOT_GENERATOR =
       deferredRegister.register("civilian_loot_gen",
           () -> lootGenerator(CIVILIAN_LOOT, SurvivalParticleTypes.CIVILIAN_LOOT_GEN,
-              CraftingDeadSurvival.serverConfig.civilianLootRefreshDelayTicks::get,
-              CraftingDeadSurvival.serverConfig.civilianLootEnabled::get));
+              CraftingDeadSurvival.serverConfig.civilianLootRefreshDelayTicks,
+              CraftingDeadSurvival.serverConfig.civilianLootEnabled));
 
   public static final RegistryObject<Block> RARE_CIVILIAN_LOOT_GENERATOR =
       deferredRegister.register("civilian_rare_loot_gen",
           () -> lootGenerator(RARE_CIVILIAN_LOOT,
               SurvivalParticleTypes.CIVILIAN_RARE_LOOT_GEN,
-              CraftingDeadSurvival.serverConfig.rareCivilianLootRefreshDelayTicks::get,
-              CraftingDeadSurvival.serverConfig.rareCivilianLootEnabled::get));
+              CraftingDeadSurvival.serverConfig.rareCivilianLootRefreshDelayTicks,
+              CraftingDeadSurvival.serverConfig.rareCivilianLootEnabled));
 
   public static final RegistryObject<Block> POLICE_LOOT_GENERATOR =
       deferredRegister.register("police_loot_gen",
           () -> lootGenerator(POLICE_LOOT, SurvivalParticleTypes.POLICE_LOOT_GEN,
-              CraftingDeadSurvival.serverConfig.policeLootRefreshDelayTicks::get,
-              CraftingDeadSurvival.serverConfig.policeLootEnabled::get));
+              CraftingDeadSurvival.serverConfig.policeLootRefreshDelayTicks,
+              CraftingDeadSurvival.serverConfig.policeLootEnabled));
 
   private static LootGeneratorBlock lootGenerator(Supplier<Block> lootBlock,
-      Supplier<? extends ParticleOptions> particleOptions, IntSupplier refreshDelayTicks,
-      BooleanSupplier enabled) {
+      Supplier<? extends ParticleOptions> particleOptions, Supplier<Integer> refreshDelayTicks,
+      Supplier<Boolean> enabled) {
     return new LootGeneratorBlock(
         BlockBehaviour.Properties.of(Material.STRUCTURAL_AIR)
             .strength(5.0F, 5.0F)

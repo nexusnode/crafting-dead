@@ -21,7 +21,7 @@ package com.craftingdead.core.world.item;
 
 import java.util.List;
 import java.util.function.BiFunction;
-import java.util.function.BooleanSupplier;
+import java.util.function.Supplier;
 import org.jetbrains.annotations.Nullable;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.capability.CapabilityUtil;
@@ -55,7 +55,7 @@ public class GrenadeItem extends Item {
       new GrenadeDispenserBehaviour();
   private final BiFunction<@Nullable LivingEntity, Level, Grenade> grenadeEntitySupplier;
   private final float throwSpeed;
-  private final BooleanSupplier enabled;
+  private final Supplier<Boolean> enabled;
   private final boolean isSticky;
 
   public GrenadeItem(Properties properties) {
@@ -78,7 +78,7 @@ public class GrenadeItem extends Item {
   public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
     final var itemStack = player.getItemInHand(hand);
 
-    if (!enabled.getAsBoolean()) {
+    if (!this.enabled.get()) {
       return InteractionResultHolder.pass(itemStack);
     }
 
@@ -121,7 +121,7 @@ public class GrenadeItem extends Item {
 
     private BiFunction<@Nullable LivingEntity, Level, Grenade> grenadeEntitySupplier;
     private float throwSpeed = 1.45F;
-    private BooleanSupplier enabled = () -> true;
+    private Supplier<Boolean> enabled = () -> true;
     private boolean isSticky;
 
     public Properties setGrenadeEntitySupplier(
@@ -135,7 +135,7 @@ public class GrenadeItem extends Item {
       return this;
     }
 
-    public Properties setEnabledSupplier(BooleanSupplier enabled) {
+    public Properties setEnabledSupplier(Supplier<Boolean> enabled) {
       this.enabled = enabled;
       return this;
     }
@@ -152,7 +152,7 @@ public class GrenadeItem extends Item {
     @Override
     protected ItemStack execute(BlockSource source, ItemStack itemStack) {
       if (CraftingDead.serverConfig.explosivesDispenseGrenades.get()
-          && itemStack.getItem()instanceof GrenadeItem grenadeItem) {
+          && itemStack.getItem() instanceof GrenadeItem grenadeItem) {
         var direction = source.getBlockState().getValue(DispenserBlock.FACING);
         var grenadeEntity = grenadeItem.grenadeEntitySupplier.apply(null, source.getLevel());
         var position = DispenserBlock.getDispensePosition(source);

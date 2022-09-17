@@ -19,19 +19,13 @@
 package com.craftingdead.immerse.world.level.extension;
 
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.DataResult;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.ExtraCodecs;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 
 public class LandOwnerType extends ForgeRegistryEntry<LandOwnerType> {
 
   public static final Codec<LandOwnerType> CODEC =
-      ResourceLocation.CODEC.flatXmap(registryName -> {
-        var type = LandOwnerTypes.registry.get().getValue(registryName);
-        return type == null
-            ? DataResult.error("Unknown registry key: " + registryName.toString())
-            : DataResult.success(type);
-      }, type -> DataResult.success(type.getRegistryName()));
+      ExtraCodecs.lazyInitializedCodec(() -> LandOwnerTypes.registry.get().getCodec());
 
   private final Codec<? extends LandOwner> codec;
   private final Codec<? extends LandOwner> networkCodec;
