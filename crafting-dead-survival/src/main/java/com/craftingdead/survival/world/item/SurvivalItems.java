@@ -137,7 +137,7 @@ public class SurvivalItems {
   public static final RegistryObject<GrenadeItem> PIPE_BOMB = deferredRegister.register("pipe_bomb",
       () -> new GrenadeItem((GrenadeItem.Properties) new GrenadeItem.Properties()
           .setGrenadeEntitySupplier(FunctionalUtil.nullsafeFunction(PipeBomb::new, PipeBomb::new))
-          .setEnabledSupplier(CraftingDeadSurvival.serverConfig.pipeBombEnabled::get)
+          .setEnabledSupplier(CraftingDeadSurvival.serverConfig.pipeBombEnabled)
           .stacksTo(3)
           .tab(TAB)));
 
