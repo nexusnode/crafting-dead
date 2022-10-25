@@ -1,0 +1,81 @@
+plugins {
+    id 'crafting-dead'
+}
+
+minecraft {
+    runs {
+        client {
+            taskName 'runDecorationClient'
+
+            workingDirectory project.file('run/client')
+
+            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+
+            args '--mixin', 'craftingdead.mixins.json'
+
+            mods {
+                craftingdeaddecoration {
+                    source sourceSets.main
+                }
+                craftingdead {
+                    source project(':crafting-dead-core').sourceSets.main
+                }
+            }
+        }
+
+        server {
+            taskName 'runDecorationServer'
+
+            workingDirectory project.file('run/server')
+
+            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+
+            args '--mixin', 'craftingdead.mixins.json'
+
+            mods {
+                craftingdeaddecoration {
+                    source sourceSets.main
+                }
+                craftingdead {
+                    source project(':crafting-dead-core').sourceSets.main
+                }
+            }
+        }
+        
+        data {
+            taskName 'runDecorationData'
+      
+            workingDirectory project.file('run/data')
+
+            property 'forge.logging.markers', 'SCAN,REGISTRIES'
+            property 'forge.logging.console.level', 'debug'
+
+            args '--mod', 'craftingdeaddecoration', '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/'), '--existing-mod', 'craftingdead'
+
+            environment 'target', 'fmluserdevdata'
+
+            mods {
+                craftingdeaddecoration {
+                    source sourceSets.main
+                }
+                craftingdead {
+                    source project(':crafting-dead-core').sourceSets.main
+                }
+            }
+        }
+    }
+}
+
+dependencies {
+    implementation project(':crafting-dead-core')
+}
+
+jar {
+    manifest {
+        attributes([
+            'Implementation-Title': project.name,
+            'Implementation-Version': project.version,
+            'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+        ])
+    }
+}

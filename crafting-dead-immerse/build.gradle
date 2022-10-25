@@ -87,29 +87,32 @@ def skija_natives = ['skija-macos-x64', 'skija-macos-arm64', 'skija-linux', 'ski
 
 configurations {
     lwjgl_native_library
-    library.extendsFrom lwjgl_native_library
+    shadedLibrary.extendsFrom lwjgl_native_library
 }
 
 dependencies {
     implementation project(':crafting-dead-core')
-    shaded_library(group: 'org.lwjgl', name: 'lwjgl-yoga', version: "${lwjgl_version}") {
+    shadedLibrary(group: 'org.lwjgl', name: 'lwjgl-yoga', version: lwjgl_version) {
         exclude group: 'org.lwjgl', module: 'lwjgl'
     }
+
     lwjgl_natives.each {
-        lwjgl_native_library("org.lwjgl:lwjgl-yoga:${lwjgl_version}:${it}") {
+        lwjgl_native_library(group: 'org.lwjgl', name: 'lwjgl-yoga', version: lwjgl_version, classifier: it) {
             exclude group: 'org.lwjgl', module: 'lwjgl'
         }
     }
+
     skija_natives.each {
-        shaded_library group: 'io.github.humbleui', name: "${it}", version: '0.106.0'
+        shadedLibrary group: 'io.github.humbleui', name: it, version: '0.106.0'
     }
 
-	shaded_library group: 'net.java.timingframework', name: 'timingframework-core', version: '7.3.1'
-	shaded_library ('io.sentry:sentry:5.6.0') {
+	shadedLibrary group: 'net.java.timingframework', name: 'timingframework-core', version: '7.3.1'
+
+    shadedLibrary (group: 'io.sentry', name: 'sentry', version: '5.6.0') {
         exclude group: 'com.google.code.gson', module: 'gson'
     }
     
-    library group: 'net.rocketpowered', name: 'rocket-api', version: '0.0.6'
+    minecraftLibrary group: 'net.rocketpowered', name: 'rocket-api', version: '0.0.6'
 
     runtimeOnly fg.deobf("net.rocketpowered:rocket-connector:${minecraft_version}-0.0.11")
 }

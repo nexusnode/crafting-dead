@@ -1,0 +1,25 @@
+issueTrackerURL = "https://github.com/nexusnode/crafting-dead/issues"
+license = "GPL v3.0"
+loaderVersion = "[27,)"
+modLoader = "javafml"
+
+[[mods]]
+authors = "Sm0keySa1m0n"
+credits = "Sm0keySa1m0n"
+displayName = "Crafting Dead Decoration"
+displayURL = "www.craftingdead.com"
+modId = "craftingdeaddecoration"
+version = "${file.jarVersion}"
+
+[[dependencies.craftingdeaddecoration]]
+mandatory = true
+modId = "craftingdead"
+side = "BOTH"
+versionRange = "[1.6.0,)"
+
+[[dependencies.craftingdeaddecoration]]
+mandatory = true
+modId = "forge"
+ordering = "NONE"
+side = "BOTH"
+versionRange = "[40.1.80,)"

@@ -10,7 +10,7 @@ plugins {
 import com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocation
 
 group = 'com.craftingdead'
-version = "${mod_version}"
+version = "${minecraft_version}-${mod_version}." + (System.env.GITHUB_RUN_NUMBER ?: "homebaked")
 
 minecraft {
     mappings channel: 'official', version: "${minecraft_version}"
@@ -30,19 +30,10 @@ repositories {
     }
 }
 
-configurations {
-    library
-    implementation.extendsFrom library
-    
-    shaded_library
-    shaded.extendsFrom shaded_library
-    library.extendsFrom shaded_library
-}
-
-minecraft.runs.all {
-    lazyToken('minecraft_classpath') {
-        configurations.library.copyRecursive().resolve().collect { it.absolutePath }.join(File.pathSeparator)
-    }
+configurations {    
+    shadedLibrary
+    shaded.extendsFrom shadedLibrary
+    minecraftLibrary.extendsFrom shadedLibrary
 }
 
 dependencies {
@@ -60,14 +51,12 @@ reobf {
 
 shadowJar {
     configurations = [project.configurations.shaded]
-    archiveVersion = "${minecraft_version}-${version}"
     archiveClassifier = ''
     finalizedBy 'reobfShadowJar'
 }
 
 jar {
     archiveBaseName = project.name
-    archiveVersion = "${minecraft_version}-${version}"
     from rootProject.file('LICENSE.txt')
     finalizedBy('reobfJar') 
 }
