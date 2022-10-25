@@ -21,6 +21,7 @@ public class DecorationBlockStateProvider extends BlockStateProvider {
     this.horizontalBlock(DecorationBlocks.WOODEN_PALLET, "wooden_pallet");
     this.horizontalBlock(DecorationBlocks.STACKED_WOODEN_PALLETS, "stacked_wooden_pallets");
     this.horizontalBlock(DecorationBlocks.CRATE_ON_WOODEN_PALLET, "crate_on_wooden_pallet");
+    this.horizontalBlock(DecorationBlocks.SECURITY_CAMERA, "security_camera");
   }
 
   private void horizontalBlock(Supplier<? extends Block> block, String path) {

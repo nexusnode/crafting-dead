@@ -45,4 +45,13 @@ public class DecorationBlocks {
                   .noOcclusion()
                   .lightLevel(__ -> 1),
               Shapes.block()));
+
+  public static final RegistryObject<Block> SECURITY_CAMERA =
+      deferredRegister.register("security_camera",
+          () -> new SecurityCameraBlock(
+              BlockBehaviour.Properties.of(Material.METAL, MaterialColor.METAL)
+                  .strength(20.5F)
+                  .sound(SoundType.WOOD)
+                  .noOcclusion()
+                  .lightLevel(__ -> 1)));
 }

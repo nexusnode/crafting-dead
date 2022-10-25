@@ -39,4 +39,8 @@ public class DecorationItems {
           () -> new BlockItem(DecorationBlocks.CRATE_ON_WOODEN_PALLET.get(),
               new Item.Properties().tab(TAB)));
 
+  public static final RegistryObject<BlockItem> SECURITY_CAMERA =
+      deferredRegister.register("security_camera",
+          () -> new BlockItem(DecorationBlocks.SECURITY_CAMERA.get(),
+              new Item.Properties().tab(TAB)));
 }
