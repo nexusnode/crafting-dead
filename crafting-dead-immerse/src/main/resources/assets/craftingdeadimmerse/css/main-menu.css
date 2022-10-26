@@ -275,7 +275,8 @@ MutableServerListView>.list-controls>* {
 }
 
 WorldItemView {
-    width: 300px;
+    width: 90%;
+    max-width: 300px;
     height: 46px;
     margin-top: 6px;
     padding: 4px;

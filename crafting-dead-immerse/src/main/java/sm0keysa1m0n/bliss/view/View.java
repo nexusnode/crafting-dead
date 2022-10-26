@@ -295,16 +295,6 @@ public class View implements Comparable<View>, StyleNode {
         this.getScaledHeight() * scale,
         radii);
 
-    if (outlineWidth > 0.0F) {
-      try (var paint = new Paint()) {
-        paint.setMode(PaintMode.STROKE);
-        paint.setStrokeWidth(outlineWidth * scale);
-        paint.setColor(this.style.outlineColor.get().multiplied(this.getAlpha()));
-        paint.setAntiAlias(false);
-        canvas.drawRRect(rect.inflate(outlineWidth).withRadii(radii), paint);
-      }
-    }
-
     this.drawBackdrop(canvas, rect);
 
     if (clip) {
@@ -353,6 +343,16 @@ public class View implements Comparable<View>, StyleNode {
       }
       canvas.restore();
     }
+
+    if (outlineWidth > 0.0F) {
+      try (var paint = new Paint()) {
+        paint.setMode(PaintMode.STROKE);
+        paint.setStrokeWidth(outlineWidth * scale);
+        paint.setColor(this.style.outlineColor.get().multiplied(this.getAlpha()));
+        paint.setAntiAlias(false);
+        canvas.drawRRect(rect.inflate(outlineWidth).withRadii(radii), paint);
+      }
+    }
   }
 
   private static RRect inflate(RRect rect, float spreadX, float spreadY) {
@@ -398,25 +398,28 @@ public class View implements Comparable<View>, StyleNode {
 
     var intRect = rect.toIRect();
 
-    try (var image = this.graphicsContext.surface().makeImageSnapshot(intRect);
-        var paint = new Paint()) {
-      for (var filter : backdropFilters) {
-        filter.apply(paint);
-      }
+    try (var image = this.graphicsContext.surface().makeImageSnapshot(intRect)) {
+      if (image != null) {
+        try (var paint = new Paint()) {
+          for (var filter : backdropFilters) {
+            filter.apply(paint);
+          }
 
-      canvas.save();
-      {
-        canvas.clipRRect(rect, ClipMode.DIFFERENCE);
-        this.drawBoxShadows(canvas, rect, false);
-      }
-      canvas.restore();
+          canvas.save();
+          {
+            canvas.clipRRect(rect, ClipMode.DIFFERENCE);
+            this.drawBoxShadows(canvas, rect, false);
+          }
+          canvas.restore();
 
-      canvas.save();
-      {
-        canvas.clipRRect(rect, true);
-        canvas.drawImageRect(image, intRect.toRect(), paint);
+          canvas.save();
+          {
+            canvas.clipRRect(rect, true);
+            canvas.drawImageRect(image, intRect.toRect(), paint);
+          }
+          canvas.restore();
+        }
       }
-      canvas.restore();
     }
   }
 
