@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "craftingdeaddecoration:block/striped_concrete_barrier_slab",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "craftingdeaddecoration:block/striped_concrete_barrier_slab"
+    },
+    "facing=west": {
+      "model": "craftingdeaddecoration:block/striped_concrete_barrier_slab",
+      "y": 270
+    },
+    "facing=south": {
+      "model": "craftingdeaddecoration:block/striped_concrete_barrier_slab",
+      "y": 180
+    }
+  }
+}

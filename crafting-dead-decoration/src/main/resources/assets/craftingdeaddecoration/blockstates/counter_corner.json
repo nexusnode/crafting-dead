@@ -1,0 +1,19 @@
+{
+    "variants": {
+        "facing=east": {
+            "model": "craftingdeaddecoration:block/counter_corner",
+            "y": 90
+        },
+        "facing=north": {
+            "model": "craftingdeaddecoration:block/counter_corner"
+        },
+        "facing=west": {
+            "model": "craftingdeaddecoration:block/counter_corner",
+            "y": 270
+        },
+        "facing=south": {
+            "model": "craftingdeaddecoration:block/counter_corner",
+            "y": 180
+        }
+    }
+}

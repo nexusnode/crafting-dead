@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/cube_all",
+  "textures": {
+    "all": "craftingdeaddecoration:block/cracked_polished_basalt_bricks"
+  }
+}

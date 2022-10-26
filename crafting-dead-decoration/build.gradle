@@ -11,14 +11,9 @@ minecraft {
 
             property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
 
-            args '--mixin', 'craftingdead.mixins.json'
-
             mods {
                 craftingdeaddecoration {
                     source sourceSets.main
-                }
-                craftingdead {
-                    source project(':crafting-dead-core').sourceSets.main
                 }
             }
         }
@@ -30,14 +25,9 @@ minecraft {
 
             property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
 
-            args '--mixin', 'craftingdead.mixins.json'
-
             mods {
                 craftingdeaddecoration {
                     source sourceSets.main
-                }
-                craftingdead {
-                    source project(':crafting-dead-core').sourceSets.main
                 }
             }
         }
@@ -50,7 +40,7 @@ minecraft {
             property 'forge.logging.markers', 'SCAN,REGISTRIES'
             property 'forge.logging.console.level', 'debug'
 
-            args '--mod', 'craftingdeaddecoration', '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/'), '--existing-mod', 'craftingdead'
+            args '--mod', 'craftingdeaddecoration', '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
 
             environment 'target', 'fmluserdevdata'
 
@@ -58,16 +48,9 @@ minecraft {
                 craftingdeaddecoration {
                     source sourceSets.main
                 }
-                craftingdead {
-                    source project(':crafting-dead-core').sourceSets.main
-                }
             }
         }
     }
-}
-
-dependencies {
-    implementation project(':crafting-dead-core')
 }
 
 jar {

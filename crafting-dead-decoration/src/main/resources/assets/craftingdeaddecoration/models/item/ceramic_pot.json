@@ -1,0 +1,9 @@
+{
+  "parent": "craftingdeaddecoration:block/flowerpot",
+  "textures": {
+    "0": "block/oak_log",
+    "1": "craftingdeaddecoration:block/leaves",
+    "3": "block/terracotta",
+    "particle": "block/oak_log"
+  }
+}

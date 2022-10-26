@@ -1,0 +1,18 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "craftingdeaddecoration:block/road/road_solid",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "craftingdeaddecoration:block/road/road_solid"
+    },
+    "facing=west": {
+      "model": "craftingdeaddecoration:block/road/road_solid",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "craftingdeaddecoration:block/road/road_solid"
+    }
+  }
+}

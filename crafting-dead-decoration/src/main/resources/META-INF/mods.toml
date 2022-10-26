@@ -5,17 +5,11 @@ modLoader = "javafml"
 
 [[mods]]
 authors = "Sm0keySa1m0n"
-credits = "Sm0keySa1m0n"
+credits = "Sm0keySa1m0n, Hallzmine"
 displayName = "Crafting Dead Decoration"
 displayURL = "www.craftingdead.com"
 modId = "craftingdeaddecoration"
 version = "${file.jarVersion}"
-
-[[dependencies.craftingdeaddecoration]]
-mandatory = true
-modId = "craftingdead"
-side = "BOTH"
-versionRange = "[1.6.0,)"
 
 [[dependencies.craftingdeaddecoration]]
 mandatory = true

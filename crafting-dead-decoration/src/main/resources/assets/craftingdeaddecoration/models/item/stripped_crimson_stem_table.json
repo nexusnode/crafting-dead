@@ -1,0 +1,9 @@
+{
+  "parent": "craftingdeaddecoration:block/tables/oak_table",
+  "textures": {
+    "0": "block/stripped_crimson_stem",
+    "1": "block/stripped_crimson_stem_top",
+    "2": "block/stripped_crimson_stem",
+    "particle": "block/stripped_crimson_stem"
+  }
+}

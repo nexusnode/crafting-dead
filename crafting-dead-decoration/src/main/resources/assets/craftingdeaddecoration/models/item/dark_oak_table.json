@@ -1,0 +1,9 @@
+{
+  "parent": "craftingdeaddecoration:item/oak_table",
+  "textures": {
+    "0": "block/dark_oak_log",
+    "1": "block/dark_oak_log_top",
+    "2": "block/stripped_dark_oak_log",
+    "particle": "block/dark_oak_log"
+  }
+}

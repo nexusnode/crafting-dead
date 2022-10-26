@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "craftingdeaddecoration:block/street_light/street_light_curve",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "craftingdeaddecoration:block/street_light/street_light_curve"
+    },
+    "facing=west": {
+      "model": "craftingdeaddecoration:block/street_light/street_light_curve",
+      "y": 270
+    },
+    "facing=south": {
+      "model": "craftingdeaddecoration:block/street_light/street_light_curve",
+      "y": 180
+    }
+  }
+}

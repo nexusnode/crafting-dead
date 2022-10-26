@@ -1,0 +1,19 @@
+{
+    "variants": {
+        "facing=east": {
+            "model": "craftingdeaddecoration:block/stools/purple_chair",
+            "y": 90
+        },
+        "facing=north": {
+            "model": "craftingdeaddecoration:block/stools/purple_chair"
+        },
+        "facing=west": {
+            "model": "craftingdeaddecoration:block/stools/purple_chair",
+            "y": 270
+        },
+        "facing=south": {
+            "model": "craftingdeaddecoration:block/stools/purple_chair",
+            "y": 180
+        }
+    }
+}

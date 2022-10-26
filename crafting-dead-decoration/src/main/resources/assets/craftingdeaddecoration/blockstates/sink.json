@@ -1,0 +1,19 @@
+{
+    "variants": {
+        "facing=east": {
+            "model": "craftingdeaddecoration:block/sink",
+            "y": 90
+        },
+        "facing=north": {
+            "model": "craftingdeaddecoration:block/sink"
+        },
+        "facing=west": {
+            "model": "craftingdeaddecoration:block/sink",
+            "y": 270
+        },
+        "facing=south": {
+            "model": "craftingdeaddecoration:block/sink",
+            "y": 180
+        }
+    }
+}

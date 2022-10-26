@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/slab",
+  "textures": {
+    "bottom": "craftingdeaddecoration:block/road/road_solid",
+    "top": "craftingdeaddecoration:block/road/road_solid",
+    "side": "craftingdeaddecoration:block/road/road_solid"
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/door_top_rh",
+  "textures": {
+    "bottom": "craftingdeaddecoration:block/cherry_door_bottom",
+    "top": "craftingdeaddecoration:block/cherry_door_top"
+  }
+}

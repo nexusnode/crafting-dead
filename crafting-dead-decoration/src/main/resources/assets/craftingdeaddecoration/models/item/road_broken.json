@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/orientable",
+  "textures": {
+    "top": "craftingdeaddecoration:block/road/road_broken",
+    "front": "craftingdeaddecoration:block/road/road_blank",
+    "side": "craftingdeaddecoration:block/road/road_blank"
+  }
+}

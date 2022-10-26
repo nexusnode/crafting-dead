@@ -1,0 +1,19 @@
+{
+    "variants": {
+        "facing=east": {
+            "model": "craftingdeaddecoration:block/radio",
+            "y": 90
+        },
+        "facing=north": {
+            "model": "craftingdeaddecoration:block/radio"
+        },
+        "facing=west": {
+            "model": "craftingdeaddecoration:block/radio",
+            "y": 270
+        },
+        "facing=south": {
+            "model": "craftingdeaddecoration:block/radio",
+            "y": 180
+        }
+    }
+}

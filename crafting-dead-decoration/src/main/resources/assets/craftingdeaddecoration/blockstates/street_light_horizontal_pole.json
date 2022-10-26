@@ -1,0 +1,18 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "craftingdeaddecoration:block/street_light/street_light_horizontal_pole",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "craftingdeaddecoration:block/street_light/street_light_horizontal_pole"
+    },
+    "facing=west": {
+      "model": "craftingdeaddecoration:block/street_light/street_light_horizontal_pole",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "craftingdeaddecoration:block/street_light/street_light_horizontal_pole"
+    }
+  }
+}

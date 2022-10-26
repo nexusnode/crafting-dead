@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "craftingdeaddecoration:block/road/road_blank_slab"
+    },
+    "type=double": {
+      "model": "craftingdeaddecoration:block/road/road_blank"
+    },
+    "type=top": {
+      "model": "craftingdeaddecoration:block/road/road_blank_slab_top"
+    }
+  }
+}

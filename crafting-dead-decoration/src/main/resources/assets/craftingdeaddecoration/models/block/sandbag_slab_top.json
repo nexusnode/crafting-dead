@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/slab_top",
+  "textures": {
+    "bottom": "craftingdeaddecoration:block/sandbag",
+    "top": "craftingdeaddecoration:block/sandbag",
+    "side": "craftingdeaddecoration:block/sandbag"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "craftingdeaddecoration:block/vending_machine",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "craftingdeaddecoration:block/vending_machine"
+    },
+    "facing=west": {
+      "model": "craftingdeaddecoration:block/vending_machine",
+      "y": 270
+    },
+    "facing=south": {
+      "model": "craftingdeaddecoration:block/vending_machine",
+      "y": 180
+    }
+  }
+}

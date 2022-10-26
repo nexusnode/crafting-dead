@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_column",
+  "textures": {
+    "end": "craftingdeaddecoration:block/cherry_log_top",
+    "side": "craftingdeaddecoration:block/cherry_log"
+  }
+}

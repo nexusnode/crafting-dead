@@ -1,0 +1,46 @@
+{
+  "variants": {
+    "facing=east,type=bottom": {
+      "model": "craftingdeaddecoration:block/road/road_broken_slab",
+      "y": 90
+    },
+    "facing=north,type=bottom": {
+      "model": "craftingdeaddecoration:block/road/road_broken_slab"
+    },
+    "facing=west,type=bottom": {
+      "model": "craftingdeaddecoration:block/road/road_broken_slab",
+      "y": 90
+    },
+    "facing=south,type=bottom": {
+      "model": "craftingdeaddecoration:block/road/road_broken_slab"
+    },
+    "facing=east,type=double": {
+      "model": "craftingdeaddecoration:block/road/road_broken",
+      "y": 90
+    },
+    "facing=north,type=double": {
+      "model": "craftingdeaddecoration:block/road/road_broken"
+    },
+    "facing=west,type=double": {
+      "model": "craftingdeaddecoration:block/road/road_broken",
+      "y": 90
+    },
+    "facing=south,type=double": {
+      "model": "craftingdeaddecoration:block/road/road_broken"
+    },
+    "facing=east,type=top": {
+      "model": "craftingdeaddecoration:block/road/road_broken_slab_top",
+      "y": 90
+    },
+    "facing=north,type=top": {
+      "model": "craftingdeaddecoration:block/road/road_broken_slab_top"
+    },
+    "facing=west,type=top": {
+      "model": "craftingdeaddecoration:block/road/road_broken_slab_top",
+      "y": 90
+    },
+    "facing=south,type=top": {
+      "model": "craftingdeaddecoration:block/road/road_broken_slab_top"
+    }
+  }
+}

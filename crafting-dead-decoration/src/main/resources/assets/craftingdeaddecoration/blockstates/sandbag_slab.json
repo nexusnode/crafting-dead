@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "craftingdeaddecoration:block/sandbag_slab"
+    },
+    "type=double": {
+      "model": "craftingdeaddecoration:block/sandbag"
+    },
+    "type=top": {
+      "model": "craftingdeaddecoration:block/sandbag_slab_top"
+    }
+  }
+}

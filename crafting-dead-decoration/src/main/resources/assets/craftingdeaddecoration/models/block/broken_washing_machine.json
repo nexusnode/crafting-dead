@@ -1,0 +1,6 @@
+{
+	"parent": "craftingdeaddecoration:block/washing_machine",
+	"textures": {
+		"0": "craftingdeaddecoration:block/broken_washing_machine"
+	}
+}

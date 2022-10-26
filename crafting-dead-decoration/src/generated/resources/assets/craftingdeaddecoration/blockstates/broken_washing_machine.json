@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "craftingdeaddecoration:block/broken_washing_machine"
+    },
+    "facing=south": {
+      "model": "craftingdeaddecoration:block/broken_washing_machine",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "craftingdeaddecoration:block/broken_washing_machine",
+      "y": 270
+    },
+    "facing=east": {
+      "model": "craftingdeaddecoration:block/broken_washing_machine",
+      "y": 90
+    }
+  }
+}

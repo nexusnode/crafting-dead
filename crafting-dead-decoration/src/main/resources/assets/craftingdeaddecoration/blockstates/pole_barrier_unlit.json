@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "craftingdeaddecoration:block/pole_barrier_unlit",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "craftingdeaddecoration:block/pole_barrier_unlit"
+    },
+    "facing=west": {
+      "model": "craftingdeaddecoration:block/pole_barrier_unlit",
+      "y": 270
+    },
+    "facing=south": {
+      "model": "craftingdeaddecoration:block/pole_barrier_unlit",
+      "y": 180
+    }
+  }
+}

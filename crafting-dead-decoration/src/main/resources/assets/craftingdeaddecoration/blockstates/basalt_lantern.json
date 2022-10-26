@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "hanging=false": {
+      "model": "craftingdeaddecoration:block/basalt_lantern"
+    },
+    "hanging=true": {
+      "model": "craftingdeaddecoration:block/basalt_lantern_hanging"
+    }
+  }
+}
