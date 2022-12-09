@@ -15,13 +15,13 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
-import net.rocketpowered.api.Rocket;
-import net.rocketpowered.common.payload.GuildInvitePayload;
-import net.rocketpowered.common.payload.GuildMemberPayload;
-import net.rocketpowered.common.payload.GuildPayload;
-import net.rocketpowered.common.payload.UserPayload;
-import net.rocketpowered.common.payload.UserPresencePayload;
+import net.rocketpowered.common.Guild;
+import net.rocketpowered.common.GuildInvite;
+import net.rocketpowered.common.GuildMember;
+import net.rocketpowered.common.User;
+import net.rocketpowered.common.UserPresence;
 import net.rocketpowered.connector.client.gui.RocketToast;
+import net.rocketpowered.sdk.Rocket;
 import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -45,14 +45,14 @@ public class InvitesView extends ParentView {
   private final Map<ObjectId, InviteView> inviteViews = new HashMap<>();
 
   @Nullable
-  private GuildPayload guild;
+  private Guild guild;
 
   @Nullable
   private InviteView selectedInviteView;
 
   private Disposable listener;
 
-  private Set<GuildInvitePayload> lastInvites = Collections.emptySet();
+  private Set<GuildInvite> lastInvites = Collections.emptySet();
 
   @SuppressWarnings("removal")
   public InvitesView() {
@@ -68,7 +68,7 @@ public class InvitesView extends ParentView {
     this.controlsView.addChild(
         this.acceptButton = Theme.createBlueButton(
             new TextComponent("Accept"),
-            () -> Rocket.getGameClientGateway()
+            () -> Rocket.gameClientInterface()
                 .ifPresentOrElse(connection -> {
                   var inviteGuild = this.selectedInviteView.invite.guild();
                   connection
@@ -82,7 +82,7 @@ public class InvitesView extends ParentView {
     this.controlsView.addChild(
         this.declineButton = Theme.createRedButton(
             new TextComponent("Decline"),
-            () -> Rocket.getGameClientGateway()
+            () -> Rocket.gameClientInterface()
                 .ifPresentOrElse(connection -> connection
                     .declineGuildInvite(this.selectedInviteView.invite.guild().id())
                     .publishOn(Schedulers.fromExecutor(this.minecraft))
@@ -112,7 +112,7 @@ public class InvitesView extends ParentView {
   @Override
   protected void added() {
     super.added();
-    this.listener = Rocket.getGameClientGatewayFeed()
+    this.listener = Rocket.gameClientInterfaceFeed()
         .flatMap(api -> api.getSocialProfileFeed()
             .publishOn(Schedulers.fromExecutor(this.minecraft))
             .doOnNext(profile -> {
@@ -154,7 +154,7 @@ public class InvitesView extends ParentView {
 
   private static class InviteView extends ParentView {
 
-    private final GuildInvitePayload invite;
+    private final GuildInvite invite;
 
     private final TextView totalMembersView;
     private final TextView onlineMemebrsView;
@@ -162,7 +162,7 @@ public class InvitesView extends ParentView {
 
     private Disposable memberListener;
 
-    public InviteView(GuildInvitePayload invite) {
+    public InviteView(GuildInvite invite) {
       super(new Properties().styleClasses("item").unscaleBorder(false).focusable(true));
 
       this.invite = invite;
@@ -204,7 +204,7 @@ public class InvitesView extends ParentView {
     protected void added() {
       super.added();
       AtomicInteger counter = new AtomicInteger();
-      this.memberListener = Rocket.getGameClientGatewayFeed()
+      this.memberListener = Rocket.gameClientInterfaceFeed()
           .flatMap(api -> Mono
               .fromRunnable(() -> this.minecraft.executeBlocking(() -> {
                 this.onlineMemebrsView.setText("0 Online");
@@ -220,10 +220,10 @@ public class InvitesView extends ParentView {
                   this.totalMembersView.setText(count + " Members");
                 }
               })
-              .map(GuildMemberPayload::user)
-              .map(UserPayload::id)
+              .map(GuildMember::user)
+              .map(User::id)
               .flatMap(userId -> api.getUserPresenceFeed(userId).next())
-              .groupBy(UserPresencePayload::online)
+              .groupBy(UserPresence::online)
               .publishOn(Schedulers.fromExecutor(this.minecraft))
               .delayUntil(group -> group.count()
                   .doOnNext(count -> {

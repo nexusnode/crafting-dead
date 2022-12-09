@@ -3,20 +3,20 @@ package net.rocketpowered.connector.client.gui.guild;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
-import org.jetbrains.annotations.Nullable;
 import org.bson.types.ObjectId;
+import org.jetbrains.annotations.Nullable;
 import com.craftingdead.immerse.client.gui.screen.Theme;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
-import net.rocketpowered.api.Rocket;
-import net.rocketpowered.api.gateway.GameClientGateway;
+import net.rocketpowered.common.Guild;
+import net.rocketpowered.common.GuildMember;
+import net.rocketpowered.common.GuildMemberUpdateEvent;
 import net.rocketpowered.common.GuildPermission;
-import net.rocketpowered.common.payload.GuildMemberPayload;
-import net.rocketpowered.common.payload.GuildMemberUpdateEvent;
-import net.rocketpowered.common.payload.GuildPayload;
 import net.rocketpowered.connector.client.gui.RocketToast;
+import net.rocketpowered.sdk.Rocket;
+import net.rocketpowered.sdk.interf.GameClientInterface;
 import reactor.core.Disposable;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
@@ -42,10 +42,10 @@ public class ManageMembersView extends ParentView {
   private final Map<ObjectId, MemberView> memberViews = new HashMap<>();
 
   @Nullable
-  private GuildPayload guild;
+  private Guild guild;
 
   @Nullable
-  private GuildMemberPayload member;
+  private GuildMember member;
 
   @Nullable
   private MemberView selectedMemberView;
@@ -66,7 +66,7 @@ public class ManageMembersView extends ParentView {
     this.controlsView.addChild(
         this.promoteButton = Theme.createBlueButton(
             new TextComponent("Promote"),
-            () -> Rocket.getGameClientGateway().ifPresent(gateway -> gateway
+            () -> Rocket.gameClientInterface().ifPresent(gateway -> gateway
                 .setGuildMemberRank(
                     this.selectedMemberView.getMember().user().id(),
                     this.selectedMemberView.getMember().rank().promote())
@@ -75,14 +75,14 @@ public class ManageMembersView extends ParentView {
     this.controlsView.addChild(
         this.demoteButton = Theme.createRedButton(
             new TextComponent("Demote"),
-            () -> Rocket.getGameClientGateway().ifPresent(gateway -> gateway
+            () -> Rocket.gameClientInterface().ifPresent(gateway -> gateway
                 .setGuildMemberRank(
                     this.selectedMemberView.getMember().user().id(),
                     this.selectedMemberView.getMember().rank().demote())
                 .subscribe())));
     this.controlsView.addChild(this.kickButton = Theme.createRedButton(
         new TextComponent("Kick"),
-        () -> Rocket.getGameClientGateway().ifPresent(gateway -> gateway
+        () -> Rocket.gameClientInterface().ifPresent(gateway -> gateway
             .kickGuildMember(this.selectedMemberView.getMember().user().id())
             .subscribe())));
     this.controlsView
@@ -96,7 +96,7 @@ public class ManageMembersView extends ParentView {
                     viewConsumer.accept(this);
                     return;
                   }
-                  Rocket.getGameClientGateway()
+                  Rocket.gameClientInterface()
                       .ifPresent(gateway -> gateway.getUserId(result)
                           .flatMap(gateway::sendGuildInvite)
                           .doOnSubscribe(__ -> RocketToast.info(this.minecraft,
@@ -134,7 +134,7 @@ public class ManageMembersView extends ParentView {
 
     var permissions = this.guild.getPermissions(this.member);
     var manageRanks = !this.guild.isOwner(selectedMember)
-        && GuildPermission.MANAGE_RANKS.hasPermission(permissions);
+        && GuildPermission.MANAGE_RANKS.contains(permissions);
 
     this.promoteButton.setEnabled(!selectedMemberRank.isHighest()
         && selectedMemberLower
@@ -144,11 +144,11 @@ public class ManageMembersView extends ParentView {
         && manageRanks);
     this.kickButton.setEnabled(!selectedMember.equals(this.member)
         && selectedMemberLower
-        && GuildPermission.KICK.hasPermission(permissions));
+        && GuildPermission.KICK.contains(permissions));
   }
 
   @SuppressWarnings("removal")
-  private void updateGuild(GameClientGateway gateway, GuildPayload guild) {
+  private void updateGuild(GameClientInterface gateway, Guild guild) {
     if (guild == null) {
       return;
     }
@@ -168,7 +168,7 @@ public class ManageMembersView extends ParentView {
     this.guild = guild;
   }
 
-  private void updateMember(GameClientGateway gateway, GuildMemberPayload member) {
+  private void updateMember(GameClientInterface gateway, GuildMember member) {
     if (member.user().equals(gateway.user())) {
       this.updateSelfMember(member);
     }
@@ -183,15 +183,15 @@ public class ManageMembersView extends ParentView {
     }
   }
 
-  private void updateSelfMember(GuildMemberPayload member) {
+  private void updateSelfMember(GuildMember member) {
     this.member = member;
     var permissions = this.guild.getPermissions(member);
 
-    this.inviteButton.setEnabled(GuildPermission.INVITE.hasPermission(permissions));
+    this.inviteButton.setEnabled(GuildPermission.INVITE.contains(permissions));
 
-    if (GuildPermission.KICK.hasPermission(permissions)
-        || GuildPermission.MANAGE_RANKS.hasPermission(permissions)
-        || GuildPermission.INVITE.hasPermission(permissions)) {
+    if (GuildPermission.KICK.contains(permissions)
+        || GuildPermission.MANAGE_RANKS.contains(permissions)
+        || GuildPermission.INVITE.contains(permissions)) {
       if (this.controlsView.getParent() != this) {
         this.addChild(this.controlsView);
         this.layout();
@@ -206,7 +206,7 @@ public class ManageMembersView extends ParentView {
   @Override
   protected void added() {
     super.added();
-    this.listener = Rocket.getGameClientGatewayFeed()
+    this.listener = Rocket.gameClientInterfaceFeed()
         .flatMap(gateway -> Mono.when(
             gateway.getSocialProfileFeed()
                 .publishOn(Schedulers.fromExecutor(this.minecraft))

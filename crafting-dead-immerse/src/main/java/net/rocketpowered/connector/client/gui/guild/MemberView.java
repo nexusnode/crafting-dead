@@ -5,13 +5,13 @@ import com.mojang.authlib.GameProfile;
 import io.github.humbleui.skija.FontMgr;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.TextComponent;
-import net.rocketpowered.api.Rocket;
-import net.rocketpowered.api.gateway.GameClientGateway;
+import net.rocketpowered.common.Guild;
+import net.rocketpowered.common.GuildMember;
+import net.rocketpowered.common.GuildMemberLeaveEvent;
 import net.rocketpowered.common.GuildRank;
-import net.rocketpowered.common.payload.GuildMemberLeaveEvent;
-import net.rocketpowered.common.payload.GuildMemberPayload;
-import net.rocketpowered.common.payload.GuildPayload;
-import net.rocketpowered.common.payload.UserPresencePayload;
+import net.rocketpowered.common.UserPresence;
+import net.rocketpowered.sdk.Rocket;
+import net.rocketpowered.sdk.interf.GameClientInterface;
 import reactor.core.Disposable;
 import reactor.core.scheduler.Schedulers;
 import sm0keysa1m0n.bliss.Color;
@@ -21,9 +21,9 @@ import sm0keysa1m0n.bliss.view.TextView;
 
 public class MemberView extends ParentView {
 
-  private GuildPayload guild;
+  private Guild guild;
 
-  private GuildMemberPayload member;
+  private GuildMember member;
 
   private Disposable removeListener;
   private Disposable presenceListener;
@@ -32,7 +32,7 @@ public class MemberView extends ParentView {
   private final TextView nameView;
   private final TextView rankView;
 
-  public MemberView(GuildPayload guild, GuildMemberPayload member) {
+  public MemberView(Guild guild, GuildMember member) {
     super(new Properties().styleClasses("item").unscaleBorder(false).focusable(true));
 
     this.guild = guild;
@@ -61,16 +61,16 @@ public class MemberView extends ParentView {
     this.nameView.getStyle().color.defineState(Theme.OFFLINE);
   }
 
-  public GuildMemberPayload getMember() {
+  public GuildMember getMember() {
     return this.member;
   }
 
-  public void updateGuild(GuildPayload guild) {
+  public void updateGuild(Guild guild) {
     this.guild = guild;
     this.updateMember(this.member);
   }
 
-  public void updateMember(GuildMemberPayload member) {
+  public void updateMember(GuildMember member) {
     this.member = member;
 
     var rank = member.rank();
@@ -91,7 +91,7 @@ public class MemberView extends ParentView {
     this.getStyle().borderLeftColor.defineState(color);
   }
 
-  private void updatePresence(UserPresencePayload presence) {
+  private void updatePresence(UserPresence presence) {
     var color = presence.online() ? Theme.ONLINE : Theme.OFFLINE;
     this.avatarView.getStyle().defineBorderColorState(color);
     this.nameView.getStyle().color.defineState(color);
@@ -101,8 +101,8 @@ public class MemberView extends ParentView {
   @Override
   protected void added() {
     super.added();
-    this.removeListener = Rocket.getGameClientGatewayFeed()
-        .flatMap(GameClientGateway::getGuildEventFeed)
+    this.removeListener = Rocket.gameClientInterfaceFeed()
+        .flatMap(GameClientInterface::getGuildEventFeed)
         .ofType(GuildMemberLeaveEvent.class)
         .filter(event -> event.user().equals(this.member.user()))
         .next()
@@ -116,7 +116,7 @@ public class MemberView extends ParentView {
           }
         });
 
-    this.presenceListener = Rocket.getGameClientGatewayFeed()
+    this.presenceListener = Rocket.gameClientInterfaceFeed()
         .flatMap(api -> api.getUserPresenceFeed(this.member.user().id()))
         .subscribeOn(Schedulers.boundedElastic())
         .publishOn(Schedulers.fromExecutor(this.minecraft))

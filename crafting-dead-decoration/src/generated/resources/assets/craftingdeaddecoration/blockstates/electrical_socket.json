@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "craftingdeaddecoration:block/electrical_socket"
+    },
+    "facing=south": {
+      "model": "craftingdeaddecoration:block/electrical_socket",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "craftingdeaddecoration:block/electrical_socket",
+      "y": 270
+    },
+    "facing=east": {
+      "model": "craftingdeaddecoration:block/electrical_socket",
+      "y": 90
+    }
+  }
+}

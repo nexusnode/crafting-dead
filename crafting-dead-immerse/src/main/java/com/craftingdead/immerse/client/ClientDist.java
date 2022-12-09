@@ -78,8 +78,8 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.progress.StartupMessageManager;
-import net.rocketpowered.api.Rocket;
 import net.rocketpowered.connector.client.gui.RocketToast;
+import net.rocketpowered.sdk.Rocket;
 import reactor.core.scheduler.Schedulers;
 import sm0keysa1m0n.bliss.Bliss;
 import sm0keysa1m0n.bliss.minecraft.platform.MinecraftGraphicsContext;
@@ -328,7 +328,7 @@ public class ClientDist implements ModDist {
   public void handleScreenOpen(ScreenOpenEvent event) {
     if (event.getScreen() instanceof TitleScreen && this.firstLoad) {
       // Do this here to make sure font is loaded for toasts
-      Rocket.getGameClientGatewayFeed()
+      Rocket.gameClientInterfaceFeed()
           .doOnNext(__ -> RocketToast.info(this.minecraft, "Connected to Rocket"))
           .flatMap(connection -> connection.onClose()
               .doOnSuccess(__ -> RocketToast.info(this.minecraft, "Disconnected from Rocket")))

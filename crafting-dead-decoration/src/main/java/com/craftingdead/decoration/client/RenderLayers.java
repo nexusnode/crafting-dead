@@ -40,6 +40,9 @@ class RenderLayers {
     cutout(DecorationBlocks.CYAN_CHAIR);
     cutout(DecorationBlocks.PURPLE_CHAIR);
     cutout(DecorationBlocks.BROWN_CHAIR);
+    cutout(DecorationBlocks.LIGHT_SWITCH);
+    cutout(DecorationBlocks.ELECTRICAL_SOCKET);
+    cutout(DecorationBlocks.ABANDONED_CAMPFIRE);
   }
 
   private static void cutout(Supplier<? extends Block> block) {

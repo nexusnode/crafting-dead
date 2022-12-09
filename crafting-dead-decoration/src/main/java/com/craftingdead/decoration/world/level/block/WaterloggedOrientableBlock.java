@@ -1,12 +1,12 @@
 package com.craftingdead.decoration.world.level.block;
 
+import java.util.function.Function;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.level.block.SimpleWaterloggedBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
@@ -14,47 +14,40 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
-import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-public class WoodenPalletBlock extends HorizontalDirectionalBlock
-    implements SimpleWaterloggedBlock {
-
-  public static final VoxelShape SINGLE_SHAPE = Block.box(0.0D, 0.0D, 0.0D, 16.0D, 3.0D, 16.0D);
-  public static final VoxelShape STACKED_SHAPE = Block.box(0.0D, 0.0D, 0.0D, 16.0D, 9.0D, 16.0D);
+public class WaterloggedOrientableBlock extends OrientableBlock implements SimpleWaterloggedBlock {
 
   public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
 
-  private final VoxelShape shape;
+  public WaterloggedOrientableBlock(Properties properties, Function<Direction, VoxelShape> shapes) {
+    this(properties, shapes, false);
+  }
 
-  public WoodenPalletBlock(Properties properties, VoxelShape shape) {
-    super(properties);
-    this.shape = shape;
+  public WaterloggedOrientableBlock(Properties properties, Function<Direction, VoxelShape> shapes,
+      boolean wallMounted) {
+    super(properties, shapes, wallMounted);
     this.registerDefaultState(this.stateDefinition.any()
         .setValue(FACING, Direction.NORTH)
         .setValue(WATERLOGGED, false));
   }
 
   @Override
-  public VoxelShape getShape(BlockState state, BlockGetter getter, BlockPos pos,
-      CollisionContext context) {
-    return this.shape;
-  }
-
-  @Override
   protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-    builder.add(FACING, WATERLOGGED);
+    super.createBlockStateDefinition(builder);
+    builder.add(WATERLOGGED);
   }
 
   @Override
   public BlockState getStateForPlacement(BlockPlaceContext context) {
+    var result = super.getStateForPlacement(context);
+    if (result == null) {
+      return null;
+    }
     var fluidState = context.getLevel().getFluidState(context.getClickedPos());
-    return this.defaultBlockState()
-        .setValue(FACING, context.getHorizontalDirection().getOpposite())
-        .setValue(WATERLOGGED, fluidState.getType() == Fluids.WATER);
+    return result.setValue(WATERLOGGED, fluidState.getType() == Fluids.WATER);
   }
 
-  @SuppressWarnings("deprecation")
   @Override
   public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState,
       LevelAccessor level, BlockPos pos, BlockPos neighborPos) {

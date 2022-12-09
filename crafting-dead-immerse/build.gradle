@@ -6,7 +6,7 @@ repositories {
     mavenCentral()
     google()
     maven {
-        url 'https://maven.tarbits.co.uk/'
+        url 'https://maven.tarbits.co.uk/releases'
     }
 }
 
@@ -112,9 +112,9 @@ dependencies {
         exclude group: 'com.google.code.gson', module: 'gson'
     }
     
-    minecraftLibrary group: 'net.rocketpowered', name: 'rocket-api', version: '0.0.6'
+    minecraftLibrary group: 'net.rocketpowered', name: 'rocket-sdk', version: '0.0.7'
 
-    runtimeOnly fg.deobf("net.rocketpowered:rocket-connector:${minecraft_version}-0.0.11")
+    runtimeOnly fg.deobf("net.rocketpowered:rocket-connector:${minecraft_version}-0.0.12")
 }
 
 shadowJar {

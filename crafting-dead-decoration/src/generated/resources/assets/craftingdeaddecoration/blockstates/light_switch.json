@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "craftingdeaddecoration:block/light_switch"
+    },
+    "facing=south": {
+      "model": "craftingdeaddecoration:block/light_switch",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "craftingdeaddecoration:block/light_switch",
+      "y": 270
+    },
+    "facing=east": {
+      "model": "craftingdeaddecoration:block/light_switch",
+      "y": 90
+    }
+  }
+}

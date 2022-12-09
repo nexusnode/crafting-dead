@@ -7,14 +7,14 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
-import net.rocketpowered.api.Rocket;
-import net.rocketpowered.api.gateway.GameClientGateway;
+import net.rocketpowered.common.Guild;
+import net.rocketpowered.common.GuildInvite;
+import net.rocketpowered.common.GuildMember;
 import net.rocketpowered.common.GuildPermission;
-import net.rocketpowered.common.payload.GuildInvitePayload;
-import net.rocketpowered.common.payload.GuildMemberPayload;
-import net.rocketpowered.common.payload.GuildPayload;
-import net.rocketpowered.common.payload.SocialProfilePayload;
+import net.rocketpowered.common.SocialProfile;
 import net.rocketpowered.connector.client.gui.RocketToast;
+import net.rocketpowered.sdk.Rocket;
+import net.rocketpowered.sdk.interf.GameClientInterface;
 import reactor.core.Disposable;
 import reactor.core.scheduler.Schedulers;
 import sm0keysa1m0n.bliss.minecraft.view.PanoramaView;
@@ -38,10 +38,10 @@ public class GuildView extends ParentView {
   private final View yourGuildButtonView;
 
   @Nullable
-  private GuildPayload guild;
+  private Guild guild;
 
   @Nullable
-  private GuildMemberPayload selfMember;
+  private GuildMember selfMember;
 
   private Disposable profileListener;
   @Nullable
@@ -80,7 +80,7 @@ public class GuildView extends ParentView {
         .setText(CreateGuildDialogView.TITLE);
     this.createGuildButtonView.addListener(ActionEvent.class,
         event -> this.setContentView(new CreateGuildDialogView((name, tag) -> {
-          Rocket.getGameClientGateway()
+          Rocket.gameClientInterface()
               .ifPresentOrElse(connection -> connection.createGuild(name, tag)
                   .doOnSubscribe(__ -> RocketToast.info(this.minecraft, "Creating guild: " + name))
                   .doOnSuccess(__ -> RocketToast.info(this.minecraft, "Guild created"))
@@ -99,7 +99,7 @@ public class GuildView extends ParentView {
     this.contentView.replace(view);
   }
 
-  private Component makeInvitesText(Set<GuildInvitePayload> invites) {
+  private Component makeInvitesText(Set<GuildInvite> invites) {
     return invites.isEmpty()
         ? InvitesView.TITLE
         : InvitesView.TITLE.copy().append(
@@ -107,7 +107,7 @@ public class GuildView extends ParentView {
   }
 
   @SuppressWarnings("removal")
-  private void handleProfile(SocialProfilePayload profile, GameClientGateway gateway) {
+  private void handleProfile(SocialProfile profile, GameClientInterface gateway) {
     this.invitesButtonView.setText(this.makeInvitesText(profile.guildInvites()));
 
     var lastGuild = this.guild;
@@ -146,12 +146,12 @@ public class GuildView extends ParentView {
     this.layout();
   }
 
-  private void handleGuildMember(GuildMemberPayload member) {
+  private void handleGuildMember(GuildMember member) {
     this.selfMember = member;
     var permissions = this.guild.getPermissions(member);
-    if (GuildPermission.KICK.hasPermission(permissions)
-        || GuildPermission.MANAGE_RANKS.hasPermission(permissions)
-        || GuildPermission.INVITE.hasPermission(permissions)) {
+    if (GuildPermission.KICK.contains(permissions)
+        || GuildPermission.MANAGE_RANKS.contains(permissions)
+        || GuildPermission.INVITE.contains(permissions)) {
       if (!this.manageMembersButtonView.hasParent()) {
         this.sideBarView.addChild(this.manageMembersButtonView);
         this.layout();
@@ -167,7 +167,7 @@ public class GuildView extends ParentView {
   @Override
   protected void added() {
     super.added();
-    this.profileListener = Rocket.getGameClientGatewayFeed()
+    this.profileListener = Rocket.gameClientInterfaceFeed()
         .flatMap(api -> api.getSocialProfileFeed()
             .publishOn(Schedulers.fromExecutor(this.minecraft))
             .doOnNext(profile -> this.handleProfile(profile, api)))

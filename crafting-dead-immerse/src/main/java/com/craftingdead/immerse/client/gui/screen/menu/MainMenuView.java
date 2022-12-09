@@ -40,9 +40,9 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.registries.ForgeRegistries;
-import net.rocketpowered.api.Rocket;
-import net.rocketpowered.common.payload.GameProfilePayload;
-import net.rocketpowered.common.payload.RolePayload;
+import net.rocketpowered.common.GameProfile;
+import net.rocketpowered.common.Role;
+import net.rocketpowered.sdk.Rocket;
 import reactor.core.Disposable;
 import sm0keysa1m0n.bliss.minecraft.MinecraftUtil;
 import sm0keysa1m0n.bliss.minecraft.view.AvatarView;
@@ -161,11 +161,11 @@ public class MainMenuView extends ParentView {
   @Override
   protected void added() {
     super.added();
-    AtomicReference<RolePayload> primaryRole = new AtomicReference<>();
-    this.listener = Rocket.getGameClientGatewayFeed()
+    AtomicReference<Role> primaryRole = new AtomicReference<>();
+    this.listener = Rocket.gameClientInterfaceFeed()
         .flatMap(gateway -> gateway.getGameProfileFeed()
             .doOnNext(__ -> primaryRole.set(null))
-            .flatMapIterable(GameProfilePayload::roles)
+            .flatMapIterable(GameProfile::roles)
             .flatMap(gateway::getRoleFeed)
             .doOnNext(role -> {
               var newRole = primaryRole.updateAndGet(

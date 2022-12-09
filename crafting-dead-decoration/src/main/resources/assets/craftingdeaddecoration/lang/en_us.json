@@ -126,5 +126,8 @@
     "block.craftingdeaddecoration.cracked_polished_basalt_bricks": "Cracked Polished Basalt Bricks",
     "block.craftingdeaddecoration.cracked_basalt_bricks": "Cracked Basalt Bricks",
     "block.craftingdeaddecoration.stripped_cherry_log": "Stripped Cherry Log",
-    "block.craftingdeaddecoration.cherry_planks": "Cherry Planks"
+    "block.craftingdeaddecoration.cherry_planks": "Cherry Planks",
+    "block.craftingdeaddecoration.light_switch": "Light Switch",
+    "block.craftingdeaddecoration.electrical_socket": "Electrical Socket",
+    "block.craftingdeaddecoration.abandoned_campfire": "Abandoned Campfire"
 }

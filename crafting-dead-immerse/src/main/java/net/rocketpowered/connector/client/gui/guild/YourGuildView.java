@@ -3,22 +3,22 @@ package net.rocketpowered.connector.client.gui.guild;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
-import org.jetbrains.annotations.Nullable;
 import org.bson.types.ObjectId;
+import org.jetbrains.annotations.Nullable;
 import com.craftingdead.immerse.client.gui.screen.Theme;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
-import net.rocketpowered.api.Rocket;
-import net.rocketpowered.api.gateway.GameClientGateway;
+import net.rocketpowered.common.Guild;
+import net.rocketpowered.common.GuildMember;
+import net.rocketpowered.common.GuildMemberUpdateEvent;
 import net.rocketpowered.common.GuildPermission;
 import net.rocketpowered.common.RocketException;
-import net.rocketpowered.common.payload.GuildMemberPayload;
-import net.rocketpowered.common.payload.GuildMemberUpdateEvent;
-import net.rocketpowered.common.payload.GuildPayload;
 import net.rocketpowered.connector.client.gui.RocketToast;
+import net.rocketpowered.sdk.Rocket;
+import net.rocketpowered.sdk.interf.GameClientInterface;
 import reactor.core.Disposable;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
@@ -45,12 +45,12 @@ public class YourGuildView extends ParentView {
   private final View leaveButton;
 
   @Nullable
-  private GuildPayload guild;
+  private Guild guild;
 
   private Disposable listener;
 
   @Nullable
-  private GuildMemberPayload selfMember;
+  private GuildMember selfMember;
 
   @SuppressWarnings("removal")
   public YourGuildView(Consumer<View> contentConsumer) {
@@ -74,7 +74,7 @@ public class YourGuildView extends ParentView {
             new TranslatableComponent("view.guild.your_guild.transfer.message"),
             I18n.get("view.guild.text_dialog.username"),
             result -> {
-              Rocket.getGameClientGateway().ifPresent(gateway -> gateway.getUserId(result)
+              Rocket.gameClientInterface().ifPresent(gateway -> gateway.getUserId(result)
                   .flatMap(gateway::transferGuildOwnership)
                   .doOnSubscribe(__ -> RocketToast.info(this.minecraft,
                       "Transferring guild: " + this.guild.name()))
@@ -91,7 +91,7 @@ public class YourGuildView extends ParentView {
             new TranslatableComponent("view.guild.your_guild.delete.message",
                 this.guild.name()),
             () -> {
-              Rocket.getGameClientGateway().ifPresent(gateway -> gateway.deleteGuild()
+              Rocket.gameClientInterface().ifPresent(gateway -> gateway.deleteGuild()
                   .doOnSubscribe(
                       __ -> RocketToast.info(this.minecraft,
                           "Deleting guild: " + guild.name()))
@@ -108,7 +108,7 @@ public class YourGuildView extends ParentView {
             new TranslatableComponent("view.guild.your_guild.rename.message"),
             I18n.get("view.guild.text_dialog.name"),
             result -> {
-              Rocket.getGameClientGateway().ifPresent(gateway -> gateway.renameGuild(result)
+              Rocket.gameClientInterface().ifPresent(gateway -> gateway.renameGuild(result)
                   .doOnSubscribe(__ -> RocketToast.info(this.minecraft,
                       "Renaming guild: " + this.guild.name()))
                   .doOnSuccess(__ -> RocketToast.info(this.minecraft, "Guild renamed"))
@@ -124,7 +124,7 @@ public class YourGuildView extends ParentView {
             new TranslatableComponent("view.guild.your_guild.leave.message",
                 this.guild.name()),
             () -> {
-              Rocket.getGameClientGateway().ifPresent(gateway -> gateway.leaveGuild()
+              Rocket.gameClientInterface().ifPresent(gateway -> gateway.leaveGuild()
                   .doOnSubscribe(
                       __ -> RocketToast.info(this.minecraft,
                           "Leaving guild: " + this.guild.name()))
@@ -138,7 +138,7 @@ public class YourGuildView extends ParentView {
   }
 
   @SuppressWarnings("removal")
-  private void updateGuild(GameClientGateway gateway, GuildPayload guild) {
+  private void updateGuild(GameClientInterface gateway, Guild guild) {
     if (guild == null) {
       return;
     }
@@ -162,7 +162,7 @@ public class YourGuildView extends ParentView {
     }
   }
 
-  private void updateInformation(GameClientGateway gateway) {
+  private void updateInformation(GameClientInterface gateway) {
     this.informationView.clearChildren();
 
     this.informationView.addChild(new TextView(new Properties())
@@ -186,7 +186,7 @@ public class YourGuildView extends ParentView {
 
     var permissions = this.guild.getPermissions(this.selfMember);
 
-    if (GuildPermission.RENAME.hasPermission(permissions)) {
+    if (GuildPermission.RENAME.contains(permissions)) {
       controlsView.forceAddChild(this.renameButton);
     }
 
@@ -200,7 +200,7 @@ public class YourGuildView extends ParentView {
     this.informationView.layout();
   }
 
-  private void updateMember(GameClientGateway gateway, GuildMemberPayload member) {
+  private void updateMember(GameClientInterface gateway, GuildMember member) {
     if (member.user().equals(gateway.user())) {
       this.selfMember = member;
       this.updateInformation(gateway);
@@ -220,7 +220,7 @@ public class YourGuildView extends ParentView {
   @Override
   protected void added() {
     super.added();
-    this.listener = Rocket.getGameClientGatewayFeed()
+    this.listener = Rocket.gameClientInterfaceFeed()
         .flatMap(api -> Mono.when(
             api.getSocialProfileFeed()
                 .publishOn(Schedulers.fromExecutor(this.minecraft))
