@@ -18,6 +18,8 @@
 
 package com.craftingdead.immerse.game.survival;
 
+import java.util.Optional;
+import org.jetbrains.annotations.Nullable;
 import com.craftingdead.core.capability.CapabilityUtil;
 import com.craftingdead.core.event.LivingExtensionEvent;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
@@ -37,17 +39,29 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 public class SurvivalServer extends SurvivalGame implements GameServer {
 
-  public static final Codec<SurvivalServer> CODEC = RecordCodecBuilder.create(instance -> instance
-      .group(
-          Codec.BOOL.fieldOf("thirst_enabled").forGetter(SurvivalGame::isThirstEnabled),
-          Codec.BOOL.fieldOf("kill_feed_enabled").forGetter(SurvivalServer::killFeedEnabled))
-      .apply(instance, SurvivalServer::new));
+  public static final Codec<SurvivalServer> CODEC =
+      RecordCodecBuilder.create(instance -> instance
+          .group(
+              ThirstSettings.CODEC
+                  .optionalFieldOf("thirst")
+                  .forGetter(SurvivalServer::getThirstSettings),
+              Codec.BOOL
+                  .fieldOf("kill_feed_enabled")
+                  .forGetter(SurvivalServer::killFeedEnabled))
+          .apply(instance, SurvivalServer::new));
 
+  @Nullable
+  private final ThirstSettings thirstSettings;
   private final boolean killFeedEnabled;
 
-  public SurvivalServer(boolean thirstEnabled, boolean killFeedEnabled) {
-    super(thirstEnabled);
+  public SurvivalServer(Optional<ThirstSettings> thirstSettings, boolean killFeedEnabled) {
+    super(thirstSettings.isPresent());
+    this.thirstSettings = thirstSettings.orElse(null);
     this.killFeedEnabled = killFeedEnabled;
+  }
+
+  public Optional<ThirstSettings> getThirstSettings() {
+    return Optional.ofNullable(this.thirstSettings);
   }
 
   @Override

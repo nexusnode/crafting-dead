@@ -72,7 +72,7 @@ public class HydrateCommand {
   }
 
   private static void hydrate(PlayerExtension<ServerPlayer> player) {
-    player.getHandlerOrThrow(SurvivalPlayerHandler.TYPE).setWater(20);
+    player.getHandlerOrThrow(SurvivalPlayerHandler.TYPE).hydrate();
     player.entity().playNotifySound(SoundEvents.GENERIC_DRINK, SoundSource.NEUTRAL, 5.0F, 5.0F);
   }
 }

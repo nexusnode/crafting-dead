@@ -32,7 +32,6 @@ import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.world.ImmerseDamageSource;
 import com.craftingdead.immerse.world.level.extension.LegacyBase;
 import com.craftingdead.immerse.world.level.extension.LevelExtension;
-import net.minecraft.SharedConstants;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
@@ -52,10 +51,6 @@ public class SurvivalPlayerHandler implements PlayerHandler {
 
   public static final LivingHandlerType<SurvivalPlayerHandler> TYPE =
       new LivingHandlerType<>(new ResourceLocation(CraftingDeadImmerse.ID, "survival_player"));
-
-  private static final int WATER_DAMAGE_DELAY_TICKS = SharedConstants.TICKS_PER_SECOND * 6;
-
-  private static final int WATER_DELAY_TICKS = SharedConstants.TICKS_PER_SECOND * 40;
 
   private static final EntityDataAccessor<Integer> DAYS_SURVIVED =
       new EntityDataAccessor<>(0x00, EntityDataSerializers.INT);
@@ -116,27 +111,23 @@ public class SurvivalPlayerHandler implements PlayerHandler {
 
   @Override
   public void playerTick() {
-    if (!this.player.level().isClientSide()) {
-      this.updateThirst();
+    if (this.game instanceof SurvivalServer server) {
+      server.getThirstSettings().ifPresent(this::updateThirst);
     }
   }
 
-  private void updateThirst() {
+  private void updateThirst(ThirstSettings settings) {
     var entity = this.player.entity();
-    if (this.game.isThirstEnabled()
-        && entity.getLevel().getDifficulty() != Difficulty.PEACEFUL
+    if (entity.getLevel().getDifficulty() != Difficulty.PEACEFUL
         && !entity.getAbilities().invulnerable) {
       this.waterTicks++;
       if (this.getWater() <= 0) {
-        if (this.waterTicks >= WATER_DAMAGE_DELAY_TICKS && this.getWater() == 0) {
+        if (this.waterTicks >= settings.damageIntervalTicks() && this.getWater() == 0) {
           entity.hurt(ImmerseDamageSource.DEHYDRATION, 1.0F);
           this.waterTicks = 0;
         }
-      } else if (this.waterTicks >= WATER_DELAY_TICKS) {
-        this.setWater(this.getWater() - 5);
-        if (entity.isSprinting()) {
-          this.setWater(this.getWater() - 5);
-        }
+      } else if (this.waterTicks >= settings.decayIntervalTicks()) {
+        this.setWater(this.getWater() - settings.decayAmountFor(entity));
         this.waterTicks = 0;
       }
     }
@@ -182,6 +173,10 @@ public class SurvivalPlayerHandler implements PlayerHandler {
 
   public void setWater(int water) {
     this.dataManager.set(WATER, Mth.clamp(water, 0, this.getMaxWater()));
+  }
+
+  public void hydrate() {
+    this.setWater(this.getMaxWater());
   }
 
   public int getMaxWater() {
