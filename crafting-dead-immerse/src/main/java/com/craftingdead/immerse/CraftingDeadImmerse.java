@@ -50,6 +50,7 @@ import io.netty.buffer.Unpooled;
 import io.sentry.Sentry;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.GsonHelper;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.MinecraftForge;
@@ -203,6 +204,20 @@ public class CraftingDeadImmerse {
         // We recommend adjusting this value in production.
         options.setTracesSampleRate(0.5);
         options.setEnvironment(FMLEnvironment.production ? "production" : "development");
+        options.setTag("dist", FMLEnvironment.dist.name());
+
+        if (FMLEnvironment.production) {
+          var instanceJson = Path.of("minecraftinstance.json");
+          if (Files.exists(instanceJson)) {
+            try (var reader = Files.newBufferedReader(Path.of("minecraftinstance.json"))) {
+              var parsedJson = GsonHelper.parse(reader);
+              var unlocked = GsonHelper.getAsBoolean(parsedJson, "isUnlocked");
+              options.setTag("unlocked", String.valueOf(unlocked));
+            } catch (IOException e) {
+              e.printStackTrace();
+            }
+          }
+        }
       });
     }
 
