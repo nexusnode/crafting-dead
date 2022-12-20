@@ -69,6 +69,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.fml.loading.FMLPaths;
 import net.minecraftforge.fml.loading.JarVersionLookupHandler;
 import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
@@ -201,6 +202,7 @@ public class CraftingDeadImmerse {
         // Set tracesSampleRate to 1.0 to capture 100% of transactions for performance monitoring.
         // We recommend adjusting this value in production.
         options.setTracesSampleRate(0.5);
+        options.setEnvironment(FMLEnvironment.production ? "production" : "development");
       });
     }
 
