@@ -18,6 +18,8 @@
 
 package com.craftingdead.core.world.effect;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.effect.MobEffect;
@@ -34,6 +36,7 @@ public class ParachuteMobEffect extends MobEffect {
 
   @Override
   public void applyEffectTick(LivingEntity livingEntity, int amplifier) {
+    livingEntity.resetFallDistance();
     if (livingEntity.isOnGround()) {
       livingEntity.removeEffect(ModMobEffects.PARACHUTE.get());
       return;
