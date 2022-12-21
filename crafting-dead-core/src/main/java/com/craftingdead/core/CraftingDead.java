@@ -19,7 +19,6 @@
 package com.craftingdead.core;
 
 import org.apache.commons.lang3.mutable.MutableInt;
-import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import com.craftingdead.core.capability.CapabilityUtil;
 import com.craftingdead.core.client.ClientDist;
@@ -115,10 +114,9 @@ public class CraftingDead {
   public static final ForgeConfigSpec serverConfigSpec;
 
   static {
-    final Pair<ServerConfig, ForgeConfigSpec> serverConfigPair =
-        new ForgeConfigSpec.Builder().configure(ServerConfig::new);
-    serverConfigSpec = serverConfigPair.getRight();
-    serverConfig = serverConfigPair.getLeft();
+    var pair = new ForgeConfigSpec.Builder().configure(ServerConfig::new);
+    serverConfigSpec = pair.getRight();
+    serverConfig = pair.getLeft();
   }
 
   /**

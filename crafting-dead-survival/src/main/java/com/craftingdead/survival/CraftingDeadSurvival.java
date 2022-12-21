@@ -19,7 +19,6 @@
 package com.craftingdead.survival;
 
 import java.util.ListIterator;
-import org.apache.commons.lang3.tuple.Pair;
 import com.craftingdead.core.event.GunEvent;
 import com.craftingdead.core.event.LivingExtensionEvent;
 import com.craftingdead.core.world.action.ActionTypes;
@@ -91,10 +90,9 @@ public class CraftingDeadSurvival {
   public static final ForgeConfigSpec serverConfigSpec;
 
   static {
-    final Pair<ServerConfig, ForgeConfigSpec> serverConfigPair =
-        new ForgeConfigSpec.Builder().configure(ServerConfig::new);
-    serverConfigSpec = serverConfigPair.getRight();
-    serverConfig = serverConfigPair.getLeft();
+    var pair = new ForgeConfigSpec.Builder().configure(ServerConfig::new);
+    serverConfigSpec = pair.getRight();
+    serverConfig = pair.getLeft();
   }
 
   private static CraftingDeadSurvival instance;
@@ -273,10 +271,9 @@ public class CraftingDeadSurvival {
       return;
     }
 
-    ListIterator<MobSpawnSettings.SpawnerData> iterator =
-        event.getSpawns().getSpawner(MobCategory.MONSTER).listIterator();
+    var iterator = event.getSpawns().getSpawner(MobCategory.MONSTER).listIterator();
     while (iterator.hasNext()) {
-      MobSpawnSettings.SpawnerData spawnEntry = iterator.next();
+      var spawnEntry = iterator.next();
       if (spawnEntry.type == EntityType.ZOMBIE) {
         if (serverConfig.advancedZombiesEnabled.get()) {
           iterator.add(new MobSpawnSettings.SpawnerData(
