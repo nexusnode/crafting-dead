@@ -248,8 +248,8 @@ public class CraftingDeadSurvival {
     if (!event.getWorld().isClientSide()
         && event.getItemStack().getCapability(Clothing.CAPABILITY).isPresent()) {
       var extension = PlayerExtension.getOrThrow(event.getPlayer());
-      extension.performAction(
-          SurvivalActionTypes.SHRED_CLOTHING.get().decode(extension, null), true);
+      SurvivalActionTypes.SHRED_CLOTHING.get().createAction(extension, event.getHand())
+          .ifPresent(action -> extension.performAction(action, true));
     }
   }
 
