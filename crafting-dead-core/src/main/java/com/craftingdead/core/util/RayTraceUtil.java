@@ -76,7 +76,7 @@ public class RayTraceUtil {
 
     var entityHitResult = ProjectileUtil.getEntityHitResult(fromEntity, startPos, endPos,
         fromEntity.getBoundingBox().expandTowards(scaledLook).inflate(1.0D, 1.0D, 1.0D),
-        EntitySelector.ENTITY_STILL_ALIVE.and(EntitySelector.NO_CREATIVE_OR_SPECTATOR),
+        EntitySelector.LIVING_ENTITY_STILL_ALIVE.and(EntitySelector.NO_CREATIVE_OR_SPECTATOR),
         sqrDistance);
 
     return entityHitResult == null ? blockHitResult : Optional.of(entityHitResult);

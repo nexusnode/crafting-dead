@@ -429,8 +429,7 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
 
     // Magazine size will be synced to clients so only decrement this on the server.
     if (!level.isClientSide()
-        && !(living.entity() instanceof Player
-            && ((Player) living.entity()).isCreative())) {
+        && !(living.entity() instanceof Player player && player.isCreative())) {
       final int unbreakingLevel =
           EnchantmentHelper.getItemEnchantmentLevel(Enchantments.UNBREAKING, this.itemStack);
       if (!DigDurabilityEnchantment.shouldIgnoreDurabilityDrop(
