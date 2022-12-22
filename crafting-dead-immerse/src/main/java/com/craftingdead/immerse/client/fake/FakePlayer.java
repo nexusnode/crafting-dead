@@ -29,6 +29,7 @@ import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.resources.DefaultPlayerSkin;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.player.PlayerModelPart;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.scores.Team;
 
@@ -40,6 +41,11 @@ public class FakePlayer extends AbstractClientPlayer {
 
   public FakePlayer(GameProfile gameProfile) {
     super(FakeLevel.getInstance(), gameProfile);
+  }
+
+  @Override
+  public boolean isModelPartShown(PlayerModelPart part) {
+    return true;
   }
 
   @Override
