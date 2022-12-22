@@ -23,6 +23,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
 import com.craftingdead.core.world.entity.ai.FollowAttractiveGrenadeGoal;
 import com.craftingdead.core.world.entity.ai.LookAtEntityGoal;
@@ -81,6 +83,8 @@ public class AdvancedZombie extends Zombie implements RangedAttackMob {
 
   private static final EntityDataAccessor<Integer> TEXTURE_NUMBER =
       SynchedEntityData.defineId(AdvancedZombie.class, EntityDataSerializers.INT);
+
+  private static final Logger logger = LogManager.getLogger();
 
   private RangedAttackGoal rangedAttackGoal;
 
@@ -297,7 +301,12 @@ public class AdvancedZombie extends Zombie implements RangedAttackMob {
           .setBaseValue(CraftingDeadSurvival.serverConfig.advancedZombieAttackDamage.get());
     }
 
-    var extension = LivingExtension.getOrThrow(this);
+    var extension = LivingExtension.get(this);
+    if (extension == null) {
+      logger.warn("LivingExtension capability is not present on {}", this.toString());
+      logger.warn("Capability NBT dump: {}", this.getCapabilities().serializeNBT().toString());
+      return groupData;
+    }
     extension.setEquipmentDropChance(ModEquipmentSlot.CLOTHING,
         CraftingDeadSurvival.serverConfig.zombieClothingDropChance.get().floatValue());
     extension.setEquipmentDropChance(ModEquipmentSlot.HAT,
