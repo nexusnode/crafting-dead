@@ -19,6 +19,7 @@
 package com.craftingdead.core.client.gui.screen.inventory;
 
 import com.craftingdead.core.CraftingDead;
+import com.craftingdead.core.client.ClientDist;
 import com.craftingdead.core.client.gui.widget.button.CompositeButton;
 import com.craftingdead.core.network.NetworkChannel;
 import com.craftingdead.core.network.message.play.OpenStorageMessage;
@@ -58,7 +59,7 @@ public class EquipmentScreen extends EffectRenderingInventoryScreen<EquipmentMen
   public void init() {
     super.init();
     this.vestButton = CompositeButton.button(this.leftPos + 95, this.topPos + 44, 12, 16,
-            BACKGROUND)
+        BACKGROUND)
         .setAtlasPos(196, 224)
         .setHoverAtlasPos(196, 240)
         .setInactiveAtlasPos(183, 240)
@@ -69,7 +70,7 @@ public class EquipmentScreen extends EffectRenderingInventoryScreen<EquipmentMen
         }).build();
     this.addRenderableWidget(this.vestButton);
     this.backpackButton = CompositeButton.button(this.leftPos + 95, this.topPos + 62, 12, 16,
-            BACKGROUND)
+        BACKGROUND)
         .setAtlasPos(196, 224)
         .setHoverAtlasPos(196, 240)
         .setInactiveAtlasPos(183, 240)
@@ -128,7 +129,7 @@ public class EquipmentScreen extends EffectRenderingInventoryScreen<EquipmentMen
 
     // Hide the icon of equipment slots if they have an item.
     // Starting at index 35 to skip the player inventory/
-    for(int i = 35; i < this.menu.slots.size(); i++) {
+    for (int i = 35; i < this.menu.slots.size(); i++) {
       var slot = this.menu.slots.get(i);
       if (slot.hasItem()) {
         this.blit(poseStack, slot.x + this.leftPos, slot.y + this.topPos, 8, 141, 16, 16);
@@ -157,5 +158,14 @@ public class EquipmentScreen extends EffectRenderingInventoryScreen<EquipmentMen
     InventoryScreen.renderEntityInInventory(this.leftPos + 51, this.topPos + 72, 30,
         (this.leftPos + 51) - this.oldMouseX, (this.topPos + 75 - 50) - this.oldMouseY,
         this.minecraft.player);
+  }
+
+  @Override
+  public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+    if (ClientDist.OPEN_EQUIPMENT_MENU.matches(keyCode, scanCode)) {
+      this.onClose();
+      return true;
+    }
+    return super.keyPressed(keyCode, scanCode, modifiers);
   }
 }
