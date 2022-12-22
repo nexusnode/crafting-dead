@@ -41,135 +41,132 @@ import net.minecraft.world.item.ItemStack;
 
 public class EquipmentScreen extends EffectRenderingInventoryScreen<EquipmentMenu> {
 
+  private static final ResourceLocation BACKGROUND =
+      new ResourceLocation(CraftingDead.ID, "textures/gui/container/equipment.png");
 
-    private static final ResourceLocation BACKGROUND =
-            new ResourceLocation(CraftingDead.ID, "textures/gui/container/equipment.png");
+  private int oldMouseX;
+  private int oldMouseY;
 
-    private int oldMouseX;
-    private int oldMouseY;
+  private Button backpackButton;
+  private Button vestButton;
 
-    private Button backpackButton;
-    private Button vestButton;
+  private boolean transitioning = false;
 
-    private boolean transitioning = false;
+  public EquipmentScreen(EquipmentMenu menu, Inventory inventory, Component title) {
+    super(menu, inventory, title);
+  }
 
-    public EquipmentScreen(EquipmentMenu menu, Inventory inventory, Component title) {
-        super(menu, inventory, title);
+  @Override
+  public void init() {
+    super.init();
+    this.vestButton = CompositeButton.button(this.leftPos + 95, this.topPos + 44, 12, 16,
+        BACKGROUND)
+        .setAtlasPos(196, 224)
+        .setHoverAtlasPos(196, 240)
+        .setInactiveAtlasPos(183, 240)
+        .setAction((button) -> {
+          NetworkChannel.PLAY.getSimpleChannel()
+              .sendToServer(new OpenStorageMessage(ModEquipmentSlot.VEST));
+          this.transitioning = true;
+        }).build();
+    this.addRenderableWidget(this.vestButton);
+    this.backpackButton = CompositeButton.button(this.leftPos + 95, this.topPos + 62, 12, 16,
+        BACKGROUND)
+        .setAtlasPos(196, 224)
+        .setHoverAtlasPos(196, 240)
+        .setInactiveAtlasPos(183, 240)
+        .setAction((button) -> {
+          NetworkChannel.PLAY.getSimpleChannel()
+              .sendToServer(new OpenStorageMessage(ModEquipmentSlot.BACKPACK));
+          this.transitioning = true;
+        }).build();
+    this.addRenderableWidget(this.backpackButton);
+    this.refreshButtonStatus();
+  }
+
+  @Override
+  public void render(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+    super.render(matrixStack, mouseX, mouseY, partialTicks);
+    this.renderTooltip(matrixStack, mouseX, mouseY);
+    this.oldMouseX = mouseX;
+    this.oldMouseY = mouseY;
+  }
+
+  @Override
+  protected void containerTick() {
+    super.containerTick();
+    this.refreshButtonStatus();
+  }
+
+  private void refreshButtonStatus() {
+    this.backpackButton.active = this.menu
+        .getItemHandler()
+        .getStackInSlot(ModEquipmentSlot.BACKPACK.getIndex())
+        .getCapability(Storage.CAPABILITY)
+        .isPresent();
+    this.vestButton.active = this.menu
+        .getItemHandler()
+        .getStackInSlot(ModEquipmentSlot.VEST.getIndex())
+        .getCapability(Storage.CAPABILITY)
+        .isPresent();
+  }
+
+  /**
+   * If we are waiting for another container GUI to open.
+   */
+  public boolean isTransitioning() {
+    return this.transitioning;
+  }
+
+  @Override
+  protected void renderLabels(PoseStack matrixStack, int x, int y) {}
+
+  @Override
+  protected void renderBg(PoseStack poseStack, float partialTicks, int mouseX, int mouseY) {
+    this.renderBackground(poseStack);
+    RenderSystem.setShaderTexture(0, BACKGROUND);
+
+    this.blit(poseStack, this.leftPos, this.topPos, 0, 0, this.imageWidth, this.imageHeight);
+
+    // Hide the icon of equipment slots if they have an item.
+    // Starting at index 35 to skip the player inventory/
+    for (int i = 35; i < this.menu.slots.size(); i++) {
+      var slot = this.menu.slots.get(i);
+      if (slot.hasItem()) {
+        this.blit(poseStack, slot.x + this.leftPos, slot.y + this.topPos, 8, 141, 16, 16);
+      }
     }
 
-    @Override
-    public void init() {
-        super.init();
-        this.vestButton = CompositeButton.button(this.leftPos + 95, this.topPos + 44, 12, 16,
-                        BACKGROUND)
-                .setAtlasPos(196, 224)
-                .setHoverAtlasPos(196, 240)
-                .setInactiveAtlasPos(183, 240)
-                .setAction((button) -> {
-                    NetworkChannel.PLAY.getSimpleChannel()
-                            .sendToServer(new OpenStorageMessage(ModEquipmentSlot.VEST));
-                    this.transitioning = true;
-                }).build();
-        this.addRenderableWidget(this.vestButton);
-        this.backpackButton = CompositeButton.button(this.leftPos + 95, this.topPos + 62, 12, 16,
-                        BACKGROUND)
-                .setAtlasPos(196, 224)
-                .setHoverAtlasPos(196, 240)
-                .setInactiveAtlasPos(183, 240)
-                .setAction((button) -> {
-                    NetworkChannel.PLAY.getSimpleChannel()
-                            .sendToServer(new OpenStorageMessage(ModEquipmentSlot.BACKPACK));
-                    this.transitioning = true;
-                }).build();
-        this.addRenderableWidget(this.backpackButton);
-        this.refreshButtonStatus();
+    ItemStack gunStack = this.menu.getGunStack();
+    gunStack.getCapability(Gun.CAPABILITY).ifPresent(gun -> {
+
+      final int gunSlotX = this.leftPos + 135;
+      final int gunSlotY = this.topPos + 26;
+
+      final boolean carriedItemAccepted = gun.isAcceptedAttachment(this.menu.getCarried())
+          || Paint.isValid(this.menu.getGunStack(), this.menu.getCarried());
+
+      if ((!this.menu.isCraftingInventoryEmpty() && this.menu.isCraftable())
+          || (!this.menu.getCarried().isEmpty() && carriedItemAccepted)) {
+        // Green outline
+        this.blit(poseStack, gunSlotX, gunSlotY, 165, 238, 16, 16);
+      } else if (!this.menu.getCarried().isEmpty() && !carriedItemAccepted) {
+        // Red outline
+        this.blit(poseStack, gunSlotX, gunSlotY, 147, 238, 16, 16);
+      }
+    });
+
+    InventoryScreen.renderEntityInInventory(this.leftPos + 51, this.topPos + 72, 30,
+        (this.leftPos + 51) - this.oldMouseX, (this.topPos + 75 - 50) - this.oldMouseY,
+        this.minecraft.player);
+  }
+
+  @Override
+  public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+    if (ClientDist.OPEN_EQUIPMENT_MENU.matches(keyCode, scanCode)) {
+      this.onClose();
+      return true;
     }
-
-    @Override
-    public void render(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
-        super.render(matrixStack, mouseX, mouseY, partialTicks);
-        this.renderTooltip(matrixStack, mouseX, mouseY);
-        this.oldMouseX = mouseX;
-        this.oldMouseY = mouseY;
-    }
-
-    @Override
-    protected void containerTick() {
-        super.containerTick();
-        this.refreshButtonStatus();
-    }
-
-    private void refreshButtonStatus() {
-        this.backpackButton.active = this.menu
-                .getItemHandler()
-                .getStackInSlot(ModEquipmentSlot.BACKPACK.getIndex())
-                .getCapability(Storage.CAPABILITY)
-                .isPresent();
-        this.vestButton.active = this.menu
-                .getItemHandler()
-                .getStackInSlot(ModEquipmentSlot.VEST.getIndex())
-                .getCapability(Storage.CAPABILITY)
-                .isPresent();
-    }
-
-    /**
-     * If we are waiting for another container GUI to open.
-     */
-    public boolean isTransitioning() {
-        return this.transitioning;
-    }
-
-    @Override
-    protected void renderLabels(PoseStack matrixStack, int x, int y) {
-    }
-
-    @Override
-    protected void renderBg(PoseStack poseStack, float partialTicks, int mouseX, int mouseY) {
-        this.renderBackground(poseStack);
-        RenderSystem.setShaderTexture(0, BACKGROUND);
-
-        this.blit(poseStack, this.leftPos, this.topPos, 0, 0, this.imageWidth, this.imageHeight);
-
-        // Hide the icon of equipment slots if they have an item.
-        // Starting at index 35 to skip the player inventory/
-        for (int i = 35; i < this.menu.slots.size(); i++) {
-            var slot = this.menu.slots.get(i);
-            if (slot.hasItem()) {
-                this.blit(poseStack, slot.x + this.leftPos, slot.y + this.topPos, 8, 141, 16, 16);
-            }
-        }
-
-        ItemStack gunStack = this.menu.getGunStack();
-        gunStack.getCapability(Gun.CAPABILITY).ifPresent(gun -> {
-
-            final int gunSlotX = this.leftPos + 135;
-            final int gunSlotY = this.topPos + 26;
-
-            final boolean carriedItemAccepted = gun.isAcceptedAttachment(this.menu.getCarried())
-                    || Paint.isValid(this.menu.getGunStack(), this.menu.getCarried());
-
-            if ((!this.menu.isCraftingInventoryEmpty() && this.menu.isCraftable())
-                    || (!this.menu.getCarried().isEmpty() && carriedItemAccepted)) {
-                // Green outline
-                this.blit(poseStack, gunSlotX, gunSlotY, 165, 238, 16, 16);
-            } else if (!this.menu.getCarried().isEmpty() && !carriedItemAccepted) {
-                // Red outline
-                this.blit(poseStack, gunSlotX, gunSlotY, 147, 238, 16, 16);
-            }
-        });
-
-        InventoryScreen.renderEntityInInventory(this.leftPos + 51, this.topPos + 72, 30,
-                (this.leftPos + 51) - this.oldMouseX, (this.topPos + 75 - 50) - this.oldMouseY,
-                this.minecraft.player);
-    }
-
-    @Override
-    public boolean keyPressed(int p_97765_, int p_97766_, int p_97767_) {
-        InputConstants.Key mouseKey = InputConstants.getKey(p_97765_, p_97766_);
-        if (ClientDist.OPEN_EQUIPMENT_MENU.isActiveAndMatches(mouseKey)) {
-            this.onClose();
-            return true;
-        }
-        return super.keyPressed(p_97765_, p_97766_, p_97767_);
-    }
+    return super.keyPressed(keyCode, scanCode, modifiers);
+  }
 }
