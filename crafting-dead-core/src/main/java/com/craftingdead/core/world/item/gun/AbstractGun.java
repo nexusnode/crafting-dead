@@ -529,16 +529,12 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
               || hitEntity instanceof WanderingTrader)
           && hitPos.y >= chinHeight;
       if (headshot) {
-        var damagePercentage = 1.0F - hitLiving.getItemHandler()
+        var headshotDamagePercent = 1.0F - hitLiving.getItemHandler()
             .getStackInSlot(ModEquipmentSlot.HAT.getIndex())
             .getCapability(Hat.CAPABILITY)
             .map(Hat::getHeadshotReductionPercentage)
             .orElse(0.0F);
-        if (damagePercentage < 1.0F) {
-          damage *= damagePercentage;
-        } else {
-          damage *= CraftingDead.serverConfig.headshotBonusDamage.get();
-        }
+        damage *= headshotDamagePercent * CraftingDead.serverConfig.headshotBonusDamage.get();
       }
     }
 
