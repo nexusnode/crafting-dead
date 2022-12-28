@@ -117,7 +117,7 @@ public class IngameGui {
   private void renderKillFeedEntry(KillFeedEntry entry, PoseStack poseStack,
       float x, float y, float alpha) {
     var killerName = entry.killerName();
-    var deadName = entry.deadName();
+    var deadName = entry.targetName();
     int killerNameWidth = this.minecraft.font.width(killerName);
     int deadNameWidth = this.minecraft.font.width(deadName);
 

@@ -46,6 +46,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.storage.LevelResource;
@@ -279,7 +280,9 @@ public class LogicalServer extends SavedData {
 
   @SubscribeEvent
   public void handleGunHitEntity(GunEvent.HitEntity event) {
-    if (!event.living().level().isClientSide() && this.gameWrapper.getGame().killFeedEnabled()) {
+    if (!event.living().level().isClientSide()
+        && this.gameWrapper.getGame().killFeedEnabled()
+        && event.target() instanceof Player) {
       NetworkChannel.PLAY.getSimpleChannel().send(PacketDistributor.ALL.noArg(),
           new AddKillFeedEntryMessage(new KillFeedEntry(event.living().entity(),
               event.target(), event.getItemStack(),

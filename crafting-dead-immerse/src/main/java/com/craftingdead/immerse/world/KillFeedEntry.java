@@ -24,27 +24,36 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 
-public record KillFeedEntry(int killerEntityId, Component killerName, Component deadName,
-    ItemStack weaponStack, Type type) {
+public record KillFeedEntry(
+    int killerEntityId,
+    Component killerName,
+    Component targetName,
+    ItemStack weaponStack,
+    Type type) {
 
-  public KillFeedEntry(LivingEntity killer, Entity dead, ItemStack weaponStack, Type type) {
-    this(killer.getId(), killer.getDisplayName(), dead.getDisplayName(), weaponStack, type);
-  }
-
-  public enum Type {
-    NONE, HEADSHOT, WALLBANG, WALLBANG_HEADSHOT;
+  public KillFeedEntry(LivingEntity killer, Entity target, ItemStack weaponStack, Type type) {
+    this(killer.getId(), killer.getDisplayName(), target.getDisplayName(), weaponStack, type);
   }
 
   public void encode(FriendlyByteBuf out) {
     out.writeVarInt(this.killerEntityId);
     out.writeComponent(this.killerName);
-    out.writeComponent(this.deadName);
+    out.writeComponent(this.targetName);
     out.writeItem(this.weaponStack);
     out.writeEnum(this.type);
   }
 
   public static KillFeedEntry decode(FriendlyByteBuf in) {
-    return new KillFeedEntry(in.readVarInt(), in.readComponent(), in.readComponent(), in.readItem(),
+    return new KillFeedEntry(
+        in.readVarInt(),
+        in.readComponent(),
+        in.readComponent(),
+        in.readItem(),
         in.readEnum(KillFeedEntry.Type.class));
+  }
+
+  public enum Type {
+
+    NONE, HEADSHOT, WALLBANG, WALLBANG_HEADSHOT;
   }
 }
