@@ -12,8 +12,8 @@
 
   "death.attack.bullet": "%s was shot by %s",
   "death.attack.bullet.item": "%s was shot by %s with %s",
-  "death.attack.bullet.headshot": "%1$s was shot in the head by %s",
-  "death.attack.bullet.headshot.item": "%1$s was shot in the head by %s with %s",
+  "death.attack.bullet.headshot": "%s was shot in the head by %s",
+  "death.attack.bullet.headshot.item": "%s was shot in the head by %s with %s",
   "death.attack.grenade": "%s was blasted by %s" ,
 
   "options.craftingdead.client.crosshair": "Crosshair",
