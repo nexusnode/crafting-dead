@@ -282,7 +282,8 @@ public class LogicalServer extends SavedData {
   public void handleGunHitEntity(GunEvent.HitEntity event) {
     if (!event.living().level().isClientSide()
         && this.gameWrapper.getGame().killFeedEnabled()
-        && event.target() instanceof Player) {
+        && event.target() instanceof Player player
+        && player.isDeadOrDying()) {
       NetworkChannel.PLAY.getSimpleChannel().send(PacketDistributor.ALL.noArg(),
           new AddKillFeedEntryMessage(new KillFeedEntry(event.living().entity(),
               event.target(), event.getItemStack(),
