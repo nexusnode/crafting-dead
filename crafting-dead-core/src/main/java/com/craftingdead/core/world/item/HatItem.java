@@ -57,7 +57,7 @@ public class HatItem extends Item {
       TooltipFlag tooltipFlag) {
     if (this.headshotReductionPercentage > 0.0F) {
       Component percentageText =
-          new TextComponent(String.format("%.1f", this.headshotReductionPercentage) + "%")
+          new TextComponent(String.format("%.0f", this.headshotReductionPercentage * 100.0F) + "%")
               .withStyle(ChatFormatting.RED);
 
       lore.add(new TranslatableComponent("hat.headshot_reduction")
