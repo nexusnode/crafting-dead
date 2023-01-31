@@ -28,6 +28,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -136,11 +137,13 @@ public class SurvivalPlayerHandler implements PlayerHandler {
       }
     }
 
+    var legBreakChance =
+        0.25F * this.player.entity().fallDistance / this.player.entity().getMaxFallDistance();
     if (!invulnerable
         && CraftingDeadSurvival.serverConfig.brokenLegsEnabled.get()
         && !this.player.entity().hasEffect(SurvivalMobEffects.BROKEN_LEG.get())
         && source == DamageSource.FALL
-        && ((amount > 0.0F && random.nextInt(3) == 0) || amount > 4.0F)) {
+        && random.nextFloat() < legBreakChance) {
       this.player.entity()
           .displayClientMessage(new TranslatableComponent("message.broken_leg")
               .withStyle(ChatFormatting.RED, ChatFormatting.BOLD), true);
