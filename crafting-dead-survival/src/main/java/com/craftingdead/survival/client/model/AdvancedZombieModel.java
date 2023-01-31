@@ -19,12 +19,12 @@
 package com.craftingdead.survival.client.model;
 
 import java.util.List;
-import com.craftingdead.survival.world.entity.monster.AdvancedZombie;
 import com.google.common.collect.Iterables;
 import net.minecraft.client.model.ZombieModel;
 import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.world.entity.monster.Zombie;
 
-public class AdvancedZombieModel<T extends AdvancedZombie> extends ZombieModel<T> {
+public class AdvancedZombieModel<T extends Zombie> extends ZombieModel<T> {
 
   public final ModelPart leftSleeve;
   public final ModelPart rightSleeve;

@@ -20,7 +20,6 @@ package com.craftingdead.survival.world.entity;
 
 import com.craftingdead.survival.CraftingDeadSurvival;
 import com.craftingdead.survival.world.entity.grenade.PipeBomb;
-import com.craftingdead.survival.world.entity.monster.AdvancedZombie;
 import com.craftingdead.survival.world.entity.monster.DoctorZombieEntity;
 import com.craftingdead.survival.world.entity.monster.FastZombie;
 import com.craftingdead.survival.world.entity.monster.GiantZombie;
@@ -55,14 +54,6 @@ public class SurvivalEntityTypes {
           () -> create("supply_drop",
               EntityType.Builder.of(SupplyDrop::new, MobCategory.MISC)));
 
-  public static final RegistryObject<EntityType<AdvancedZombie>> ADVANCED_ZOMBIE =
-      deferredRegister.register("advanced_zombie", () -> create("advanced_zombie",
-          EntityType.Builder
-              .<AdvancedZombie>of(AdvancedZombie::new, MobCategory.MONSTER)
-              .setTrackingRange(64)
-              .setUpdateInterval(3)
-              .sized(0.6F, 1.95F)
-              .setShouldReceiveVelocityUpdates(false)));
   public static final RegistryObject<EntityType<FastZombie>> FAST_ZOMBIE =
       deferredRegister.register("fast_zombie", () -> create("fast_zombie",
           EntityType.Builder
@@ -87,18 +78,18 @@ public class SurvivalEntityTypes {
               .setUpdateInterval(3)
               .sized(0.6F, 1.95F)
               .setShouldReceiveVelocityUpdates(false)));
-  public static final RegistryObject<EntityType<AdvancedZombie>> POLICE_ZOMBIE =
+  public static final RegistryObject<EntityType<PoliceZombieEntity>> POLICE_ZOMBIE =
       deferredRegister.register("police_zombie", () -> create("police_zombie",
           EntityType.Builder
-              .<AdvancedZombie>of(PoliceZombieEntity::new, MobCategory.MONSTER)
+              .<PoliceZombieEntity>of(PoliceZombieEntity::new, MobCategory.MONSTER)
               .setTrackingRange(64)
               .setUpdateInterval(3)
               .sized(0.6F, 1.95F)
               .setShouldReceiveVelocityUpdates(false)));
-  public static final RegistryObject<EntityType<AdvancedZombie>> DOCTOR_ZOMBIE =
+  public static final RegistryObject<EntityType<DoctorZombieEntity>> DOCTOR_ZOMBIE =
       deferredRegister.register("doctor_zombie", () -> create("doctor_zombie",
           EntityType.Builder
-              .<AdvancedZombie>of(DoctorZombieEntity::new, MobCategory.MONSTER)
+              .<DoctorZombieEntity>of(DoctorZombieEntity::new, MobCategory.MONSTER)
               .setTrackingRange(64)
               .setUpdateInterval(3)
               .sized(0.6F, 1.95F)

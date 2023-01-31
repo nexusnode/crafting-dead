@@ -27,7 +27,6 @@
   "options.craftingdeadsurvival.server.zombies.doctor_zombie.damage": "Doctor Zombie Heath",
   "options.craftingdeadsurvival.server.zombies.giant_zombie.damage": "Giant Zombie Health",
   "options.craftingdeadsurvival.server.zombies.spawning.enable": "Zombie Spawning Enabled",
-  "options.craftingdeadsurvival.server.zombies.spawning.baby_zombies.enable": "Baby Zombie Spawning Enabled",
   "options.craftingdeadsurvival.server.zombies.spawning.advanced_zombie.enable": "Advanced Zombie Spawning Enabled",
   "options.craftingdeadsurvival.server.zombies.spawning.tank_zombie.enable": "Tank Zombie Spawning Enabled",
   "options.craftingdeadsurvival.server.zombies.spawning.fast_zombie.enable": "Fast Zombie Spawning Enabled",
@@ -81,7 +80,6 @@
 
   "entity.craftingdeadsurvival.supply_drop": "Supply Drop",
   "entity.craftingdeadsurvival.pipe_bomb": "Pipe Bomb",
-  "entity.craftingdeadsurvival.advanced_zombie": "Advanced Zombie",
   "entity.craftingdeadsurvival.fast_zombie": "Fast Zombie",
   "entity.craftingdeadsurvival.tank_zombie": "Tank Zombie",
   "entity.craftingdeadsurvival.weak_zombie": "Weak Zombie",
@@ -116,7 +114,6 @@
   "item.craftingdeadsurvival.pipe_bomb": "Pipe Bomb",
   "item.craftingdeadsurvival.military_drop_radio": "Military Supply Drop Radio",
   "item.craftingdeadsurvival.medical_drop_radio": "Medical Supply Drop Radio",
-  "item.craftingdeadsurvival.advanced_zombie_spawn_egg": "Advanced Zombie Spawn Egg",
   "item.craftingdeadsurvival.fast_zombie_spawn_egg": "Fast Zombie Spawn Egg",
   "item.craftingdeadsurvival.tank_zombie_spawn_egg": "Tank Zombie Spawn Egg",
   "item.craftingdeadsurvival.weak_zombie_spawn_egg": "Weak Zombie Spawn Egg",

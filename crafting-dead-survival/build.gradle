@@ -11,7 +11,7 @@ minecraft {
 
             property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
 
-            args '--mixin', 'craftingdead.mixins.json'
+            args '--mixin', 'craftingdead.mixins.json', '--mixin', 'craftingdeadsurvival.mixins.json'
 
             mods {
                 craftingdeadsurvival {
@@ -30,7 +30,7 @@ minecraft {
 
             property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
 
-            args '--mixin', 'craftingdead.mixins.json'
+            args '--mixin', 'craftingdead.mixins.json', '--mixin', 'craftingdeadsurvival.mixins.json'
 
             mods {
                 craftingdeadsurvival {
@@ -75,7 +75,8 @@ jar {
         attributes([
             'Implementation-Title': project.name,
             'Implementation-Version': project.version,
-            'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+            'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
+            'MixinConfigs': 'craftingdeadsurvival.mixins.json'
         ])
     }
 }

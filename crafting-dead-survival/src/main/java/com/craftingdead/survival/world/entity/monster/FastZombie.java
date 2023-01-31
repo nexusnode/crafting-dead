@@ -18,7 +18,6 @@
 
 package com.craftingdead.survival.world.entity.monster;
 
-import java.util.Objects;
 import org.jetbrains.annotations.Nullable;
 import com.craftingdead.survival.CraftingDeadSurvival;
 import net.minecraft.nbt.CompoundTag;
@@ -28,17 +27,18 @@ import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.SpawnGroupData;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
 
-public class FastZombie extends AdvancedZombie {
+public class FastZombie extends Zombie {
 
-  public FastZombie(EntityType<? extends AdvancedZombie> type, Level world) {
-    super(type, world);
+  public FastZombie(EntityType<? extends FastZombie> type, Level level) {
+    super(type, level);
   }
 
   public static AttributeSupplier.Builder createAttributes() {
-    return AdvancedZombie.attributeTemplate()
+    return Zombie.createAttributes()
         .add(Attributes.MAX_HEALTH, 10.0D)
         .add(Attributes.ATTACK_DAMAGE, 1.0D)
         .add(Attributes.FOLLOW_RANGE, 30.0D)
@@ -51,12 +51,10 @@ public class FastZombie extends AdvancedZombie {
   public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty,
       MobSpawnType spawnType, @Nullable SpawnGroupData groupData, @Nullable CompoundTag tag) {
     groupData = super.finalizeSpawn(level, difficulty, spawnType, groupData, tag);
-    if (!level.isClientSide()) {
-      Objects.requireNonNull(this.getAttribute(Attributes.MAX_HEALTH))
-          .setBaseValue(CraftingDeadSurvival.serverConfig.fastZombieMaxHealth.get());
-      Objects.requireNonNull(this.getAttribute(Attributes.ATTACK_DAMAGE))
-          .setBaseValue(CraftingDeadSurvival.serverConfig.fastZombieAttackDamage.get());
-    }
+    this.getAttribute(Attributes.MAX_HEALTH)
+        .setBaseValue(CraftingDeadSurvival.serverConfig.fastZombieMaxHealth.get());
+    this.getAttribute(Attributes.ATTACK_DAMAGE)
+        .setBaseValue(CraftingDeadSurvival.serverConfig.fastZombieAttackDamage.get());
     return groupData;
   }
 }

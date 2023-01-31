@@ -169,11 +169,6 @@ public class SurvivalItems {
   // Spawn Eggs
   // ================================================================================
 
-  public static final RegistryObject<Item> ADVANCED_ZOMBIE_SPAWN_EGG =
-      deferredRegister.register("advanced_zombie_spawn_egg",
-          () -> new ForgeSpawnEggItem(SurvivalEntityTypes.ADVANCED_ZOMBIE, 0x000000, 0xFFFFFF,
-              new Item.Properties().tab(TAB)));
-
   public static final RegistryObject<Item> FAST_ZOMBIE_SPAWN_EGG =
       deferredRegister.register("fast_zombie_spawn_egg",
           () -> new ForgeSpawnEggItem(SurvivalEntityTypes.FAST_ZOMBIE, 0x000000, 0xFFFFFF,

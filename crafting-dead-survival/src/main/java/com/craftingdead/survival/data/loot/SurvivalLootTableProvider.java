@@ -24,17 +24,16 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import com.craftingdead.survival.world.level.storage.loot.BuiltInLootTables;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.loot.LootTableProvider;
-import net.minecraft.world.level.storage.loot.parameters.LootContextParamSet;
-import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.LootTables;
 import net.minecraft.world.level.storage.loot.ValidationContext;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParamSet;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 
 public class SurvivalLootTableProvider extends LootTableProvider {
 
@@ -44,26 +43,24 @@ public class SurvivalLootTableProvider extends LootTableProvider {
 
   @Override
   protected List<Pair<Supplier<Consumer<BiConsumer<ResourceLocation, LootTable.Builder>>>, LootContextParamSet>> getTables() {
-    ImmutableList.Builder<Pair<Supplier<Consumer<BiConsumer<ResourceLocation, LootTable.Builder>>>, LootContextParamSet>> builder =
-        ImmutableList.builder();
-    builder.add(Pair.of(SupplyDropLootTables::new, LootContextParamSets.CHEST));
-    builder.add(Pair.of(SurvivalBlockLootTables::new, LootContextParamSets.BLOCK));
-    return builder.build();
+    return List.of(
+        Pair.of(SupplyDropLoot::new, LootContextParamSets.CHEST),
+        Pair.of(SurvivalBlockLoot::new, LootContextParamSets.BLOCK),
+        Pair.of(SurvivalEntityLoot::new, LootContextParamSets.ENTITY));
   }
 
   @Override
   protected void validate(Map<ResourceLocation, LootTable> map,
       ValidationContext validationTracker) {
-    for (ResourceLocation location : Sets.difference(BuiltInLootTables.getLootTables(),
-        map.keySet())) {
+    for (var location : Sets.difference(BuiltInLootTables.getLootTables(), map.keySet())) {
       validationTracker.reportProblem("Missing built-in table: " + location);
     }
-    map.forEach((location, lootTable) -> LootTables.validate(validationTracker,
-        location, lootTable));
+    map.forEach(
+        (location, lootTable) -> LootTables.validate(validationTracker, location, lootTable));
   }
 
   @Override
   public String getName() {
-    return "Crafting Dead Loot Tables";
+    return "Crafting Dead Survival Loot Tables";
   }
 }

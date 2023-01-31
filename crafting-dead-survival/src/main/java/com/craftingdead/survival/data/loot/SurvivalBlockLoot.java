@@ -31,7 +31,7 @@ import net.minecraft.world.level.storage.loot.entries.LootItem;
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 import net.minecraftforge.registries.RegistryObject;
 
-public class SurvivalBlockLootTables extends BlockLoot {
+public class SurvivalBlockLoot extends BlockLoot {
 
   @Override
   protected void addTables() {

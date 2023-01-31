@@ -37,6 +37,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.SpellParticle;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.EntityType;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.ParticleFactoryRegisterEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
@@ -84,7 +85,7 @@ public class ClientDist implements ModDist {
             context.bakeLayer(SurvivalModelLayers.PIPE_BOMB)));
     event.registerEntityRenderer(SurvivalEntityTypes.SUPPLY_DROP.get(),
         SupplyDropRenderer::new);
-    event.registerEntityRenderer(SurvivalEntityTypes.ADVANCED_ZOMBIE.get(),
+    event.registerEntityRenderer(EntityType.ZOMBIE,
         AdvancedZombieRenderer::new);
     event.registerEntityRenderer(SurvivalEntityTypes.FAST_ZOMBIE.get(),
         AdvancedZombieRenderer::new);

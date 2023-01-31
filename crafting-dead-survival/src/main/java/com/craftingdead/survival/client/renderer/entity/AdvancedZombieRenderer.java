@@ -19,12 +19,12 @@
 package com.craftingdead.survival.client.renderer.entity;
 
 import com.craftingdead.survival.client.model.AdvancedZombieModel;
-import com.craftingdead.survival.world.entity.monster.AdvancedZombie;
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.world.entity.monster.Zombie;
 
 public class AdvancedZombieRenderer extends
-    AbstractAdvancedZombieRenderer<AdvancedZombie, AdvancedZombieModel<AdvancedZombie>> {
+    AbstractAdvancedZombieRenderer<Zombie, AdvancedZombieModel<Zombie>> {
 
   public AdvancedZombieRenderer(EntityRendererProvider.Context context) {
     super(context, new AdvancedZombieModel<>(

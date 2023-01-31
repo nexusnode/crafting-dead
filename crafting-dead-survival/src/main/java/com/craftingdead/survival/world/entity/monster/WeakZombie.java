@@ -18,7 +18,6 @@
 
 package com.craftingdead.survival.world.entity.monster;
 
-import java.util.Objects;
 import org.jetbrains.annotations.Nullable;
 import com.craftingdead.survival.CraftingDeadSurvival;
 import net.minecraft.nbt.CompoundTag;
@@ -28,17 +27,18 @@ import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.SpawnGroupData;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
 
-public class WeakZombie extends AdvancedZombie {
+public class WeakZombie extends Zombie {
 
   public WeakZombie(EntityType<? extends WeakZombie> type, Level world) {
     super(type, world);
   }
 
   public static AttributeSupplier.Builder createAttributes() {
-    return AdvancedZombie.attributeTemplate()
+    return Zombie.createAttributes()
         .add(Attributes.FOLLOW_RANGE, 25.0D)
         .add(Attributes.MAX_HEALTH, 5.0D)
         .add(Attributes.ATTACK_DAMAGE, 2.0D);
@@ -49,12 +49,10 @@ public class WeakZombie extends AdvancedZombie {
   public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty,
       MobSpawnType spawnType, @Nullable SpawnGroupData groupData, @Nullable CompoundTag tag) {
     groupData = super.finalizeSpawn(level, difficulty, spawnType, groupData, tag);
-    if (!level.isClientSide()) {
-      Objects.requireNonNull(this.getAttribute(Attributes.MAX_HEALTH))
-          .setBaseValue(CraftingDeadSurvival.serverConfig.weakZombieMaxHealth.get());
-      Objects.requireNonNull(this.getAttribute(Attributes.ATTACK_DAMAGE))
-          .setBaseValue(CraftingDeadSurvival.serverConfig.weakZombieAttackDamage.get());
-    }
+    this.getAttribute(Attributes.MAX_HEALTH)
+        .setBaseValue(CraftingDeadSurvival.serverConfig.weakZombieMaxHealth.get());
+    this.getAttribute(Attributes.ATTACK_DAMAGE)
+        .setBaseValue(CraftingDeadSurvival.serverConfig.weakZombieAttackDamage.get());
     return groupData;
   }
 }

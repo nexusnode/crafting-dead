@@ -1,0 +1,13 @@
+{
+    "required": true,
+    "package": "com.craftingdead.survival.mixin",
+    "compatibilityLevel": "JAVA_17",
+    "refmap": "craftingdeadsurvival.refmap.json",
+    "mixins": [
+        "ZombieMixin",
+        "SpawnPlacementsMixin"
+    ],
+    "injectors": {
+        "defaultRequire": 1
+    }
+}

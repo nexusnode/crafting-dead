@@ -20,15 +20,17 @@ package com.craftingdead.survival.client.renderer.entity;
 
 import com.craftingdead.core.client.renderer.entity.layers.ClothingLayer;
 import com.craftingdead.core.client.renderer.entity.layers.EquipmentLayer;
+import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.inventory.ModEquipmentSlot;
 import com.craftingdead.survival.CraftingDeadSurvival;
 import com.craftingdead.survival.client.model.AdvancedZombieModel;
-import com.craftingdead.survival.world.entity.monster.AdvancedZombie;
+import com.craftingdead.survival.world.entity.extension.ZombieHandler;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.HumanoidMobRenderer;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.monster.Zombie;
 
-public abstract class AbstractAdvancedZombieRenderer<T extends AdvancedZombie, M extends AdvancedZombieModel<T>>
+public abstract class AbstractAdvancedZombieRenderer<T extends Zombie, M extends AdvancedZombieModel<T>>
     extends HumanoidMobRenderer<T, M> {
 
   public AbstractAdvancedZombieRenderer(EntityRendererProvider.Context context, M model,
@@ -55,8 +57,10 @@ public abstract class AbstractAdvancedZombieRenderer<T extends AdvancedZombie, M
   }
 
   @Override
-  public ResourceLocation getTextureLocation(AdvancedZombie entity) {
+  public ResourceLocation getTextureLocation(Zombie entity) {
+    var textureIndex =
+        LivingExtension.getOrThrow(entity).getHandlerOrThrow(ZombieHandler.TYPE).getTextureIndex();
     return new ResourceLocation(CraftingDeadSurvival.ID, "textures/entity/zombie/zombie"
-        + entity.getTextureNumber() + ".png");
+        + textureIndex + ".png");
   }
 }

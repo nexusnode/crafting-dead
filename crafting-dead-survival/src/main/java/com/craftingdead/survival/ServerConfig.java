@@ -45,7 +45,6 @@ public class ServerConfig {
   // ================================================================================
 
   public final ForgeConfigSpec.BooleanValue zombiesEnabled;
-  public final ForgeConfigSpec.BooleanValue babyZombiesEnabled;
   public final ForgeConfigSpec.BooleanValue advancedZombiesEnabled;
   public final ForgeConfigSpec.BooleanValue tankZombiesEnabled;
   public final ForgeConfigSpec.BooleanValue fastZombiesEnabled;
@@ -83,7 +82,6 @@ public class ServerConfig {
   public final ForgeConfigSpec.DoubleValue zombieHandDropChance;
   public final ForgeConfigSpec.DoubleValue zombieClothingDropChance;
   public final ForgeConfigSpec.DoubleValue zombieAttackKnockback;
-  public final ForgeConfigSpec.BooleanValue zombieDeathLootEnabled;
 
   // ================================================================================
   // Abilities Values
@@ -225,9 +223,6 @@ public class ServerConfig {
       this.zombiesEnabled = builder
           .translation("options.craftingdeadsurvival.server.zombies.spawning.enable")
           .define("zombiesEnabled", true);
-      this.babyZombiesEnabled = builder
-          .translation("options.craftingdeadsurvival.server.zombies.spawning.baby_zombies.enable")
-          .define("babyZombiesEnabled", true);
       this.advancedZombiesEnabled = builder
           .translation("options.craftingdeadsurvival.server.zombies.spawning.advanced_zombie.enable")
           .define("advancedZombiesEnabled", true);
@@ -307,10 +302,6 @@ public class ServerConfig {
           .translation("options.craftingdeadsurvival.server.zombies.misc.attack_knockback")
           .comment("Additional knockback given to all zombies")
           .defineInRange("zombieAttackKnockback", 0D, 0D, 5.0D);
-      this.zombieDeathLootEnabled = builder
-          .translation("options.craftingdeadsurvival.server.zombies.misc.death_drops")
-          .comment("If disabled, all zombies will not drop any loot")
-          .define("zombieDeathLootEnabled", true);
       builder.pop();
     }
     builder.pop();
