@@ -108,7 +108,7 @@ public class ServerListView<S extends ServerList> extends ParentView {
   }
 
   @Override
-  protected void added() {
+  public void added() {
     super.added();
     int delay = 0;
     for (var view : this.listView.getChildren()) {
@@ -132,7 +132,7 @@ public class ServerListView<S extends ServerList> extends ParentView {
   }
 
   @Override
-  protected void removed() {
+  public void removed() {
     super.removed();
     if (this.refreshTask != null) {
       this.refreshTask.dispose();

@@ -4,8 +4,8 @@ import java.util.Set;
 import org.jetbrains.annotations.Nullable;
 import com.google.common.base.Objects;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.TitleScreen;
-import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.rocketpowered.common.Guild;
 import net.rocketpowered.common.GuildInvite;
@@ -17,6 +17,8 @@ import net.rocketpowered.sdk.Rocket;
 import net.rocketpowered.sdk.interf.GameClientInterface;
 import reactor.core.Disposable;
 import reactor.core.scheduler.Schedulers;
+import sm0keysa1m0n.bliss.StyledText;
+import sm0keysa1m0n.bliss.minecraft.AdapterUtil;
 import sm0keysa1m0n.bliss.minecraft.view.PanoramaView;
 import sm0keysa1m0n.bliss.view.ParentView;
 import sm0keysa1m0n.bliss.view.TextView;
@@ -24,6 +26,8 @@ import sm0keysa1m0n.bliss.view.View;
 import sm0keysa1m0n.bliss.view.event.ActionEvent;
 
 public class GuildView extends ParentView {
+
+  private final Minecraft minecraft = Minecraft.getInstance();
 
   private final ParentView contentView = new ParentView(new Properties().id("content"));
 
@@ -47,7 +51,6 @@ public class GuildView extends ParentView {
   @Nullable
   private Disposable guildMemberListener;
 
-  @SuppressWarnings("removal")
   public GuildView() {
     super(new Properties());
 
@@ -62,23 +65,23 @@ public class GuildView extends ParentView {
 
     this.manageMembersButtonView = new TextView(new Properties().focusable(true))
         .setText(ManageMembersView.TITLE);
-    this.manageMembersButtonView.addListener(ActionEvent.class,
+    this.manageMembersButtonView.eventBus().subscribe(ActionEvent.class,
         event -> this.setContentView(manageMembersView));
 
     this.yourGuildButtonView = new TextView(new Properties().focusable(true))
         .setText(YourGuildView.TITLE);
-    this.yourGuildButtonView.addListener(ActionEvent.class,
+    this.yourGuildButtonView.eventBus().subscribe(ActionEvent.class,
         event -> this.setContentView(this.yourGuildView));
 
     this.invitesButtonView = new TextView(new Properties().focusable(true))
         .setText(InvitesView.TITLE);
-    this.invitesButtonView.addListener(ActionEvent.class,
+    this.invitesButtonView.eventBus().subscribe(ActionEvent.class,
         event -> this.setContentView(this.invitesView));
     this.sideBarView.addChild(this.invitesButtonView);
 
     this.createGuildButtonView = new TextView(new Properties().focusable(true))
         .setText(CreateGuildDialogView.TITLE);
-    this.createGuildButtonView.addListener(ActionEvent.class,
+    this.createGuildButtonView.eventBus().subscribe(ActionEvent.class,
         event -> this.setContentView(new CreateGuildDialogView((name, tag) -> {
           Rocket.gameClientInterface()
               .ifPresentOrElse(connection -> connection.createGuild(name, tag)
@@ -99,14 +102,13 @@ public class GuildView extends ParentView {
     this.contentView.replace(view);
   }
 
-  private Component makeInvitesText(Set<GuildInvite> invites) {
+  private StyledText makeInvitesText(Set<GuildInvite> invites) {
     return invites.isEmpty()
         ? InvitesView.TITLE
-        : InvitesView.TITLE.copy().append(
-            new TextComponent(" (" + invites.size() + ")").withStyle(ChatFormatting.LIGHT_PURPLE));
+        : AdapterUtil.createStyledText(new TextComponent(InvitesView.TITLE.text()).append(
+            new TextComponent(" (" + invites.size() + ")").withStyle(ChatFormatting.LIGHT_PURPLE)));
   }
 
-  @SuppressWarnings("removal")
   private void handleProfile(SocialProfile profile, GameClientInterface gateway) {
     this.invitesButtonView.setText(this.makeInvitesText(profile.guildInvites()));
 
@@ -163,9 +165,8 @@ public class GuildView extends ParentView {
     }
   }
 
-  @SuppressWarnings("removal")
   @Override
-  protected void added() {
+  public void added() {
     super.added();
     this.profileListener = Rocket.gameClientInterfaceFeed()
         .flatMap(api -> api.getSocialProfileFeed()
@@ -176,7 +177,7 @@ public class GuildView extends ParentView {
   }
 
   @Override
-  protected void removed() {
+  public void removed() {
     super.removed();
     this.selfMember = null;
     this.guild = null;

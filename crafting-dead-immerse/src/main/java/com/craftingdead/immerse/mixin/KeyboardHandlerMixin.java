@@ -31,7 +31,7 @@ import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.rocketpowered.connector.client.gui.guild.GuildView;
 import net.rocketpowered.sdk.Rocket;
-import sm0keysa1m0n.bliss.view.ViewScreen;
+import sm0keysa1m0n.bliss.minecraft.view.MinecraftViewScreen;
 
 @Mixin(KeyboardHandler.class)
 public class KeyboardHandlerMixin {
@@ -44,7 +44,7 @@ public class KeyboardHandlerMixin {
           && (modifiers & GLFW.GLFW_MOD_SHIFT) == GLFW.GLFW_MOD_SHIFT
           && Rocket.gameClientInterface().isPresent()) {
         callbackInfo.cancel();
-        var screen = new ViewScreen(TextComponent.EMPTY, new GuildView());
+        var screen = new MinecraftViewScreen(TextComponent.EMPTY, new GuildView());
         screen.setStylesheets(List.of(new ResourceLocation(CraftingDeadImmerse.ID, "guild")));
         Minecraft.getInstance().setScreen(screen);
       }

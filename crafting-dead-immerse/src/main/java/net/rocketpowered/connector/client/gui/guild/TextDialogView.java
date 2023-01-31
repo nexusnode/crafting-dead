@@ -4,6 +4,7 @@ import java.util.function.Consumer;
 import com.craftingdead.immerse.client.gui.screen.Theme;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
+import sm0keysa1m0n.bliss.minecraft.AdapterUtil;
 import sm0keysa1m0n.bliss.view.ParentView;
 import sm0keysa1m0n.bliss.view.TextFieldView;
 import sm0keysa1m0n.bliss.view.TextView;
@@ -14,7 +15,7 @@ public class TextDialogView extends ParentView {
       Runnable cancelListener) {
     super(new Properties().styleClasses("dialog", "blur"));
 
-    this.addChild(new TextView(new Properties()).setText(message));
+    this.addChild(new TextView(new Properties()).setText(AdapterUtil.createStyledText(message)));
 
     var usernameFieldView = new TextFieldView(new Properties());
     usernameFieldView.setPlaceholder(placeholder);

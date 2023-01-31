@@ -40,11 +40,11 @@ public class FogView extends View {
   }
 
   @Override
-  public void renderContent(PoseStack poseStack, int mouseX, int mouseY, float paritalTicks) {
+  public void renderContent(int mouseX, int mouseY) {
     var fogSize = ObjectFit.COVER.getSize(1920, 1080, this.getScaledContentWidth(),
         this.getScaledContentHeight());
-    float fogWidth = fogSize.x;
-    float fogHeight = fogSize.y;
+    float fogWidth = fogSize.width();
+    float fogHeight = fogSize.height();
 
     final float pct =
         Mth.clamp((Util.getMillis() - fogStartTime) / (1000.0F * 100.0F * 2.0F), 0.0F, 1.0F);
@@ -53,26 +53,24 @@ public class FogView extends View {
     }
 
     this.graphicsContext.exitManaged();
-    poseStack.pushPose();
-    {
-      poseStack.scale(4F, 4F, 4F);
-      RenderSystem.enableBlend();
+    var poseStack = new PoseStack();
+    poseStack.scale(4F, 4F, 4F);
+    RenderSystem.enableBlend();
 
-      RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 0.3F * this.getAlpha());
+    RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 0.3F * this.getAlpha());
 
-      RenderSystem.setShaderTexture(0, SMOKE_TEXTURE);
+    RenderSystem.setShaderTexture(0, SMOKE_TEXTURE);
 
-      final float smokeX = this.getScaledX() + pct * this.getContentWidth();
+    final float smokeX = this.getScaledX() + pct * this.getContentWidth();
 
-      RenderUtil.blit(poseStack, smokeX, this.getScaledContentY(), fogWidth, fogHeight);
-      RenderUtil.blit(poseStack, smokeX - fogWidth, this.getScaledContentY(), fogWidth,
-          fogHeight);
+    RenderUtil.blit(poseStack, smokeX, this.getScaledContentY(), fogWidth, fogHeight);
+    RenderUtil.blit(poseStack, smokeX - fogWidth, this.getScaledContentY(), fogWidth,
+        fogHeight);
 
-      RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+    RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 
-      RenderSystem.disableBlend();
-    }
-    poseStack.popPose();
+    RenderSystem.disableBlend();
+
     this.graphicsContext.enterManaged();
   }
 }

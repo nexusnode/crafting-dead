@@ -3,8 +3,8 @@ package net.rocketpowered.connector.client.gui.guild;
 import com.craftingdead.immerse.client.gui.screen.Theme;
 import com.mojang.authlib.GameProfile;
 import io.github.humbleui.skija.FontMgr;
-import net.minecraft.ChatFormatting;
-import net.minecraft.network.chat.TextComponent;
+import io.github.humbleui.skija.FontStyle;
+import net.minecraft.client.Minecraft;
 import net.rocketpowered.common.Guild;
 import net.rocketpowered.common.GuildMember;
 import net.rocketpowered.common.GuildMemberLeaveEvent;
@@ -15,6 +15,7 @@ import net.rocketpowered.sdk.interf.GameClientInterface;
 import reactor.core.Disposable;
 import reactor.core.scheduler.Schedulers;
 import sm0keysa1m0n.bliss.Color;
+import sm0keysa1m0n.bliss.StyledText;
 import sm0keysa1m0n.bliss.minecraft.view.AvatarView;
 import sm0keysa1m0n.bliss.view.ParentView;
 import sm0keysa1m0n.bliss.view.TextView;
@@ -84,8 +85,9 @@ public class MemberView extends ParentView {
       color = Color.AQUA;
     }
 
-    this.rankView.setText(new TextComponent(owner ? "Owner" : rank.getDisplayName().orElse(""))
-        .withStyle(ChatFormatting.ITALIC));
+    this.rankView.setText(new StyledText(
+        owner ? "Owner" : rank.getDisplayName().orElse(""),
+        FontStyle.ITALIC, null));
     this.rankView.getStyle().color.defineState(color);
 
     this.getStyle().borderLeftColor.defineState(color);
@@ -97,9 +99,8 @@ public class MemberView extends ParentView {
     this.nameView.getStyle().color.defineState(color);
   }
 
-  @SuppressWarnings("removal")
   @Override
-  protected void added() {
+  public void added() {
     super.added();
     this.removeListener = Rocket.gameClientInterfaceFeed()
         .flatMap(GameClientInterface::getGuildEventFeed)
@@ -107,7 +108,7 @@ public class MemberView extends ParentView {
         .filter(event -> event.user().equals(this.member.user()))
         .next()
         .subscribeOn(Schedulers.boundedElastic())
-        .publishOn(Schedulers.fromExecutor(this.minecraft))
+        .publishOn(Schedulers.fromExecutor(Minecraft.getInstance()))
         .subscribe(__ -> {
           if (this.hasParent()) {
             var parent = this.getParent();
@@ -119,15 +120,14 @@ public class MemberView extends ParentView {
     this.presenceListener = Rocket.gameClientInterfaceFeed()
         .flatMap(api -> api.getUserPresenceFeed(this.member.user().id()))
         .subscribeOn(Schedulers.boundedElastic())
-        .publishOn(Schedulers.fromExecutor(this.minecraft))
+        .publishOn(Schedulers.fromExecutor(Minecraft.getInstance()))
         .subscribe(this::updatePresence);
   }
 
   @Override
-  protected void removed() {
+  public void removed() {
     super.removed();
     this.removeListener.dispose();
     this.presenceListener.dispose();
-
   }
 }

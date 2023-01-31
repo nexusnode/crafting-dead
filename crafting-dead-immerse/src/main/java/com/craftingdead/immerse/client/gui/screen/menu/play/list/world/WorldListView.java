@@ -19,7 +19,6 @@
 package com.craftingdead.immerse.client.gui.screen.menu.play.list.world;
 
 import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import org.jdesktop.core.animation.timing.Animator;
@@ -28,11 +27,12 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import com.craftingdead.immerse.client.gui.screen.Theme;
 import com.mojang.logging.LogUtils;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.level.storage.LevelStorageException;
-import net.minecraft.world.level.storage.LevelSummary;
 import sm0keysa1m0n.bliss.Animation;
+import sm0keysa1m0n.bliss.minecraft.view.MinecraftViewScreen;
 import sm0keysa1m0n.bliss.style.Percentage;
 import sm0keysa1m0n.bliss.style.States;
 import sm0keysa1m0n.bliss.view.ParentView;
@@ -65,8 +65,8 @@ public class WorldListView extends ParentView {
 
     var createButton = Theme.createBlueButton(
         new TranslatableComponent("view.world_list.button.create"),
-        () -> this.getScreen()
-            .keepOpenAndSetScreen(CreateWorldScreen.createFresh(this.getScreen())));
+        () -> ((MinecraftViewScreen) this.getScreen()).keepOpenAndSetScreen(
+            CreateWorldScreen.createFresh((MinecraftViewScreen) this.getScreen())));
 
     this.editButton = Theme.createBlueButton(
         new TranslatableComponent("view.world_list.button.edit"),
@@ -103,7 +103,7 @@ public class WorldListView extends ParentView {
   }
 
   @Override
-  protected void added() {
+  public void added() {
     super.added();
     int delay = 0;
     for (var view : this.listView.getChildren()) {
@@ -141,13 +141,12 @@ public class WorldListView extends ParentView {
     this.recreateButton.setEnabled(enabled);
   }
 
-  @SuppressWarnings("removal")
   private void loadWorlds() {
     try {
-      List<LevelSummary> saveList = this.minecraft.getLevelSource().getLevelList();
-      Collections.sort(saveList);
-      for (LevelSummary worldSummary : saveList) {
-        this.listView.addChild(new WorldItemView(worldSummary, this));
+      var levelList = Minecraft.getInstance().getLevelSource().getLevelList();
+      Collections.sort(levelList);
+      for (var levelSummary : levelList) {
+        this.listView.addChild(new WorldItemView(levelSummary, this));
       }
     } catch (LevelStorageException e) {
       logger.error("Unable to load save list", e);

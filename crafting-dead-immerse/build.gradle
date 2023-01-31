@@ -92,6 +92,13 @@ configurations {
 
 dependencies {
     implementation project(':crafting-dead-core')
+    
+    minecraftLibrary(group: 'bliss', name: 'bliss-common', version: '0.0.3') {
+        exclude group: 'org.slf4j', module: 'slf4j-api'
+        exclude group: 'com.google.guava', module: 'guava'
+    }
+    implementation fg.deobf(group: 'bliss', name: 'bliss-minecraft', version: '0.0.3')
+    
     shadedLibrary(group: 'org.lwjgl', name: 'lwjgl-yoga', version: lwjgl_version) {
         exclude group: 'org.lwjgl', module: 'lwjgl'
     }

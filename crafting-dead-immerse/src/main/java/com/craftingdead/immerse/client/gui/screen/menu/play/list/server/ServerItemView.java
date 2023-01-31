@@ -25,19 +25,23 @@ import com.craftingdead.immerse.client.gui.screen.ConnectView;
 import com.google.common.collect.Iterators;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
-import net.minecraft.network.chat.Component;
+import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.TextComponent;
 import reactor.core.Disposable;
 import reactor.core.scheduler.Schedulers;
+import sm0keysa1m0n.bliss.Color;
+import sm0keysa1m0n.bliss.StyledText;
+import sm0keysa1m0n.bliss.TextVisitor;
+import sm0keysa1m0n.bliss.minecraft.AdapterUtil;
+import sm0keysa1m0n.bliss.minecraft.view.MinecraftViewScreen;
 import sm0keysa1m0n.bliss.view.ParentView;
 import sm0keysa1m0n.bliss.view.TextView;
 import sm0keysa1m0n.bliss.view.event.ActionEvent;
 
 class ServerItemView extends ParentView {
 
-  private static final Component QUESTION_MARK =
-      new TextComponent("?").withStyle(ChatFormatting.DARK_GRAY);
-  private static final Component ELLIPSES = new TextComponent("...");
+  private static final StyledText QUESTION_MARK = StyledText.of("?", Color.DARK_GRAY);
+  private static final StyledText ELLIPSES = StyledText.of("...");
 
   private final Iterator<String> animation = Iterators.cycle("O o o", "o O o", "o o O");
 
@@ -64,11 +68,11 @@ class ServerItemView extends ParentView {
     this.pingView = new TextView(new Properties().id("ping"));
     this.playerCountView = new TextView(new Properties().id("players"));
 
-    this.addListener(ActionEvent.class, event -> this.connect());
+    this.eventBus().subscribe(ActionEvent.class, event -> this.connect());
     this.addChild(this.descriptionView);
     this.addChild(new TextView(new Properties().id("map"))
-        .setText(new TextComponent(this.serverEntry.map() == null ? "-" : this.serverEntry.map())
-            .withStyle(ChatFormatting.GRAY))
+        .setText(StyledText.of(
+            this.serverEntry.map() == null ? "-" : this.serverEntry.map(), Color.GRAY))
         .setWrap(false));
     this.addChild(this.pingView);
     this.addChild(this.playerCountView);
@@ -82,7 +86,7 @@ class ServerItemView extends ParentView {
     long currentTime = Util.getMillis();
     if (this.lastAnimationUpdateMs != -1L && currentTime - this.lastAnimationUpdateMs >= 100L) {
       this.lastAnimationUpdateMs = currentTime;
-      this.descriptionView.setText(new TextComponent(this.animation.next()));
+      this.descriptionView.setText(this.animation.next());
     }
   }
 
@@ -103,26 +107,25 @@ class ServerItemView extends ParentView {
   }
 
   @Override
-  protected void removed() {
+  public void removed() {
     super.removed();
     if (this.pingTask != null) {
       this.pingTask.dispose();
     }
   }
 
-  @SuppressWarnings("removal")
   public void connect() {
     // Call this before creating a ConnectView instance.
-    this.getScreen().keepOpen();
-    this.minecraft.setScreen(
-        ConnectView.createScreen(this.getScreen(), this.serverEntry.toServerAddress()));
+    var screen = (MinecraftViewScreen) this.getScreen();
+    screen.keepOpen();
+    Minecraft.getInstance().setScreen(
+        ConnectView.createScreen(screen, this.serverEntry.toServerAddress()));
   }
 
   public ServerEntry getServerEntry() {
     return this.serverEntry;
   }
 
-  @SuppressWarnings("removal")
   public void ping() {
     if (this.pingTask != null && !this.pingTask.isDisposed()) {
       return;
@@ -134,9 +137,10 @@ class ServerItemView extends ParentView {
     this.lastAnimationUpdateMs = 0;
 
     this.pingTask = this.list.getStatusProvider().checkStatus(this.serverEntry)
-        .publishOn(Schedulers.fromExecutor(this.minecraft))
+        .publishOn(Schedulers.fromExecutor(Minecraft.getInstance()))
         .doOnNext(this::handlePingResult)
         .doOnError(PingError.class, this::handlePingError)
+        .onErrorComplete()
         .subscribe();
   }
 
@@ -144,42 +148,42 @@ class ServerItemView extends ParentView {
     var status = result.serverStatus();
     this.descriptionView.setText(status.getDescription() == null
         ? QUESTION_MARK
-        : status.getDescription());
+        : AdapterUtil.createStyledText(status.getDescription()));
     if (result.responseTimeMs() >= 0) {
       var pingMs = result.responseTimeMs();
-      ChatFormatting pingColor;
+      Color pingColor;
       if (pingMs < 200) {
-        pingColor = ChatFormatting.GREEN;
+        pingColor = Color.GREEN;
       } else if (pingMs < 400) {
-        pingColor = ChatFormatting.YELLOW;
+        pingColor = Color.YELLOW;
       } else if (pingMs < 1200) {
-        pingColor = ChatFormatting.RED;
+        pingColor = Color.RED;
       } else {
-        pingColor = ChatFormatting.DARK_RED;
+        pingColor = Color.DARK_RED;
       }
-      this.pingView.setText(new TextComponent(pingMs + "ms").withStyle(pingColor));
+      this.pingView.setText(StyledText.of(pingMs + "ms", pingColor));
     } else {
       this.pingView.setText(QUESTION_MARK);
     }
 
     var players = status.getPlayers();
     this.playerCountView.setText(players == null
-        ? QUESTION_MARK
+        ? TextVisitor.of(QUESTION_MARK)
         : formatPlayerCount(players.getNumPlayers(), players.getMaxPlayers()));
 
     this.lastAnimationUpdateMs = -1L;
   }
 
   private void handlePingError(PingError error) {
-    this.descriptionView.setText(
-        error.getDescription().copy().withStyle(ChatFormatting.RED));
+    this.descriptionView.setText(AdapterUtil.createTextVisitor(
+        error.getDescription().copy().withStyle(ChatFormatting.RED)));
     this.lastAnimationUpdateMs = -1L;
   }
 
-  private static Component formatPlayerCount(int playerCount, int maxPlayerCount) {
-    return new TextComponent(String.format("%,d", playerCount))
+  private static TextVisitor formatPlayerCount(int playerCount, int maxPlayerCount) {
+    return AdapterUtil.createTextVisitor(new TextComponent(String.format("%,d", playerCount))
         .append(new TextComponent(" / ").withStyle(ChatFormatting.GRAY))
         .append(String.format("%,d", maxPlayerCount))
-        .withStyle(ChatFormatting.WHITE);
+        .withStyle(ChatFormatting.WHITE));
   }
 }

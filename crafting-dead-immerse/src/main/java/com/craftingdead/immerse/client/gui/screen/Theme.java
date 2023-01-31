@@ -25,19 +25,20 @@ import org.jdesktop.core.animation.timing.KeyFrames;
 import org.jdesktop.core.animation.timing.interpolators.SplineInterpolator;
 import org.jetbrains.annotations.Nullable;
 import com.craftingdead.immerse.CraftingDeadImmerse;
+import com.craftingdead.immerse.client.gui.GuiUtil;
 import com.craftingdead.immerse.sounds.ImmerseSoundEvents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import sm0keysa1m0n.bliss.Animation;
 import sm0keysa1m0n.bliss.Color;
-import sm0keysa1m0n.bliss.minecraft.MinecraftUtil;
+import sm0keysa1m0n.bliss.minecraft.AdapterUtil;
 import sm0keysa1m0n.bliss.view.ImageView;
 import sm0keysa1m0n.bliss.view.ParentView;
 import sm0keysa1m0n.bliss.view.TextView;
 import sm0keysa1m0n.bliss.view.View;
 import sm0keysa1m0n.bliss.view.View.Properties;
 import sm0keysa1m0n.bliss.view.event.ActionEvent;
-import sm0keysa1m0n.bliss.view.event.AddedEvent;
+import sm0keysa1m0n.bliss.view.event.MouseEnterEvent;
 import sm0keysa1m0n.bliss.view.event.RemovedEvent;
 
 public class Theme {
@@ -86,10 +87,11 @@ public class Theme {
       View.Properties properties) {
     var view = new ParentView(properties.styleClasses("button").focusable(true));
 
-    view.addChild(new TextView(new View.Properties().id("label")).setText(text));
+    view.addChild(new TextView(new View.Properties().id("label"))
+        .setText(AdapterUtil.createStyledText(text)));
 
-    view.addActionSound(ImmerseSoundEvents.BUTTON_CLICK.get());
-    view.addListener(ActionEvent.class, event -> actionListener.run());
+    GuiUtil.addEventSound(view, ActionEvent.class, ImmerseSoundEvents.BUTTON_CLICK);
+    view.eventBus().subscribe(ActionEvent.class, __ -> actionListener.run());
 
     return view;
   }
@@ -97,16 +99,16 @@ public class Theme {
   public static ImageView createImageButton(ResourceLocation image, Runnable actionListener,
       View.Properties properties) {
     var view = new ImageView(properties.styleClasses("image-button").focusable(true));
-    view.setImage(MinecraftUtil.createImageAccess(image));
-    view.addActionSound(ImmerseSoundEvents.BUTTON_CLICK.get());
-    view.addHoverSound(ImmerseSoundEvents.MAIN_MENU_HOVER.get());
-    view.addListener(ActionEvent.class, event -> actionListener.run());
+    view.setImage(AdapterUtil.createImageAccess(image));
+    GuiUtil.addEventSound(view, ActionEvent.class, ImmerseSoundEvents.BUTTON_CLICK);
+    GuiUtil.addEventSound(view, MouseEnterEvent.class, ImmerseSoundEvents.MAIN_MENU_HOVER);
+    view.eventBus().subscribe(ActionEvent.class, __ -> actionListener.run());
     return view;
   }
 
   public static View createBackground() {
     var view = new ImageView(new View.Properties().styleClasses("background"))
-        .setImage(MinecraftUtil.createImageAccess(
+        .setImage(AdapterUtil.createImageAccess(
             new ResourceLocation(CraftingDeadImmerse.ID, "textures/gui/background.png")));
 
     var animator = new Animator.Builder()
@@ -136,8 +138,8 @@ public class Theme {
         .setRepeatBehavior(RepeatBehavior.REVERSE)
         .build();
 
-    view.addListener(AddedEvent.class, __ -> animator.start());
-    view.addListener(RemovedEvent.class, __ -> animator.stop());
+    view.eventBus().subscribe(ActionEvent.class, __ -> animator.start());
+    view.eventBus().subscribe(RemovedEvent.class, __ -> animator.stop());
 
     return view;
   }

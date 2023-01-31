@@ -23,8 +23,8 @@ import java.util.concurrent.TimeUnit;
 import org.jdesktop.core.animation.timing.Animator;
 import org.jdesktop.core.animation.timing.TimingTargetAdapter;
 import sm0keysa1m0n.bliss.Animation;
+import sm0keysa1m0n.bliss.minecraft.ViewUtil;
 import sm0keysa1m0n.bliss.view.ParentView;
-import sm0keysa1m0n.bliss.view.ViewUtil;
 
 public class HomeView extends ParentView implements TransitionView {
 
@@ -69,13 +69,13 @@ public class HomeView extends ParentView implements TransitionView {
   }
 
   @Override
-  protected void added() {
+  public void added() {
     super.added();
     this.entranceAnimator.start();
   }
 
   @Override
-  protected void removed() {
+  public void removed() {
     super.removed();
     this.entranceAnimator.stop();
     this.exitAnimator.stop();

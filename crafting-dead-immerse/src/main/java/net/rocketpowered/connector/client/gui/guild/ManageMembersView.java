@@ -5,9 +5,10 @@ import java.util.Map;
 import java.util.function.Consumer;
 import org.bson.types.ObjectId;
 import org.jetbrains.annotations.Nullable;
+import com.craftingdead.immerse.client.gui.GuiUtil;
 import com.craftingdead.immerse.client.gui.screen.Theme;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.language.I18n;
-import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.rocketpowered.common.Guild;
@@ -20,6 +21,7 @@ import net.rocketpowered.sdk.interf.GameClientInterface;
 import reactor.core.Disposable;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
+import sm0keysa1m0n.bliss.StyledText;
 import sm0keysa1m0n.bliss.view.ParentView;
 import sm0keysa1m0n.bliss.view.TextView;
 import sm0keysa1m0n.bliss.view.View;
@@ -27,8 +29,9 @@ import sm0keysa1m0n.bliss.view.event.RemovedEvent;
 
 public class ManageMembersView extends ParentView {
 
-  public static final Component TITLE =
-      new TranslatableComponent("view.guild.manage_members");
+  public static final StyledText TITLE = GuiUtil.translatable("view.guild.manage_members");
+
+  private final Minecraft minecraft = Minecraft.getInstance();
 
   private final ParentView membersListView;
 
@@ -52,7 +55,6 @@ public class ManageMembersView extends ParentView {
 
   private Disposable listener;
 
-  @SuppressWarnings("removal")
   public ManageMembersView(Consumer<View> viewConsumer) {
     super(new Properties().styleClasses("page", "blur"));
 
@@ -147,7 +149,6 @@ public class ManageMembersView extends ParentView {
         && GuildPermission.KICK.contains(permissions));
   }
 
-  @SuppressWarnings("removal")
   private void updateGuild(GameClientInterface gateway, Guild guild) {
     if (guild == null) {
       return;
@@ -177,7 +178,7 @@ public class ManageMembersView extends ParentView {
     if (view.hasParent()) {
       view.updateMember(member);
     } else {
-      view.addListener(RemovedEvent.class,
+      view.eventBus().subscribe(RemovedEvent.class,
           __ -> this.memberViews.remove(member.user().id(), view));
       this.membersListView.addChild(view);
     }
@@ -202,9 +203,8 @@ public class ManageMembersView extends ParentView {
     }
   }
 
-  @SuppressWarnings("removal")
   @Override
-  protected void added() {
+  public void added() {
     super.added();
     this.listener = Rocket.gameClientInterfaceFeed()
         .flatMap(gateway -> Mono.when(
@@ -225,7 +225,7 @@ public class ManageMembersView extends ParentView {
   }
 
   @Override
-  protected void removed() {
+  public void removed() {
     super.removed();
     this.listener.dispose();
     this.guild = null;

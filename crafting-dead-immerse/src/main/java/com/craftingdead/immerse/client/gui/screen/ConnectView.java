@@ -26,12 +26,13 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import org.slf4j.Logger;
 import com.craftingdead.immerse.CraftingDeadImmerse;
+import com.craftingdead.immerse.client.gui.GuiUtil;
 import com.google.common.collect.Iterators;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.mojang.logging.LogUtils;
-import net.minecraft.ChatFormatting;
 import net.minecraft.DefaultUncaughtExceptionHandler;
 import net.minecraft.Util;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.chat.NarratorChatListener;
 import net.minecraft.client.gui.screens.ConnectScreen;
 import net.minecraft.client.gui.screens.DisconnectedScreen;
@@ -43,15 +44,16 @@ import net.minecraft.client.multiplayer.resolver.ServerNameResolver;
 import net.minecraft.network.Connection;
 import net.minecraft.network.ConnectionProtocol;
 import net.minecraft.network.chat.CommonComponents;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.network.protocol.handshake.ClientIntentionPacket;
 import net.minecraft.network.protocol.login.ServerboundHelloPacket;
 import net.minecraft.resources.ResourceLocation;
+import sm0keysa1m0n.bliss.Color;
+import sm0keysa1m0n.bliss.StyledText;
+import sm0keysa1m0n.bliss.minecraft.AdapterUtil;
+import sm0keysa1m0n.bliss.minecraft.view.MinecraftViewScreen;
 import sm0keysa1m0n.bliss.view.ParentView;
 import sm0keysa1m0n.bliss.view.TextView;
-import sm0keysa1m0n.bliss.view.ViewScreen;
 
 public class ConnectView extends ParentView {
 
@@ -62,6 +64,8 @@ public class ConnectView extends ParentView {
           .setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler(logger))
           .build());
 
+  private final Minecraft minecraft = Minecraft.getInstance();
+
   private final Iterator<String> animation = Iterators.cycle("O o o", "o O o", "o o O");
   private long lastAnimationUpdateMs;
 
@@ -71,7 +75,6 @@ public class ConnectView extends ParentView {
   private final TextView statusView;
   private final TextView animationView;
 
-  @SuppressWarnings("removal")
   public ConnectView(Screen lastScreen, ServerAddress address) {
     super(new Properties());
     this.lastScreen = lastScreen;
@@ -83,7 +86,7 @@ public class ConnectView extends ParentView {
     this.addChild(dialog);
     dialog.addChild(this.statusView =
         new TextView(new Properties().id("status"))
-            .setText(new TranslatableComponent("connect.connecting")));
+            .setText(GuiUtil.translatable("connect.connecting")));
     dialog.addChild(this.animationView =
         new TextView(new Properties().id("animation"))
             .setText(this.nextAnimation()));
@@ -101,7 +104,6 @@ public class ConnectView extends ParentView {
     this.connect(address);
   }
 
-  @SuppressWarnings("removal")
   private void connect(ServerAddress serverAddress) {
     logger.info("Connecting to {}:{}", serverAddress.getHost(), serverAddress.getPort());
     executorService.submit(() -> {
@@ -117,8 +119,9 @@ public class ConnectView extends ParentView {
 
         if (!optional.isPresent()) {
           this.minecraft.execute(
-              () -> this.minecraft.setScreen(new DisconnectedScreen(ConnectView.this.getScreen(),
-                  CommonComponents.CONNECT_FAILED, ConnectScreen.UNKNOWN_HOST_MESSAGE)));
+              () -> this.minecraft.setScreen(
+                  new DisconnectedScreen((MinecraftViewScreen) ConnectView.this.getScreen(),
+                      CommonComponents.CONNECT_FAILED, ConnectScreen.UNKNOWN_HOST_MESSAGE)));
           return;
         }
 
@@ -129,7 +132,8 @@ public class ConnectView extends ParentView {
         ConnectView.this.connection.setListener(
             new ClientHandshakePacketListenerImpl(ConnectView.this.connection,
                 ConnectView.this.minecraft, ConnectView.this.lastScreen,
-                text -> this.minecraft.execute(() -> ConnectView.this.statusView.setText(text))));
+                text -> this.minecraft.execute(() -> ConnectView.this.statusView
+                    .setText(AdapterUtil.createStyledText(text)))));
         ConnectView.this.connection
             .send(new ClientIntentionPacket(inetAddress.getHostName(), inetAddress.getPort(),
                 ConnectionProtocol.LOGIN));
@@ -171,13 +175,13 @@ public class ConnectView extends ParentView {
     }
   }
 
-  private Component nextAnimation() {
-    return new TextComponent(this.animation.next()).withStyle(ChatFormatting.GRAY);
+  private StyledText nextAnimation() {
+    return StyledText.of(this.animation.next(), Color.GRAY);
   }
 
   public static Screen createScreen(Screen lastScreen, ServerAddress address) {
-    var screen =
-        new ViewScreen(NarratorChatListener.NO_TITLE, new ConnectView(lastScreen, address));
+    var screen = new MinecraftViewScreen(
+        NarratorChatListener.NO_TITLE, new ConnectView(lastScreen, address));
     screen.setStylesheets(List.of(new ResourceLocation(CraftingDeadImmerse.ID, "connect")));
     return screen;
   }

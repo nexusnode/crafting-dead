@@ -20,6 +20,7 @@ package com.craftingdead.immerse.client.gui.screen.menu.play.list.server;
 
 import org.jetbrains.annotations.Nullable;
 import com.craftingdead.immerse.client.gui.screen.Theme;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.ConnectScreen;
 import net.minecraft.client.gui.screens.DirectJoinServerScreen;
 import net.minecraft.client.gui.screens.EditServerScreen;
@@ -28,9 +29,9 @@ import net.minecraft.client.multiplayer.resolver.ServerAddress;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.TranslatableComponent;
 import reactor.core.publisher.Flux;
+import sm0keysa1m0n.bliss.minecraft.view.MinecraftViewScreen;
 import sm0keysa1m0n.bliss.view.ParentView;
 import sm0keysa1m0n.bliss.view.View;
-import sm0keysa1m0n.bliss.view.ViewScreen;
 
 public class MutableServerListView<S extends MutableServerList> extends ServerListView<S> {
 
@@ -42,36 +43,32 @@ public class MutableServerListView<S extends MutableServerList> extends ServerLi
 
   @Override
   protected ParentView createTopRowControls() {
-    @SuppressWarnings("removal")
     var directConnectButton = Theme.createBlueButton(
         new TranslatableComponent("view.mutable_server_list.button.direct_connect"), () -> {
-          ServerData tempServerData =
-              new ServerData(I18n.get("selectServer.defaultName"), "", false);
-          ViewScreen screen = this.getScreen();
+          var tempServerData = new ServerData(I18n.get("selectServer.defaultName"), "", false);
+          var screen = (MinecraftViewScreen) this.getScreen();
           screen.keepOpenAndSetScreen(new DirectJoinServerScreen(screen,
               connect -> {
                 if (connect) {
-                  ConnectScreen.startConnecting(screen, this.minecraft,
+                  ConnectScreen.startConnecting(screen, Minecraft.getInstance(),
                       ServerAddress.parseString(tempServerData.ip), tempServerData);
                 } else {
-                  this.minecraft.setScreen(screen);
+                  Minecraft.getInstance().setScreen(screen);
                 }
               },
               tempServerData));
         });
 
-    @SuppressWarnings("removal")
     var addServerButton = Theme.createGreenButton(
         new TranslatableComponent("view.mutable_server_list.button.add"), () -> {
-          ServerData tempServerData =
-              new ServerData(I18n.get("selectServer.defaultName"), "", false);
-          ViewScreen screen = this.getScreen();
+          var tempServerData = new ServerData(I18n.get("selectServer.defaultName"), "", false);
+          var screen = (MinecraftViewScreen) this.getScreen();
           screen.keepOpenAndSetScreen(new EditServerScreen(screen,
               success -> {
                 if (success) {
                   this.addServer(tempServerData.ip);
                 }
-                this.minecraft.setScreen(screen);
+                Minecraft.getInstance().setScreen(screen);
               },
               tempServerData));
         });

@@ -1,19 +1,19 @@
 package net.rocketpowered.connector.client.gui.guild;
 
 import java.util.function.BiConsumer;
+import com.craftingdead.immerse.client.gui.GuiUtil;
 import com.craftingdead.immerse.client.gui.screen.Theme;
 import net.minecraft.network.chat.CommonComponents;
-import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.rocketpowered.common.GuildConstants;
+import sm0keysa1m0n.bliss.StyledText;
 import sm0keysa1m0n.bliss.view.ParentView;
 import sm0keysa1m0n.bliss.view.TextFieldView;
 import sm0keysa1m0n.bliss.view.TextView;
 
 public class CreateGuildDialogView extends ParentView {
 
-  public static final Component TITLE = new TranslatableComponent("view.guild.create_guild");
+  public static final StyledText TITLE = GuiUtil.translatable("view.guild.create_guild");
 
   public CreateGuildDialogView(BiConsumer<String, String> resultConsumer, Runnable cancelListener) {
     super(new Properties().styleClasses("dialog", "blur"));

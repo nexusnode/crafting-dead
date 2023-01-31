@@ -25,6 +25,7 @@ import org.jdesktop.core.animation.timing.KeyFrames;
 import org.jdesktop.core.animation.timing.TimingTargetAdapter;
 import org.jdesktop.core.animation.timing.interpolators.SplineInterpolator;
 import com.craftingdead.immerse.CraftingDeadImmerse;
+import com.craftingdead.immerse.client.gui.GuiUtil;
 import com.craftingdead.immerse.client.gui.screen.Theme;
 import com.craftingdead.immerse.client.gui.screen.menu.TransitionView;
 import com.craftingdead.immerse.client.gui.screen.menu.play.list.server.JsonServerList;
@@ -33,14 +34,16 @@ import com.craftingdead.immerse.client.gui.screen.menu.play.list.server.NbtServe
 import com.craftingdead.immerse.client.gui.screen.menu.play.list.server.ServerListView;
 import com.craftingdead.immerse.client.gui.screen.menu.play.list.world.WorldListView;
 import com.craftingdead.immerse.sounds.ImmerseSoundEvents;
-import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.TranslatableComponent;
 import sm0keysa1m0n.bliss.Animation;
+import sm0keysa1m0n.bliss.minecraft.AdapterUtil;
 import sm0keysa1m0n.bliss.view.DropdownView;
 import sm0keysa1m0n.bliss.view.ParentView;
 import sm0keysa1m0n.bliss.view.TabsView;
 import sm0keysa1m0n.bliss.view.TextView;
 import sm0keysa1m0n.bliss.view.View;
+import sm0keysa1m0n.bliss.view.event.ActionEvent;
+import sm0keysa1m0n.bliss.view.event.MouseEnterEvent;
 
 public class PlayView extends ParentView implements TransitionView {
 
@@ -65,16 +68,16 @@ public class PlayView extends ParentView implements TransitionView {
 
     officialView.addChild(new TabsView(new Properties())
         .addTab(() -> this.officialContent.replace(survivalServerListView),
-            new TranslatableComponent("menu.play.tab.survival"),
+            GuiUtil.translatable("menu.play.tab.survival"),
             tab -> {
-              tab.addActionSound(ImmerseSoundEvents.TAB_SELECT.get());
-              tab.addHoverSound(ImmerseSoundEvents.TAB_HOVER.get());
+              GuiUtil.addEventSound(tab, ActionEvent.class, ImmerseSoundEvents.TAB_SELECT);
+              GuiUtil.addEventSound(tab, MouseEnterEvent.class, ImmerseSoundEvents.TAB_HOVER);
             })
         .addTab(() -> this.officialContent.replace(deathmatchServerListView),
-            new TranslatableComponent("menu.play.tab.tdm"),
+            GuiUtil.translatable("menu.play.tab.tdm"),
             tab -> {
-              tab.addActionSound(ImmerseSoundEvents.TAB_SELECT.get());
-              tab.addHoverSound(ImmerseSoundEvents.TAB_HOVER.get());
+              GuiUtil.addEventSound(tab, ActionEvent.class, ImmerseSoundEvents.TAB_SELECT);
+              GuiUtil.addEventSound(tab, MouseEnterEvent.class, ImmerseSoundEvents.TAB_HOVER);
             }));
     officialView.addChild(this.officialContent);
 
@@ -84,17 +87,25 @@ public class PlayView extends ParentView implements TransitionView {
         CraftingDeadImmerse.getInstance().getModDir().resolve("custom_servers.dat")));
 
     this.addChild(new TextView(new Properties().id("title"))
-        .setText(new TranslatableComponent("menu.play.title")));
+        .setText(AdapterUtil.createStyledText(new TranslatableComponent("menu.play.title"))));
     this.addChild(Theme.newSeparator());
-    this.addChild(new DropdownView(new Properties())
-        .setExpandSound(ImmerseSoundEvents.DROP_DOWN_EXPAND.get())
-        .setItemHoverSound(ImmerseSoundEvents.TAB_HOVER.get())
-        .addItem(new TranslatableComponent("menu.play.dropdown.official"),
+
+    var dropdownView = new DropdownView(new Properties())
+        .addItem(
+            GuiUtil.translatable("menu.play.dropdown.official"),
             () -> this.dropDownSelect(officialView))
-        .addItem(new TranslatableComponent("menu.play.dropdown.singleplayer"),
+        .addItem(
+            GuiUtil.translatable("menu.play.dropdown.singleplayer"),
             () -> this.dropDownSelect(singleplayerView))
-        .addItem(new TranslatableComponent("menu.play.dropdown.custom"),
-            () -> this.dropDownSelect(customServerListView)));
+        .addItem(
+            GuiUtil.translatable("menu.play.dropdown.custom"),
+            () -> this.dropDownSelect(customServerListView));
+    GuiUtil.addEventSound(dropdownView, DropdownView.ToggleExpandedEvent.class,
+        ImmerseSoundEvents.DROP_DOWN_EXPAND);
+    GuiUtil.addEventSound(dropdownView, DropdownView.ItemHoverEvent.class,
+        ImmerseSoundEvents.TAB_HOVER);
+
+    this.addChild(dropdownView);
     this.addChild(Theme.newSeparator());
     this.addChild(this.content);
 
@@ -123,10 +134,8 @@ public class PlayView extends ParentView implements TransitionView {
         .build();
   }
 
-  @SuppressWarnings("removal")
   private void dropDownSelect(View content) {
-    this.minecraft.getSoundManager().play(
-        SimpleSoundInstance.forUI(ImmerseSoundEvents.SUBMENU_SELECT.get(), 1.0F));
+    GuiUtil.playSound(ImmerseSoundEvents.SUBMENU_SELECT);
     this.setContent(content);
   }
 
@@ -134,17 +143,15 @@ public class PlayView extends ParentView implements TransitionView {
     this.content.replace(content);
   }
 
-  @SuppressWarnings("removal")
   @Override
-  protected void added() {
+  public void added() {
     super.added();
     this.entranceAnimator.start();
-    this.minecraft.getSoundManager().play(
-        SimpleSoundInstance.forUI(ImmerseSoundEvents.MAIN_MENU_PRESS_PLAY.get(), 1.0F));
+    GuiUtil.playSound(ImmerseSoundEvents.MAIN_MENU_PRESS_PLAY);
   }
 
   @Override
-  protected void removed() {
+  public void removed() {
     super.removed();
     this.entranceAnimator.stop();
     this.exitAnimator.stop();

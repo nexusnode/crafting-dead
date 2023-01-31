@@ -5,10 +5,11 @@ import java.util.Map;
 import java.util.function.Consumer;
 import org.bson.types.ObjectId;
 import org.jetbrains.annotations.Nullable;
+import com.craftingdead.immerse.client.gui.GuiUtil;
 import com.craftingdead.immerse.client.gui.screen.Theme;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.language.I18n;
-import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.rocketpowered.common.Guild;
@@ -22,6 +23,8 @@ import net.rocketpowered.sdk.interf.GameClientInterface;
 import reactor.core.Disposable;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
+import sm0keysa1m0n.bliss.StyledText;
+import sm0keysa1m0n.bliss.minecraft.AdapterUtil;
 import sm0keysa1m0n.bliss.view.ParentView;
 import sm0keysa1m0n.bliss.view.TextView;
 import sm0keysa1m0n.bliss.view.View;
@@ -29,7 +32,9 @@ import sm0keysa1m0n.bliss.view.event.RemovedEvent;
 
 public class YourGuildView extends ParentView {
 
-  public static final Component TITLE = new TranslatableComponent("view.guild.your_guild");
+  public static final StyledText TITLE = GuiUtil.translatable("view.guild.your_guild");
+
+  private final Minecraft minecraft = Minecraft.getInstance();
 
   private final ParentView informationView;
 
@@ -52,7 +57,6 @@ public class YourGuildView extends ParentView {
   @Nullable
   private GuildMember selfMember;
 
-  @SuppressWarnings("removal")
   public YourGuildView(Consumer<View> contentConsumer) {
     super(new Properties().styleClasses("page", "blur"));
 
@@ -137,7 +141,6 @@ public class YourGuildView extends ParentView {
             () -> this.contentConsumer.accept(this))));
   }
 
-  @SuppressWarnings("removal")
   private void updateGuild(GameClientInterface gateway, Guild guild) {
     if (guild == null) {
       return;
@@ -166,20 +169,23 @@ public class YourGuildView extends ParentView {
     this.informationView.clearChildren();
 
     this.informationView.addChild(new TextView(new Properties())
-        .setText(new TextComponent("")
-            .append(new TextComponent("Name: ")
-                .withStyle(ChatFormatting.GRAY))
-            .append(this.guild.name())));
+        .setText(AdapterUtil.createStyledText(
+            TextComponent.EMPTY.copy()
+                .append(new TextComponent("Name: ")
+                    .withStyle(ChatFormatting.GRAY))
+                .append(this.guild.name()))));
     this.informationView.addChild(new TextView(new Properties())
-        .setText(new TextComponent("")
-            .append(new TextComponent("Tag: ")
-                .withStyle(ChatFormatting.GRAY))
-            .append(this.guild.tag())));
+        .setText(AdapterUtil.createStyledText(
+            TextComponent.EMPTY.copy()
+                .append(new TextComponent("Tag: ")
+                    .withStyle(ChatFormatting.GRAY))
+                .append(this.guild.tag()))));
     this.informationView.addChild(new TextView(new Properties())
-        .setText(new TextComponent("")
-            .append(new TextComponent("Owner: ")
-                .withStyle(ChatFormatting.GRAY))
-            .append(this.guild.owner().minecraftProfile().name())));
+        .setText(AdapterUtil.createStyledText(
+            TextComponent.EMPTY.copy()
+                .append(new TextComponent("Owner: ")
+                    .withStyle(ChatFormatting.GRAY))
+                .append(this.guild.owner().minecraftProfile().name()))));
 
     var controlsView = new ParentView(new Properties().id("controls"));
     this.informationView.addChild(controlsView);
@@ -211,14 +217,14 @@ public class YourGuildView extends ParentView {
     if (view.hasParent()) {
       view.updateMember(member);
     } else {
-      view.addListener(RemovedEvent.class, __ -> this.memberViews.remove(member.user().id(), view));
+      view.eventBus().subscribe(RemovedEvent.class,
+          __ -> this.memberViews.remove(member.user().id(), view));
       this.membersView.addChild(view);
     }
   }
 
-  @SuppressWarnings("removal")
   @Override
-  protected void added() {
+  public void added() {
     super.added();
     this.listener = Rocket.gameClientInterfaceFeed()
         .flatMap(api -> Mono.when(
@@ -236,7 +242,7 @@ public class YourGuildView extends ParentView {
   }
 
   @Override
-  protected void removed() {
+  public void removed() {
     super.removed();
     this.listener.dispose();
   }

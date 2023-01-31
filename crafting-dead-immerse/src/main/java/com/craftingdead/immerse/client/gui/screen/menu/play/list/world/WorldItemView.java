@@ -33,6 +33,7 @@ import com.mojang.logging.LogUtils;
 import io.github.humbleui.skija.Image;
 import net.minecraft.ChatFormatting;
 import net.minecraft.SharedConstants;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.toasts.SystemToast;
 import net.minecraft.client.gui.screens.AlertScreen;
 import net.minecraft.client.gui.screens.BackupConfirmScreen;
@@ -43,17 +44,19 @@ import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
 import net.minecraft.client.gui.screens.worldselection.EditWorldScreen;
 import net.minecraft.client.gui.screens.worldselection.WorldSelectionList;
 import net.minecraft.network.chat.CommonComponents;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.storage.LevelResource;
 import net.minecraft.world.level.storage.LevelStorageSource;
 import net.minecraft.world.level.storage.LevelSummary;
+import sm0keysa1m0n.bliss.Color;
+import sm0keysa1m0n.bliss.StyledText;
+import sm0keysa1m0n.bliss.minecraft.AdapterUtil;
+import sm0keysa1m0n.bliss.minecraft.view.MinecraftViewScreen;
 import sm0keysa1m0n.bliss.view.ImageAccess;
 import sm0keysa1m0n.bliss.view.ImageView;
 import sm0keysa1m0n.bliss.view.ParentView;
 import sm0keysa1m0n.bliss.view.TextView;
-import sm0keysa1m0n.bliss.view.ViewScreen;
 import sm0keysa1m0n.bliss.view.event.ActionEvent;
 
 class WorldItemView extends ParentView {
@@ -76,9 +79,10 @@ class WorldItemView extends ParentView {
 
     this.iconImage = this.loadIconTexture(levelSummary);
     if (this.iconImage == null) {
-      try (@SuppressWarnings("removal")
-      var inputStream =
-          this.minecraft.getResourceManager().getResource(UNKOWN_SERVER_ICON).getInputStream()) {
+      try (
+          var inputStream =
+              Minecraft.getInstance().getResourceManager().getResource(UNKOWN_SERVER_ICON)
+                  .getInputStream()) {
         this.iconImage = Image.makeFromEncoded(inputStream.readAllBytes());
       } catch (IOException e) {
         // This shouldn't happen, if it does we'll crash the game.
@@ -86,7 +90,7 @@ class WorldItemView extends ParentView {
       }
     }
 
-    this.addListener(ActionEvent.class, event -> this.joinWorld(), true);
+    this.eventBus().subscribe(ActionEvent.class, event -> this.joinWorld());
     this.addChild(new ImageView(new Properties().id("icon"))
         .setImage(ImageAccess.forImage(this.iconImage)));
 
@@ -94,12 +98,12 @@ class WorldItemView extends ParentView {
     texts.addChild(new TextView(new Properties())
         .setText(levelSummary.getLevelName()));
     texts.addChild(new TextView(new Properties().id("details"))
-        .setText(new TextComponent(levelSummary.getLevelId() + " (" + dateFormat.format(
-            new Date(levelSummary.getLastPlayed())) + ")")
-                .withStyle(ChatFormatting.GRAY)));
+        .setText(StyledText.of(levelSummary.getLevelId() + " (" + dateFormat.format(
+            new Date(levelSummary.getLastPlayed())) + ")",
+            Color.GRAY)));
     texts.addChild(new TextView(new Properties())
-        .setText(levelSummary.getInfo().copy()
-            .withStyle(ChatFormatting.GRAY)));
+        .setText(AdapterUtil.createStyledText(levelSummary.getInfo().copy()
+            .withStyle(ChatFormatting.GRAY))));
     this.addChild(texts);
   }
 
@@ -140,13 +144,14 @@ class WorldItemView extends ParentView {
   /**
    * A slightly edited copy of {@link WorldSelectionList.Entry#joinWorld}
    */
-  @SuppressWarnings("removal")
   public void joinWorld() {
     if (this.worldSummary.isDisabled()) {
       return;
     }
 
-    var screen = (ViewScreen) this.getScreen();
+    var minecraft = Minecraft.getInstance();
+
+    var screen = (MinecraftViewScreen) this.getScreen();
     var backupStatus = this.worldSummary.backupStatus();
     if (backupStatus.shouldBackup()) {
       var backupQuestionKey = "selectWorld.backupQuestion." + backupStatus.getTranslationKey();
@@ -164,10 +169,10 @@ class WorldItemView extends ParentView {
           new BackupConfirmScreen(screen, (backup, eraseCache) -> {
             if (backup) {
               var levelName = this.worldSummary.getLevelName();
-              try (var levelSave = this.minecraft.getLevelSource().createAccess(levelName)) {
+              try (var levelSave = minecraft.getLevelSource().createAccess(levelName)) {
                 EditWorldScreen.makeBackupAndShowToast(levelSave);
               } catch (IOException ioexception) {
-                SystemToast.onWorldAccessFailure(this.minecraft, levelName);
+                SystemToast.onWorldAccessFailure(minecraft, levelName);
                 logger.error("Failed to backup level {}", levelName, ioexception);
               }
             }
@@ -183,13 +188,13 @@ class WorldItemView extends ParentView {
             screen.removed();
           } catch (Exception exception) {
             logger.error("Failure to open 'future world'", (Throwable) exception);
-            this.minecraft.setScreen(new AlertScreen(() -> {
-              this.minecraft.setScreen(this.minecraft.screen);
+            minecraft.setScreen(new AlertScreen(() -> {
+              minecraft.setScreen(minecraft.screen);
             }, new TranslatableComponent("selectWorld.futureworld.error.title"),
                 new TranslatableComponent("selectWorld.futureworld.error.text")));
           }
         } else {
-          this.minecraft.setScreen(screen);
+          minecraft.setScreen(screen);
         }
 
       }, new TranslatableComponent("selectWorld.versionQuestion"),
@@ -203,24 +208,24 @@ class WorldItemView extends ParentView {
 
   }
 
-  @SuppressWarnings("removal")
   private void loadWorld() {
-    if (this.minecraft.getLevelSource().levelExists(this.worldSummary.getLevelName())) {
-      this.minecraft.forceSetScreen(
+    var minecraft = Minecraft.getInstance();
+    if (minecraft.getLevelSource().levelExists(this.worldSummary.getLevelName())) {
+      minecraft.forceSetScreen(
           new GenericDirtMessageScreen(new TranslatableComponent("selectWorld.data_read")));
-      this.minecraft.loadLevel(this.worldSummary.getLevelId());
+      minecraft.loadLevel(this.worldSummary.getLevelId());
     }
   }
 
   /**
    * A slightly edited copy of {@link WorldSelectionList.Entry#editWorld}
    */
-  @SuppressWarnings("removal")
   public void editWorld() {
     var fileName = this.worldSummary.getLevelName();
+    var minecraft = Minecraft.getInstance();
     try {
-      var levelSave = this.minecraft.getLevelSource().createAccess(fileName);
-      var screen = this.getScreen();
+      var levelSave = minecraft.getLevelSource().createAccess(fileName);
+      var screen = (MinecraftViewScreen) this.getScreen();
       screen.keepOpenAndSetScreen(new EditWorldScreen(confirm -> {
         try {
           levelSave.close();
@@ -230,10 +235,10 @@ class WorldItemView extends ParentView {
         if (confirm) {
           this.parentWorldList.reloadWorlds();
         }
-        this.minecraft.setScreen(screen);
+        minecraft.setScreen(screen);
       }, levelSave));
     } catch (IOException ioexception) {
-      SystemToast.onWorldAccessFailure(this.minecraft, fileName);
+      SystemToast.onWorldAccessFailure(minecraft, fileName);
       logger.error("Failed to access level {}", fileName, ioexception);
       this.parentWorldList.reloadWorlds();
     }
@@ -242,23 +247,23 @@ class WorldItemView extends ParentView {
   /**
    * A slightly edited copy of {@link WorldSelectionList.Entry#deleteWorld}
    */
-  @SuppressWarnings("removal")
   public void deleteWorld() {
-    ViewScreen screen = this.getScreen();
+    var screen = (MinecraftViewScreen) this.getScreen();
+    var minecraft = Minecraft.getInstance();
     screen.keepOpenAndSetScreen(new ConfirmScreen(confirmed -> {
       if (confirmed) {
-        this.minecraft.setScreen(new ProgressScreen(true));
-        LevelStorageSource levelSource = this.minecraft.getLevelSource();
+        minecraft.setScreen(new ProgressScreen(true));
+        LevelStorageSource levelSource = minecraft.getLevelSource();
         String s = this.worldSummary.getLevelName();
         try (var levelSave = levelSource.createAccess(s)) {
           levelSave.deleteLevel();
         } catch (IOException ioexception) {
-          SystemToast.onWorldDeleteFailure(this.minecraft, s);
+          SystemToast.onWorldDeleteFailure(minecraft, s);
           logger.error("Failed to delete world {}", s, ioexception);
         }
         this.parentWorldList.reloadWorlds();
       }
-      this.minecraft.setScreen(screen);
+      minecraft.setScreen(screen);
     }, new TranslatableComponent("selectWorld.deleteQuestion"),
         new TranslatableComponent("selectWorld.deleteWarning",
             this.worldSummary.getLevelName()),
@@ -269,35 +274,36 @@ class WorldItemView extends ParentView {
   /**
    * A slightly edited copy of {@link WorldSelectionList.Entry#recreateWorld}
    */
-  @SuppressWarnings("removal")
   public void recreateWorld() {
-    ViewScreen screen = this.getScreen();
+    var screen = (MinecraftViewScreen) this.getScreen();
     screen.keepOpen();
 
-    this.minecraft.forceSetScreen(
+    var minecraft = Minecraft.getInstance();
+
+    minecraft.forceSetScreen(
         new GenericDirtMessageScreen(new TranslatableComponent("selectWorld.data_read")));
 
     try (
         var levelSave =
-            this.minecraft.getLevelSource().createAccess(this.worldSummary.getLevelName());
-        var worldStem = this.minecraft.makeWorldStem(levelSave, false);) {
+            minecraft.getLevelSource().createAccess(this.worldSummary.getLevelName());
+        var worldStem = minecraft.makeWorldStem(levelSave, false);) {
       var worldGenSettings = worldStem.worldData().worldGenSettings();
       var path = CreateWorldScreen.createTempDataPackDirFromExistingWorld(
           levelSave.getLevelPath(LevelResource.DATAPACK_DIR),
-          this.minecraft);
+          minecraft);
       if (worldGenSettings.isOldCustomizedWorld()) {
-        this.minecraft.setScreen(new ConfirmScreen(confirm -> this.minecraft.setScreen(confirm
+        minecraft.setScreen(new ConfirmScreen(confirm -> minecraft.setScreen(confirm
             ? CreateWorldScreen.createFromExisting(screen, worldStem, path)
             : screen),
             new TranslatableComponent("selectWorld.recreate.customized.title"),
             new TranslatableComponent("selectWorld.recreate.customized.text"),
             CommonComponents.GUI_PROCEED, CommonComponents.GUI_CANCEL));
       } else {
-        this.minecraft.setScreen(CreateWorldScreen.createFromExisting(screen, worldStem, path));
+        minecraft.setScreen(CreateWorldScreen.createFromExisting(screen, worldStem, path));
       }
     } catch (Exception e) {
       logger.error("Unable to recreate world", e);
-      this.minecraft.setScreen(new AlertScreen(() -> this.minecraft.setScreen(screen),
+      minecraft.setScreen(new AlertScreen(() -> minecraft.setScreen(screen),
           new TranslatableComponent("selectWorld.recreate.error.title"),
           new TranslatableComponent("selectWorld.recreate.error.text")));
     }

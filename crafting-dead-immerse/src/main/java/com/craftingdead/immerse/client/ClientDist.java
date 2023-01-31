@@ -84,8 +84,8 @@ import reactor.core.scheduler.Schedulers;
 import sm0keysa1m0n.bliss.Bliss;
 import sm0keysa1m0n.bliss.minecraft.platform.MinecraftGraphicsContext;
 import sm0keysa1m0n.bliss.minecraft.platform.MinecraftPlatform;
-import sm0keysa1m0n.bliss.style.StyleSheetManager;
-import sm0keysa1m0n.bliss.view.ViewScreen;
+import sm0keysa1m0n.bliss.minecraft.platform.StyleSheetManager;
+import sm0keysa1m0n.bliss.minecraft.view.MinecraftViewScreen;
 
 public class ClientDist implements ModDist {
 
@@ -339,7 +339,7 @@ public class ClientDist implements ModDist {
 
     if (event.getScreen() instanceof TitleScreen
         || event.getScreen() instanceof JoinMultiplayerScreen) {
-      if (this.minecraft.screen instanceof ViewScreen screen
+      if (this.minecraft.screen instanceof MinecraftViewScreen screen
           && screen.getRoot() instanceof MainMenuView) {
         event.setCanceled(true);
         return;

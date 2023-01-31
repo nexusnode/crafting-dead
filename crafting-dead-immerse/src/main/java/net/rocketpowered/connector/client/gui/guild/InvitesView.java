@@ -8,13 +8,13 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.bson.types.ObjectId;
 import org.jetbrains.annotations.Nullable;
+import com.craftingdead.immerse.client.gui.GuiUtil;
 import com.craftingdead.immerse.client.gui.screen.Theme;
 import com.google.common.collect.Sets;
 import io.github.humbleui.skija.FontMgr;
-import net.minecraft.ChatFormatting;
-import net.minecraft.network.chat.Component;
+import io.github.humbleui.skija.FontStyle;
+import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.rocketpowered.common.Guild;
 import net.rocketpowered.common.GuildInvite;
 import net.rocketpowered.common.GuildMember;
@@ -27,13 +27,16 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 import sm0keysa1m0n.bliss.Color;
+import sm0keysa1m0n.bliss.StyledText;
 import sm0keysa1m0n.bliss.view.ParentView;
 import sm0keysa1m0n.bliss.view.TextView;
 import sm0keysa1m0n.bliss.view.View;
 
 public class InvitesView extends ParentView {
 
-  public static final Component TITLE = new TranslatableComponent("view.guild.invites");
+  public static final StyledText TITLE = GuiUtil.translatable("view.guild.invites");
+
+  private final Minecraft minecraft = Minecraft.getInstance();
 
   private final ParentView invitesListView;
 
@@ -54,7 +57,6 @@ public class InvitesView extends ParentView {
 
   private Set<GuildInvite> lastInvites = Collections.emptySet();
 
-  @SuppressWarnings("removal")
   public InvitesView() {
     super(new Properties().styleClasses("page", "blur"));
 
@@ -108,9 +110,8 @@ public class InvitesView extends ParentView {
     this.declineButton.setEnabled(this.selectedInviteView != null);
   }
 
-  @SuppressWarnings("removal")
   @Override
-  protected void added() {
+  public void added() {
     super.added();
     this.listener = Rocket.gameClientInterfaceFeed()
         .flatMap(api -> api.getSocialProfileFeed()
@@ -141,7 +142,7 @@ public class InvitesView extends ParentView {
   }
 
   @Override
-  protected void removed() {
+  public void removed() {
     super.removed();
     this.listener.dispose();
   }
@@ -172,24 +173,23 @@ public class InvitesView extends ParentView {
       this.offlineMemebrsView = new TextView(new Properties());
 
       this.addChild(new TextView(new Properties())
-          .setText(new TextComponent(this.invite.guild().name())
-              .withStyle(ChatFormatting.BOLD)));
+          .setText(new StyledText(this.invite.guild().name(), FontStyle.BOLD, null)));
 
       var playerCountsView = new ParentView(new Properties().id("player-counts"));
 
       this.addChild(playerCountsView);
       playerCountsView.addChild(this.totalMembersView);
       playerCountsView.addChild(new TextView(new Properties())
-          .setText(new TextComponent(" | ")));
+          .setText(" | "));
       playerCountsView.addChild(this.onlineMemebrsView);
       playerCountsView.addChild(new TextView(new Properties())
-          .setText(new TextComponent(" | ")));
+          .setText(" | "));
       playerCountsView.addChild(this.offlineMemebrsView);
       if (this.invite.sender() != null) {
         this.addChild(new TextView(new Properties())
-            .setText(
-                new TextComponent("Invited by " + this.invite.sender().minecraftProfile().name())
-                    .withStyle(ChatFormatting.ITALIC)));
+            .setText(new StyledText(
+                "Invited by " + this.invite.sender().minecraftProfile().name(),
+                FontStyle.ITALIC, null)));
       }
     }
 
@@ -199,17 +199,16 @@ public class InvitesView extends ParentView {
       this.offlineMemebrsView.getStyle().color.defineState(Color.GRAY);
     }
 
-    @SuppressWarnings("removal")
     @Override
-    protected void added() {
+    public void added() {
       super.added();
       AtomicInteger counter = new AtomicInteger();
       this.memberListener = Rocket.gameClientInterfaceFeed()
           .flatMap(api -> Mono
-              .fromRunnable(() -> this.minecraft.executeBlocking(() -> {
+              .fromRunnable(() -> {
                 this.onlineMemebrsView.setText("0 Online");
                 this.offlineMemebrsView.setText("0 Offline");
-              }))
+              })
               .thenMany(api.getGuildMembers(this.invite.guild().id()))
               .doOnNext(__ -> counter.incrementAndGet())
               .doOnComplete(() -> {
@@ -224,15 +223,15 @@ public class InvitesView extends ParentView {
               .map(User::id)
               .flatMap(userId -> api.getUserPresenceFeed(userId).next())
               .groupBy(UserPresence::online)
-              .publishOn(Schedulers.fromExecutor(this.minecraft))
               .delayUntil(group -> group.count()
                   .doOnNext(count -> {
                     if (group.key()) {
                       this.onlineMemebrsView.setText(count + " Online");
                     } else {
-                      this.offlineMemebrsView.setText(new TextComponent(count + " Offline"));
+                      this.offlineMemebrsView.setText(count + " Offline");
                     }
                   }))
+              .subscribeOn(Schedulers.fromExecutor(Minecraft.getInstance()))
               // Update member counts every minute.
               .repeatWhen(flux -> Flux.interval(Duration.ofMinutes(1L))))
           .subscribeOn(Schedulers.boundedElastic())
@@ -240,7 +239,7 @@ public class InvitesView extends ParentView {
     }
 
     @Override
-    protected void removed() {
+    public void removed() {
       super.removed();
       this.memberListener.dispose();
     }
