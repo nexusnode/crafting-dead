@@ -23,7 +23,6 @@ import com.craftingdead.core.capability.CapabilityUtil;
 import com.craftingdead.core.world.item.combatslot.CombatSlot;
 import com.craftingdead.core.world.item.combatslot.CombatSlotProvider;
 import com.google.common.collect.ImmutableMultimap;
-import com.google.common.collect.ImmutableMultimap.Builder;
 import com.google.common.collect.Multimap;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -45,19 +44,18 @@ public class MeleeWeaponItem extends ToolItem {
     super(properties);
     this.attackSpeed = attackSpeed;
     this.attackDamage = attackDamage;
-
-    Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.builder();
-    builder.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(BASE_ATTACK_DAMAGE_UUID,
-        "Weapon modifier", this.attackDamage, AttributeModifier.Operation.ADDITION));
-    builder.put(Attributes.ATTACK_SPEED, new AttributeModifier(BASE_ATTACK_SPEED_UUID,
-        "Weapon modifier", this.attackSpeed, AttributeModifier.Operation.ADDITION));
-    this.attributeModifiers = builder.build();
+    this.attributeModifiers = ImmutableMultimap.of(
+        Attributes.ATTACK_DAMAGE, new AttributeModifier(BASE_ATTACK_DAMAGE_UUID,
+            "Weapon modifier", this.attackDamage, AttributeModifier.Operation.ADDITION),
+        Attributes.ATTACK_SPEED, new AttributeModifier(BASE_ATTACK_SPEED_UUID,
+            "Weapon modifier", this.attackSpeed, AttributeModifier.Operation.ADDITION));
   }
 
   @Override
   public Multimap<Attribute, AttributeModifier> getAttributeModifiers(
       EquipmentSlot equipmentSlot, ItemStack itemStack) {
-    return equipmentSlot == EquipmentSlot.MAINHAND ? this.attributeModifiers
+    return equipmentSlot == EquipmentSlot.MAINHAND
+        ? this.attributeModifiers
         : super.getAttributeModifiers(equipmentSlot, itemStack);
   }
 
