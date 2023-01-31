@@ -101,7 +101,7 @@ public class GenericMenu extends AbstractMenu {
   public static GenericMenu createMediumBackpack(int windowId, Inventory inventory,
       IItemHandler itemHandler) {
     return new GenericMenu(ModMenuTypes.MEDIUM_BACKPACK.get(), windowId, inventory,
-        itemHandler, 4,
+        itemHandler, 3,
         (slot, itemStack) -> !(itemStack.getCapability(Storage.CAPABILITY).isPresent()
             || itemStack.getItem() instanceof GunItem));
   }
@@ -109,14 +109,14 @@ public class GenericMenu extends AbstractMenu {
   public static GenericMenu createMediumBackpack(int windowId,
       Inventory inventory) {
     return new GenericMenu(ModMenuTypes.MEDIUM_BACKPACK.get(), windowId, inventory,
-        4, (slot, itemStack) -> !(itemStack.getCapability(Storage.CAPABILITY).isPresent()
+        3, (slot, itemStack) -> !(itemStack.getCapability(Storage.CAPABILITY).isPresent()
             || itemStack.getItem() instanceof GunItem));
   }
 
   public static GenericMenu createLargeBackpack(int windowId, Inventory inventory,
       IItemHandler itemHandler) {
     return new GenericMenu(ModMenuTypes.LARGE_BACKPACK.get(), windowId, inventory,
-        itemHandler, 6,
+        itemHandler, 4,
         (slot, itemStack) -> !(itemStack.getCapability(Storage.CAPABILITY).isPresent()
             || itemStack.getItem() instanceof GunItem));
   }
@@ -124,19 +124,19 @@ public class GenericMenu extends AbstractMenu {
   public static GenericMenu createLargeBackpack(int windowId,
       Inventory inventory) {
     return new GenericMenu(ModMenuTypes.LARGE_BACKPACK.get(), windowId, inventory,
-        6, (slot, itemStack) -> !(itemStack.getCapability(Storage.CAPABILITY).isPresent()
+        4, (slot, itemStack) -> !(itemStack.getCapability(Storage.CAPABILITY).isPresent()
             || itemStack.getItem() instanceof GunItem));
   }
 
   public static GenericMenu createGunBag(int windowId, Inventory inventory,
       IItemHandler itemHandler) {
     return new GenericMenu(ModMenuTypes.GUN_BAG.get(), windowId, inventory,
-        itemHandler, 4,
+        itemHandler, 2,
         (slot, itemStack) -> !(itemStack.getCapability(Storage.CAPABILITY).isPresent()));
   }
 
   public static GenericMenu createGunBag(int windowId, Inventory inventory) {
-    return new GenericMenu(ModMenuTypes.GUN_BAG.get(), windowId, inventory, 4,
+    return new GenericMenu(ModMenuTypes.GUN_BAG.get(), windowId, inventory, 2,
         (slot, itemStack) -> !(itemStack.getCapability(Storage.CAPABILITY).isPresent()));
   }
 }

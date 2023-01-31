@@ -52,15 +52,15 @@ public class StorageItem extends Item {
           GenericMenu::createSmallBackpack);
 
   public static final NonNullSupplier<Storage> MEDIUM_BACKPACK =
-      () -> new ItemStackHandlerStorage(4 * 9, ModEquipmentSlot.BACKPACK,
+      () -> new ItemStackHandlerStorage(3 * 9, ModEquipmentSlot.BACKPACK,
           GenericMenu::createMediumBackpack);
 
   public static final NonNullSupplier<Storage> LARGE_BACKPACK =
-      () -> new ItemStackHandlerStorage(6 * 9, ModEquipmentSlot.BACKPACK,
+      () -> new ItemStackHandlerStorage(4 * 9, ModEquipmentSlot.BACKPACK,
           GenericMenu::createLargeBackpack);
 
   public static final NonNullSupplier<Storage> GUN_BAG =
-      () -> new ItemStackHandlerStorage(4 * 9, ModEquipmentSlot.BACKPACK,
+      () -> new ItemStackHandlerStorage(2 * 9, ModEquipmentSlot.BACKPACK,
           GenericMenu::createGunBag);
 
   private final NonNullSupplier<Storage> storageContainer;
