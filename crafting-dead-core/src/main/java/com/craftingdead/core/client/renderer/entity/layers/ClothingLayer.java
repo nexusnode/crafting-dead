@@ -19,8 +19,8 @@
 package com.craftingdead.core.client.renderer.entity.layers;
 
 import com.craftingdead.core.world.entity.extension.LivingExtension;
-import com.craftingdead.core.world.inventory.ModEquipmentSlot;
-import com.craftingdead.core.world.item.clothing.Clothing;
+import com.craftingdead.core.world.item.equipment.Clothing;
+import com.craftingdead.core.world.item.equipment.Equipment;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.resources.ResourceLocation;
@@ -36,14 +36,11 @@ public class ClothingLayer<T extends LivingEntity, M extends HumanoidModel<T>>
   @Override
   protected ResourceLocation getClothingTexture(LivingEntity livingEntity, String skinType) {
     final var living = LivingExtension.get(livingEntity);
-    if (living != null) {
-      var clothing = living.getItemHandler().getStackInSlot(ModEquipmentSlot.CLOTHING.getIndex())
-          .getCapability(Clothing.CAPABILITY)
-          .orElse(null);
-      if (clothing != null) {
-        return clothing.getTexture(skinType);
-      }
+    if (living == null) {
+      return null;
     }
-    return null;
+    return living.getEquipmentInSlot(Equipment.Slot.CLOTHING, Clothing.class)
+        .map(clothing -> clothing.getTexture(skinType))
+        .orElse(null);
   }
 }

@@ -58,12 +58,12 @@ import com.craftingdead.core.world.entity.ModEntityTypes;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.core.world.entity.grenade.FlashGrenadeEntity;
-import com.craftingdead.core.world.inventory.ModEquipmentSlot;
 import com.craftingdead.core.world.inventory.ModMenuTypes;
 import com.craftingdead.core.world.item.ArbitraryTooltips;
 import com.craftingdead.core.world.item.GunItem;
 import com.craftingdead.core.world.item.RegisterGunColor;
-import com.craftingdead.core.world.item.clothing.Clothing;
+import com.craftingdead.core.world.item.equipment.Clothing;
+import com.craftingdead.core.world.item.equipment.Equipment;
 import com.craftingdead.core.world.item.gun.Gun;
 import com.craftingdead.core.world.item.gun.skin.Paint;
 import com.craftingdead.core.world.item.gun.skin.Skins;
@@ -84,7 +84,6 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.PostChain;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.player.PlayerRenderer;
-import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.client.tutorial.Tutorial;
@@ -316,13 +315,6 @@ public class ClientDist implements ModDist {
   }
 
   private void handleClientSetup(FMLClientSetupEvent event) {
-    ItemProperties.registerGeneric(new ResourceLocation("wearing"),
-        (itemStack, level, entity, value) -> entity.getCapability(LivingExtension.CAPABILITY)
-            .filter(living -> living.getItemHandler()
-                .getStackInSlot(ModEquipmentSlot.HAT.getIndex()) == itemStack)
-            .map(__ -> 1.0F)
-            .orElse(0.0F));
-
     MenuScreens.register(ModMenuTypes.EQUIPMENT.get(), EquipmentScreen::new);
     MenuScreens.register(ModMenuTypes.VEST.get(), GenericContainerScreen::new);
     MenuScreens.register(ModMenuTypes.SMALL_BACKPACK.get(), GenericContainerScreen::new);
@@ -360,24 +352,24 @@ public class ClientDist implements ModDist {
       renderer.addLayer(new HandcuffsLayer<>(renderer, event.getEntityModels()));
       renderer.addLayer(new ClothingLayer<>(renderer));
       renderer.addLayer(EquipmentLayer.builder(renderer)
-          .slot(ModEquipmentSlot.MELEE)
+          .slot(Equipment.Slot.MELEE)
           .useCrouchOrientation(true)
           .build());
       renderer.addLayer(EquipmentLayer.builder(renderer)
-          .slot(ModEquipmentSlot.VEST)
+          .slot(Equipment.Slot.VEST)
           .useCrouchOrientation(true)
           .build());
       renderer.addLayer(EquipmentLayer.builder(renderer)
-          .slot(ModEquipmentSlot.HAT)
+          .slot(Equipment.Slot.HAT)
           .useHeadOrientation(true)
           .transformation(poseStack -> poseStack.scale(-1F, -1F, 1F))
           .build());
       renderer.addLayer(EquipmentLayer.builder(renderer)
-          .slot(ModEquipmentSlot.GUN)
+          .slot(Equipment.Slot.GUN)
           .useCrouchOrientation(true)
           .build());
       renderer.addLayer(EquipmentLayer.builder(renderer)
-          .slot(ModEquipmentSlot.BACKPACK)
+          .slot(Equipment.Slot.BACKPACK)
           .useCrouchOrientation(true)
           .build());
     }
@@ -790,9 +782,8 @@ public class ClientDist implements ModDist {
       ModelPart arm, ModelPart sleeve) {
 
     var clothingTexture = playerEntity.getCapability(LivingExtension.CAPABILITY)
-        .map(LivingExtension::getItemHandler)
-        .map(itemHandler -> itemHandler.getStackInSlot(ModEquipmentSlot.CLOTHING.getIndex()))
-        .flatMap(clothingStack -> clothingStack.getCapability(Clothing.CAPABILITY).resolve())
+        .resolve()
+        .flatMap(living -> living.getEquipmentInSlot(Equipment.Slot.CLOTHING, Clothing.class))
         .map(clothing -> clothing.getTexture(playerEntity.getModelName()))
         .orElse(null);
 

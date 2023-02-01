@@ -16,26 +16,43 @@
  * https://craftingdead.net/terms.php
  */
 
-package com.craftingdead.core.world.item.clothing;
+package com.craftingdead.core.world.item.equipment;
 
-import java.util.UUID;
+import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.common.capabilities.CapabilityToken;
-import net.minecraft.resources.ResourceLocation;
 
-public interface Clothing {
+@FunctionalInterface
+public interface Equipment {
 
-  Capability<Clothing> CAPABILITY = CapabilityManager.get(new CapabilityToken<>() {});
+  Capability<Equipment> CAPABILITY = CapabilityManager.get(new CapabilityToken<>() {});
 
-  UUID MODIFIER_ID = UUID.fromString("c14e5f26-bbe9-11eb-8529-0242ac130003");
+  default Multimap<Attribute, AttributeModifier> attributeModifiers() {
+    return ImmutableMultimap.of();
+  }
 
-  Multimap<Attribute, AttributeModifier> getAttributeModifiers();
+  boolean isValidForSlot(Slot slot);
 
-  boolean hasFireImmunity();
+  static Equipment forSlot(Slot slot) {
+    return slot::equals;
+  }
 
-  ResourceLocation getTexture(String skinType);
+  enum Slot {
+
+    MELEE(0), GUN(1), HAT(2), CLOTHING(3), VEST(4), BACKPACK(5);
+
+    private final int index;
+
+    private Slot(int index) {
+      this.index = index;
+    }
+
+    public int getIndex() {
+      return this.index;
+    }
+  }
 }

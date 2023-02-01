@@ -19,11 +19,12 @@
 package com.craftingdead.core.world.item;
 
 import org.jetbrains.annotations.Nullable;
-import com.craftingdead.core.capability.CapabilityUtil;
 import com.craftingdead.core.world.item.combatslot.CombatSlot;
 import com.craftingdead.core.world.item.combatslot.CombatSlotProvider;
+import com.craftingdead.core.world.item.equipment.Equipment;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
+import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ai.attributes.Attribute;
@@ -31,7 +32,9 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.minecraftforge.common.util.LazyOptional;
 
 public class MeleeWeaponItem extends ToolItem {
 
@@ -61,6 +64,22 @@ public class MeleeWeaponItem extends ToolItem {
 
   @Override
   public ICapabilityProvider initCapabilities(ItemStack itemStack, @Nullable CompoundTag nbt) {
-    return CapabilityUtil.provider(() -> CombatSlot.MELEE, CombatSlotProvider.CAPABILITY);
+    var combatSlotProvider = LazyOptional.of(() -> CombatSlot.MELEE);
+    var equipment = LazyOptional.of(() -> Equipment.forSlot(Equipment.Slot.MELEE));
+    return new ICapabilityProvider() {
+
+      @Override
+      public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
+        if (cap == CombatSlotProvider.CAPABILITY) {
+          return combatSlotProvider.cast();
+        }
+
+        if (cap == Equipment.CAPABILITY) {
+          return equipment.cast();
+        }
+
+        return LazyOptional.empty();
+      }
+    };
   }
 }

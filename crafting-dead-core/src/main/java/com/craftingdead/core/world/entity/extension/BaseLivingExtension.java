@@ -35,12 +35,11 @@ import com.craftingdead.core.world.action.Action;
 import com.craftingdead.core.world.action.ActionObserver;
 import com.craftingdead.core.world.action.ActionType;
 import com.craftingdead.core.world.entity.EntityUtil;
-import com.craftingdead.core.world.inventory.ModEquipmentSlot;
 import com.craftingdead.core.world.item.MeleeWeaponItem;
-import com.craftingdead.core.world.item.ModItems;
-import com.craftingdead.core.world.item.clothing.Clothing;
+import com.craftingdead.core.world.item.equipment.Clothing;
+import com.craftingdead.core.world.item.equipment.Equipment;
+import com.craftingdead.core.world.item.equipment.Hat;
 import com.craftingdead.core.world.item.gun.Gun;
-import com.craftingdead.core.world.item.hat.Hat;
 import io.netty.buffer.Unpooled;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
@@ -63,7 +62,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.BlockSnapshot;
-import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.network.PacketDistributor;
 
@@ -84,13 +82,17 @@ class BaseLivingExtension<E extends LivingEntity, H extends LivingHandler>
 
   private final EntitySnapshot[] snapshots = new EntitySnapshot[20];
 
-  private final ItemStackHandler itemHandler =
-      new ItemStackHandler(ModEquipmentSlot.values().length) {
+  protected final ItemStackHandler itemHandler =
+      new ItemStackHandler(Equipment.Slot.values().length) {
         @Override
         protected void onLoad() {
-          if (this.getSlots() != ModEquipmentSlot.values().length) {
-            this.setSize(ModEquipmentSlot.values().length);
+          if (this.getSlots() != Equipment.Slot.values().length) {
+            this.setSize(Equipment.Slot.values().length);
           }
+          Arrays.stream(Equipment.Slot.values())
+              .map(Equipment.Slot::getIndex)
+              .map(this::getStackInSlot)
+              .forEach(BaseLivingExtension.this::applyEquipmentModifiers);
         }
 
         @Override
@@ -106,7 +108,7 @@ class BaseLivingExtension<E extends LivingEntity, H extends LivingHandler>
    */
   protected ItemStack lastHeldStack = null;
 
-  protected float[] equipmentDropChances = new float[ModEquipmentSlot.values().length];
+  protected float[] equipmentDropChances = new float[Equipment.Slot.values().length];
 
   @Nullable
   private Action action;
@@ -123,8 +125,6 @@ class BaseLivingExtension<E extends LivingEntity, H extends LivingHandler>
   private boolean moving;
 
   private Visibility cachedVisibility = Visibility.VISIBLE;
-
-  private ItemStack lastClothingStack = ItemStack.EMPTY;
 
   BaseLivingExtension(E entity) {
     this.entity = entity;
@@ -279,10 +279,12 @@ class BaseLivingExtension<E extends LivingEntity, H extends LivingHandler>
 
     heldStack.getCapability(Gun.CAPABILITY).ifPresent(gun -> gun.tick(this));
 
-    this.updateClothing();
-    this.updateHat();
+    this.getEquipmentInSlot(Equipment.Slot.CLOTHING, Clothing.class)
+        .ifPresent(this::tickClothing);
+    this.getEquipmentInSlot(Equipment.Slot.HAT, Hat.class)
+        .ifPresent(this::tickHat);
 
-    if (!this.entity.getLevel().isClientSide()) {
+    if (!this.level().isClientSide()) {
       // This is called at the start of the entity tick so it's equivalent of last tick's position.
       this.snapshots[this.entity.getServer().getTickCount() % 20] = this.makeSnapshot(1.0F);
     }
@@ -319,53 +321,32 @@ class BaseLivingExtension<E extends LivingEntity, H extends LivingHandler>
     }
   }
 
-  private void updateHat() {
-    var headStack = this.itemHandler.getStackInSlot(ModEquipmentSlot.HAT.getIndex());
-    var hat = headStack.getCapability(Hat.CAPABILITY).orElse(null);
-    if (headStack.getItem() == ModItems.SCUBA_MASK.get()
-        && this.entity.isEyeInFluid(FluidTags.WATER)) {
+  private void tickHat(Hat hat) {
+    if (hat.waterBreathing() && this.entity.isEyeInFluid(FluidTags.WATER)) {
       this.entity.addEffect(
           new MobEffectInstance(MobEffects.WATER_BREATHING, 2, 0, false, false, false));
-    } else if (hat != null && hat.hasNightVision()) {
+    }
+
+    if (hat.nightVision()) {
       this.entity.addEffect(
           new MobEffectInstance(MobEffects.NIGHT_VISION, 2, 0, false, false, false));
     }
   }
 
-  private void updateClothing() {
-    var clothingStack = this.itemHandler.getStackInSlot(ModEquipmentSlot.CLOTHING.getIndex());
-    var clothing = clothingStack.getCapability(Clothing.CAPABILITY).orElse(null);
-
-    if (clothingStack != this.lastClothingStack) {
-      this.lastClothingStack.getCapability(Clothing.CAPABILITY)
-          .map(Clothing::getAttributeModifiers)
-          .ifPresent(this.entity.getAttributes()::removeAttributeModifiers);
-      if (clothing != null) {
-        this.entity.getAttributes().addTransientAttributeModifiers(
-            clothing.getAttributeModifiers());
+  private void tickClothing(Clothing clothing) {
+    if (clothing.fireImmunity()) {
+      if (this.entity.getRemainingFireTicks() > 0) {
+        this.entity.clearFire();
       }
+
+      this.entity.addEffect(
+          new MobEffectInstance(MobEffects.FIRE_RESISTANCE, 2, 0, false, false, false));
     }
 
-    if (clothing != null) {
-      // Fire immunity
-      if (clothing.hasFireImmunity()) {
-        if (this.entity.getRemainingFireTicks() > 0) {
-          this.entity.clearFire();
-        }
-
-        this.entity
-            .addEffect(
-                new MobEffectInstance(MobEffects.FIRE_RESISTANCE, 2, 0, false, false, false));
-      }
-    }
-
-    if (clothingStack.getItem() == ModItems.SCUBA_CLOTHING.get()
-        && this.entity.isEyeInFluid(FluidTags.WATER)) {
+    if (clothing.enhancesSwimming() && this.entity.isEyeInFluid(FluidTags.WATER)) {
       this.entity.addEffect(
           new MobEffectInstance(MobEffects.DOLPHINS_GRACE, 2, 0, false, false, false));
     }
-
-    this.lastClothingStack = clothingStack;
   }
 
   @Override
@@ -458,11 +439,6 @@ class BaseLivingExtension<E extends LivingEntity, H extends LivingHandler>
   }
 
   @Override
-  public IItemHandlerModifiable getItemHandler() {
-    return this.itemHandler;
-  }
-
-  @Override
   public EntitySnapshot getSnapshot(int tick) {
     final int currentTick = this.entity.getServer().getTickCount();
     if (tick == currentTick) {
@@ -506,30 +482,55 @@ class BaseLivingExtension<E extends LivingEntity, H extends LivingHandler>
     return this.entity;
   }
 
-  @Override
-  public float[] getEquipmentDropChances() {
-    return Arrays.copyOf(this.equipmentDropChances, this.equipmentDropChances.length);
-  }
+  // public float[] getEquipmentDropChances() {
+  // return Arrays.copyOf(this.equipmentDropChances, this.equipmentDropChances.length);
+  // }
 
   @Override
-  public float getEquipmentDropChance(ModEquipmentSlot slot) {
+  public float getEquipmentDropChance(Equipment.Slot slot) {
     return this.equipmentDropChances[slot.getIndex()];
   }
 
-  @Override
-  public void setEquipmentDropChances(float[] newChances) throws IllegalArgumentException {
-    if (newChances.length < this.equipmentDropChances.length) {
-      throw new IllegalArgumentException(
-          String.format("Missing drop chances. Expected %s but %s was provided.",
-              this.equipmentDropChances.length, newChances.length));
-    }
+  // public void setEquipmentDropChances(float[] newChances) throws IllegalArgumentException {
+  // if (newChances.length < this.equipmentDropChances.length) {
+  // throw new IllegalArgumentException(
+  // String.format("Missing drop chances. Expected %s but %s was provided.",
+  // this.equipmentDropChances.length, newChances.length));
+  // }
+  //
+  // this.equipmentDropChances = Arrays.copyOf(newChances, this.equipmentDropChances.length);
+  // }
 
-    this.equipmentDropChances = Arrays.copyOf(newChances, this.equipmentDropChances.length);
+  @Override
+  public void setEquipmentDropChance(Equipment.Slot slot, float chance) {
+    this.equipmentDropChances[slot.getIndex()] = chance;
   }
 
   @Override
-  public void setEquipmentDropChance(ModEquipmentSlot slot, float chance) {
-    this.equipmentDropChances[slot.getIndex()] = chance;
+  public ItemStack getItemInSlot(Equipment.Slot slot) {
+    return this.itemHandler.getStackInSlot(slot.getIndex());
+  }
+
+  @Override
+  public ItemStack setItemInSlot(Equipment.Slot slot, ItemStack itemStack) {
+    var attributes = this.entity.getAttributes();
+
+    var oldStack = this.getItemInSlot(slot);
+    oldStack.getCapability(Equipment.CAPABILITY)
+        .map(Equipment::attributeModifiers)
+        .ifPresent(attributes::removeAttributeModifiers);
+
+    this.applyEquipmentModifiers(itemStack);
+
+    this.itemHandler.setStackInSlot(slot.getIndex(), itemStack);
+    return oldStack;
+  }
+
+  private void applyEquipmentModifiers(ItemStack itemStack) {
+    var attributes = this.entity.getAttributes();
+    itemStack.getCapability(Equipment.CAPABILITY)
+        .map(Equipment::attributeModifiers)
+        .ifPresent(attributes::addTransientAttributeModifiers);
   }
 
   @Override

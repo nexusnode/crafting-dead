@@ -25,7 +25,7 @@ import com.craftingdead.core.event.CollectMagazineItemHandlers;
 import com.craftingdead.core.world.action.ActionType;
 import com.craftingdead.core.world.action.ActionTypes;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
-import com.craftingdead.core.world.inventory.ModEquipmentSlot;
+import com.craftingdead.core.world.item.equipment.Equipment;
 import com.craftingdead.core.world.item.gun.ammoprovider.MagazineAmmoProvider;
 import com.craftingdead.core.world.item.gun.magazine.Magazine;
 import com.google.common.collect.ImmutableList;
@@ -102,12 +102,14 @@ public class MagazineReloadAction extends AbstractReloadAction {
     builder.addAll(event.getItemHandlers());
 
     // Vest - first
-    living.getItemHandler().getStackInSlot(ModEquipmentSlot.VEST.getIndex())
-        .getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).ifPresent(builder::add);
+    living.getItemInSlot(Equipment.Slot.VEST)
+        .getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
+        .ifPresent(builder::add);
 
     // Backpack - second
-    living.getItemHandler().getStackInSlot(ModEquipmentSlot.BACKPACK.getIndex())
-        .getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).ifPresent(builder::add);
+    living.getItemInSlot(Equipment.Slot.BACKPACK)
+        .getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
+        .ifPresent(builder::add);
 
     // Inventory - third
     living.entity().getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)

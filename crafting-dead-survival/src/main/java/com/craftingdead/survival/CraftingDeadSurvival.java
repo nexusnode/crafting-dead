@@ -22,14 +22,14 @@ import java.util.Random;
 import org.slf4j.Logger;
 import com.craftingdead.core.event.GunEvent;
 import com.craftingdead.core.event.LivingExtensionEvent;
+import com.craftingdead.core.tags.ModItemTags;
 import com.craftingdead.core.world.action.ActionTypes;
 import com.craftingdead.core.world.action.item.EntityItemAction;
 import com.craftingdead.core.world.entity.extension.BasicLivingExtension;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
-import com.craftingdead.core.world.inventory.ModEquipmentSlot;
 import com.craftingdead.core.world.item.ModItems;
-import com.craftingdead.core.world.item.clothing.Clothing;
+import com.craftingdead.core.world.item.equipment.Equipment;
 import com.craftingdead.survival.client.ClientDist;
 import com.craftingdead.survival.data.SurvivalItemTagsProvider;
 import com.craftingdead.survival.data.SurvivalRecipeProvider;
@@ -241,9 +241,9 @@ public class CraftingDeadSurvival {
         return;
       }
 
-      extension.setEquipmentDropChance(ModEquipmentSlot.CLOTHING,
+      extension.setEquipmentDropChance(Equipment.Slot.CLOTHING,
           serverConfig.zombieClothingDropChance.get().floatValue());
-      extension.setEquipmentDropChance(ModEquipmentSlot.HAT,
+      extension.setEquipmentDropChance(Equipment.Slot.HAT,
           serverConfig.zombieHatDropChance.get().floatValue());
       zombie.setDropChance(EquipmentSlot.MAINHAND,
           serverConfig.zombieHandDropChance.get().floatValue());
@@ -312,7 +312,7 @@ public class CraftingDeadSurvival {
   @SubscribeEvent
   public void handleRightClickItem(PlayerInteractEvent.RightClickItem event) {
     if (!event.getWorld().isClientSide()
-        && event.getItemStack().getCapability(Clothing.CAPABILITY).isPresent()) {
+        && event.getItemStack().is(ModItemTags.CLOTHING)) {
       var extension = PlayerExtension.getOrThrow(event.getPlayer());
       SurvivalActionTypes.SHRED_CLOTHING.get().createAction(extension, event.getHand())
           .ifPresent(action -> extension.performAction(action, true));

@@ -20,23 +20,23 @@ package com.craftingdead.core.network.message.play;
 
 import java.util.function.Supplier;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
-import com.craftingdead.core.world.inventory.ModEquipmentSlot;
+import com.craftingdead.core.world.item.equipment.Equipment;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
 
-public record OpenStorageMessage(ModEquipmentSlot slot) {
+public record OpenStorageMessage(Equipment.Slot slot) {
 
   public void encode(FriendlyByteBuf out) {
     out.writeEnum(this.slot);
   }
 
   public static OpenStorageMessage decode(FriendlyByteBuf in) {
-    return new OpenStorageMessage(in.readEnum(ModEquipmentSlot.class));
+    return new OpenStorageMessage(in.readEnum(Equipment.Slot.class));
   }
 
   public boolean handle(Supplier<NetworkEvent.Context> ctx) {
     ctx.get().enqueueWork(
-        () -> PlayerExtension.getOrThrow(ctx.get().getSender()).openStorage(this.slot));
+        () -> PlayerExtension.getOrThrow(ctx.get().getSender()).openMenu(this.slot));
     return true;
   }
 }

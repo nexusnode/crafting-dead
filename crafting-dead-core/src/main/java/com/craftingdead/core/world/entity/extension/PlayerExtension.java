@@ -20,7 +20,7 @@ package com.craftingdead.core.world.entity.extension;
 
 import org.jetbrains.annotations.Nullable;
 import com.craftingdead.core.capability.CapabilityUtil;
-import com.craftingdead.core.world.inventory.ModEquipmentSlot;
+import com.craftingdead.core.world.item.equipment.Equipment;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
@@ -48,7 +48,7 @@ public interface PlayerExtension<E extends Player>
 
   void openEquipmentMenu();
 
-  void openStorage(ModEquipmentSlot slot);
+  void openMenu(Equipment.Slot slot);
 
   ItemStack getHandcuffs();
 

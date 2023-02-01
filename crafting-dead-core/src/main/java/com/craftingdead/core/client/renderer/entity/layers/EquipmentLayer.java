@@ -23,7 +23,7 @@ import java.util.function.Consumer;
 import org.jetbrains.annotations.Nullable;
 import com.craftingdead.core.client.util.RenderUtil;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
-import com.craftingdead.core.world.inventory.ModEquipmentSlot;
+import com.craftingdead.core.world.item.equipment.Equipment;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.EntityModel;
@@ -42,7 +42,7 @@ import net.minecraft.world.item.ItemStack;
 public class EquipmentLayer<T extends LivingEntity, M extends EntityModel<T> & HeadedModel>
     extends RenderLayer<T, M> {
 
-  private final ModEquipmentSlot slot;
+  private final Equipment.Slot slot;
 
   /**
    * Whether this model should be rotated when the player is crouching.
@@ -82,10 +82,11 @@ public class EquipmentLayer<T extends LivingEntity, M extends EntityModel<T> & H
 
       livingEntity.getCapability(LivingExtension.CAPABILITY).ifPresent(living -> {
 
-        final var itemStack = living.getItemHandler().getStackInSlot(this.slot.getIndex());
+        final var itemStack = living.getItemInSlot(this.slot);
 
         if (!itemStack.isEmpty()) {
-          var bakedModel = itemRenderer.getModel(itemStack, livingEntity.level, livingEntity, 0);
+          var bakedModel =
+              itemRenderer.getModel(itemStack, livingEntity.getLevel(), livingEntity, 0);
 
           poseStack.pushPose();
 
@@ -129,7 +130,7 @@ public class EquipmentLayer<T extends LivingEntity, M extends EntityModel<T> & H
   public static class Builder<T extends LivingEntity, M extends EntityModel<T> & HeadedModel> {
 
     private final LivingEntityRenderer<T, M> renderer;
-    private ModEquipmentSlot slot;
+    private Equipment.Slot slot;
     @Nullable
     private Consumer<PoseStack> tranformation;
     private boolean useCrouchOrientation;
@@ -139,7 +140,7 @@ public class EquipmentLayer<T extends LivingEntity, M extends EntityModel<T> & H
       this.renderer = renderer;
     }
 
-    public Builder<T, M> slot(ModEquipmentSlot slot) {
+    public Builder<T, M> slot(Equipment.Slot slot) {
       this.slot = slot;
       return this;
     }

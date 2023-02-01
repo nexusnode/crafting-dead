@@ -18,14 +18,13 @@
 
 package com.craftingdead.survival.world.action;
 
-import com.craftingdead.core.capability.CapabilityUtil;
+import com.craftingdead.core.tags.ModItemTags;
 import com.craftingdead.core.world.action.ActionType;
 import com.craftingdead.core.world.action.ActionTypes;
 import com.craftingdead.core.world.action.TargetSelector;
 import com.craftingdead.core.world.action.item.BlockItemActionType;
 import com.craftingdead.core.world.action.item.EntityItemActionType;
 import com.craftingdead.core.world.item.ModItems;
-import com.craftingdead.core.world.item.clothing.Clothing;
 import com.craftingdead.survival.CraftingDeadSurvival;
 import com.craftingdead.survival.world.effect.SurvivalMobEffects;
 import com.craftingdead.survival.world.item.SurvivalItems;
@@ -46,7 +45,7 @@ public class SurvivalActionTypes {
   public static final RegistryObject<EntityItemActionType<?>> SHRED_CLOTHING =
       deferredRegister.register("shred_clothing",
           () -> EntityItemActionType.builder(TargetSelector.SELF_ONLY)
-              .forItem(CapabilityUtil.capabilityPresent(Clothing.CAPABILITY))
+              .forItem(itemStack -> itemStack.is(ModItemTags.CLOTHING))
               .customAction((performer, target) -> {
                 var random = target.random();
                 int randomRagAmount = random.nextInt(3) + 3;

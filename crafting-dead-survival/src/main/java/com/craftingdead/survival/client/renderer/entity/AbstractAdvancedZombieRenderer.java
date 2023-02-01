@@ -21,7 +21,7 @@ package com.craftingdead.survival.client.renderer.entity;
 import com.craftingdead.core.client.renderer.entity.layers.ClothingLayer;
 import com.craftingdead.core.client.renderer.entity.layers.EquipmentLayer;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
-import com.craftingdead.core.world.inventory.ModEquipmentSlot;
+import com.craftingdead.core.world.item.equipment.Equipment;
 import com.craftingdead.survival.CraftingDeadSurvival;
 import com.craftingdead.survival.client.model.AdvancedZombieModel;
 import com.craftingdead.survival.world.entity.extension.ZombieHandler;
@@ -38,20 +38,20 @@ public abstract class AbstractAdvancedZombieRenderer<T extends Zombie, M extends
     super(context, model, scale);
     this.addLayer(new ClothingLayer<>(this));
     this.addLayer(EquipmentLayer.builder(this)
-        .slot(ModEquipmentSlot.MELEE)
+        .slot(Equipment.Slot.MELEE)
         .useCrouchOrientation(true)
         .build());
     this.addLayer(EquipmentLayer.builder(this)
-        .slot(ModEquipmentSlot.VEST)
+        .slot(Equipment.Slot.VEST)
         .useCrouchOrientation(true)
         .build());
     this.addLayer(EquipmentLayer.builder(this)
-        .slot(ModEquipmentSlot.HAT)
+        .slot(Equipment.Slot.HAT)
         .useHeadOrientation(true)
         .transformation(poseStack -> poseStack.scale(-1F, -1F, 1F))
         .build());
     this.addLayer(EquipmentLayer.builder(this)
-        .slot(ModEquipmentSlot.GUN)
+        .slot(Equipment.Slot.GUN)
         .useCrouchOrientation(true)
         .build());
   }

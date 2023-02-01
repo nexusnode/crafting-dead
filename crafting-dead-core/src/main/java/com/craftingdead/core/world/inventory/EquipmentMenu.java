@@ -18,12 +18,12 @@
 
 package com.craftingdead.core.world.inventory;
 
-import com.craftingdead.core.tags.ModItemTags;
-import com.craftingdead.core.world.inventory.storage.Storage;
+import java.util.function.BiPredicate;
+import com.craftingdead.core.world.entity.extension.PlayerExtension;
+import com.craftingdead.core.world.item.equipment.Equipment;
 import com.craftingdead.core.world.item.gun.Gun;
 import com.craftingdead.core.world.item.gun.attachment.AttachmentLike;
 import com.craftingdead.core.world.item.gun.skin.Paint;
-import java.util.function.BiPredicate;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -31,79 +31,68 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ResultContainer;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.ItemStackHandler;
 
 public class EquipmentMenu extends AbstractContainerMenu {
-
-  private final IItemHandler equipment;
 
   private final ResultContainer outputContainer = new ResultContainer();
   private final SimpleContainer craftingContainer = new SimpleContainer(4);
 
-  public EquipmentMenu(int id, Inventory playerInventory) {
-    this(id, playerInventory, new ItemStackHandler(ModEquipmentSlot.values().length));
+  private final PlayerExtension<?> player;
+
+  public EquipmentMenu(int id, Inventory inventory) {
+    this(id, PlayerExtension.getOrThrow(inventory.player));
   }
 
-  public EquipmentMenu(int id, Inventory playerInventory, IItemHandler equipment) {
+  public EquipmentMenu(int id, PlayerExtension<?> player) {
     super(ModMenuTypes.EQUIPMENT.get(), id);
-    this.equipment = equipment;
+
+    this.player = player;
+
     this.craftingContainer.addListener(this::slotsChanged);
+
+    var inventory = player.entity().getInventory();
 
     final int slotSize = 18;
 
     for (int y = 0; y < 3; ++y) {
       for (int x = 0; x < 9; ++x) {
         this.addSlot(
-            new Slot(playerInventory, x + (y + 1) * 9, 8 + x * slotSize, 84 + y * slotSize));
+            new Slot(inventory, x + (y + 1) * 9, 8 + x * slotSize, 84 + y * slotSize));
       }
     }
 
     for (int x = 0; x < 9; ++x) {
-      this.addSlot(new Slot(playerInventory, x, 8 + x * slotSize, 141));
+      this.addSlot(new Slot(inventory, x, 8 + x * slotSize, 141));
     }
 
     int equipmentColumnX = 77;
     int equipmentColumnY = 8;
 
-    this.addSlot(new PredicateItemHandlerSlot(this.equipment,
-        ModEquipmentSlot.HAT.getIndex(),
-        equipmentColumnX, equipmentColumnY,
-        (slot, itemStack) -> itemStack.is(ModItemTags.HATS)));
+    this.addSlot(new EquipmentSlot(player,
+        Equipment.Slot.HAT, equipmentColumnX, equipmentColumnY));
 
-    this.addSlot(new PredicateItemHandlerSlot(this.equipment,
-        ModEquipmentSlot.CLOTHING.getIndex(),
-        equipmentColumnX, equipmentColumnY += slotSize,
-        (slot, itemStack) -> itemStack.is(ModItemTags.CLOTHING)));
+    this.addSlot(new EquipmentSlot(player,
+        Equipment.Slot.CLOTHING,
+        equipmentColumnX, equipmentColumnY += slotSize));
 
-    this.addSlot(new PredicateItemHandlerSlot(this.equipment,
-        ModEquipmentSlot.VEST.getIndex(),
-        equipmentColumnX, equipmentColumnY += slotSize,
-        (slot, itemStack) -> itemStack
-            .getCapability(Storage.CAPABILITY)
-            .map(storage -> storage.isValidForSlot(ModEquipmentSlot.VEST))
-            .orElse(false)));
+    this.addSlot(new EquipmentSlot(player,
+        Equipment.Slot.VEST,
+        equipmentColumnX, equipmentColumnY += slotSize));
 
-    this.addSlot(new PredicateItemHandlerSlot(this.equipment,
-        ModEquipmentSlot.BACKPACK.getIndex(),
-        equipmentColumnX, equipmentColumnY + slotSize,
-        (slot, itemStack) -> itemStack
-            .getCapability(Storage.CAPABILITY)
-            .map(storage -> storage.isValidForSlot(ModEquipmentSlot.BACKPACK))
-            .orElse(false)));
+    this.addSlot(new EquipmentSlot(player,
+        Equipment.Slot.BACKPACK,
+        equipmentColumnX, equipmentColumnY + slotSize));
 
     int weaponColumnX = 8;
     int weaponColumnY = 8;
 
-    this.addSlot(new PredicateItemHandlerSlot(this.equipment,
-        ModEquipmentSlot.GUN.getIndex(),
-        weaponColumnX, weaponColumnY,
-        (slot, itemStack) -> itemStack.getCapability(Gun.CAPABILITY).isPresent()));
+    this.addSlot(new EquipmentSlot(player,
+        Equipment.Slot.GUN,
+        weaponColumnX, weaponColumnY));
 
-    this.addSlot(new PredicateItemHandlerSlot(this.equipment,
-        ModEquipmentSlot.MELEE.getIndex(),
-        weaponColumnX, weaponColumnY + slotSize,
-        (slot, itemStack) -> itemStack.is(ModItemTags.MELEES)));
+    this.addSlot(new EquipmentSlot(player,
+        Equipment.Slot.MELEE,
+        weaponColumnX, weaponColumnY + slotSize));
 
     final int gunCraftSlotGap = 2;
     final int gunCraftY = 6;
@@ -146,22 +135,22 @@ public class EquipmentMenu extends AbstractContainerMenu {
         (slot, itemStack) -> Paint.isValid(this.getGunStack(), itemStack)));
   }
 
+  public PlayerExtension<?> getPlayer() {
+    return this.player;
+  }
+
   @Override
-  public boolean stillValid(Player playerEntity) {
+  public boolean stillValid(Player player) {
     return true;
   }
 
   @Override
-  public void removed(Player playerEntity) {
-    super.removed(playerEntity);
-    if (!playerEntity.level.isClientSide()) {
-      this.clearContainer(playerEntity, this.craftingContainer);
-      this.clearContainer(playerEntity, this.outputContainer);
+  public void removed(Player player) {
+    super.removed(player);
+    if (!player.getLevel().isClientSide()) {
+      this.clearContainer(player, this.craftingContainer);
+      this.clearContainer(player, this.outputContainer);
     }
-  }
-
-  public IItemHandler getItemHandler() {
-    return this.equipment;
   }
 
   public ItemStack getGunStack() {

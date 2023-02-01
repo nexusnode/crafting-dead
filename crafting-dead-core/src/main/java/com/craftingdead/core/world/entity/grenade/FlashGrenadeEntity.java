@@ -26,10 +26,10 @@ import com.craftingdead.core.world.effect.ModMobEffects;
 import com.craftingdead.core.world.entity.EntityUtil;
 import com.craftingdead.core.world.entity.ModEntityTypes;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
-import com.craftingdead.core.world.inventory.ModEquipmentSlot;
 import com.craftingdead.core.world.item.GrenadeItem;
 import com.craftingdead.core.world.item.ModItems;
-import com.craftingdead.core.world.item.hat.Hat;
+import com.craftingdead.core.world.item.equipment.Equipment;
+import com.craftingdead.core.world.item.equipment.Hat;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -37,7 +37,6 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
 public class FlashGrenadeEntity extends Grenade {
@@ -122,21 +121,20 @@ public class FlashGrenadeEntity extends Grenade {
    *
    * @return int - The amount in ticks. Zero if it should not be applied.
    */
-  public int calculateDuration(LivingEntity viewerEntity, boolean insideFOV) {
+  public int calculateDuration(LivingEntity viewerEntity, boolean visible) {
     if (!viewerEntity.hasLineOfSight(this)) {
       return 0;
     }
 
-    ItemStack hatItemStack = viewerEntity
+    var immuneToFlashes = viewerEntity
         .getCapability(LivingExtension.CAPABILITY)
-        .map(living -> living.getItemHandler().getStackInSlot(ModEquipmentSlot.HAT.getIndex()))
-        .orElse(ItemStack.EMPTY);
-
-    final boolean isImmuneToFlashes =
-        hatItemStack.getCapability(Hat.CAPABILITY).map(Hat::isImmuneToFlashes).orElse(false);
+        .resolve()
+        .flatMap(living -> living.getEquipmentInSlot(Equipment.Slot.HAT, Hat.class))
+        .map(Hat::immuneToFlashes)
+        .orElse(false);
 
     var flashRange = CraftingDead.serverConfig.explosivesFlashRadius.get();
-    if (insideFOV && !isImmuneToFlashes) {
+    if (visible && !immuneToFlashes) {
       double distanceProportion =
           Mth.clamp(this.distanceTo(viewerEntity) / flashRange, 0F, 1F);
       int calculatedDuration =

@@ -21,8 +21,8 @@ package com.craftingdead.core.world.item;
 import java.util.List;
 import org.jetbrains.annotations.Nullable;
 import com.craftingdead.core.capability.CapabilityUtil;
-import com.craftingdead.core.world.item.hat.DefaultHat;
-import com.craftingdead.core.world.item.hat.Hat;
+import com.craftingdead.core.world.item.equipment.Equipment;
+import com.craftingdead.core.world.item.equipment.SimpleHat;
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -44,12 +44,15 @@ public class HatItem extends Item {
 
   private final boolean nightVision;
 
+  private final boolean waterBreathing;
+
   public HatItem(Properties properties) {
     super(properties);
     this.headshotReductionPercentage = properties.headshotReductionPercentage;
     this.immuneToFlashes = properties.immuneToFlashes;
     this.immuneToGas = properties.immuneToGas;
     this.nightVision = properties.nightVision;
+    this.waterBreathing = properties.waterBreathing;
   }
 
   @Override
@@ -81,9 +84,12 @@ public class HatItem extends Item {
   @Override
   public ICapabilityProvider initCapabilities(ItemStack itemStack, @Nullable CompoundTag nbt) {
     return CapabilityUtil.provider(
-        () -> new DefaultHat(this.nightVision, this.headshotReductionPercentage,
+        () -> new SimpleHat(
+            this.waterBreathing,
+            this.nightVision,
+            this.headshotReductionPercentage,
             this.immuneToFlashes),
-        Hat.CAPABILITY);
+        Equipment.CAPABILITY);
   }
 
   public static class Properties extends Item.Properties {
@@ -92,9 +98,15 @@ public class HatItem extends Item {
     private boolean immuneToFlashes;
     private boolean immuneToGas;
     private boolean nightVision;
+    private boolean waterBreathing;
 
     public Properties setHeadshotReductionPercentage(float headshotReductionPercentage) {
       this.headshotReductionPercentage = headshotReductionPercentage;
+      return this;
+    }
+
+    public Properties waterBreathing(boolean waterBreathing) {
+      this.waterBreathing = waterBreathing;
       return this;
     }
 

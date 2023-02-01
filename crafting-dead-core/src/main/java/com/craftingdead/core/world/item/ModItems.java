@@ -30,8 +30,9 @@ import com.craftingdead.core.world.entity.grenade.FireGrenadeEntity;
 import com.craftingdead.core.world.entity.grenade.FlashGrenadeEntity;
 import com.craftingdead.core.world.entity.grenade.FragGrenade;
 import com.craftingdead.core.world.entity.grenade.SmokeGrenadeEntity;
-import com.craftingdead.core.world.item.clothing.Clothing;
+import com.craftingdead.core.world.inventory.GenericMenu;
 import com.craftingdead.core.world.item.combatslot.CombatSlot;
+import com.craftingdead.core.world.item.equipment.Equipment;
 import com.craftingdead.core.world.item.gun.Gun;
 import com.craftingdead.core.world.item.gun.GunAnimationEvent;
 import com.craftingdead.core.world.item.gun.GunConfigurations;
@@ -1219,40 +1220,22 @@ public class ModItems {
   // ================================================================================
 
   public static final RegistryObject<Item> BLACK_TACTICAL_VEST =
-      deferredRegister.register("black_tactical_vest", () -> new StorageItem(StorageItem.VEST,
-          new Item.Properties()
-              .stacksTo(1)
-              .tab(COSMETICS_TAB)));
+      deferredRegister.register("black_tactical_vest", ModItems::weakVest);
 
   public static final RegistryObject<Item> GHILLIE_TACTICAL_VEST =
-      deferredRegister.register("ghillie_tactical_vest", () -> new StorageItem(StorageItem.VEST,
-          new Item.Properties()
-              .stacksTo(1)
-              .tab(COSMETICS_TAB)));
+      deferredRegister.register("ghillie_tactical_vest", ModItems::weakVest);
 
   public static final RegistryObject<Item> GREEN_TACTICAL_VEST =
-      deferredRegister.register("green_tactical_vest", () -> new StorageItem(StorageItem.VEST,
-          new Item.Properties()
-              .stacksTo(1)
-              .tab(COSMETICS_TAB)));
+      deferredRegister.register("green_tactical_vest", ModItems::weakVest);
 
   public static final RegistryObject<Item> GREY_TACTICAL_VEST =
-      deferredRegister.register("grey_tactical_vest", () -> new StorageItem(StorageItem.VEST,
-          new Item.Properties()
-              .stacksTo(1)
-              .tab(COSMETICS_TAB)));
+      deferredRegister.register("grey_tactical_vest", ModItems::weakVest);
 
   public static final RegistryObject<Item> RIOT_VEST =
-      deferredRegister.register("riot_vest", () -> new StorageItem(StorageItem.VEST,
-          new Item.Properties()
-              .stacksTo(1)
-              .tab(COSMETICS_TAB)));
+      deferredRegister.register("riot_vest", ModItems::strongVest);
 
   public static final RegistryObject<Item> TAN_TACTICAL_VEST =
-      deferredRegister.register("tan_tactical_vest", () -> new StorageItem(StorageItem.VEST,
-          new Item.Properties()
-              .stacksTo(1)
-              .tab(COSMETICS_TAB)));
+      deferredRegister.register("tan_tactical_vest", ModItems::weakVest);
 
   // ================================================================================
   // Hats, Helmets and Masks
@@ -1471,6 +1454,7 @@ public class ModItems {
 
   public static final RegistryObject<Item> SCUBA_MASK = deferredRegister.register("scuba_mask",
       () -> new HatItem((HatItem.Properties) new HatItem.Properties()
+          .waterBreathing(true)
           .stacksTo(1)
           .tab(COSMETICS_TAB)));
 
@@ -1533,184 +1517,109 @@ public class ModItems {
   public static final RegistryObject<Item> ARMY_CLOTHING =
       deferredRegister.register("army_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-              .addAttributeModifier(Attributes.ARMOR, new AttributeModifier(
-                  Clothing.MODIFIER_ID,
-                  "Armor modifier",
-                  3,
-                  AttributeModifier.Operation.ADDITION))
               .stacksTo(1)
               .tab(COSMETICS_TAB)));
 
   public static final RegistryObject<Item> SAS_CLOTHING =
       deferredRegister.register("sas_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-              .addAttributeModifier(Attributes.ARMOR, new AttributeModifier(
-                  Clothing.MODIFIER_ID,
-                  "Armor modifier",
-                  3,
-                  AttributeModifier.Operation.ADDITION))
               .stacksTo(1)
               .tab(COSMETICS_TAB)));
 
   public static final RegistryObject<Item> SPETSNAZ_CLOTHING =
       deferredRegister.register("spetsnaz_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-              .addAttributeModifier(Attributes.ARMOR, new AttributeModifier(
-                  Clothing.MODIFIER_ID,
-                  "Armor modifier",
-                  3,
-                  AttributeModifier.Operation.ADDITION))
               .stacksTo(1)
               .tab(COSMETICS_TAB)));
 
   public static final RegistryObject<Item> POLICE_CLOTHING =
       deferredRegister.register("police_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-              .addAttributeModifier(Attributes.ARMOR, new AttributeModifier(
-                  Clothing.MODIFIER_ID,
-                  "Armor modifier",
-                  2,
-                  AttributeModifier.Operation.ADDITION))
               .stacksTo(1)
               .tab(COSMETICS_TAB)));
 
   public static final RegistryObject<Item> CAMO_CLOTHING =
       deferredRegister.register("camo_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-              .addAttributeModifier(Attributes.ARMOR, new AttributeModifier(
-                  Clothing.MODIFIER_ID,
-                  "Armor modifier",
-                  3,
-                  AttributeModifier.Operation.ADDITION))
               .stacksTo(1)
               .tab(COSMETICS_TAB)));
 
   public static final RegistryObject<Item> COMBAT_BDU_CLOTHING =
       deferredRegister.register("combat_bdu_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-              .addAttributeModifier(Attributes.ARMOR, new AttributeModifier(
-                  Clothing.MODIFIER_ID,
-                  "Armor modifier",
-                  3,
-                  AttributeModifier.Operation.ADDITION))
               .stacksTo(1)
               .tab(COSMETICS_TAB)));
 
   public static final RegistryObject<Item> WINTER_ARMY_CLOTHING =
       deferredRegister.register("winter_army_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-              .addAttributeModifier(Attributes.ARMOR, new AttributeModifier(
-                  Clothing.MODIFIER_ID,
-                  "Armor modifier",
-                  3,
-                  AttributeModifier.Operation.ADDITION))
               .stacksTo(1)
               .tab(COSMETICS_TAB)));
 
   public static final RegistryObject<Item> ARMY_DESERT_CLOTHING =
       deferredRegister.register("army_desert_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-              .addAttributeModifier(Attributes.ARMOR, new AttributeModifier(
-                  Clothing.MODIFIER_ID,
-                  "Armor modifier",
-                  3,
-                  AttributeModifier.Operation.ADDITION))
               .stacksTo(1)
               .tab(COSMETICS_TAB)));
 
   public static final RegistryObject<Item> PILOT_CLOTHING =
       deferredRegister.register("pilot_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-              .addAttributeModifier(Attributes.ARMOR, new AttributeModifier(
-                  Clothing.MODIFIER_ID,
-                  "Armor modifier",
-                  1,
-                  AttributeModifier.Operation.ADDITION))
               .stacksTo(1)
               .tab(COSMETICS_TAB)));
 
   public static final RegistryObject<Item> HAZMAT_CLOTHING =
       deferredRegister.register("hazmat_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-              .addAttributeModifier(Attributes.ARMOR, new AttributeModifier(
-                  Clothing.MODIFIER_ID,
-                  "Armor modifier",
-                  2,
-                  AttributeModifier.Operation.ADDITION))
-              .setFireImmunity(true)
+              .fireImmunity()
               .stacksTo(1)
               .tab(COSMETICS_TAB)));
 
   public static final RegistryObject<Item> TAC_GHILLIE_CLOTHING =
       deferredRegister.register("tac_ghillie_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-              .addAttributeModifier(Attributes.ARMOR, new AttributeModifier(
-                  Clothing.MODIFIER_ID,
-                  "Armor modifier",
-                  2,
-                  AttributeModifier.Operation.ADDITION))
               .stacksTo(1)
               .tab(COSMETICS_TAB)));
 
   public static final RegistryObject<Item> SWAT_CLOTHING =
       deferredRegister.register("swat_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-              .addAttributeModifier(Attributes.ARMOR, new AttributeModifier(
-                  Clothing.MODIFIER_ID,
-                  "Armor modifier",
-                  3,
-                  AttributeModifier.Operation.ADDITION))
               .stacksTo(1)
               .tab(COSMETICS_TAB)));
 
   public static final RegistryObject<Item> SPACE_SUIT_CLOTHING =
       deferredRegister.register("space_suit_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-              .addAttributeModifier(Attributes.ARMOR, new AttributeModifier(
-                  Clothing.MODIFIER_ID,
-                  "Armor modifier",
-                  3,
-                  AttributeModifier.Operation.ADDITION))
               .stacksTo(1)
               .tab(COSMETICS_TAB)));
 
   public static final RegistryObject<Item> SHERIFF_CLOTHING =
       deferredRegister.register("sheriff_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-              .addAttributeModifier(Attributes.ARMOR, new AttributeModifier(
-                  Clothing.MODIFIER_ID,
-                  "Armor modifier",
-                  1,
-                  AttributeModifier.Operation.ADDITION))
               .stacksTo(1)
               .tab(COSMETICS_TAB)));
 
   public static final RegistryObject<Item> JUGGERNAUT_CLOTHING =
       deferredRegister.register("juggernaut_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-              .addAttributeModifier(Attributes.ARMOR, new AttributeModifier(
-                  Clothing.MODIFIER_ID,
+              .attributeModifier(Attributes.ARMOR, new AttributeModifier(
+                  ClothingItem.ARMOR_MODIFIER_ID,
                   "Armor modifier",
-                  3,
+                  5,
                   AttributeModifier.Operation.ADDITION))
-              .addAttributeModifier(Attributes.MOVEMENT_SPEED, new AttributeModifier(
-                  Clothing.MODIFIER_ID,
+              .attributeModifier(Attributes.MOVEMENT_SPEED, new AttributeModifier(
+                  ClothingItem.ARMOR_MODIFIER_ID,
                   "Slowness modifier",
                   -0.15D,
                   AttributeModifier.Operation.MULTIPLY_TOTAL))
-              .setFireImmunity(true)
+              .fireImmunity()
               .stacksTo(1)
               .tab(COSMETICS_TAB)));
 
   public static final RegistryObject<Item> FIREMAN_CLOTHING =
       deferredRegister.register("fireman_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-              .addAttributeModifier(Attributes.ARMOR, new AttributeModifier(
-                  Clothing.MODIFIER_ID,
-                  "Armor modifier",
-                  3,
-                  AttributeModifier.Operation.ADDITION))
-              .setFireImmunity(true)
+              .fireImmunity()
               .stacksTo(1)
               .tab(COSMETICS_TAB)));
 
@@ -1747,56 +1656,31 @@ public class ModItems {
   public static final RegistryObject<Item> SEC_GUARD_CLOTHING =
       deferredRegister.register("sec_guard_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-              .addAttributeModifier(Attributes.ARMOR, new AttributeModifier(
-                  Clothing.MODIFIER_ID,
-                  "Armor modifier",
-                  1,
-                  AttributeModifier.Operation.ADDITION))
               .stacksTo(1)
               .tab(COSMETICS_TAB)));
 
   public static final RegistryObject<Item> MIL_HAZMAT_CLOTHING =
       deferredRegister.register("mil_hazmat_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-              .addAttributeModifier(Attributes.ARMOR, new AttributeModifier(
-                  Clothing.MODIFIER_ID,
-                  "Armor modifier",
-                  2,
-                  AttributeModifier.Operation.ADDITION))
-              .setFireImmunity(true)
+              .fireImmunity()
               .stacksTo(1)
               .tab(COSMETICS_TAB)));
 
   public static final RegistryObject<Item> FULL_GHILLIE_CLOTHING =
       deferredRegister.register("full_ghillie_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-              .addAttributeModifier(Attributes.ARMOR, new AttributeModifier(
-                  Clothing.MODIFIER_ID,
-                  "Armor modifier",
-                  2,
-                  AttributeModifier.Operation.ADDITION))
               .stacksTo(1)
               .tab(COSMETICS_TAB)));
 
   public static final RegistryObject<Item> RED_DUSK_CLOTHING =
       deferredRegister.register("red_dusk_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-              .addAttributeModifier(Attributes.ARMOR, new AttributeModifier(
-                  Clothing.MODIFIER_ID,
-                  "Armor modifier",
-                  2,
-                  AttributeModifier.Operation.ADDITION))
               .stacksTo(1)
               .tab(COSMETICS_TAB)));
 
   public static final RegistryObject<Item> CLONE_CLOTHING =
       deferredRegister.register("clone_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-              .addAttributeModifier(Attributes.ARMOR, new AttributeModifier(
-                  Clothing.MODIFIER_ID,
-                  "Armor modifier",
-                  2,
-                  AttributeModifier.Operation.ADDITION))
               .stacksTo(1)
               .tab(COSMETICS_TAB)));
 
@@ -1809,44 +1693,24 @@ public class ModItems {
   public static final RegistryObject<Item> DEADPOOL_CLOTHING =
       deferredRegister.register("deadpool_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-              .addAttributeModifier(Attributes.ARMOR, new AttributeModifier(
-                  Clothing.MODIFIER_ID,
-                  "Armor modifier",
-                  2,
-                  AttributeModifier.Operation.ADDITION))
               .stacksTo(1)
               .tab(COSMETICS_TAB)));
 
   public static final RegistryObject<Item> NINJA_CLOTHING =
       deferredRegister.register("ninja_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-              .addAttributeModifier(Attributes.ARMOR, new AttributeModifier(
-                  Clothing.MODIFIER_ID,
-                  "Armor modifier",
-                  1,
-                  AttributeModifier.Operation.ADDITION))
               .stacksTo(1)
               .tab(COSMETICS_TAB)));
 
   public static final RegistryObject<Item> ARMY_MEDIC_CLOTHING =
       deferredRegister.register("army_medic_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-              .addAttributeModifier(Attributes.ARMOR, new AttributeModifier(
-                  Clothing.MODIFIER_ID,
-                  "Armor modifier",
-                  3,
-                  AttributeModifier.Operation.ADDITION))
               .stacksTo(1)
               .tab(COSMETICS_TAB)));
 
   public static final RegistryObject<Item> BLUE_DUSK_CLOTHING =
       deferredRegister.register("blue_dusk_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-              .addAttributeModifier(Attributes.ARMOR, new AttributeModifier(
-                  Clothing.MODIFIER_ID,
-                  "Armor modifier",
-                  2,
-                  AttributeModifier.Operation.ADDITION))
               .stacksTo(1)
               .tab(COSMETICS_TAB)));
 
@@ -1859,88 +1723,49 @@ public class ModItems {
   public static final RegistryObject<Item> YELLOW_DUSK_CLOTHING =
       deferredRegister.register("yellow_dusk_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-              .addAttributeModifier(Attributes.ARMOR, new AttributeModifier(
-                  Clothing.MODIFIER_ID,
-                  "Armor modifier",
-                  2,
-                  AttributeModifier.Operation.ADDITION))
               .stacksTo(1)
               .tab(COSMETICS_TAB)));
 
   public static final RegistryObject<Item> ORANGE_DUSK_CLOTHING =
       deferredRegister.register("orange_dusk_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-              .addAttributeModifier(Attributes.ARMOR, new AttributeModifier(
-                  Clothing.MODIFIER_ID,
-                  "Armor modifier",
-                  2,
-                  AttributeModifier.Operation.ADDITION))
               .stacksTo(1)
               .tab(COSMETICS_TAB)));
 
   public static final RegistryObject<Item> GREEN_DUSK_CLOTHING =
       deferredRegister.register("green_dusk_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-              .addAttributeModifier(Attributes.ARMOR, new AttributeModifier(
-                  Clothing.MODIFIER_ID,
-                  "Armor modifier",
-                  2,
-                  AttributeModifier.Operation.ADDITION))
               .stacksTo(1)
               .tab(COSMETICS_TAB)));
 
   public static final RegistryObject<Item> WHITE_DUSK_CLOTHING =
       deferredRegister.register("white_dusk_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-              .addAttributeModifier(Attributes.ARMOR, new AttributeModifier(
-                  Clothing.MODIFIER_ID,
-                  "Armor modifier",
-                  2,
-                  AttributeModifier.Operation.ADDITION))
               .stacksTo(1)
               .tab(COSMETICS_TAB)));
 
   public static final RegistryObject<Item> PURPLE_DUSK_CLOTHING =
       deferredRegister.register("purple_dusk_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-              .addAttributeModifier(Attributes.ARMOR, new AttributeModifier(
-                  Clothing.MODIFIER_ID,
-                  "Armor modifier",
-                  2,
-                  AttributeModifier.Operation.ADDITION))
               .stacksTo(1)
               .tab(COSMETICS_TAB)));
 
   public static final RegistryObject<Item> SCUBA_CLOTHING =
       deferredRegister.register("scuba_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-              .addAttributeModifier(Attributes.ARMOR, new AttributeModifier(
-                  Clothing.MODIFIER_ID,
-                  "Armor modifier",
-                  1,
-                  AttributeModifier.Operation.ADDITION))
+              .enhancesSwimming()
               .stacksTo(1)
               .tab(COSMETICS_TAB)));
 
   public static final RegistryObject<Item> DDPAT_CLOTHING =
       deferredRegister.register("ddpat_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-              .addAttributeModifier(Attributes.ARMOR, new AttributeModifier(
-                  Clothing.MODIFIER_ID,
-                  "Armor modifier",
-                  2,
-                  AttributeModifier.Operation.ADDITION))
               .stacksTo(1)
               .tab(COSMETICS_TAB)));
 
   public static final RegistryObject<Item> CONTRACTOR_CLOTHING =
       deferredRegister.register("contractor_clothing",
           () -> new ClothingItem((ClothingItem.Properties) new ClothingItem.Properties()
-              .addAttributeModifier(Attributes.ARMOR, new AttributeModifier(
-                  Clothing.MODIFIER_ID,
-                  "Armor modifier",
-                  3,
-                  AttributeModifier.Operation.ADDITION))
               .stacksTo(1)
               .tab(COSMETICS_TAB)));
 
@@ -2055,96 +1880,132 @@ public class ModItems {
   // ================================================================================
 
   public static final RegistryObject<Item> SMALL_RED_BACKPACK = deferredRegister
-      .register("small_red_backpack", () -> new StorageItem(StorageItem.SMALL_BACKPACK,
-          new Item.Properties().stacksTo(1).tab(COSMETICS_TAB)));
+      .register("small_red_backpack", ModItems::smallBackpack);
 
   public static final RegistryObject<Item> SMALL_ORANGE_BACKPACK = deferredRegister
-      .register("small_orange_backpack", () -> new StorageItem(StorageItem.SMALL_BACKPACK,
-          new Item.Properties().stacksTo(1).tab(COSMETICS_TAB)));
+      .register("small_orange_backpack", ModItems::smallBackpack);
 
   public static final RegistryObject<Item> SMALL_YELLOW_BACKPACK = deferredRegister
-      .register("small_yellow_backpack", () -> new StorageItem(StorageItem.SMALL_BACKPACK,
-          new Item.Properties().stacksTo(1).tab(COSMETICS_TAB)));
+      .register("small_yellow_backpack", ModItems::smallBackpack);
 
   public static final RegistryObject<Item> SMALL_GREEN_BACKPACK = deferredRegister
-      .register("small_green_backpack", () -> new StorageItem(StorageItem.SMALL_BACKPACK,
-          new Item.Properties().stacksTo(1).tab(COSMETICS_TAB)));
+      .register("small_green_backpack", ModItems::smallBackpack);
 
   public static final RegistryObject<Item> SMALL_BLUE_BACKPACK = deferredRegister
-      .register("small_blue_backpack", () -> new StorageItem(StorageItem.SMALL_BACKPACK,
-          new Item.Properties().stacksTo(1).tab(COSMETICS_TAB)));
+      .register("small_blue_backpack", ModItems::smallBackpack);
 
   public static final RegistryObject<Item> SMALL_PURPLE_BACKPACK = deferredRegister
-      .register("small_purple_backpack", () -> new StorageItem(StorageItem.SMALL_BACKPACK,
-          new Item.Properties().stacksTo(1).tab(COSMETICS_TAB)));
+      .register("small_purple_backpack", ModItems::smallBackpack);
 
   public static final RegistryObject<Item> MEDIUM_RED_BACKPACK = deferredRegister
-      .register("medium_red_backpack", () -> new StorageItem(StorageItem.MEDIUM_BACKPACK,
-          new Item.Properties().stacksTo(1).tab(COSMETICS_TAB)));
+      .register("medium_red_backpack", ModItems::mediumBackpack);
 
   public static final RegistryObject<Item> MEDIUM_ORANGE_BACKPACK = deferredRegister
-      .register("medium_orange_backpack", () -> new StorageItem(StorageItem.MEDIUM_BACKPACK,
-          new Item.Properties().stacksTo(1).tab(COSMETICS_TAB)));
+      .register("medium_orange_backpack", ModItems::mediumBackpack);
 
   public static final RegistryObject<Item> MEDIUM_YELLOW_BACKPACK = deferredRegister
-      .register("medium_yellow_backpack", () -> new StorageItem(StorageItem.MEDIUM_BACKPACK,
-          new Item.Properties().stacksTo(1).tab(COSMETICS_TAB)));
+      .register("medium_yellow_backpack", ModItems::mediumBackpack);
 
   public static final RegistryObject<Item> MEDIUM_GREEN_BACKPACK = deferredRegister
-      .register("medium_green_backpack", () -> new StorageItem(StorageItem.MEDIUM_BACKPACK,
-          new Item.Properties().stacksTo(1).tab(COSMETICS_TAB)));
+      .register("medium_green_backpack", ModItems::mediumBackpack);
 
   public static final RegistryObject<Item> MEDIUM_BLUE_BACKPACK = deferredRegister
-      .register("medium_blue_backpack", () -> new StorageItem(StorageItem.MEDIUM_BACKPACK,
-          new Item.Properties().stacksTo(1).tab(COSMETICS_TAB)));
+      .register("medium_blue_backpack", ModItems::mediumBackpack);
 
   public static final RegistryObject<Item> MEDIUM_PURPLE_BACKPACK = deferredRegister
-      .register("medium_purple_backpack", () -> new StorageItem(StorageItem.MEDIUM_BACKPACK,
-          new Item.Properties().stacksTo(1).tab(COSMETICS_TAB)));
+      .register("medium_purple_backpack", ModItems::mediumBackpack);
 
   public static final RegistryObject<Item> MEDIUM_GREY_BACKPACK = deferredRegister
-      .register("medium_grey_backpack", () -> new StorageItem(StorageItem.MEDIUM_BACKPACK,
-          new Item.Properties().stacksTo(1).tab(COSMETICS_TAB)));
+      .register("medium_grey_backpack", ModItems::mediumBackpack);
 
   public static final RegistryObject<Item> MEDIUM_BLACK_BACKPACK = deferredRegister
-      .register("medium_black_backpack", () -> new StorageItem(StorageItem.MEDIUM_BACKPACK,
-          new Item.Properties().stacksTo(1).tab(COSMETICS_TAB)));
+      .register("medium_black_backpack", ModItems::mediumBackpack);
 
   public static final RegistryObject<Item> MEDIUM_GHILLIE_BACKPACK = deferredRegister
-      .register("medium_ghillie_backpack", () -> new StorageItem(StorageItem.MEDIUM_BACKPACK,
-          new Item.Properties().stacksTo(1).tab(COSMETICS_TAB)));
+      .register("medium_ghillie_backpack", ModItems::mediumBackpack);
 
   public static final RegistryObject<Item> MEDIUM_WHITE_BACKPACK = deferredRegister
-      .register("medium_white_backpack", () -> new StorageItem(StorageItem.MEDIUM_BACKPACK,
-          new Item.Properties().stacksTo(1).tab(COSMETICS_TAB)));
+      .register("medium_white_backpack", ModItems::mediumBackpack);
 
   public static final RegistryObject<Item> LARGE_GREY_BACKPACK = deferredRegister
-      .register("large_grey_backpack", () -> new StorageItem(StorageItem.LARGE_BACKPACK,
-          new Item.Properties().stacksTo(1).tab(COSMETICS_TAB)));
+      .register("large_grey_backpack", ModItems::largeBackpack);
 
   public static final RegistryObject<Item> LARGE_GREEN_BACKPACK = deferredRegister
-      .register("large_green_backpack", () -> new StorageItem(StorageItem.LARGE_BACKPACK,
-          new Item.Properties().stacksTo(1).tab(COSMETICS_TAB)));
+      .register("large_green_backpack", ModItems::largeBackpack);
 
   public static final RegistryObject<Item> LARGE_TAN_BACKPACK = deferredRegister
-      .register("large_tan_backpack", () -> new StorageItem(StorageItem.LARGE_BACKPACK,
-          new Item.Properties().stacksTo(1).tab(COSMETICS_TAB)));
+      .register("large_tan_backpack", ModItems::largeBackpack);
 
   public static final RegistryObject<Item> LARGE_BLACK_BACKPACK = deferredRegister
-      .register("large_black_backpack", () -> new StorageItem(StorageItem.LARGE_BACKPACK,
-          new Item.Properties().stacksTo(1).tab(COSMETICS_TAB)));
+      .register("large_black_backpack", ModItems::largeBackpack);
 
   public static final RegistryObject<Item> LARGE_GHILLIE_BACKPACK = deferredRegister
-      .register("large_ghillie_backpack", () -> new StorageItem(StorageItem.LARGE_BACKPACK,
-          new Item.Properties().stacksTo(1).tab(COSMETICS_TAB)));
+      .register("large_ghillie_backpack", ModItems::largeBackpack);
 
   public static final RegistryObject<Item> TAN_GUN_BAG = deferredRegister
-      .register("tan_gun_bag", () -> new StorageItem(StorageItem.GUN_BAG,
-          new Item.Properties().stacksTo(1).tab(COSMETICS_TAB)));
+      .register("tan_gun_bag", ModItems::gunBag);
 
   public static final RegistryObject<Item> GREY_GUN_BAG = deferredRegister
-      .register("grey_gun_bag", () -> new StorageItem(StorageItem.GUN_BAG,
-          new Item.Properties().stacksTo(1).tab(COSMETICS_TAB)));
+      .register("grey_gun_bag", ModItems::gunBag);
+
+  private static StorageItem weakVest() {
+    return vest(4.0F, 1.5F);
+  }
+
+  private static StorageItem strongVest() {
+    return vest(8.0F, 3.0F);
+  }
+
+  private static StorageItem vest(float armor, float armorToughness) {
+    return new StorageItem((StorageItem.Properties) new StorageItem.Properties()
+        .attributeModifier(Attributes.ARMOR,
+            new AttributeModifier(StorageItem.ARMOR_MODIFIER_ID, "Armor modifier",
+                armor, AttributeModifier.Operation.ADDITION))
+        .attributeModifier(Attributes.ARMOR_TOUGHNESS,
+            new AttributeModifier(StorageItem.ARMOR_MODIFIER_ID, "Armor toughness",
+                armorToughness, AttributeModifier.Operation.ADDITION))
+        .menuConstructor(GenericMenu::createVest)
+        .slot(Equipment.Slot.VEST)
+        .itemRows(2)
+        .stacksTo(1)
+        .tab(COSMETICS_TAB));
+  }
+
+  private static StorageItem smallBackpack() {
+    return new StorageItem((StorageItem.Properties) new StorageItem.Properties()
+        .slot(Equipment.Slot.BACKPACK)
+        .itemRows(2)
+        .menuConstructor(GenericMenu::createSmallBackpack)
+        .stacksTo(1)
+        .tab(COSMETICS_TAB));
+  }
+
+  private static StorageItem mediumBackpack() {
+    return new StorageItem((StorageItem.Properties) new StorageItem.Properties()
+        .slot(Equipment.Slot.BACKPACK)
+        .itemRows(3)
+        .menuConstructor(GenericMenu::createMediumBackpack)
+        .stacksTo(1)
+        .tab(COSMETICS_TAB));
+  }
+
+  private static StorageItem largeBackpack() {
+    return new StorageItem((StorageItem.Properties) new StorageItem.Properties()
+        .slot(Equipment.Slot.BACKPACK)
+        .itemRows(4)
+        .menuConstructor(GenericMenu::createLargeBackpack)
+        .stacksTo(1)
+        .tab(COSMETICS_TAB));
+  }
+
+  private static StorageItem gunBag() {
+    return new StorageItem((StorageItem.Properties) new StorageItem.Properties()
+        .slot(Equipment.Slot.BACKPACK)
+        .itemRows(2)
+        .menuConstructor(GenericMenu::createGunBag)
+        .stacksTo(1)
+        .tab(COSMETICS_TAB));
+  }
 
   static {
     ArbitraryTooltips.registerTooltip(SCUBA_MASK,

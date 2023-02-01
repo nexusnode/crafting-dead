@@ -27,8 +27,7 @@ import com.craftingdead.core.network.SynchedData;
 import com.craftingdead.core.network.message.play.EnableCombatModeMessage;
 import com.craftingdead.core.world.action.Action;
 import com.craftingdead.core.world.inventory.EquipmentMenu;
-import com.craftingdead.core.world.inventory.ModEquipmentSlot;
-import com.craftingdead.core.world.inventory.storage.Storage;
+import com.craftingdead.core.world.item.equipment.Equipment;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -46,6 +45,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.MenuConstructor;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.block.state.BlockState;
@@ -228,21 +228,23 @@ final class PlayerExtensionImpl<E extends Player>
       return;
     }
     this.entity().openMenu(new SimpleMenuProvider(
-        (windowId, inventory, player) -> new EquipmentMenu(windowId,
-            this.entity().getInventory(), this.getItemHandler()),
+        (windowId, inventory, player) -> new EquipmentMenu(windowId, this),
         new TranslatableComponent("container.equipment")));
   }
 
   @Override
-  public void openStorage(ModEquipmentSlot slotType) {
-    var storageStack = this.getItemHandler().getStackInSlot(slotType.getIndex());
-    storageStack.getCapability(Storage.CAPABILITY)
-        .ifPresent(storage -> this.entity().openMenu(
-            new SimpleMenuProvider(storage, storageStack.getHoverName())));
+  public void openMenu(Equipment.Slot slot) {
+    var itemStack = this.getItemInSlot(slot);
+    itemStack.getCapability(Equipment.CAPABILITY)
+        .filter(MenuConstructor.class::isInstance)
+        .map(MenuConstructor.class::cast)
+        .ifPresent(constructor -> this.entity().openMenu(
+            new SimpleMenuProvider(constructor, itemStack.getHoverName())));
   }
 
   @Override
-  public boolean handleDeathLoot(DamageSource cause, Collection<ItemEntity> drops, int lootingLevel) {
+  public boolean handleDeathLoot(DamageSource cause, Collection<ItemEntity> drops,
+      int lootingLevel) {
     if (super.handleDeathLoot(cause, drops, lootingLevel)) {
       return true;
     }
@@ -267,8 +269,8 @@ final class PlayerExtensionImpl<E extends Player>
   public void copyFrom(PlayerExtension<ServerPlayer> that, boolean wasDeath) {
     // Copies the inventory. Doesn't actually matter if it was death or not.
     // Death drops from 'that' should be cleared on death drops to prevent item duplication.
-    for (int i = 0; i < that.getItemHandler().getSlots(); i++) {
-      this.getItemHandler().setStackInSlot(i, that.getItemHandler().getStackInSlot(i));
+    for (var slot : Equipment.Slot.values()) {
+      this.setItemInSlot(slot, that.getItemInSlot(slot));
     }
 
     for (var extension : this.handlers.values()) {

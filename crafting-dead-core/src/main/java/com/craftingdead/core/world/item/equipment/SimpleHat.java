@@ -16,37 +16,42 @@
  * https://craftingdead.net/terms.php
  */
 
-package com.craftingdead.core.world.item.hat;
+package com.craftingdead.core.world.item.equipment;
 
-public class DefaultHat implements Hat {
+public class SimpleHat implements Hat {
 
+  private final boolean waterBreathing;
   private final boolean nightVision;
   private final float headshotReductionPercentage;
   private final boolean immuneToFlashes;
 
-  public DefaultHat() {
-    this(false, 0.0F, false);
-  }
-
-  public DefaultHat(boolean nightVision, float headshotReductionPercentage,
+  public SimpleHat(
+      boolean waterBreathing, boolean nightVision,
+      float headshotReductionPercentage,
       boolean immuneToFlashes) {
+    this.waterBreathing = waterBreathing;
     this.nightVision = nightVision;
     this.headshotReductionPercentage = headshotReductionPercentage;
     this.immuneToFlashes = immuneToFlashes;
   }
 
   @Override
-  public boolean hasNightVision() {
+  public boolean waterBreathing() {
+    return this.waterBreathing;
+  }
+
+  @Override
+  public boolean nightVision() {
     return this.nightVision;
   }
 
   @Override
-  public float getHeadshotReductionPercentage() {
+  public float headshotReductionPercentage() {
     return this.headshotReductionPercentage;
   }
 
   @Override
-  public boolean isImmuneToFlashes() {
+  public boolean immuneToFlashes() {
     return this.immuneToFlashes;
   }
 }

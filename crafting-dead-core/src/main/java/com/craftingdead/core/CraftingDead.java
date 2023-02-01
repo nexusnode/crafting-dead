@@ -38,13 +38,12 @@ import com.craftingdead.core.world.entity.extension.BasicLivingExtension;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.core.world.inventory.ModMenuTypes;
-import com.craftingdead.core.world.inventory.storage.Storage;
 import com.craftingdead.core.world.item.ModItems;
-import com.craftingdead.core.world.item.clothing.Clothing;
 import com.craftingdead.core.world.item.combatslot.CombatSlot;
 import com.craftingdead.core.world.item.combatslot.CombatSlotProvider;
 import com.craftingdead.core.world.item.crafting.ModRecipeSerializers;
 import com.craftingdead.core.world.item.enchantment.ModEnchantments;
+import com.craftingdead.core.world.item.equipment.Equipment;
 import com.craftingdead.core.world.item.gun.Gun;
 import com.craftingdead.core.world.item.gun.GunConfigurations;
 import com.craftingdead.core.world.item.gun.GunTriggerPredicates;
@@ -52,7 +51,6 @@ import com.craftingdead.core.world.item.gun.ammoprovider.AmmoProviderTypes;
 import com.craftingdead.core.world.item.gun.attachment.Attachments;
 import com.craftingdead.core.world.item.gun.magazine.Magazine;
 import com.craftingdead.core.world.item.gun.skin.Paint;
-import com.craftingdead.core.world.item.hat.Hat;
 import com.craftingdead.core.world.item.scope.Scope;
 import com.mojang.logging.LogUtils;
 import io.netty.buffer.Unpooled;
@@ -200,9 +198,7 @@ public class CraftingDead {
 
   private void handleRegisterCapabilities(RegisterCapabilitiesEvent event) {
     event.register(LivingExtension.class);
-    event.register(Storage.class);
-    event.register(Clothing.class);
-    event.register(Hat.class);
+    event.register(Equipment.class);
     event.register(CombatSlotProvider.class);
     event.register(Gun.class);
     event.register(Magazine.class);

@@ -16,19 +16,20 @@
  * https://craftingdead.net/terms.php
  */
 
-package com.craftingdead.core.world.inventory;
+package com.craftingdead.core.world.item.equipment;
 
-public enum ModEquipmentSlot {
+public interface Hat extends Equipment {
 
-  MELEE(0), GUN(1), HAT(2), CLOTHING(3), VEST(4), BACKPACK(5);
+  boolean waterBreathing();
 
-  private final int index;
+  boolean nightVision();
 
-  private ModEquipmentSlot(int index) {
-    this.index = index;
-  }
+  float headshotReductionPercentage();
 
-  public int getIndex() {
-    return this.index;
+  boolean immuneToFlashes();
+
+  @Override
+  default boolean isValidForSlot(Slot slot) {
+    return slot == Slot.HAT;
   }
 }

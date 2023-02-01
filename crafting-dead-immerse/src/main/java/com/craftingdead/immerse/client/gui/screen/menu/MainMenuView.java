@@ -24,7 +24,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.jetbrains.annotations.Nullable;
 import com.craftingdead.core.tags.ModItemTags;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
-import com.craftingdead.core.world.inventory.ModEquipmentSlot;
+import com.craftingdead.core.world.item.equipment.Equipment;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.client.fake.FakePlayer;
 import com.craftingdead.immerse.client.gui.screen.FogView;
@@ -146,7 +146,7 @@ public class MainMenuView extends ParentView {
         .orElse(ItemStack.EMPTY);
 
     var livingExtension = LivingExtension.getOrThrow(fakePlayerEntity);
-    livingExtension.getItemHandler().insertItem(ModEquipmentSlot.HAT.getIndex(), hatItem, false);
+    livingExtension.setItemInSlot(Equipment.Slot.HAT, hatItem);
 
     var entityContainer = new ParentView(new Properties().id("entity-container"));
     entityContainer.addChild(new EntityView(new Properties(), fakePlayerEntity));

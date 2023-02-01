@@ -20,10 +20,16 @@ package com.craftingdead.survival.world.item;
 
 import com.craftingdead.survival.world.entity.SupplyDrop;
 import com.craftingdead.survival.world.entity.SurvivalEntityTypes;
+import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.Level;
 
 public class SupplyDropRadioItem extends Item {
 
@@ -36,18 +42,33 @@ public class SupplyDropRadioItem extends Item {
     this.lootTable = properties.lootTable;
   }
 
+  private void spawnSupplyDrop(Level level, BlockPos pos, ItemStack itemStack) {
+    var supplyDrop =
+        new SupplyDrop(SurvivalEntityTypes.SUPPLY_DROP.get(), level, this.lootTable,
+            level.getRandom().nextLong(),
+            pos.getX(), pos.getY() + SPAWN_HEIGHT_OFFSET, pos.getZ());
+    level.addFreshEntity(supplyDrop);
+    itemStack.shrink(1);
+  }
+
   @Override
   public InteractionResult useOn(UseOnContext context) {
     var level = context.getLevel();
     var blockPos = context.getClickedPos();
     var itemStack = context.getItemInHand();
-    var supplyDrop =
-        new SupplyDrop(SurvivalEntityTypes.SUPPLY_DROP.get(), level, this.lootTable,
-            level.getRandom().nextLong(),
-            blockPos.getX(), blockPos.getY() + SPAWN_HEIGHT_OFFSET, blockPos.getZ());
-    level.addFreshEntity(supplyDrop);
-    itemStack.shrink(1);
-    return InteractionResult.SUCCESS;
+    if (!level.isClientSide()) {
+      this.spawnSupplyDrop(level, blockPos, itemStack);
+    }
+    return InteractionResult.sidedSuccess(level.isClientSide());
+  }
+
+  @Override
+  public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+    var itemStack = player.getItemInHand(hand);
+    if (!level.isClientSide()) {
+      this.spawnSupplyDrop(level, player.blockPosition(), itemStack);
+    }
+    return InteractionResultHolder.sidedSuccess(itemStack, level.isClientSide());
   }
 
   public static class Properties extends Item.Properties {

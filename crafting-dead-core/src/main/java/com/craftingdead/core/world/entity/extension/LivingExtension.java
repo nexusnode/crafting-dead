@@ -26,7 +26,7 @@ import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.capability.CapabilityUtil;
 import com.craftingdead.core.world.action.Action;
 import com.craftingdead.core.world.action.ActionObserver;
-import com.craftingdead.core.world.inventory.ModEquipmentSlot;
+import com.craftingdead.core.world.item.equipment.Equipment;
 import com.craftingdead.core.world.item.gun.Gun;
 import net.minecraft.core.particles.ItemParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
@@ -43,8 +43,6 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.common.capabilities.CapabilityToken;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.IItemHandlerModifiable;
 
 public interface LivingExtension<E extends LivingEntity, H extends LivingHandler>
     extends LivingHandler {
@@ -175,15 +173,6 @@ public interface LivingExtension<E extends LivingEntity, H extends LivingHandler
   boolean isMoving();
 
   /**
-   * Gets the {@link IItemHandler} associated with this {@link LivingExtension} (used for the mod's
-   * equipment storage)
-   * 
-   * @return the {@link IItemHandler}
-   * @see {@link com.craftingdead.core.world.inventory.ModEquipmentSlot}
-   */
-  IItemHandlerModifiable getItemHandler();
-
-  /**
    * Get an {@link EntitySnapshot} for the specified tick time.
    * 
    * @param tick - the tick in which to retrieve the {@link EntitySnapshot} for
@@ -208,21 +197,6 @@ public interface LivingExtension<E extends LivingEntity, H extends LivingHandler
   void setCrouching(boolean crouching, boolean sendUpdate);
 
   /**
-   * Get the drop chance for the entity equipment slots. The array indexes will be in correlation
-   * with {@link ModEquipmentSlot}
-   *
-   * <p>
-   *
-   * NOTE: Drop chances follows the vanilla drop chance formula
-   * <code>Math.max(randomFloat - (lootingLevel * 0.01F), 0.0F) < dropChance</code> Use
-   * <code>2.0F</code> for guarantee drop
-   *
-   * @return an array containing the drop chance for each slot, this array will be a copy of the
-   *         original.
-   */
-  float[] getEquipmentDropChances();
-
-  /**
    * Get the drop chance for the entity equipment slot.
    *
    * <p>
@@ -234,21 +208,7 @@ public interface LivingExtension<E extends LivingEntity, H extends LivingHandler
    * @param slot - the equipment slot to get the drop chance
    * @return the drop chance for the provided equipment slot
    */
-  float getEquipmentDropChance(ModEquipmentSlot slot);
-
-  /**
-   * Defines the new drop chances for the entity equipment slots. The provided array must contain
-   * all slots from {@link ModEquipmentSlot}
-   *
-   * <p>
-   *
-   * NOTE: Drop chances follows the vanilla drop chance scheme
-   * <code>Math.max(randomFloat - (lootingLevel * 0.01F), 0.0F) < dropChance</code> Use
-   * <code>2.0F</code> for guarantee drop
-   *
-   * @param newChances - the new drop chances to be defined
-   */
-  void setEquipmentDropChances(float[] newChances);
+  float getEquipmentDropChance(Equipment.Slot slot);
 
   /**
    * Defines the new drop chance for the entity equipment slot.
@@ -262,7 +222,7 @@ public interface LivingExtension<E extends LivingEntity, H extends LivingHandler
    * @param slot - the equipment slot to set the new drop chance
    * @param chance - the new drop chance
    */
-  void setEquipmentDropChance(ModEquipmentSlot slot, float chance);
+  void setEquipmentDropChance(Equipment.Slot slot, float chance);
 
   /**
    * Get the {@link LivingEntity} associated with this {@link LivingExtension}.
@@ -307,6 +267,20 @@ public interface LivingExtension<E extends LivingEntity, H extends LivingHandler
   default LazyOptional<Gun> mainHandGun() {
     return this.mainHandItem().getCapability(Gun.CAPABILITY);
   }
+
+  ItemStack getItemInSlot(Equipment.Slot slot);
+
+  default LazyOptional<Equipment> getEquipmentInSlot(Equipment.Slot slot) {
+    return this.getItemInSlot(slot).getCapability(Equipment.CAPABILITY);
+  }
+
+  default <T extends Equipment> Optional<T> getEquipmentInSlot(Equipment.Slot slot, Class<T> type) {
+    return this.getEquipmentInSlot(slot)
+        .filter(type::isInstance)
+        .map(type::cast);
+  }
+
+  ItemStack setItemInSlot(Equipment.Slot slot, ItemStack itemStack);
 
   default void breakItem(ItemStack itemStack) {
     if (!itemStack.isEmpty()) {

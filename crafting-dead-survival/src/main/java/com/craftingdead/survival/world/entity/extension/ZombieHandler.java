@@ -23,7 +23,7 @@ import java.util.UUID;
 import com.craftingdead.core.world.entity.extension.BasicLivingExtension;
 import com.craftingdead.core.world.entity.extension.LivingHandler;
 import com.craftingdead.core.world.entity.extension.LivingHandlerType;
-import com.craftingdead.core.world.inventory.ModEquipmentSlot;
+import com.craftingdead.core.world.item.equipment.Equipment;
 import com.craftingdead.survival.CraftingDeadSurvival;
 import com.craftingdead.survival.tags.SurvivalItemTags;
 import net.minecraft.core.Holder;
@@ -44,12 +44,6 @@ public class ZombieHandler implements LivingHandler {
 
   public static final LivingHandlerType<ZombieHandler> TYPE =
       new LivingHandlerType<>(new ResourceLocation(CraftingDeadSurvival.ID, "zombie"));
-
-  private static final UUID DAMAGE_MODIFIER_BABY_UUID =
-      UUID.fromString("53405062-b8d8-461c-a542-26b0be8ed481");
-  private static final AttributeModifier DAMAGE_MODIFIER_BABY =
-      new AttributeModifier(DAMAGE_MODIFIER_BABY_UUID, "Baby damage reduction", -1.5D,
-          AttributeModifier.Operation.MULTIPLY_BASE);
 
   private static final UUID HEALTH_MODIFIER_BABY_UUID =
       UUID.fromString("69d754ea-1ae3-4684-bb69-51a29de92b9a");
@@ -75,12 +69,9 @@ public class ZombieHandler implements LivingHandler {
       return;
     }
     var zombie = this.extension.entity();
-    var damageAttribute = zombie.getAttribute(Attributes.ATTACK_DAMAGE);
     var healthAttribute = zombie.getAttribute(Attributes.MAX_HEALTH);
-    damageAttribute.removeModifier(DAMAGE_MODIFIER_BABY);
     healthAttribute.removeModifier(HEALTH_MODIFIER_BABY);
     if (baby) {
-      damageAttribute.addTransientModifier(DAMAGE_MODIFIER_BABY);
       healthAttribute.addTransientModifier(HEALTH_MODIFIER_BABY);
     }
   }
@@ -88,10 +79,8 @@ public class ZombieHandler implements LivingHandler {
   public void populateDefaultEquipmentSlots(DifficultyInstance difficulty) {
     var zombie = this.extension.entity();
     zombie.setItemSlot(EquipmentSlot.MAINHAND, this.createHeldItem());
-    this.extension.getItemHandler().setStackInSlot(ModEquipmentSlot.CLOTHING.getIndex(),
-        this.createClothingItem());
-    this.extension.getItemHandler().setStackInSlot(ModEquipmentSlot.HAT.getIndex(),
-        this.getHatStack());
+    this.extension.setItemInSlot(Equipment.Slot.CLOTHING, this.createClothingItem());
+    this.extension.setItemInSlot(Equipment.Slot.HAT, this.getHatStack());
   }
 
   protected ItemStack createHeldItem() {

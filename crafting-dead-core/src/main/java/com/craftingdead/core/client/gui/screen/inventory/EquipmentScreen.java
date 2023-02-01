@@ -24,8 +24,7 @@ import com.craftingdead.core.client.gui.widget.button.CompositeButton;
 import com.craftingdead.core.network.NetworkChannel;
 import com.craftingdead.core.network.message.play.OpenStorageMessage;
 import com.craftingdead.core.world.inventory.EquipmentMenu;
-import com.craftingdead.core.world.inventory.ModEquipmentSlot;
-import com.craftingdead.core.world.inventory.storage.Storage;
+import com.craftingdead.core.world.item.equipment.Equipment;
 import com.craftingdead.core.world.item.gun.Gun;
 import com.craftingdead.core.world.item.gun.skin.Paint;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -36,6 +35,7 @@ import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.MenuConstructor;
 import net.minecraft.world.item.ItemStack;
 
 public class EquipmentScreen extends EffectRenderingInventoryScreen<EquipmentMenu> {
@@ -65,7 +65,7 @@ public class EquipmentScreen extends EffectRenderingInventoryScreen<EquipmentMen
         .setInactiveAtlasPos(183, 240)
         .setAction((button) -> {
           NetworkChannel.PLAY.getSimpleChannel()
-              .sendToServer(new OpenStorageMessage(ModEquipmentSlot.VEST));
+              .sendToServer(new OpenStorageMessage(Equipment.Slot.VEST));
           this.transitioning = true;
         }).build();
     this.addRenderableWidget(this.vestButton);
@@ -76,7 +76,7 @@ public class EquipmentScreen extends EffectRenderingInventoryScreen<EquipmentMen
         .setInactiveAtlasPos(183, 240)
         .setAction((button) -> {
           NetworkChannel.PLAY.getSimpleChannel()
-              .sendToServer(new OpenStorageMessage(ModEquipmentSlot.BACKPACK));
+              .sendToServer(new OpenStorageMessage(Equipment.Slot.BACKPACK));
           this.transitioning = true;
         }).build();
     this.addRenderableWidget(this.backpackButton);
@@ -99,15 +99,15 @@ public class EquipmentScreen extends EffectRenderingInventoryScreen<EquipmentMen
 
   private void refreshButtonStatus() {
     this.backpackButton.active = this.menu
-        .getItemHandler()
-        .getStackInSlot(ModEquipmentSlot.BACKPACK.getIndex())
-        .getCapability(Storage.CAPABILITY)
-        .isPresent();
+        .getPlayer()
+        .getEquipmentInSlot(Equipment.Slot.BACKPACK)
+        .map(MenuConstructor.class::isInstance)
+        .orElse(false);
     this.vestButton.active = this.menu
-        .getItemHandler()
-        .getStackInSlot(ModEquipmentSlot.VEST.getIndex())
-        .getCapability(Storage.CAPABILITY)
-        .isPresent();
+        .getPlayer()
+        .getEquipmentInSlot(Equipment.Slot.VEST)
+        .map(MenuConstructor.class::isInstance)
+        .orElse(false);
   }
 
   /**

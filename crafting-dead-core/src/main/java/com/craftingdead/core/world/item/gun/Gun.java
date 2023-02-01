@@ -31,6 +31,7 @@ import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.core.world.inventory.GunCraftSlotType;
 import com.craftingdead.core.world.item.combatslot.CombatSlotProvider;
+import com.craftingdead.core.world.item.equipment.Equipment;
 import com.craftingdead.core.world.item.gun.ammoprovider.AmmoProvider;
 import com.craftingdead.core.world.item.gun.attachment.Attachment;
 import com.craftingdead.core.world.item.gun.attachment.Attachment.MultiplierType;
@@ -47,9 +48,14 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.common.capabilities.CapabilityToken;
 
-public interface Gun extends CombatSlotProvider, Synched {
+public interface Gun extends Equipment, CombatSlotProvider, Synched {
 
   Capability<Gun> CAPABILITY = CapabilityManager.get(new CapabilityToken<>() {});
+
+  @Override
+  default boolean isValidForSlot(Slot slot) {
+    return slot == Slot.GUN;
+  }
 
   /**
    * Ticked when held by the passed in {@link LivingExtension}.

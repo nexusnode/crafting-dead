@@ -20,120 +20,220 @@ package com.craftingdead.core.world.item;
 
 
 import java.util.List;
+import java.util.UUID;
 import org.jetbrains.annotations.Nullable;
-import com.craftingdead.core.capability.CapabilityUtil;
-import com.craftingdead.core.world.inventory.GenericMenu;
-import com.craftingdead.core.world.inventory.ModEquipmentSlot;
-import com.craftingdead.core.world.inventory.storage.ItemStackHandlerStorage;
-import com.craftingdead.core.world.inventory.storage.Storage;
+import com.craftingdead.core.world.item.equipment.Equipment;
+import com.google.common.collect.ImmutableMultimap;
+import com.google.common.collect.Multimap;
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.MenuConstructor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.minecraftforge.common.util.NonNullSupplier;
+import net.minecraftforge.common.capabilities.ICapabilitySerializable;
+import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.ItemStackHandler;
 
-public class StorageItem extends Item {
+public class StorageItem extends EquipmentItem {
 
   public static final int MAX_ROWS_TO_SHOW = 6;
 
-  public static final NonNullSupplier<Storage> VEST =
-      () -> new ItemStackHandlerStorage(2 * 9, ModEquipmentSlot.VEST, GenericMenu::createVest);
+  public static final UUID ARMOR_MODIFIER_ID =
+      UUID.fromString("5900b64d-0e0b-4872-804b-0522bb87c33f");
 
-  public static final NonNullSupplier<Storage> SMALL_BACKPACK =
-      () -> new ItemStackHandlerStorage(2 * 9, ModEquipmentSlot.BACKPACK,
-          GenericMenu::createSmallBackpack);
+  private final Multimap<Attribute, AttributeModifier> attributeModifiers;
+  private final Equipment.Slot slot;
+  private final int itemRows;
+  private final ItemHandlerMenuConstructor menuConstructor;
 
-  public static final NonNullSupplier<Storage> MEDIUM_BACKPACK =
-      () -> new ItemStackHandlerStorage(3 * 9, ModEquipmentSlot.BACKPACK,
-          GenericMenu::createMediumBackpack);
-
-  public static final NonNullSupplier<Storage> LARGE_BACKPACK =
-      () -> new ItemStackHandlerStorage(4 * 9, ModEquipmentSlot.BACKPACK,
-          GenericMenu::createLargeBackpack);
-
-  public static final NonNullSupplier<Storage> GUN_BAG =
-      () -> new ItemStackHandlerStorage(2 * 9, ModEquipmentSlot.BACKPACK,
-          GenericMenu::createGunBag);
-
-  private final NonNullSupplier<Storage> storageContainer;
-
-  public StorageItem(NonNullSupplier<Storage> storageContainer, Properties properties) {
+  public StorageItem(Properties properties) {
     super(properties);
-    this.storageContainer = storageContainer;
+    this.attributeModifiers = properties.attributeModifiers.build();
+    this.slot = properties.slot;
+    this.itemRows = properties.itemRows;
+    this.menuConstructor = properties.menuConstructor;
   }
 
   @Override
   public ICapabilityProvider initCapabilities(ItemStack itemStack, @Nullable CompoundTag nbt) {
-    return CapabilityUtil.serializableProvider(this.storageContainer,
-        Storage.CAPABILITY, CapabilityItemHandler.ITEM_HANDLER_CAPABILITY);
+    return new ICapabilitySerializable<CompoundTag>() {
+
+      private final LazyOptional<Storage> storage = LazyOptional.of(Storage::new);
+
+      @Override
+      public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
+        if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
+          return this.storage.lazyMap(Storage::itemHandler).cast();
+        }
+
+        if (cap == Equipment.CAPABILITY) {
+          return this.storage.cast();
+        }
+
+        return LazyOptional.empty();
+      }
+
+      @Override
+      public CompoundTag serializeNBT() {
+        return this.storage
+            .lazyMap(Storage::itemHandler)
+            .lazyMap(ItemStackHandler::serializeNBT)
+            .orElseGet(CompoundTag::new);
+      }
+
+      @Override
+      public void deserializeNBT(CompoundTag tag) {
+        this.storage
+            .lazyMap(Storage::itemHandler)
+            .ifPresent(itemHandler -> itemHandler.deserializeNBT(tag));
+      }
+    };
   }
 
   @Override
-  public void appendHoverText(ItemStack backpackStack, Level world, List<Component> lines,
+  public void appendHoverText(ItemStack itemStack, Level world, List<Component> lines,
       TooltipFlag tooltipFlag) {
-    super.appendHoverText(backpackStack, world, lines, tooltipFlag);
+    super.appendHoverText(itemStack, world, lines, tooltipFlag);
 
-    backpackStack.getCapability(Storage.CAPABILITY).ifPresent(storage -> {
-      if (!storage.isEmpty()) {
-        lines.add(new TextComponent(" "));
-        lines.add(new TranslatableComponent("storage_item.contents")
-            .withStyle(ChatFormatting.RED, ChatFormatting.BOLD));
+    itemStack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
+        .ifPresent(itemHandler -> {
+          int itemsBeyondLimit = 0;
+          int itemsDisplayed = 0;
 
-        int itemsBeyondLimit = 0;
-        int itemsDisplayed = 0;
-
-        for (int i = 0; i < storage.getSlots(); i++) {
-          var stack = storage.getStackInSlot(i);
-          if (!stack.isEmpty()) {
-            if (itemsDisplayed++ >= MAX_ROWS_TO_SHOW) {
-              itemsBeyondLimit++;
-              continue;
+          for (int i = 0; i < itemHandler.getSlots(); i++) {
+            var stack = itemHandler.getStackInSlot(i);
+            if (!stack.isEmpty()) {
+              if (itemsDisplayed++ >= MAX_ROWS_TO_SHOW) {
+                itemsBeyondLimit++;
+                continue;
+              }
+              var amountText = new TextComponent(stack.getCount() + "x ")
+                  .withStyle(ChatFormatting.DARK_GRAY);
+              var itemText = stack.getHoverName().plainCopy().withStyle(ChatFormatting.GRAY);
+              // First item
+              if (itemsDisplayed == 1) {
+                lines.add(new TextComponent(" "));
+                lines.add(new TranslatableComponent("storage_item.contents")
+                    .withStyle(ChatFormatting.RED, ChatFormatting.BOLD));
+              }
+              lines.add(amountText.append(itemText));
             }
-            var amountText = new TextComponent(stack.getCount() + "x ")
-                .withStyle(ChatFormatting.DARK_GRAY);
-            var itemText = stack.getHoverName().plainCopy().withStyle(ChatFormatting.GRAY);
-            lines.add(amountText.append(itemText));
           }
-        }
 
-        if (itemsBeyondLimit > 0) {
-          lines.add(new TextComponent(". . . +" + itemsBeyondLimit)
-              .withStyle(ChatFormatting.RED));
-        }
-      }
-    });
+          if (itemsBeyondLimit > 0) {
+            lines.add(new TextComponent(". . . + " + itemsBeyondLimit)
+                .withStyle(ChatFormatting.RED));
+          }
+        });
   }
 
   @Override
   public CompoundTag getShareTag(ItemStack stack) {
-    var shareTag = stack.getTag();
-    if (shareTag == null) {
-      shareTag = new CompoundTag();
-    }
-    var storageTag = stack.getCapability(Storage.CAPABILITY)
-        .map(Storage::serializeNBT)
-        .orElse(null);
-    if (storageTag != null && !storageTag.isEmpty()) {
-      shareTag.put("storage", storageTag);
-    }
+    var shareTag = stack.getTag() == null ? new CompoundTag() : stack.getTag();
+    stack.getCapability(Equipment.CAPABILITY)
+        .<Storage>cast()
+        .lazyMap(Storage::itemHandler)
+        .map(ItemStackHandler::serializeNBT)
+        .filter(tag -> !tag.isEmpty())
+        .ifPresent(tag -> shareTag.put("storage", tag));
     return shareTag;
   }
 
   @Override
   public void readShareTag(ItemStack stack, @Nullable CompoundTag tag) {
     if (tag != null && tag.contains("storage", Tag.TAG_COMPOUND)) {
-      stack.getCapability(Storage.CAPABILITY)
-          .ifPresent(gun -> gun.deserializeNBT(tag.getCompound("storage")));
+      stack.getCapability(Equipment.CAPABILITY)
+          .<Storage>cast()
+          .ifPresent(storage -> storage.itemHandler().deserializeNBT(tag.getCompound("storage")));
     }
     super.readShareTag(stack, tag);
   }
 
+  public static class Properties extends Item.Properties {
+
+    private ImmutableMultimap.Builder<Attribute, AttributeModifier> attributeModifiers =
+        ImmutableMultimap.builder();
+    private Equipment.Slot slot;
+    private int itemRows;
+    private ItemHandlerMenuConstructor menuConstructor;
+
+    public Properties attributeModifier(Attribute attribute, AttributeModifier modifier) {
+      this.attributeModifiers.put(attribute, modifier);
+      return this;
+    }
+
+    public Properties slot(Equipment.Slot slot) {
+      this.slot = slot;
+      return this;
+    }
+
+    public Properties itemRows(int itemRows) {
+      this.itemRows = itemRows;
+      return this;
+    }
+
+    public Properties menuConstructor(ItemHandlerMenuConstructor menuConstructor) {
+      this.menuConstructor = menuConstructor;
+      return this;
+    }
+  }
+
+  @FunctionalInterface
+  public interface ItemHandlerMenuConstructor {
+
+    @Nullable
+    AbstractContainerMenu createMenu(int windowId, Inventory inventory, IItemHandler itemHandler);
+  }
+
+  private class Storage implements Equipment, MenuConstructor {
+
+    private final ItemStackHandler itemHandler;
+
+    public Storage() {
+      final var size = StorageItem.this.itemRows * 9;
+      this.itemHandler = new ItemStackHandler(size) {
+        @Override
+        protected void onLoad() {
+          if (this.getSlots() != size) {
+            this.setSize(size);
+          }
+        }
+      };
+    }
+
+    private ItemStackHandler itemHandler() {
+      return this.itemHandler;
+    }
+
+    @Override
+    public AbstractContainerMenu createMenu(int windowId, Inventory inventory, Player player) {
+      return StorageItem.this.menuConstructor.createMenu(windowId, inventory, this.itemHandler);
+    }
+
+    @Override
+    public Multimap<Attribute, AttributeModifier> attributeModifiers() {
+      return StorageItem.this.attributeModifiers;
+    }
+
+    @Override
+    public boolean isValidForSlot(Slot slot) {
+      return slot == StorageItem.this.slot;
+    }
+  }
 }

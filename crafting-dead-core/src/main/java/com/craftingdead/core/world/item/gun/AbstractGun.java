@@ -48,8 +48,9 @@ import com.craftingdead.core.world.entity.extension.EntitySnapshot;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.core.world.inventory.GunCraftSlotType;
-import com.craftingdead.core.world.inventory.ModEquipmentSlot;
 import com.craftingdead.core.world.item.enchantment.ModEnchantments;
+import com.craftingdead.core.world.item.equipment.Equipment;
+import com.craftingdead.core.world.item.equipment.Hat;
 import com.craftingdead.core.world.item.gun.ammoprovider.AmmoProvider;
 import com.craftingdead.core.world.item.gun.ammoprovider.AmmoProviderType;
 import com.craftingdead.core.world.item.gun.ammoprovider.AmmoProviderTypes;
@@ -58,7 +59,6 @@ import com.craftingdead.core.world.item.gun.attachment.Attachments;
 import com.craftingdead.core.world.item.gun.magazine.Magazine;
 import com.craftingdead.core.world.item.gun.skin.Paint;
 import com.craftingdead.core.world.item.gun.skin.Skin;
-import com.craftingdead.core.world.item.hat.Hat;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
@@ -529,10 +529,10 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
               || hitEntity instanceof WanderingTrader)
           && hitPos.y >= chinHeight;
       if (headshot) {
-        var headshotDamagePercent = 1.0F - hitLiving.getItemHandler()
-            .getStackInSlot(ModEquipmentSlot.HAT.getIndex())
-            .getCapability(Hat.CAPABILITY)
-            .map(Hat::getHeadshotReductionPercentage)
+        var headshotDamagePercent = 1.0F - hitLiving.getEquipmentInSlot(Equipment.Slot.HAT)
+            .filter(Hat.class::isInstance)
+            .map(Hat.class::cast)
+            .map(Hat::headshotReductionPercentage)
             .orElse(0.0F);
         damage *= headshotDamagePercent * CraftingDead.serverConfig.headshotBonusDamage.get();
       }
