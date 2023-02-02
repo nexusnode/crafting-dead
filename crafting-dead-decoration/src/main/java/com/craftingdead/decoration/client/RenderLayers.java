@@ -30,6 +30,8 @@ class RenderLayers {
     cutout(DecorationBlocks.WOODEN_PALLET);
     cutout(DecorationBlocks.STACKED_WOODEN_PALLETS);
     cutout(DecorationBlocks.CRATE_ON_WOODEN_PALLET);
+    cutout(DecorationBlocks.CLOTHING_RACK);
+
     translucent(DecorationBlocks.WASHING_MACHINE);
     translucent(DecorationBlocks.BROKEN_WASHING_MACHINE);
     cutout(DecorationBlocks.POLE_BARRIER);

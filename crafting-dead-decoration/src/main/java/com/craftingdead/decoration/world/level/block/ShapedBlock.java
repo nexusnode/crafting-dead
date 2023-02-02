@@ -39,4 +39,9 @@ public class ShapedBlock extends Block {
       BlockPos pos, CollisionContext context) {
     return this.shape;
   }
+
+  @Override
+  public boolean useShapeForLightOcclusion(BlockState state) {
+    return true;
+  }
 }

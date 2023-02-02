@@ -21,6 +21,7 @@ package com.craftingdead.decoration;
 import org.slf4j.Logger;
 import com.craftingdead.decoration.client.ClientDist;
 import com.craftingdead.decoration.data.DecorationBlockStateProvider;
+import com.craftingdead.decoration.data.DecorationItemModelProvider;
 import com.craftingdead.decoration.data.DecorationRecipeProvider;
 import com.craftingdead.decoration.data.loot.DecorationLootTableProvider;
 import com.craftingdead.decoration.world.item.DecorationItems;
@@ -66,6 +67,7 @@ public class CraftingDeadDecoration {
     var existingFileHelper = event.getExistingFileHelper();
     if (event.includeClient()) {
       generator.addProvider(new DecorationBlockStateProvider(generator, existingFileHelper));
+      generator.addProvider(new DecorationItemModelProvider(generator, ID, existingFileHelper));
     } else if (event.includeServer()) {
       generator.addProvider(new DecorationLootTableProvider(generator));
       generator.addProvider(new DecorationRecipeProvider(generator));

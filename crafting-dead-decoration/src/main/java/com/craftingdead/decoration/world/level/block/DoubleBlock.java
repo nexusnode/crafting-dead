@@ -47,7 +47,7 @@ public class DoubleBlock extends HorizontalDirectionalBlock {
     super(properties);
     this.registerDefaultState(this.stateDefinition.any()
         .setValue(FACING, Direction.NORTH)
-        .setValue(PART, Part.LEFT));
+        .setValue(PART, Part.FIRST));
   }
 
   @SuppressWarnings("deprecation")
@@ -63,18 +63,18 @@ public class DoubleBlock extends HorizontalDirectionalBlock {
   }
 
   private static Direction getNeighbourDirection(Part part, Direction direction) {
-    return part == Part.LEFT ? direction : direction.getOpposite();
+    return part == Part.FIRST ? direction : direction.getOpposite();
   }
 
   @Override
   public void playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
     if (!level.isClientSide() && player.isCreative()) {
       var part = state.getValue(PART);
-      if (part == Part.LEFT) {
+      if (part == Part.FIRST) {
         var neighborPos =
             pos.relative(getNeighbourDirection(part, state.getValue(FACING)));
         var neighborState = level.getBlockState(neighborPos);
-        if (neighborState.is(this) && neighborState.getValue(PART) == Part.RIGHT) {
+        if (neighborState.is(this) && neighborState.getValue(PART) == Part.SECOND) {
           level.setBlock(neighborPos, Blocks.AIR.defaultBlockState(),
               Block.UPDATE_SUPPRESS_DROPS | Block.UPDATE_CLIENTS | Block.UPDATE_NEIGHBORS);
           level.levelEvent(player, LevelEvent.PARTICLES_DESTROY_BLOCK, neighborPos,
@@ -115,7 +115,7 @@ public class DoubleBlock extends HorizontalDirectionalBlock {
     super.setPlacedBy(level, pos, state, entity, item);
     if (!level.isClientSide()) {
       var otherPos = pos.relative(state.getValue(FACING));
-      level.setBlock(otherPos, state.setValue(PART, Part.RIGHT),
+      level.setBlock(otherPos, state.setValue(PART, Part.SECOND),
           Block.UPDATE_NEIGHBORS | Block.UPDATE_CLIENTS);
       level.blockUpdated(pos, Blocks.AIR);
       state.updateNeighbourShapes(level, pos, Block.UPDATE_NEIGHBORS | Block.UPDATE_CLIENTS);
@@ -124,20 +124,19 @@ public class DoubleBlock extends HorizontalDirectionalBlock {
 
   public static Direction getConnectedDirection(BlockState state) {
     var facing = state.getValue(FACING);
-    return state.getValue(PART) == Part.LEFT ? facing.getOpposite() : facing;
+    return state.getValue(PART) == Part.FIRST ? facing.getOpposite() : facing;
   }
 
   public static DoubleBlockCombiner.BlockType getBlockType(BlockState state) {
-    return state.getValue(PART) == Part.LEFT
+    return state.getValue(PART) == Part.FIRST
         ? DoubleBlockCombiner.BlockType.FIRST
         : DoubleBlockCombiner.BlockType.SECOND;
   }
 
-
   public enum Part implements StringRepresentable {
 
-    LEFT("left"),
-    RIGHT("right");
+    FIRST("first"),
+    SECOND("second");
 
     private final String name;
 

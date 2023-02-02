@@ -48,12 +48,8 @@ public class DecorationBlockStateProvider extends BlockStateProvider {
     this.horizontalBlock(DecorationBlocks.ABANDONED_CAMPFIRE);
 
     this.horizontalBlock(DecorationBlocks.CLOTHING_RACK.get(),
-        state -> state.getValue(DoubleBlock.PART) == DoubleBlock.Part.LEFT
-            ? this.blockModel("clothing_rack_left")
-            : this.blockModel("clothing_rack_right"),
-        90);
-    
-
+        state -> this.blockModel("clothing_rack_"
+            + state.getValue(DoubleBlock.PART).getSerializedName()));
   }
 
   private void horizontalBlock(RegistryObject<? extends Block> block) {

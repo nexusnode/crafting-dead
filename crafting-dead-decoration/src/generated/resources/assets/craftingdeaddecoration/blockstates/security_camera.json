@@ -1,17 +1,32 @@
 {
   "variants": {
-    "facing=north": {
+    "facing=north,waterlogged=false": {
       "model": "craftingdeaddecoration:block/security_camera"
     },
-    "facing=south": {
+    "facing=south,waterlogged=false": {
       "model": "craftingdeaddecoration:block/security_camera",
       "y": 180
     },
-    "facing=west": {
+    "facing=west,waterlogged=false": {
       "model": "craftingdeaddecoration:block/security_camera",
       "y": 270
     },
-    "facing=east": {
+    "facing=east,waterlogged=false": {
+      "model": "craftingdeaddecoration:block/security_camera",
+      "y": 90
+    },
+    "facing=north,waterlogged=true": {
+      "model": "craftingdeaddecoration:block/security_camera"
+    },
+    "facing=south,waterlogged=true": {
+      "model": "craftingdeaddecoration:block/security_camera",
+      "y": 180
+    },
+    "facing=west,waterlogged=true": {
+      "model": "craftingdeaddecoration:block/security_camera",
+      "y": 270
+    },
+    "facing=east,waterlogged=true": {
       "model": "craftingdeaddecoration:block/security_camera",
       "y": 90
     }

@@ -1,34 +1,34 @@
 {
   "variants": {
-    "facing=north,part=left": {
-      "model": "craftingdeaddecoration:block/clothing_rack_left",
-      "y": 270
+    "facing=north,part=first": {
+      "model": "craftingdeaddecoration:block/clothing_rack_first"
     },
-    "facing=south,part=left": {
-      "model": "craftingdeaddecoration:block/clothing_rack_left",
-      "y": 90
-    },
-    "facing=west,part=left": {
-      "model": "craftingdeaddecoration:block/clothing_rack_left",
+    "facing=south,part=first": {
+      "model": "craftingdeaddecoration:block/clothing_rack_first",
       "y": 180
     },
-    "facing=east,part=left": {
-      "model": "craftingdeaddecoration:block/clothing_rack_left"
-    },
-    "facing=north,part=right": {
-      "model": "craftingdeaddecoration:block/clothing_rack_right",
+    "facing=west,part=first": {
+      "model": "craftingdeaddecoration:block/clothing_rack_first",
       "y": 270
     },
-    "facing=south,part=right": {
-      "model": "craftingdeaddecoration:block/clothing_rack_right",
+    "facing=east,part=first": {
+      "model": "craftingdeaddecoration:block/clothing_rack_first",
       "y": 90
     },
-    "facing=west,part=right": {
-      "model": "craftingdeaddecoration:block/clothing_rack_right",
+    "facing=north,part=second": {
+      "model": "craftingdeaddecoration:block/clothing_rack_second"
+    },
+    "facing=south,part=second": {
+      "model": "craftingdeaddecoration:block/clothing_rack_second",
       "y": 180
     },
-    "facing=east,part=right": {
-      "model": "craftingdeaddecoration:block/clothing_rack_right"
+    "facing=west,part=second": {
+      "model": "craftingdeaddecoration:block/clothing_rack_second",
+      "y": 270
+    },
+    "facing=east,part=second": {
+      "model": "craftingdeaddecoration:block/clothing_rack_second",
+      "y": 90
     }
   }
 }

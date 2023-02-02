@@ -45,8 +45,7 @@ public class DecorationBlocks {
               BlockBehaviour.Properties.of(Material.WOOD, MaterialColor.WOOD)
                   .strength(2.0F, 3.0F)
                   .sound(SoundType.WOOD)
-                  .noOcclusion()
-                  .lightLevel(__ -> 1),
+                  .noOcclusion(),
               __ -> BlockShapes.WOODEN_PALLET));
 
   public static final RegistryObject<Block> STACKED_WOODEN_PALLETS =
@@ -55,8 +54,7 @@ public class DecorationBlocks {
               BlockBehaviour.Properties.of(Material.WOOD, MaterialColor.WOOD)
                   .strength(2.0F, 3.0F)
                   .sound(SoundType.WOOD)
-                  .noOcclusion()
-                  .lightLevel(__ -> 1),
+                  .noOcclusion(),
               __ -> BlockShapes.STACKED_WOODEN_PALLETS));
 
   public static final RegistryObject<Block> CRATE_ON_WOODEN_PALLET =
@@ -65,8 +63,7 @@ public class DecorationBlocks {
               BlockBehaviour.Properties.of(Material.WOOD, MaterialColor.WOOD)
                   .strength(2.0F, 3.0F)
                   .sound(SoundType.WOOD)
-                  .noOcclusion()
-                  .lightLevel(__ -> 1),
+                  .noOcclusion(),
               __ -> Shapes.block()));
 
   public static final RegistryObject<Block> SECURITY_CAMERA =
@@ -75,8 +72,7 @@ public class DecorationBlocks {
               BlockBehaviour.Properties.of(Material.METAL, MaterialColor.METAL)
                   .strength(5.0F)
                   .sound(SoundType.WOOD)
-                  .noOcclusion()
-                  .lightLevel(__ -> 1),
+                  .noOcclusion(),
               BlockShapes.SECURITY_CAMERA));
 
   public static final RegistryObject<Block> WASHING_MACHINE =
@@ -85,8 +81,7 @@ public class DecorationBlocks {
               BlockBehaviour.Properties.of(Material.METAL, MaterialColor.METAL)
                   .strength(5.0F)
                   .sound(SoundType.METAL)
-                  .noOcclusion()
-                  .lightLevel(__ -> 1),
+                  .noOcclusion(),
               __ -> Shapes.block()));
 
   public static final RegistryObject<Block> BROKEN_WASHING_MACHINE =
@@ -95,18 +90,16 @@ public class DecorationBlocks {
               BlockBehaviour.Properties.of(Material.METAL, MaterialColor.METAL)
                   .strength(5.0F)
                   .sound(SoundType.METAL)
-                  .noOcclusion()
-                  .lightLevel(__ -> 1),
+                  .noOcclusion(),
               __ -> Shapes.block()));
 
   public static final RegistryObject<Block> CLOTHING_RACK =
       deferredRegister.register("clothing_rack",
-          () -> new DoubleBlock(
+          () -> new ClothingRackBlock(
               BlockBehaviour.Properties.of(Material.METAL, MaterialColor.METAL)
                   .strength(5.0F)
                   .sound(SoundType.METAL)
-                  .noOcclusion()
-                  .lightLevel(__ -> 1)));
+                  .noCollission()));
 
   public static final RegistryObject<Block> CHERRY_LEAVES =
       deferredRegister.register("cherry_leaves",
