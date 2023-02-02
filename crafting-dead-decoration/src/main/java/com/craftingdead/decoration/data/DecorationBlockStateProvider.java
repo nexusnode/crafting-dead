@@ -77,6 +77,11 @@ public class DecorationBlockStateProvider extends BlockStateProvider {
     this.horizontalBlock(DecorationBlocks.YELLOW_GAS_TANK);
     this.horizontalBlock(DecorationBlocks.BLUE_GAS_TANK);
     this.horizontalBlock(DecorationBlocks.GRAY_GAS_TANK);
+
+    this.horizontalBlock(DecorationBlocks.LAPTOP_1);
+    this.horizontalBlock(DecorationBlocks.LAPTOP_2);
+    this.horizontalBlock(DecorationBlocks.LAPTOP_3);
+    this.horizontalBlock(DecorationBlocks.BROKEN_LAPTOP);
   }
 
   private void simpleBlock(RegistryObject<? extends Block> block) {

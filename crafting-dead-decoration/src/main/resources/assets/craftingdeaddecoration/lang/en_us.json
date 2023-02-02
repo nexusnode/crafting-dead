@@ -1,6 +1,11 @@
 {
     "itemGroup.craftingdeaddecoration": "Crafting Dead Decoration",
 
+    "block.craftingdeaddecoration.laptop_1": "Laptop 1",
+    "block.craftingdeaddecoration.laptop_2": "Laptop 2",
+    "block.craftingdeaddecoration.laptop_3": "Laptop 3",
+    "block.craftingdeaddecoration.broken_laptop": "Broken Laptop",
+
     "block.craftingdeaddecoration.yellow_gas_tank": "Yellow Gas Tank",
     "block.craftingdeaddecoration.blue_gas_tank": "Blue Gas Tank1",
     "block.craftingdeaddecoration.gray_gas_tank": "Gray Gas Tank",

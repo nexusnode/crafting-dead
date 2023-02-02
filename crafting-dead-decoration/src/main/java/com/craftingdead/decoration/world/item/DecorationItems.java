@@ -42,6 +42,23 @@ public class DecorationItems {
         }
       };
 
+  public static final RegistryObject<BlockItem> LAPTOP_1 =
+      deferredRegister.register("laptop_1",
+          () -> new BlockItem(DecorationBlocks.LAPTOP_1.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<BlockItem> LAPTOP_2 =
+      deferredRegister.register("laptop_2",
+          () -> new BlockItem(DecorationBlocks.LAPTOP_2.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<BlockItem> LAPTOP_3 =
+      deferredRegister.register("laptop_3",
+          () -> new BlockItem(DecorationBlocks.LAPTOP_3.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<BlockItem> BROKEN_LAPTOP =
+      deferredRegister.register("broken_laptop",
+          () -> new BlockItem(DecorationBlocks.BROKEN_LAPTOP.get(),
+              new Item.Properties().tab(TAB)));
+
   public static final RegistryObject<BlockItem> YELLOW_GAS_TANK =
       deferredRegister.register("yellow_gas_tank",
           () -> new BlockItem(DecorationBlocks.YELLOW_GAS_TANK.get(),

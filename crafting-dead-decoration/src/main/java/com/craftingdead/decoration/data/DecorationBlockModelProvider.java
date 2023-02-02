@@ -22,22 +22,21 @@ public class DecorationBlockModelProvider extends BlockModelProvider {
     this.plankBarricades("birch");
     this.plankBarricades("dark_oak");
 
-    this.computer(DecorationBlocks.COMPUTER_1);
-    this.computer(DecorationBlocks.COMPUTER_2);
-    this.computer(DecorationBlocks.COMPUTER_3);
+    this.textureVariant(DecorationBlocks.COMPUTER_1, "computer");
+    this.textureVariant(DecorationBlocks.COMPUTER_2, "computer");
+    this.textureVariant(DecorationBlocks.COMPUTER_3, "computer");
 
-    this.gasTank(DecorationBlocks.YELLOW_GAS_TANK);
-    this.gasTank(DecorationBlocks.BLUE_GAS_TANK);
-    this.gasTank(DecorationBlocks.GRAY_GAS_TANK);
+    this.textureVariant(DecorationBlocks.YELLOW_GAS_TANK, "gas_tank");
+    this.textureVariant(DecorationBlocks.BLUE_GAS_TANK, "gas_tank");
+    this.textureVariant(DecorationBlocks.GRAY_GAS_TANK, "gas_tank");
+
+    this.textureVariant(DecorationBlocks.LAPTOP_1, "laptop");
+    this.textureVariant(DecorationBlocks.LAPTOP_2, "laptop");
+    this.textureVariant(DecorationBlocks.LAPTOP_3, "laptop");
   }
 
-  private void gasTank(RegistryObject<? extends Block> block) {
-    this.singleTexture(block.getId().toString(), this.modLoc("block/gas_tank"),
-        this.modLoc("block/" + block.getId().getPath().toString()));
-  }
-
-  private void computer(RegistryObject<? extends Block> block) {
-    this.singleTexture(block.getId().toString(), this.modLoc("block/computer"),
+  private void textureVariant(RegistryObject<? extends Block> block, String model) {
+    this.singleTexture(block.getId().toString(), this.modLoc("block/" + model),
         this.modLoc("block/" + block.getId().getPath().toString()));
   }
 

@@ -30,6 +30,8 @@ import net.minecraft.world.phys.shapes.VoxelShape;
  */
 public class BlockShapes {
 
+  public static final VoxelShape LAPTOP = Block.box(1.0D, 0.0D, 1.0D, 15.0D, 1.0D, 15.0D);
+
   public static final VoxelShape GAS_TANK = Block.box(3, 1, 3, 13, 14, 13);
 
   public static final Function<Direction, VoxelShape> COMPUTER =

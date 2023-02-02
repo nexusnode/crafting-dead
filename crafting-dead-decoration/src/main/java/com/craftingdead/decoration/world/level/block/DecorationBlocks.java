@@ -39,6 +39,42 @@ public class DecorationBlocks {
   public static final DeferredRegister<Block> deferredRegister =
       DeferredRegister.create(ForgeRegistries.BLOCKS, CraftingDeadDecoration.ID);
 
+  public static final RegistryObject<Block> LAPTOP_1 =
+      deferredRegister.register("laptop_1",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(5.0F)
+                  .sound(SoundType.METAL)
+                  .noCollission(),
+              __ -> BlockShapes.LAPTOP));
+
+  public static final RegistryObject<Block> LAPTOP_2 =
+      deferredRegister.register("laptop_2",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(5.0F)
+                  .sound(SoundType.METAL)
+                  .noCollission(),
+              __ -> BlockShapes.LAPTOP));
+
+  public static final RegistryObject<Block> LAPTOP_3 =
+      deferredRegister.register("laptop_3",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(5.0F)
+                  .sound(SoundType.METAL)
+                  .noCollission(),
+              __ -> BlockShapes.LAPTOP));
+
+  public static final RegistryObject<Block> BROKEN_LAPTOP =
+      deferredRegister.register("broken_laptop",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(5.0F)
+                  .sound(SoundType.METAL)
+                  .noCollission(),
+              __ -> BlockShapes.LAPTOP));
+
   public static final RegistryObject<Block> YELLOW_GAS_TANK =
       deferredRegister.register("yellow_gas_tank",
           () -> new OrientableBlock(

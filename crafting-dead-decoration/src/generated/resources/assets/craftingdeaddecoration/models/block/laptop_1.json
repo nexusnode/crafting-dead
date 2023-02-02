@@ -1,0 +1,6 @@
+{
+  "parent": "craftingdeaddecoration:block/laptop",
+  "textures": {
+    "texture": "craftingdeaddecoration:block/laptop_1"
+  }
+}
