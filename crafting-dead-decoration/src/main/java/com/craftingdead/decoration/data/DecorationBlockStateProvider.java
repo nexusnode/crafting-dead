@@ -53,6 +53,19 @@ public class DecorationBlockStateProvider extends BlockStateProvider {
 
     this.horizontalBlock(DecorationBlocks.BATTEN_LIGHT);
     this.horizontalBlock(DecorationBlocks.LIT_BATTEN_LIGHT);
+
+    this.horizontalBlock(DecorationBlocks.OAK_PLANK_BARRICADE_1);
+    this.horizontalBlock(DecorationBlocks.OAK_PLANK_BARRICADE_2);
+    this.horizontalBlock(DecorationBlocks.OAK_PLANK_BARRICADE_3);
+    this.horizontalBlock(DecorationBlocks.SPRUCE_PLANK_BARRICADE_1);
+    this.horizontalBlock(DecorationBlocks.SPRUCE_PLANK_BARRICADE_2);
+    this.horizontalBlock(DecorationBlocks.SPRUCE_PLANK_BARRICADE_3);
+    this.horizontalBlock(DecorationBlocks.BIRCH_PLANK_BARRICADE_1);
+    this.horizontalBlock(DecorationBlocks.BIRCH_PLANK_BARRICADE_2);
+    this.horizontalBlock(DecorationBlocks.BIRCH_PLANK_BARRICADE_3);
+    this.horizontalBlock(DecorationBlocks.DARK_OAK_PLANK_BARRICADE_1);
+    this.horizontalBlock(DecorationBlocks.DARK_OAK_PLANK_BARRICADE_2);
+    this.horizontalBlock(DecorationBlocks.DARK_OAK_PLANK_BARRICADE_3);
   }
 
   private void horizontalBlock(RegistryObject<? extends Block> block) {

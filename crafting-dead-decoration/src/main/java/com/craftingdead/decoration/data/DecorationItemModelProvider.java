@@ -1,5 +1,6 @@
 package com.craftingdead.decoration.data;
 
+import com.craftingdead.decoration.CraftingDeadDecoration;
 import com.craftingdead.decoration.world.item.DecorationItems;
 import net.minecraft.data.DataGenerator;
 import net.minecraftforge.client.model.generators.ItemModelProvider;
@@ -7,9 +8,9 @@ import net.minecraftforge.common.data.ExistingFileHelper;
 
 public class DecorationItemModelProvider extends ItemModelProvider {
 
-  public DecorationItemModelProvider(DataGenerator generator, String modid,
+  public DecorationItemModelProvider(DataGenerator generator,
       ExistingFileHelper existingFileHelper) {
-    super(generator, modid, existingFileHelper);
+    super(generator, CraftingDeadDecoration.ID, existingFileHelper);
   }
 
   @Override

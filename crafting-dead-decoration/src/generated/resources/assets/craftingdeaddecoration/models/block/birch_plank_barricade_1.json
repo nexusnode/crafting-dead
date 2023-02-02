@@ -1,0 +1,6 @@
+{
+  "parent": "craftingdeaddecoration:block/plank_barricade_1",
+  "textures": {
+    "texture": "craftingdeaddecoration:block/birch_plank_barricade"
+  }
+}

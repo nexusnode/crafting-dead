@@ -1,5 +1,19 @@
 {
     "itemGroup.craftingdeaddecoration": "Crafting Dead Decoration",
+
+    "block.craftingdeaddecoration.oak_plank_barricade_1": "Oak Plank Barricade 1",
+    "block.craftingdeaddecoration.oak_plank_barricade_2": "Oak Plank Barricade 2",
+    "block.craftingdeaddecoration.oak_plank_barricade_3": "Oak Plank Barricade 3",
+    "block.craftingdeaddecoration.spruce_plank_barricade_1": "Spruce Plank Barricade 1",
+    "block.craftingdeaddecoration.spruce_plank_barricade_2": "Spruce Plank Barricade 2",
+    "block.craftingdeaddecoration.spruce_plank_barricade_3": "Spruce Plank Barricade 3",
+    "block.craftingdeaddecoration.birch_plank_barricade_1": "Birch Plank Barricade 1",
+    "block.craftingdeaddecoration.birch_plank_barricade_2": "Birch Plank Barricade 2",
+    "block.craftingdeaddecoration.birch_plank_barricade_3": "Birch Plank Barricade 3",
+    "block.craftingdeaddecoration.dark_oak_plank_barricade_1": "Dark Oak Plank Barricade 1",
+    "block.craftingdeaddecoration.dark_oak_plank_barricade_2": "Dark Oak Plank Barricade 2",
+    "block.craftingdeaddecoration.dark_oak_plank_barricade_3": "Dark Oak Plank Barricade 3",
+
     "block.craftingdeaddecoration.batten_light": "Batten Light",
     "block.craftingdeaddecoration.lit_batten_light": "Lit Batten Light",
     "block.craftingdeaddecoration.wooden_pallet": "Wooden Pallet",

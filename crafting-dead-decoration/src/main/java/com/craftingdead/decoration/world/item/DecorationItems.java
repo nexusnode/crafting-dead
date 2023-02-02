@@ -42,6 +42,55 @@ public class DecorationItems {
         }
       };
 
+  public static final RegistryObject<BlockItem> OAK_PLANK_BARRICADE_1 =
+      deferredRegister.register("oak_plank_barricade_1",
+          () -> new BlockItem(DecorationBlocks.OAK_PLANK_BARRICADE_1.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<BlockItem> OAK_PLANK_BARRICADE_2 =
+      deferredRegister.register("oak_plank_barricade_2",
+          () -> new BlockItem(DecorationBlocks.OAK_PLANK_BARRICADE_2.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<BlockItem> OAK_PLANK_BARRICADE_3 =
+      deferredRegister.register("oak_plank_barricade_3",
+          () -> new BlockItem(DecorationBlocks.OAK_PLANK_BARRICADE_3.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<BlockItem> SPRUCE_PLANK_BARRICADE_1 =
+      deferredRegister.register("spruce_plank_barricade_1",
+          () -> new BlockItem(DecorationBlocks.SPRUCE_PLANK_BARRICADE_1.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<BlockItem> SPRUCE_PLANK_BARRICADE_2 =
+      deferredRegister.register("spruce_plank_barricade_2",
+          () -> new BlockItem(DecorationBlocks.SPRUCE_PLANK_BARRICADE_2.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<BlockItem> SPRUCE_PLANK_BARRICADE_3 =
+      deferredRegister.register("spruce_plank_barricade_3",
+          () -> new BlockItem(DecorationBlocks.SPRUCE_PLANK_BARRICADE_3.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<BlockItem> BIRCH_PLANK_BARRICADE_1 =
+      deferredRegister.register("birch_plank_barricade_1",
+          () -> new BlockItem(DecorationBlocks.BIRCH_PLANK_BARRICADE_1.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<BlockItem> BIRCH_PLANK_BARRICADE_2 =
+      deferredRegister.register("birch_plank_barricade_2",
+          () -> new BlockItem(DecorationBlocks.BIRCH_PLANK_BARRICADE_2.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<BlockItem> BIRCH_PLANK_BARRICADE_3 =
+      deferredRegister.register("birch_plank_barricade_3",
+          () -> new BlockItem(DecorationBlocks.BIRCH_PLANK_BARRICADE_3.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<BlockItem> DARK_OAK_PLANK_BARRICADE_1 =
+      deferredRegister.register("dark_oak_plank_barricade_1",
+          () -> new BlockItem(DecorationBlocks.DARK_OAK_PLANK_BARRICADE_1.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<BlockItem> DARK_OAK_PLANK_BARRICADE_2 =
+      deferredRegister.register("dark_oak_plank_barricade_2",
+          () -> new BlockItem(DecorationBlocks.DARK_OAK_PLANK_BARRICADE_2.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<BlockItem> DARK_OAK_PLANK_BARRICADE_3 =
+      deferredRegister.register("dark_oak_plank_barricade_3",
+          () -> new BlockItem(DecorationBlocks.DARK_OAK_PLANK_BARRICADE_3.get(),
+              new Item.Properties().tab(TAB)));
+
   public static final RegistryObject<BlockItem> BATTEN_LIGHT =
       deferredRegister.register("batten_light",
           () -> new BlockItem(DecorationBlocks.BATTEN_LIGHT.get(),

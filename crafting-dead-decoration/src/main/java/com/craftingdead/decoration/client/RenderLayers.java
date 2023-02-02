@@ -34,6 +34,19 @@ class RenderLayers {
     cutout(DecorationBlocks.BATTEN_LIGHT);
     cutout(DecorationBlocks.LIT_BATTEN_LIGHT);
 
+    cutout(DecorationBlocks.OAK_PLANK_BARRICADE_1);
+    cutout(DecorationBlocks.OAK_PLANK_BARRICADE_2);
+    cutout(DecorationBlocks.OAK_PLANK_BARRICADE_3);
+    cutout(DecorationBlocks.SPRUCE_PLANK_BARRICADE_1);
+    cutout(DecorationBlocks.SPRUCE_PLANK_BARRICADE_2);
+    cutout(DecorationBlocks.SPRUCE_PLANK_BARRICADE_3);
+    cutout(DecorationBlocks.BIRCH_PLANK_BARRICADE_1);
+    cutout(DecorationBlocks.BIRCH_PLANK_BARRICADE_2);
+    cutout(DecorationBlocks.BIRCH_PLANK_BARRICADE_3);
+    cutout(DecorationBlocks.DARK_OAK_PLANK_BARRICADE_1);
+    cutout(DecorationBlocks.DARK_OAK_PLANK_BARRICADE_2);
+    cutout(DecorationBlocks.DARK_OAK_PLANK_BARRICADE_3);
+
     translucent(DecorationBlocks.WASHING_MACHINE);
     translucent(DecorationBlocks.BROKEN_WASHING_MACHINE);
     cutout(DecorationBlocks.POLE_BARRIER);

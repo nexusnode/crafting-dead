@@ -39,6 +39,102 @@ public class DecorationBlocks {
   public static final DeferredRegister<Block> deferredRegister =
       DeferredRegister.create(ForgeRegistries.BLOCKS, CraftingDeadDecoration.ID);
 
+  public static final RegistryObject<Block> OAK_PLANK_BARRICADE_1 =
+      deferredRegister.register("oak_plank_barricade_1",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.WOOD)
+                  .strength(0.3F)
+                  .sound(SoundType.WOOD),
+              BlockShapes.PLANK_BARRICADE_1));
+
+  public static final RegistryObject<Block> OAK_PLANK_BARRICADE_2 =
+      deferredRegister.register("oak_plank_barricade_2",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.WOOD)
+                  .strength(0.3F)
+                  .sound(SoundType.WOOD),
+              BlockShapes.PLANK_BARRICADE_2));
+
+  public static final RegistryObject<Block> OAK_PLANK_BARRICADE_3 =
+      deferredRegister.register("oak_plank_barricade_3",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.WOOD)
+                  .strength(0.3F)
+                  .sound(SoundType.WOOD),
+              BlockShapes.PLANK_BARRICADE_3));
+
+  public static final RegistryObject<Block> SPRUCE_PLANK_BARRICADE_1 =
+      deferredRegister.register("spruce_plank_barricade_1",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.WOOD)
+                  .strength(0.3F)
+                  .sound(SoundType.WOOD),
+              BlockShapes.PLANK_BARRICADE_1));
+
+  public static final RegistryObject<Block> SPRUCE_PLANK_BARRICADE_2 =
+      deferredRegister.register("spruce_plank_barricade_2",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.WOOD)
+                  .strength(0.3F)
+                  .sound(SoundType.WOOD),
+              BlockShapes.PLANK_BARRICADE_2));
+
+  public static final RegistryObject<Block> SPRUCE_PLANK_BARRICADE_3 =
+      deferredRegister.register("spruce_plank_barricade_3",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.WOOD)
+                  .strength(0.3F)
+                  .sound(SoundType.WOOD),
+              BlockShapes.PLANK_BARRICADE_3));
+
+  public static final RegistryObject<Block> BIRCH_PLANK_BARRICADE_1 =
+      deferredRegister.register("birch_plank_barricade_1",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.WOOD)
+                  .strength(0.3F)
+                  .sound(SoundType.WOOD),
+              BlockShapes.PLANK_BARRICADE_1));
+
+  public static final RegistryObject<Block> BIRCH_PLANK_BARRICADE_2 =
+      deferredRegister.register("birch_plank_barricade_2",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.WOOD)
+                  .strength(0.3F)
+                  .sound(SoundType.WOOD),
+              BlockShapes.PLANK_BARRICADE_2));
+
+  public static final RegistryObject<Block> BIRCH_PLANK_BARRICADE_3 =
+      deferredRegister.register("birch_plank_barricade_3",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.WOOD)
+                  .strength(0.3F)
+                  .sound(SoundType.WOOD),
+              BlockShapes.PLANK_BARRICADE_3));
+
+  public static final RegistryObject<Block> DARK_OAK_PLANK_BARRICADE_1 =
+      deferredRegister.register("dark_oak_plank_barricade_1",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.WOOD)
+                  .strength(0.3F)
+                  .sound(SoundType.WOOD),
+              BlockShapes.PLANK_BARRICADE_1));
+
+  public static final RegistryObject<Block> DARK_OAK_PLANK_BARRICADE_2 =
+      deferredRegister.register("dark_oak_plank_barricade_2",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.WOOD)
+                  .strength(0.3F)
+                  .sound(SoundType.WOOD),
+              BlockShapes.PLANK_BARRICADE_2));
+
+  public static final RegistryObject<Block> DARK_OAK_PLANK_BARRICADE_3 =
+      deferredRegister.register("dark_oak_plank_barricade_3",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.WOOD)
+                  .strength(0.3F)
+                  .sound(SoundType.WOOD),
+              BlockShapes.PLANK_BARRICADE_3));
+
   public static final RegistryObject<Block> BATTEN_LIGHT =
       deferredRegister.register("batten_light",
           () -> new OrientableBlock(

@@ -30,6 +30,22 @@ import net.minecraft.world.phys.shapes.VoxelShape;
  */
 public class BlockShapes {
 
+  public static final Function<Direction, VoxelShape> PLANK_BARRICADE_1 =
+      computeOrientableShape(Shapes.or(
+          Block.box(-3, 8.75, 15, 19, 11.75, 16),
+          Block.box(-2, 1, 15, 18, 4, 16)));
+
+  public static final Function<Direction, VoxelShape> PLANK_BARRICADE_2 =
+      computeOrientableShape(Shapes.or(
+          Block.box(-3, 1, 15, 19, 5, 16),
+          Block.box(-3, 6, 15, 19, 10, 16),
+          Block.box(-3, 11, 15, 19, 15, 16)));
+
+  public static final Function<Direction, VoxelShape> PLANK_BARRICADE_3 =
+      computeOrientableShape(Shapes.or(
+          Block.box(-3, 1, 15, 19, 5, 16),
+          Block.box(-3, 11, 15, 19, 15, 16)));
+
   public static final Function<Direction, VoxelShape> BATTEN_LIGHT =
       computeOrientableShape(Shapes.or(
           Block.box(7.5, 13, 1, 8.5, 16, 2),
