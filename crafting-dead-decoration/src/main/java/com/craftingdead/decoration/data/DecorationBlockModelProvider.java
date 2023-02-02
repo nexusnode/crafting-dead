@@ -38,6 +38,10 @@ public class DecorationBlockModelProvider extends BlockModelProvider {
 
     this.textureVariant(DecorationBlocks.CRACKED_OLD_TELEVISION, "old_television");
     this.textureVariant(DecorationBlocks.CRACKED_TELEVISION, "television");
+
+    this.textureVariant(DecorationBlocks.FULL_TOILET, "toilet");
+    this.textureVariant(DecorationBlocks.DIRTY_TOILET, "toilet");
+    this.textureVariant(DecorationBlocks.FULL_DIRTY_TOILET, "toilet");
   }
 
   private void textureVariant(RegistryObject<? extends Block> block, String model) {

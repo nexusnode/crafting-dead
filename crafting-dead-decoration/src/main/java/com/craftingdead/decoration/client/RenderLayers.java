@@ -57,6 +57,9 @@ class RenderLayers {
     cutout(DecorationBlocks.LAPTOP_3);
     cutout(DecorationBlocks.BROKEN_LAPTOP);
 
+    cutout(DecorationBlocks.TOILET);
+    cutout(DecorationBlocks.DIRTY_TOILET);
+
     translucent(DecorationBlocks.WASHING_MACHINE);
     translucent(DecorationBlocks.BROKEN_WASHING_MACHINE);
     cutout(DecorationBlocks.POLE_BARRIER);

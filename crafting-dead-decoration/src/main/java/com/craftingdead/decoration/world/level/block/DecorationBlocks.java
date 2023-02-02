@@ -39,14 +39,50 @@ public class DecorationBlocks {
   public static final DeferredRegister<Block> deferredRegister =
       DeferredRegister.create(ForgeRegistries.BLOCKS, CraftingDeadDecoration.ID);
 
+  public static final RegistryObject<Block> TOILET =
+      deferredRegister.register("toilet",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(5.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.TOILET));
+
+  public static final RegistryObject<Block> FULL_TOILET =
+      deferredRegister.register("full_toilet",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(5.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.TOILET));
+
+  public static final RegistryObject<Block> DIRTY_TOILET =
+      deferredRegister.register("dirty_toilet",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(5.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.TOILET));
+
+  public static final RegistryObject<Block> FULL_DIRTY_TOILET =
+      deferredRegister.register("full_dirty_toilet",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(5.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.TOILET));
+
   public static final RegistryObject<Block> OLD_TELEVISION =
       deferredRegister.register("old_television",
           () -> new OrientableBlock(
               BlockBehaviour.Properties.of(Material.METAL)
                   .strength(5.0F)
                   .sound(SoundType.METAL)
-                  .noCollission(),
-              BlockShapes.OLD_TV));
+                  .noOcclusion(),
+              BlockShapes.OLD_TELEVISION));
 
   public static final RegistryObject<Block> CRACKED_OLD_TELEVISION =
       deferredRegister.register("cracked_old_television",
@@ -54,8 +90,8 @@ public class DecorationBlocks {
               BlockBehaviour.Properties.of(Material.METAL)
                   .strength(5.0F)
                   .sound(SoundType.METAL)
-                  .noCollission(),
-              BlockShapes.OLD_TV));
+                  .noOcclusion(),
+              BlockShapes.OLD_TELEVISION));
 
   public static final RegistryObject<Block> CRACKED_TELEVISION =
       deferredRegister.register("cracked_television",
@@ -63,8 +99,8 @@ public class DecorationBlocks {
               BlockBehaviour.Properties.of(Material.METAL)
                   .strength(5.0F)
                   .sound(SoundType.METAL)
-                  .noCollission(),
-              BlockShapes.TV));
+                  .noOcclusion(),
+              BlockShapes.TELEVISION));
 
   public static final RegistryObject<Block> TELEVISION =
       deferredRegister.register("television",
@@ -72,8 +108,8 @@ public class DecorationBlocks {
               BlockBehaviour.Properties.of(Material.METAL)
                   .strength(5.0F)
                   .sound(SoundType.METAL)
-                  .noCollission(),
-              BlockShapes.TV));
+                  .noOcclusion(),
+              BlockShapes.TELEVISION));
 
   public static final RegistryObject<Block> OFFICE_CHAIR_1 =
       deferredRegister.register("office_chair_1",

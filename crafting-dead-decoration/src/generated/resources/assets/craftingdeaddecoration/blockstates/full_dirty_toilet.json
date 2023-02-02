@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "craftingdeaddecoration:block/full_dirty_toilet"
+    },
+    "facing=south": {
+      "model": "craftingdeaddecoration:block/full_dirty_toilet",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "craftingdeaddecoration:block/full_dirty_toilet",
+      "y": 270
+    },
+    "facing=east": {
+      "model": "craftingdeaddecoration:block/full_dirty_toilet",
+      "y": 90
+    }
+  }
+}

@@ -42,6 +42,23 @@ public class DecorationItems {
         }
       };
 
+  public static final RegistryObject<BlockItem> TOILET =
+      deferredRegister.register("toilet",
+          () -> new BlockItem(DecorationBlocks.TOILET.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<BlockItem> FULL_TOILET =
+      deferredRegister.register("full_toilet",
+          () -> new BlockItem(DecorationBlocks.FULL_TOILET.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<BlockItem> DIRTY_TOILET =
+      deferredRegister.register("dirty_toilet",
+          () -> new BlockItem(DecorationBlocks.DIRTY_TOILET.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<BlockItem> FULL_DIRTY_TOILET =
+      deferredRegister.register("full_dirty_toilet",
+          () -> new BlockItem(DecorationBlocks.FULL_DIRTY_TOILET.get(),
+              new Item.Properties().tab(TAB)));
+
   public static final RegistryObject<BlockItem> OLD_TELEVISION =
       deferredRegister.register("old_television",
           () -> new BlockItem(DecorationBlocks.OLD_TELEVISION.get(),

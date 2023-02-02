@@ -1,0 +1,6 @@
+{
+  "parent": "craftingdeaddecoration:block/toilet",
+  "textures": {
+    "texture": "craftingdeaddecoration:block/dirty_toilet"
+  }
+}

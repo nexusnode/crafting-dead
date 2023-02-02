@@ -30,12 +30,20 @@ import net.minecraft.world.phys.shapes.VoxelShape;
  */
 public class BlockShapes {
 
-  public static final Function<Direction, VoxelShape> OLD_TV =
+  public static final Function<Direction, VoxelShape> TOILET =
+      computeOrientableShape(Shapes.or(
+          Block.box(3, 4, 2, 5, 8, 12),
+          Block.box(11, 4, 2, 13, 8, 12),
+          Block.box(5, 4, 2, 11, 8, 4),
+          Block.box(4, 0, 3, 12, 4, 12),
+          Block.box(3, 0, 12, 13, 19, 16)));
+
+  public static final Function<Direction, VoxelShape> OLD_TELEVISION =
       computeOrientableShape(Shapes.or(
           Block.box(2, 0, 7, 14, 12, 15),
           Block.box(0.0D, 0.0D, 0.0D, 16, 14, 7)));
 
-  public static final Function<Direction, VoxelShape> TV =
+  public static final Function<Direction, VoxelShape> TELEVISION =
       computeOrientableShape(Shapes.or(
           Block.box(3, 0, 6, 13, 1, 11),
           Block.box(-1, 7, 8, 18, 19, 10),

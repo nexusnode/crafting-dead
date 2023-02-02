@@ -1,6 +1,11 @@
 {
     "itemGroup.craftingdeaddecoration": "Crafting Dead Decoration",
 
+    "block.craftingdeaddecoration.toilet": "Toilet",
+    "block.craftingdeaddecoration.full_toilet": "Full Toilet",
+    "block.craftingdeaddecoration.dirty_toilet": "Dirty Toilet",
+    "block.craftingdeaddecoration.full_dirty_toilet": "Full Dirty Toilet",
+
     "block.craftingdeaddecoration.old_television": "Old Television",
     "block.craftingdeaddecoration.cracked_old_television": "Cracked Old Television",
     "block.craftingdeaddecoration.television": "Television",

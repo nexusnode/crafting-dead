@@ -94,6 +94,11 @@ public class DecorationBlockStateProvider extends BlockStateProvider {
     this.horizontalBlock(DecorationBlocks.CRACKED_OLD_TELEVISION);
     this.horizontalBlock(DecorationBlocks.TELEVISION);
     this.horizontalBlock(DecorationBlocks.CRACKED_TELEVISION);
+
+    this.horizontalBlock(DecorationBlocks.TOILET);
+    this.horizontalBlock(DecorationBlocks.FULL_TOILET);
+    this.horizontalBlock(DecorationBlocks.DIRTY_TOILET);
+    this.horizontalBlock(DecorationBlocks.FULL_DIRTY_TOILET);
   }
 
   private void simpleBlock(RegistryObject<? extends Block> block) {
