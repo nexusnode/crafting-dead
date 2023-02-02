@@ -42,6 +42,16 @@ public class DecorationItems {
         }
       };
 
+  public static final RegistryObject<BlockItem> BATTEN_LIGHT =
+      deferredRegister.register("batten_light",
+          () -> new BlockItem(DecorationBlocks.BATTEN_LIGHT.get(),
+              new Item.Properties().tab(TAB)));
+
+  public static final RegistryObject<BlockItem> LIT_BATTEN_LIGHT =
+      deferredRegister.register("lit_batten_light",
+          () -> new BlockItem(DecorationBlocks.LIT_BATTEN_LIGHT.get(),
+              new Item.Properties().tab(TAB)));
+
   public static final RegistryObject<BlockItem> WOODEN_PALLET =
       deferredRegister.register("wooden_pallet",
           () -> new BlockItem(DecorationBlocks.WOODEN_PALLET.get(),

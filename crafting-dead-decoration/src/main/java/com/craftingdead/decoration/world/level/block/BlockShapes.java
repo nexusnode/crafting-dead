@@ -30,6 +30,12 @@ import net.minecraft.world.phys.shapes.VoxelShape;
  */
 public class BlockShapes {
 
+  public static final Function<Direction, VoxelShape> BATTEN_LIGHT =
+      computeOrientableShape(Shapes.or(
+          Block.box(7.5, 13, 1, 8.5, 16, 2),
+          Block.box(7.5, 13, 14, 8.5, 16, 15),
+          Block.box(5.5, 12, 0, 10.5, 13, 16)));
+
   public static final Function<Direction, VoxelShape> LIGHT_SWITCH =
       computeOrientableShape(Block.box(6, 6, 15, 10, 11, 16));
 

@@ -39,10 +39,29 @@ public class DecorationBlocks {
   public static final DeferredRegister<Block> deferredRegister =
       DeferredRegister.create(ForgeRegistries.BLOCKS, CraftingDeadDecoration.ID);
 
+  public static final RegistryObject<Block> BATTEN_LIGHT =
+      deferredRegister.register("batten_light",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(0.3F)
+                  .sound(SoundType.METAL)
+                  .noCollission(),
+              BlockShapes.BATTEN_LIGHT));
+
+  public static final RegistryObject<Block> LIT_BATTEN_LIGHT =
+      deferredRegister.register("lit_batten_light",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(0.3F)
+                  .sound(SoundType.METAL)
+                  .noCollission()
+                  .lightLevel(__ -> 15),
+              BlockShapes.BATTEN_LIGHT));
+
   public static final RegistryObject<Block> WOODEN_PALLET =
       deferredRegister.register("wooden_pallet",
           () -> new OrientableBlock(
-              BlockBehaviour.Properties.of(Material.WOOD, MaterialColor.WOOD)
+              BlockBehaviour.Properties.of(Material.WOOD)
                   .strength(2.0F, 3.0F)
                   .sound(SoundType.WOOD)
                   .noOcclusion(),
@@ -51,7 +70,7 @@ public class DecorationBlocks {
   public static final RegistryObject<Block> STACKED_WOODEN_PALLETS =
       deferredRegister.register("stacked_wooden_pallets",
           () -> new OrientableBlock(
-              BlockBehaviour.Properties.of(Material.WOOD, MaterialColor.WOOD)
+              BlockBehaviour.Properties.of(Material.WOOD)
                   .strength(2.0F, 3.0F)
                   .sound(SoundType.WOOD)
                   .noOcclusion(),
@@ -60,7 +79,7 @@ public class DecorationBlocks {
   public static final RegistryObject<Block> CRATE_ON_WOODEN_PALLET =
       deferredRegister.register("crate_on_wooden_pallet",
           () -> new OrientableBlock(
-              BlockBehaviour.Properties.of(Material.WOOD, MaterialColor.WOOD)
+              BlockBehaviour.Properties.of(Material.WOOD)
                   .strength(2.0F, 3.0F)
                   .sound(SoundType.WOOD)
                   .noOcclusion(),
@@ -69,7 +88,7 @@ public class DecorationBlocks {
   public static final RegistryObject<Block> SECURITY_CAMERA =
       deferredRegister.register("security_camera",
           () -> new WaterloggedOrientableBlock(
-              BlockBehaviour.Properties.of(Material.METAL, MaterialColor.METAL)
+              BlockBehaviour.Properties.of(Material.METAL)
                   .strength(5.0F)
                   .sound(SoundType.WOOD)
                   .noOcclusion(),
@@ -78,7 +97,7 @@ public class DecorationBlocks {
   public static final RegistryObject<Block> WASHING_MACHINE =
       deferredRegister.register("washing_machine",
           () -> new OrientableBlock(
-              BlockBehaviour.Properties.of(Material.METAL, MaterialColor.METAL)
+              BlockBehaviour.Properties.of(Material.METAL)
                   .strength(5.0F)
                   .sound(SoundType.METAL)
                   .noOcclusion(),
@@ -87,7 +106,7 @@ public class DecorationBlocks {
   public static final RegistryObject<Block> BROKEN_WASHING_MACHINE =
       deferredRegister.register("broken_washing_machine",
           () -> new OrientableBlock(
-              BlockBehaviour.Properties.of(Material.METAL, MaterialColor.METAL)
+              BlockBehaviour.Properties.of(Material.METAL)
                   .strength(5.0F)
                   .sound(SoundType.METAL)
                   .noOcclusion(),
@@ -96,7 +115,7 @@ public class DecorationBlocks {
   public static final RegistryObject<Block> CLOTHING_RACK =
       deferredRegister.register("clothing_rack",
           () -> new ClothingRackBlock(
-              BlockBehaviour.Properties.of(Material.METAL, MaterialColor.METAL)
+              BlockBehaviour.Properties.of(Material.METAL)
                   .strength(5.0F)
                   .sound(SoundType.METAL)
                   .noCollission()));

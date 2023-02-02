@@ -50,6 +50,9 @@ public class DecorationBlockStateProvider extends BlockStateProvider {
     this.horizontalBlock(DecorationBlocks.CLOTHING_RACK.get(),
         state -> this.blockModel("clothing_rack_"
             + state.getValue(DoubleBlock.PART).getSerializedName()));
+
+    this.horizontalBlock(DecorationBlocks.BATTEN_LIGHT);
+    this.horizontalBlock(DecorationBlocks.LIT_BATTEN_LIGHT);
   }
 
   private void horizontalBlock(RegistryObject<? extends Block> block) {

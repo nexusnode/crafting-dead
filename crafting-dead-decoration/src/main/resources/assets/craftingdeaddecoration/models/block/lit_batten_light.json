@@ -1,0 +1,6 @@
+{
+    "parent": "craftingdeaddecoration:block/batten_light",
+    "textures": {
+        "texture": "craftingdeaddecoration:block/lit_batten_light"
+    }
+}
