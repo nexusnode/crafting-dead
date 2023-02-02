@@ -42,6 +42,32 @@ public class DecorationItems {
         }
       };
 
+  public static final RegistryObject<BlockItem> COMPUTER_1 =
+      deferredRegister.register("computer_1",
+          () -> new BlockItem(DecorationBlocks.COMPUTER_1.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<BlockItem> COMPUTER_2 =
+      deferredRegister.register("computer_2",
+          () -> new BlockItem(DecorationBlocks.COMPUTER_2.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<BlockItem> COMPUTER_3 =
+      deferredRegister.register("computer_3",
+          () -> new BlockItem(DecorationBlocks.COMPUTER_3.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<BlockItem> BROKEN_COMPUTER =
+      deferredRegister.register("broken_computer",
+          () -> new BlockItem(DecorationBlocks.BROKEN_COMPUTER.get(),
+              new Item.Properties().tab(TAB)));
+
+  public static final RegistryObject<BlockItem> BARREL_1 =
+      deferredRegister.register("barrel_1",
+          () -> new BlockItem(DecorationBlocks.BARREL_1.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<BlockItem> BARREL_2 =
+      deferredRegister.register("barrel_2",
+          () -> new BlockItem(DecorationBlocks.BARREL_2.get(),
+              new Item.Properties().tab(TAB)));
+
   public static final RegistryObject<BlockItem> OAK_PLANK_BARRICADE_1 =
       deferredRegister.register("oak_plank_barricade_1",
           () -> new BlockItem(DecorationBlocks.OAK_PLANK_BARRICADE_1.get(),

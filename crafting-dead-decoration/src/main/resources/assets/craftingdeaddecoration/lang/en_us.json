@@ -1,6 +1,13 @@
 {
     "itemGroup.craftingdeaddecoration": "Crafting Dead Decoration",
 
+    "block.craftingdeaddecoration.barrel_1": "Barrel 1",
+    "block.craftingdeaddecoration.barrel_2": "Barrel 2",
+    "block.craftingdeaddecoration.computer_1": "Computer 1",
+    "block.craftingdeaddecoration.computer_2": "Computer 2",
+    "block.craftingdeaddecoration.computer_3": "Computer 3",
+    "block.craftingdeaddecoration.broken_computer": "Broken Computer",
+
     "block.craftingdeaddecoration.oak_plank_barricade_1": "Oak Plank Barricade 1",
     "block.craftingdeaddecoration.oak_plank_barricade_2": "Oak Plank Barricade 2",
     "block.craftingdeaddecoration.oak_plank_barricade_3": "Oak Plank Barricade 3",

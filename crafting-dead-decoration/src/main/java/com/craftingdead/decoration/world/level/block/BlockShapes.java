@@ -30,6 +30,13 @@ import net.minecraft.world.phys.shapes.VoxelShape;
  */
 public class BlockShapes {
 
+  public static final Function<Direction, VoxelShape> COMPUTER =
+      computeOrientableShape(Shapes.or(
+          Shapes.block(),
+          Block.box(17, 0, 1, 24, 16, 14)));
+
+  public static final VoxelShape BARREL = Block.box(2, 0, 2, 14, 15, 14);
+
   public static final Function<Direction, VoxelShape> PLANK_BARRICADE_1 =
       computeOrientableShape(Shapes.or(
           Block.box(-3, 8.75, 15, 19, 11.75, 16),

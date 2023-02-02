@@ -1,0 +1,6 @@
+{
+  "parent": "craftingdeaddecoration:block/computer",
+  "textures": {
+    "texture": "craftingdeaddecoration:block/computer_1"
+  }
+}

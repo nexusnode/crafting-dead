@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "craftingdeaddecoration:block/broken_computer"
+    },
+    "facing=south": {
+      "model": "craftingdeaddecoration:block/broken_computer",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "craftingdeaddecoration:block/broken_computer",
+      "y": 270
+    },
+    "facing=east": {
+      "model": "craftingdeaddecoration:block/broken_computer",
+      "y": 90
+    }
+  }
+}

@@ -47,6 +47,11 @@ class RenderLayers {
     cutout(DecorationBlocks.DARK_OAK_PLANK_BARRICADE_2);
     cutout(DecorationBlocks.DARK_OAK_PLANK_BARRICADE_3);
 
+    cutout(DecorationBlocks.COMPUTER_1);
+    cutout(DecorationBlocks.COMPUTER_2);
+    cutout(DecorationBlocks.COMPUTER_3);
+    cutout(DecorationBlocks.BROKEN_COMPUTER);
+
     translucent(DecorationBlocks.WASHING_MACHINE);
     translucent(DecorationBlocks.BROKEN_WASHING_MACHINE);
     cutout(DecorationBlocks.POLE_BARRIER);

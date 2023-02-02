@@ -39,6 +39,58 @@ public class DecorationBlocks {
   public static final DeferredRegister<Block> deferredRegister =
       DeferredRegister.create(ForgeRegistries.BLOCKS, CraftingDeadDecoration.ID);
 
+  public static final RegistryObject<Block> COMPUTER_1 =
+      deferredRegister.register("computer_1",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(5.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.COMPUTER));
+
+  public static final RegistryObject<Block> COMPUTER_2 =
+      deferredRegister.register("computer_2",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(5.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.COMPUTER));
+
+  public static final RegistryObject<Block> COMPUTER_3 =
+      deferredRegister.register("computer_3",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(5.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.COMPUTER));
+
+  public static final RegistryObject<Block> BROKEN_COMPUTER =
+      deferredRegister.register("broken_computer",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(5.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.COMPUTER));
+
+  public static final RegistryObject<Block> BARREL_1 =
+      deferredRegister.register("barrel_1",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(5.0F)
+                  .sound(SoundType.METAL),
+              __ -> BlockShapes.BARREL));
+
+  public static final RegistryObject<Block> BARREL_2 =
+      deferredRegister.register("barrel_2",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(5.0F)
+                  .sound(SoundType.METAL),
+              __ -> BlockShapes.BARREL));
+
   public static final RegistryObject<Block> OAK_PLANK_BARRICADE_1 =
       deferredRegister.register("oak_plank_barricade_1",
           () -> new OrientableBlock(
