@@ -1,0 +1,6 @@
+{
+  "parent": "craftingdeaddecoration:block/television",
+  "textures": {
+    "texture": "craftingdeaddecoration:block/cracked_television"
+  }
+}

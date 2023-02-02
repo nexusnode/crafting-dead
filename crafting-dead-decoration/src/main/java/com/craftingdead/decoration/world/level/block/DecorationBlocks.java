@@ -39,6 +39,42 @@ public class DecorationBlocks {
   public static final DeferredRegister<Block> deferredRegister =
       DeferredRegister.create(ForgeRegistries.BLOCKS, CraftingDeadDecoration.ID);
 
+  public static final RegistryObject<Block> OLD_TELEVISION =
+      deferredRegister.register("old_television",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(5.0F)
+                  .sound(SoundType.METAL)
+                  .noCollission(),
+              BlockShapes.OLD_TV));
+
+  public static final RegistryObject<Block> CRACKED_OLD_TELEVISION =
+      deferredRegister.register("cracked_old_television",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(5.0F)
+                  .sound(SoundType.METAL)
+                  .noCollission(),
+              BlockShapes.OLD_TV));
+
+  public static final RegistryObject<Block> CRACKED_TELEVISION =
+      deferredRegister.register("cracked_television",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(5.0F)
+                  .sound(SoundType.METAL)
+                  .noCollission(),
+              BlockShapes.TV));
+
+  public static final RegistryObject<Block> TELEVISION =
+      deferredRegister.register("television",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(5.0F)
+                  .sound(SoundType.METAL)
+                  .noCollission(),
+              BlockShapes.TV));
+
   public static final RegistryObject<Block> OFFICE_CHAIR_1 =
       deferredRegister.register("office_chair_1",
           () -> new OrientableBlock(

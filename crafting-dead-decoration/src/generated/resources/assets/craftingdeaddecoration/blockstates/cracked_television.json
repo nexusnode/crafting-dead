@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "craftingdeaddecoration:block/cracked_television"
+    },
+    "facing=south": {
+      "model": "craftingdeaddecoration:block/cracked_television",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "craftingdeaddecoration:block/cracked_television",
+      "y": 270
+    },
+    "facing=east": {
+      "model": "craftingdeaddecoration:block/cracked_television",
+      "y": 90
+    }
+  }
+}

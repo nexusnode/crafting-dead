@@ -1,6 +1,11 @@
 {
     "itemGroup.craftingdeaddecoration": "Crafting Dead Decoration",
 
+    "block.craftingdeaddecoration.old_television": "Old Television",
+    "block.craftingdeaddecoration.cracked_old_television": "Cracked Old Television",
+    "block.craftingdeaddecoration.television": "Television",
+    "block.craftingdeaddecoration.cracked_television": "Cracked Television",
+
     "block.craftingdeaddecoration.office_chair_1": "Office Chair 1",
     "block.craftingdeaddecoration.office_chair_2": "Office Chair 2",
     "block.craftingdeaddecoration.office_chair_3": "Office Chair 3",

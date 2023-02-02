@@ -42,6 +42,22 @@ public class DecorationItems {
         }
       };
 
+  public static final RegistryObject<BlockItem> OLD_TELEVISION =
+      deferredRegister.register("old_television",
+          () -> new BlockItem(DecorationBlocks.OLD_TELEVISION.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<BlockItem> CRACKED_OLD_TELEVISION =
+      deferredRegister.register("cracked_old_television",
+          () -> new BlockItem(DecorationBlocks.CRACKED_OLD_TELEVISION.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<BlockItem> TELEVISION =
+      deferredRegister.register("television",
+          () -> new BlockItem(DecorationBlocks.TELEVISION.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<BlockItem> CRACKED_TELEVISION =
+      deferredRegister.register("cracked_television",
+          () -> new BlockItem(DecorationBlocks.CRACKED_TELEVISION.get(),
+              new Item.Properties().tab(TAB)));
   public static final RegistryObject<BlockItem> OFFICE_CHAIR_1 =
       deferredRegister.register("office_chair_1",
           () -> new BlockItem(DecorationBlocks.OFFICE_CHAIR_1.get(),

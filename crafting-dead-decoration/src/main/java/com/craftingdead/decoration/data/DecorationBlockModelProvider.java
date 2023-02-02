@@ -35,6 +35,9 @@ public class DecorationBlockModelProvider extends BlockModelProvider {
     this.textureVariant(DecorationBlocks.LAPTOP_3, "laptop");
 
     this.modelVariant("ripped", "office_chair", 3);
+
+    this.textureVariant(DecorationBlocks.CRACKED_OLD_TELEVISION, "old_television");
+    this.textureVariant(DecorationBlocks.CRACKED_TELEVISION, "television");
   }
 
   private void textureVariant(RegistryObject<? extends Block> block, String model) {
