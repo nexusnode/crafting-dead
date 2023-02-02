@@ -25,6 +25,15 @@ public class DecorationBlockModelProvider extends BlockModelProvider {
     this.computer(DecorationBlocks.COMPUTER_1);
     this.computer(DecorationBlocks.COMPUTER_2);
     this.computer(DecorationBlocks.COMPUTER_3);
+
+    this.gasTank(DecorationBlocks.YELLOW_GAS_TANK);
+    this.gasTank(DecorationBlocks.BLUE_GAS_TANK);
+    this.gasTank(DecorationBlocks.GRAY_GAS_TANK);
+  }
+
+  private void gasTank(RegistryObject<? extends Block> block) {
+    this.singleTexture(block.getId().toString(), this.modLoc("block/gas_tank"),
+        this.modLoc("block/" + block.getId().getPath().toString()));
   }
 
   private void computer(RegistryObject<? extends Block> block) {

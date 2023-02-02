@@ -30,6 +30,8 @@ import net.minecraft.world.phys.shapes.VoxelShape;
  */
 public class BlockShapes {
 
+  public static final VoxelShape GAS_TANK = Block.box(3, 1, 3, 13, 14, 13);
+
   public static final Function<Direction, VoxelShape> COMPUTER =
       computeOrientableShape(Shapes.or(
           Shapes.block(),

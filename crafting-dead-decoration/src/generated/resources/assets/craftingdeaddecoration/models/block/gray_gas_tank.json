@@ -1,0 +1,6 @@
+{
+  "parent": "craftingdeaddecoration:block/gas_tank",
+  "textures": {
+    "texture": "craftingdeaddecoration:block/gray_gas_tank"
+  }
+}
