@@ -1,0 +1,6 @@
+{
+  "parent": "craftingdeaddecoration:block/office_chair_3",
+  "textures": {
+    "texture": "craftingdeaddecoration:block/ripped_office_chair"
+  }
+}

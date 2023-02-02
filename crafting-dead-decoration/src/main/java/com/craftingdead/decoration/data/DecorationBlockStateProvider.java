@@ -82,6 +82,13 @@ public class DecorationBlockStateProvider extends BlockStateProvider {
     this.horizontalBlock(DecorationBlocks.LAPTOP_2);
     this.horizontalBlock(DecorationBlocks.LAPTOP_3);
     this.horizontalBlock(DecorationBlocks.BROKEN_LAPTOP);
+
+    this.horizontalBlock(DecorationBlocks.OFFICE_CHAIR_1);
+    this.horizontalBlock(DecorationBlocks.OFFICE_CHAIR_2);
+    this.horizontalBlock(DecorationBlocks.OFFICE_CHAIR_3);
+    this.horizontalBlock(DecorationBlocks.RIPPED_OFFICE_CHAIR_1);
+    this.horizontalBlock(DecorationBlocks.RIPPED_OFFICE_CHAIR_2);
+    this.horizontalBlock(DecorationBlocks.RIPPED_OFFICE_CHAIR_3);
   }
 
   private void simpleBlock(RegistryObject<? extends Block> block) {

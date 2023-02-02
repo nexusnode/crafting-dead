@@ -1,6 +1,13 @@
 {
     "itemGroup.craftingdeaddecoration": "Crafting Dead Decoration",
 
+    "block.craftingdeaddecoration.office_chair_1": "Office Chair 1",
+    "block.craftingdeaddecoration.office_chair_2": "Office Chair 2",
+    "block.craftingdeaddecoration.office_chair_3": "Office Chair 3",
+    "block.craftingdeaddecoration.ripped_office_chair_1": "Ripped Office Chair 1",
+    "block.craftingdeaddecoration.ripped_office_chair_2": "Ripped Office Chair 2",
+    "block.craftingdeaddecoration.ripped_office_chair_3": "Ripped Office Chair 3",
+
     "block.craftingdeaddecoration.laptop_1": "Laptop 1",
     "block.craftingdeaddecoration.laptop_2": "Laptop 2",
     "block.craftingdeaddecoration.laptop_3": "Laptop 3",

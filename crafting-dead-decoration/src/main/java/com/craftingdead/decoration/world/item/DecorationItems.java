@@ -42,6 +42,31 @@ public class DecorationItems {
         }
       };
 
+  public static final RegistryObject<BlockItem> OFFICE_CHAIR_1 =
+      deferredRegister.register("office_chair_1",
+          () -> new BlockItem(DecorationBlocks.OFFICE_CHAIR_1.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<BlockItem> OFFICE_CHAIR_2 =
+      deferredRegister.register("office_chair_2",
+          () -> new BlockItem(DecorationBlocks.OFFICE_CHAIR_2.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<BlockItem> OFFICE_CHAIR_3 =
+      deferredRegister.register("office_chair_3",
+          () -> new BlockItem(DecorationBlocks.OFFICE_CHAIR_3.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<BlockItem> RIPPED_OFFICE_CHAIR_1 =
+      deferredRegister.register("ripped_office_chair_1",
+          () -> new BlockItem(DecorationBlocks.RIPPED_OFFICE_CHAIR_1.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<BlockItem> RIPPED_OFFICE_CHAIR_2 =
+      deferredRegister.register("ripped_office_chair_2",
+          () -> new BlockItem(DecorationBlocks.RIPPED_OFFICE_CHAIR_2.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<BlockItem> RIPPED_OFFICE_CHAIR_3 =
+      deferredRegister.register("ripped_office_chair_3",
+          () -> new BlockItem(DecorationBlocks.RIPPED_OFFICE_CHAIR_3.get(),
+              new Item.Properties().tab(TAB)));
+
   public static final RegistryObject<BlockItem> LAPTOP_1 =
       deferredRegister.register("laptop_1",
           () -> new BlockItem(DecorationBlocks.LAPTOP_1.get(),

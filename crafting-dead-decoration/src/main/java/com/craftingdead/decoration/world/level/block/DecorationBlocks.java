@@ -39,6 +39,60 @@ public class DecorationBlocks {
   public static final DeferredRegister<Block> deferredRegister =
       DeferredRegister.create(ForgeRegistries.BLOCKS, CraftingDeadDecoration.ID);
 
+  public static final RegistryObject<Block> OFFICE_CHAIR_1 =
+      deferredRegister.register("office_chair_1",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(5.0F)
+                  .sound(SoundType.METAL)
+                  .noCollission(),
+              __ -> Shapes.block()));
+
+  public static final RegistryObject<Block> OFFICE_CHAIR_2 =
+      deferredRegister.register("office_chair_2",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(5.0F)
+                  .sound(SoundType.METAL)
+                  .noCollission(),
+              __ -> Shapes.block()));
+
+  public static final RegistryObject<Block> OFFICE_CHAIR_3 =
+      deferredRegister.register("office_chair_3",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(5.0F)
+                  .sound(SoundType.METAL)
+                  .noCollission(),
+              __ -> Shapes.block()));
+
+  public static final RegistryObject<Block> RIPPED_OFFICE_CHAIR_1 =
+      deferredRegister.register("ripped_office_chair_1",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(5.0F)
+                  .sound(SoundType.METAL)
+                  .noCollission(),
+              __ -> Shapes.block()));
+
+  public static final RegistryObject<Block> RIPPED_OFFICE_CHAIR_2 =
+      deferredRegister.register("ripped_office_chair_2",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(5.0F)
+                  .sound(SoundType.METAL)
+                  .noCollission(),
+              __ -> Shapes.block()));
+
+  public static final RegistryObject<Block> RIPPED_OFFICE_CHAIR_3 =
+      deferredRegister.register("ripped_office_chair_3",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(5.0F)
+                  .sound(SoundType.METAL)
+                  .noCollission(),
+              __ -> Shapes.block()));
+
   public static final RegistryObject<Block> LAPTOP_1 =
       deferredRegister.register("laptop_1",
           () -> new OrientableBlock(
