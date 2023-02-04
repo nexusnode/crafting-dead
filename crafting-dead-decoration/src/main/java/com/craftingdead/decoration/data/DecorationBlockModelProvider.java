@@ -1,5 +1,6 @@
 package com.craftingdead.decoration.data;
 
+import java.util.Set;
 import com.craftingdead.decoration.CraftingDeadDecoration;
 import com.craftingdead.decoration.world.level.block.DecorationBlocks;
 import net.minecraft.data.DataGenerator;
@@ -22,6 +23,12 @@ public class DecorationBlockModelProvider extends BlockModelProvider {
     this.modelVariant("birch", "plank_barricade", 3);
     this.modelVariant("dark_oak", "plank_barricade", 3);
 
+    Set.of("blue", "gray", "green", "red")
+        .forEach(color -> {
+          this.modelVariant(color, "barrel", 2);
+          this.modelVariant("worn_" + color, "barrel", 2);
+        });
+
     this.textureVariant(DecorationBlocks.COMPUTER_1, "computer");
     this.textureVariant(DecorationBlocks.COMPUTER_2, "computer");
     this.textureVariant(DecorationBlocks.COMPUTER_3, "computer");
@@ -42,6 +49,24 @@ public class DecorationBlockModelProvider extends BlockModelProvider {
     this.textureVariant(DecorationBlocks.FULL_TOILET, "toilet");
     this.textureVariant(DecorationBlocks.DIRTY_TOILET, "toilet");
     this.textureVariant(DecorationBlocks.FULL_DIRTY_TOILET, "toilet");
+
+    this.bottomStoreShelfs("box_store_shelf");
+    this.bottomStoreShelfs("can_store_shelf");
+    this.bottomStoreShelfs("store_shelf");
+
+    this.modelVariant("blue", "gas_can", 3);
+    this.modelVariant("green", "gas_can", 3);
+    this.modelVariant("red", "gas_can", 3);
+  }
+
+  private void bottomStoreShelfs(String model) {
+    var texture1 = this.modLoc("block/bottom_store_shelf_1");
+    var texture = this.modLoc("block/bottom_store_shelf");
+    for (int i = 1; i <= 4; i++) {
+      var tex = i == 1 ? texture1 : texture;
+      var name = "%s:block/bottom_%s_%s".formatted(CraftingDeadDecoration.ID, model, i);
+      this.singleTexture(name, this.modLoc("block/%s_%s".formatted(model, i)), tex);
+    }
   }
 
   private void textureVariant(RegistryObject<? extends Block> block, String model) {
@@ -50,10 +75,14 @@ public class DecorationBlockModelProvider extends BlockModelProvider {
   }
 
   private void modelVariant(String variant, String model, int count) {
-    for (int i = 1; i <= count; i++) {
+    this.modelVariant(variant, model, 1, count);
+  }
+
+  private void modelVariant(String variant, String model, int from, int to) {
+    var texture = this.modLoc("block/%s_%s".formatted(variant, model));
+    for (int i = from; i <= to; i++) {
       var name = "%s:block/%s_%s_%s".formatted(CraftingDeadDecoration.ID, variant, model, i);
-      this.singleTexture(name, this.modLoc("block/%s_%s".formatted(model, i)),
-          this.modLoc("block/%s_%s".formatted(variant, model)));
+      this.singleTexture(name, this.modLoc("block/%s_%s".formatted(model, i)), texture);
     }
   }
 }

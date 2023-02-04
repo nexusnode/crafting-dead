@@ -1,0 +1,6 @@
+{
+  "parent": "craftingdeaddecoration:block/box_store_shelf_3",
+  "textures": {
+    "texture": "craftingdeaddecoration:block/bottom_store_shelf"
+  }
+}

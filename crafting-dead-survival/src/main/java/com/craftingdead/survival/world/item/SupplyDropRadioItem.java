@@ -37,7 +37,7 @@ public class SupplyDropRadioItem extends Item {
 
   private final ResourceLocation lootTable;
 
-  public SupplyDropRadioItem(SupplyDropRadioItem.Properties properties) {
+  public SupplyDropRadioItem(Properties properties) {
     super(properties);
     this.lootTable = properties.lootTable;
   }

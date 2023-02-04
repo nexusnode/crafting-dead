@@ -1,6 +1,53 @@
 {
     "itemGroup.craftingdeaddecoration": "Crafting Dead Decoration",
 
+    "block.craftingdeaddecoration.blue_gas_can_1": "Blue Gas Can 1",
+    "block.craftingdeaddecoration.blue_gas_can_2": "Blue Gas Can 2",
+    "block.craftingdeaddecoration.blue_gas_can_3": "Blue Gas Can 3",
+
+    "block.craftingdeaddecoration.green_gas_can_1": "Green Gas Can 1",
+    "block.craftingdeaddecoration.green_gas_can_2": "Green Gas Can 2",
+    "block.craftingdeaddecoration.green_gas_can_3": "Green Gas Can 3",
+
+    "block.craftingdeaddecoration.red_gas_can_1": "Red Gas Can 1",
+    "block.craftingdeaddecoration.red_gas_can_2": "Red Gas Can 2",
+    "block.craftingdeaddecoration.red_gas_can_3": "Red Gas Can 3",
+
+    "block.craftingdeaddecoration.box_store_shelf_1": "Box Store Shelf 1",
+    "block.craftingdeaddecoration.box_store_shelf_2": "Box Store Shelf 2",
+    "block.craftingdeaddecoration.box_store_shelf_3": "Box Store Shelf 3",
+    "block.craftingdeaddecoration.box_store_shelf_4": "Box Store Shelf 4",
+
+    "block.craftingdeaddecoration.bottom_box_store_shelf_1": "Bottom Box Store Shelf 1",
+    "block.craftingdeaddecoration.bottom_box_store_shelf_2": "Bottom Box Store Shelf 2",
+    "block.craftingdeaddecoration.bottom_box_store_shelf_3": "Bottom Box Store Shelf 3",
+    "block.craftingdeaddecoration.bottom_box_store_shelf_4": "Bottom Box Store Shelf 4",
+
+    "block.craftingdeaddecoration.can_store_shelf_1": "Can Store Shelf 1",
+    "block.craftingdeaddecoration.can_store_shelf_2": "Can Store Shelf 2",
+    "block.craftingdeaddecoration.can_store_shelf_3": "Can Store Shelf 3",
+    "block.craftingdeaddecoration.can_store_shelf_4": "Can Store Shelf 4",
+
+    "block.craftingdeaddecoration.bottom_can_store_shelf_1": "Bottom Can Store Shelf 1",
+    "block.craftingdeaddecoration.bottom_can_store_shelf_2": "Bottom Can Store Shelf 2",
+    "block.craftingdeaddecoration.bottom_can_store_shelf_3": "Bottom Can Store Shelf 3",
+    "block.craftingdeaddecoration.bottom_can_store_shelf_4": "Bottom Can Store Shelf 4",
+
+    "block.craftingdeaddecoration.store_shelf_1": "Store Shelf 1",
+    "block.craftingdeaddecoration.store_shelf_2": "Store Shelf 2",
+    "block.craftingdeaddecoration.store_shelf_3": "Store Shelf 3",
+    "block.craftingdeaddecoration.store_shelf_4": "Store Shelf 4",
+
+    "block.craftingdeaddecoration.bottom_store_shelf_1": "Bottom Store Shelf 1",
+    "block.craftingdeaddecoration.bottom_store_shelf_2": "Bottom Store Shelf 2",
+    "block.craftingdeaddecoration.bottom_store_shelf_3": "Bottom Store Shelf 3",
+    "block.craftingdeaddecoration.bottom_store_shelf_4": "Bottom Store Shelf 4",
+
+    "block.craftingdeaddecoration.tool_1": "Tool 1",
+    "block.craftingdeaddecoration.tool_2": "Tool 2",
+    "block.craftingdeaddecoration.tool_3": "Tool 3",
+    "block.craftingdeaddecoration.tool_4": "Tool 4",
+
     "block.craftingdeaddecoration.toilet": "Toilet",
     "block.craftingdeaddecoration.full_toilet": "Full Toilet",
     "block.craftingdeaddecoration.dirty_toilet": "Dirty Toilet",
@@ -27,8 +74,26 @@
     "block.craftingdeaddecoration.blue_gas_tank": "Blue Gas Tank1",
     "block.craftingdeaddecoration.gray_gas_tank": "Gray Gas Tank",
 
-    "block.craftingdeaddecoration.barrel_1": "Barrel 1",
-    "block.craftingdeaddecoration.barrel_2": "Barrel 2",
+    "block.craftingdeaddecoration.blue_barrel_1": "Blue Barrel 1",
+    "block.craftingdeaddecoration.worn_blue_barrel_1": "Worn Blue Barrel 1",
+    "block.craftingdeaddecoration.blue_barrel_2": "Blue Barrel 2",
+    "block.craftingdeaddecoration.worn_blue_barrel_2": "Worn Blue Barrel 2",
+
+    "block.craftingdeaddecoration.gray_barrel_1": "Gray Barrel 1",
+    "block.craftingdeaddecoration.worn_gray_barrel_1": "Worn Gray Barrel 1",
+    "block.craftingdeaddecoration.gray_barrel_2": "Gray Barrel 2",
+    "block.craftingdeaddecoration.worn_gray_barrel_2": "Worn Gray Barrel 2",
+
+    "block.craftingdeaddecoration.green_barrel_1": "Green Barrel 1",
+    "block.craftingdeaddecoration.worn_green_barrel_1": "Worn Green Barrel 1",
+    "block.craftingdeaddecoration.green_barrel_2": "Green Barrel 2",
+    "block.craftingdeaddecoration.worn_green_barrel_2": "Worn Green Barrel 2",
+
+    "block.craftingdeaddecoration.red_barrel_1": "Red Barrel 1",
+    "block.craftingdeaddecoration.worn_red_barrel_1": "Worn Red Barrel 1",
+    "block.craftingdeaddecoration.red_barrel_2": "Red Barrel 2",
+    "block.craftingdeaddecoration.worn_red_barrel_2": "Worn Red Barrel 2",
+
     "block.craftingdeaddecoration.computer_1": "Computer 1",
     "block.craftingdeaddecoration.computer_2": "Computer 2",
     "block.craftingdeaddecoration.computer_3": "Computer 3",

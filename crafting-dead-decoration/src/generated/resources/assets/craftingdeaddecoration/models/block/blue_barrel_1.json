@@ -1,0 +1,6 @@
+{
+  "parent": "craftingdeaddecoration:block/barrel_1",
+  "textures": {
+    "texture": "craftingdeaddecoration:block/blue_barrel"
+  }
+}

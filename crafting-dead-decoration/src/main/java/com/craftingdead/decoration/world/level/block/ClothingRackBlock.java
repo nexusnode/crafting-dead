@@ -19,7 +19,7 @@ public class ClothingRackBlock extends DoubleBlock {
       box(7, 4, 14, 9, 29, 16),
       box(7, 2, 0, 9, 4, 14));
   private static final Function<Direction, VoxelShape> directionShapes =
-      BlockShapes.computeOrientableShape(SHAPE);
+      BlockShapes.rotatedOrientableShape(SHAPE);
 
   protected ClothingRackBlock(Properties properties) {
     super(properties);

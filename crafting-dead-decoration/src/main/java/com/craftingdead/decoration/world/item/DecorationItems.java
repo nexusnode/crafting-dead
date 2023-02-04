@@ -42,6 +42,164 @@ public class DecorationItems {
         }
       };
 
+  public static final RegistryObject<BlockItem> BLUE_GAS_CAN_1 =
+      deferredRegister.register("blue_gas_can_1",
+          () -> new BlockItem(DecorationBlocks.BLUE_GAS_CAN_1.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<BlockItem> BLUE_GAS_CAN_2 =
+      deferredRegister.register("blue_gas_can_2",
+          () -> new BlockItem(DecorationBlocks.BLUE_GAS_CAN_2.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<BlockItem> BLUE_GAS_CAN_3 =
+      deferredRegister.register("blue_gas_can_3",
+          () -> new BlockItem(DecorationBlocks.BLUE_GAS_CAN_3.get(),
+              new Item.Properties().tab(TAB)));
+
+  public static final RegistryObject<BlockItem> GREEN_GAS_CAN_1 =
+      deferredRegister.register("green_gas_can_1",
+          () -> new BlockItem(DecorationBlocks.GREEN_GAS_CAN_1.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<BlockItem> GREEN_GAS_CAN_2 =
+      deferredRegister.register("green_gas_can_2",
+          () -> new BlockItem(DecorationBlocks.GREEN_GAS_CAN_2.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<BlockItem> GREEN_GAS_CAN_3 =
+      deferredRegister.register("green_gas_can_3",
+          () -> new BlockItem(DecorationBlocks.GREEN_GAS_CAN_3.get(),
+              new Item.Properties().tab(TAB)));
+
+  public static final RegistryObject<BlockItem> RED_GAS_CAN_1 =
+      deferredRegister.register("red_gas_can_1",
+          () -> new BlockItem(DecorationBlocks.RED_GAS_CAN_1.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<BlockItem> RED_GAS_CAN_2 =
+      deferredRegister.register("red_gas_can_2",
+          () -> new BlockItem(DecorationBlocks.RED_GAS_CAN_2.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<BlockItem> RED_GAS_CAN_3 =
+      deferredRegister.register("red_gas_can_3",
+          () -> new BlockItem(DecorationBlocks.RED_GAS_CAN_3.get(),
+              new Item.Properties().tab(TAB)));
+
+  public static final RegistryObject<BlockItem> BOX_STORE_SHELF_1 =
+      deferredRegister.register("box_store_shelf_1",
+          () -> new BlockItem(DecorationBlocks.BOX_STORE_SHELF_1.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<BlockItem> BOX_STORE_SHELF_2 =
+      deferredRegister.register("box_store_shelf_2",
+          () -> new BlockItem(DecorationBlocks.BOX_STORE_SHELF_2.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<BlockItem> BOX_STORE_SHELF_3 =
+      deferredRegister.register("box_store_shelf_3",
+          () -> new BlockItem(DecorationBlocks.BOX_STORE_SHELF_3.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<BlockItem> BOX_STORE_SHELF_4 =
+      deferredRegister.register("box_store_shelf_4",
+          () -> new BlockItem(DecorationBlocks.BOX_STORE_SHELF_4.get(),
+              new Item.Properties().tab(TAB)));
+
+  public static final RegistryObject<BlockItem> BOTTOM_BOX_STORE_SHELF_1 =
+      deferredRegister.register("bottom_box_store_shelf_1",
+          () -> new BlockItem(DecorationBlocks.BOTTOM_BOX_STORE_SHELF_1.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<BlockItem> BOTTOM_BOX_STORE_SHELF_2 =
+      deferredRegister.register("bottom_box_store_shelf_2",
+          () -> new BlockItem(DecorationBlocks.BOTTOM_BOX_STORE_SHELF_2.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<BlockItem> BOTTOM_BOX_STORE_SHELF_3 =
+      deferredRegister.register("bottom_box_store_shelf_3",
+          () -> new BlockItem(DecorationBlocks.BOTTOM_BOX_STORE_SHELF_3.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<BlockItem> BOTTOM_BOX_STORE_SHELF_4 =
+      deferredRegister.register("bottom_box_store_shelf_4",
+          () -> new BlockItem(DecorationBlocks.BOTTOM_BOX_STORE_SHELF_4.get(),
+              new Item.Properties().tab(TAB)));
+
+  public static final RegistryObject<BlockItem> CAN_STORE_SHELF_1 =
+      deferredRegister.register("can_store_shelf_1",
+          () -> new BlockItem(DecorationBlocks.CAN_STORE_SHELF_1.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<BlockItem> CAN_STORE_SHELF_2 =
+      deferredRegister.register("can_store_shelf_2",
+          () -> new BlockItem(DecorationBlocks.CAN_STORE_SHELF_2.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<BlockItem> CAN_STORE_SHELF_3 =
+      deferredRegister.register("can_store_shelf_3",
+          () -> new BlockItem(DecorationBlocks.CAN_STORE_SHELF_3.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<BlockItem> CAN_STORE_SHELF_4 =
+      deferredRegister.register("can_store_shelf_4",
+          () -> new BlockItem(DecorationBlocks.CAN_STORE_SHELF_4.get(),
+              new Item.Properties().tab(TAB)));
+
+  public static final RegistryObject<BlockItem> BOTTOM_CAN_STORE_SHELF_1 =
+      deferredRegister.register("bottom_can_store_shelf_1",
+          () -> new BlockItem(DecorationBlocks.BOTTOM_CAN_STORE_SHELF_1.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<BlockItem> BOTTOM_CAN_STORE_SHELF_2 =
+      deferredRegister.register("bottom_can_store_shelf_2",
+          () -> new BlockItem(DecorationBlocks.BOTTOM_CAN_STORE_SHELF_2.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<BlockItem> BOTTOM_CAN_STORE_SHELF_3 =
+      deferredRegister.register("bottom_can_store_shelf_3",
+          () -> new BlockItem(DecorationBlocks.BOTTOM_CAN_STORE_SHELF_3.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<BlockItem> BOTTOM_CAN_STORE_SHELF_4 =
+      deferredRegister.register("bottom_can_store_shelf_4",
+          () -> new BlockItem(DecorationBlocks.BOTTOM_CAN_STORE_SHELF_4.get(),
+              new Item.Properties().tab(TAB)));
+
+  public static final RegistryObject<BlockItem> STORE_SHELF_1 =
+      deferredRegister.register("store_shelf_1",
+          () -> new BlockItem(DecorationBlocks.STORE_SHELF_1.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<BlockItem> STORE_SHELF_2 =
+      deferredRegister.register("store_shelf_2",
+          () -> new BlockItem(DecorationBlocks.STORE_SHELF_2.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<BlockItem> STORE_SHELF_3 =
+      deferredRegister.register("store_shelf_3",
+          () -> new BlockItem(DecorationBlocks.STORE_SHELF_3.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<BlockItem> STORE_SHELF_4 =
+      deferredRegister.register("store_shelf_4",
+          () -> new BlockItem(DecorationBlocks.STORE_SHELF_4.get(),
+              new Item.Properties().tab(TAB)));
+
+  public static final RegistryObject<BlockItem> BOTTOM_STORE_SHELF_1 =
+      deferredRegister.register("bottom_store_shelf_1",
+          () -> new BlockItem(DecorationBlocks.BOTTOM_STORE_SHELF_1.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<BlockItem> BOTTOM_STORE_SHELF_2 =
+      deferredRegister.register("bottom_store_shelf_2",
+          () -> new BlockItem(DecorationBlocks.BOTTOM_STORE_SHELF_2.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<BlockItem> BOTTOM_STORE_SHELF_3 =
+      deferredRegister.register("bottom_store_shelf_3",
+          () -> new BlockItem(DecorationBlocks.BOTTOM_STORE_SHELF_3.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<BlockItem> BOTTOM_STORE_SHELF_4 =
+      deferredRegister.register("bottom_store_shelf_4",
+          () -> new BlockItem(DecorationBlocks.BOTTOM_STORE_SHELF_4.get(),
+              new Item.Properties().tab(TAB)));
+
+  public static final RegistryObject<BlockItem> TOOL_1 =
+      deferredRegister.register("tool_1",
+          () -> new BlockItem(DecorationBlocks.TOOL_1.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<BlockItem> TOOL_2 =
+      deferredRegister.register("tool_2",
+          () -> new BlockItem(DecorationBlocks.TOOL_2.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<BlockItem> TOOL_3 =
+      deferredRegister.register("tool_3",
+          () -> new BlockItem(DecorationBlocks.TOOL_3.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<BlockItem> TOOL_4 =
+      deferredRegister.register("tool_4",
+          () -> new BlockItem(DecorationBlocks.TOOL_4.get(),
+              new Item.Properties().tab(TAB)));
+
   public static final RegistryObject<BlockItem> TOILET =
       deferredRegister.register("toilet",
           () -> new BlockItem(DecorationBlocks.TOILET.get(),
@@ -147,13 +305,72 @@ public class DecorationItems {
           () -> new BlockItem(DecorationBlocks.BROKEN_COMPUTER.get(),
               new Item.Properties().tab(TAB)));
 
-  public static final RegistryObject<BlockItem> BARREL_1 =
-      deferredRegister.register("barrel_1",
-          () -> new BlockItem(DecorationBlocks.BARREL_1.get(),
+  public static final RegistryObject<BlockItem> BLUE_BARREL_1 =
+      deferredRegister.register("blue_barrel_1",
+          () -> new BlockItem(DecorationBlocks.BLUE_BARREL_1.get(),
               new Item.Properties().tab(TAB)));
-  public static final RegistryObject<BlockItem> BARREL_2 =
-      deferredRegister.register("barrel_2",
-          () -> new BlockItem(DecorationBlocks.BARREL_2.get(),
+  public static final RegistryObject<BlockItem> WORN_BLUE_BARREL_1 =
+      deferredRegister.register("worn_blue_barrel_1",
+          () -> new BlockItem(DecorationBlocks.WORN_BLUE_BARREL_1.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<BlockItem> BLUE_BARREL_2 =
+      deferredRegister.register("blue_barrel_2",
+          () -> new BlockItem(DecorationBlocks.BLUE_BARREL_2.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<BlockItem> WORN_BLUE_BARREL_2 =
+      deferredRegister.register("worn_blue_barrel_2",
+          () -> new BlockItem(DecorationBlocks.WORN_BLUE_BARREL_2.get(),
+              new Item.Properties().tab(TAB)));
+
+  public static final RegistryObject<BlockItem> GRAY_BARREL_1 =
+      deferredRegister.register("gray_barrel_1",
+          () -> new BlockItem(DecorationBlocks.GRAY_BARREL_1.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<BlockItem> WORN_GRAY_BARREL_1 =
+      deferredRegister.register("worn_gray_barrel_1",
+          () -> new BlockItem(DecorationBlocks.WORN_GRAY_BARREL_1.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<BlockItem> GRAY_BARREL_2 =
+      deferredRegister.register("gray_barrel_2",
+          () -> new BlockItem(DecorationBlocks.GRAY_BARREL_2.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<BlockItem> WORN_GRAY_BARREL_2 =
+      deferredRegister.register("worn_gray_barrel_2",
+          () -> new BlockItem(DecorationBlocks.WORN_GRAY_BARREL_2.get(),
+              new Item.Properties().tab(TAB)));
+
+  public static final RegistryObject<BlockItem> GREEN_BARREL_1 =
+      deferredRegister.register("green_barrel_1",
+          () -> new BlockItem(DecorationBlocks.GREEN_BARREL_1.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<BlockItem> WORN_GREEN_BARREL_1 =
+      deferredRegister.register("worn_green_barrel_1",
+          () -> new BlockItem(DecorationBlocks.WORN_GREEN_BARREL_1.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<BlockItem> GREEN_BARREL_2 =
+      deferredRegister.register("green_barrel_2",
+          () -> new BlockItem(DecorationBlocks.GREEN_BARREL_2.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<BlockItem> WORN_GREEN_BARREL_2 =
+      deferredRegister.register("worn_green_barrel_2",
+          () -> new BlockItem(DecorationBlocks.WORN_GREEN_BARREL_2.get(),
+              new Item.Properties().tab(TAB)));
+
+  public static final RegistryObject<BlockItem> RED_BARREL_1 =
+      deferredRegister.register("red_barrel_1",
+          () -> new BlockItem(DecorationBlocks.RED_BARREL_1.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<BlockItem> WORN_RED_BARREL_1 =
+      deferredRegister.register("worn_red_barrel_1",
+          () -> new BlockItem(DecorationBlocks.WORN_RED_BARREL_1.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<BlockItem> RED_BARREL_2 =
+      deferredRegister.register("red_barrel_2",
+          () -> new BlockItem(DecorationBlocks.RED_BARREL_2.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<BlockItem> WORN_RED_BARREL_2 =
+      deferredRegister.register("worn_red_barrel_2",
+          () -> new BlockItem(DecorationBlocks.WORN_RED_BARREL_2.get(),
               new Item.Properties().tab(TAB)));
 
   public static final RegistryObject<BlockItem> OAK_PLANK_BARRICADE_1 =

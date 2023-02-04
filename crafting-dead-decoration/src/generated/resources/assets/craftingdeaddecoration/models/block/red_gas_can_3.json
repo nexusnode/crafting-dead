@@ -1,0 +1,6 @@
+{
+  "parent": "craftingdeaddecoration:block/gas_can_3",
+  "textures": {
+    "texture": "craftingdeaddecoration:block/red_gas_can"
+  }
+}

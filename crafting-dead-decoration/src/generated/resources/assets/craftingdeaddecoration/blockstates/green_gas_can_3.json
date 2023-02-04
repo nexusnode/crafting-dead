@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "craftingdeaddecoration:block/green_gas_can_3"
+    },
+    "facing=south": {
+      "model": "craftingdeaddecoration:block/green_gas_can_3",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "craftingdeaddecoration:block/green_gas_can_3",
+      "y": 270
+    },
+    "facing=east": {
+      "model": "craftingdeaddecoration:block/green_gas_can_3",
+      "y": 90
+    }
+  }
+}

@@ -19,12 +19,14 @@
 package com.craftingdead.survival.world.entity;
 
 import org.jetbrains.annotations.Nullable;
+import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
@@ -42,16 +44,14 @@ import net.minecraft.world.inventory.ChestMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.loot.LootContext;
-import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.network.NetworkHooks;
 import net.minecraftforge.network.PlayMessages;
 
 public class SupplyDrop extends Entity implements MenuProvider {
 
-  private SimpleContainer inventory = new SimpleContainer(54);
+  private SimpleContainer container = new SimpleContainer(54);
 
   @Nullable
   private ResourceLocation lootTable;
@@ -98,7 +98,7 @@ public class SupplyDrop extends Entity implements MenuProvider {
   @Override
   public void remove(RemovalReason reason) {
     if (!this.level.isClientSide() && reason.shouldDestroy()) {
-      Containers.dropContents(this.level, this, this.inventory);
+      Containers.dropContents(this.level, this, this.container);
     }
     super.remove(reason);
   }
@@ -108,10 +108,10 @@ public class SupplyDrop extends Entity implements MenuProvider {
     if (compound.contains("lootTable", Tag.TAG_STRING)) {
       this.lootTable = new ResourceLocation(compound.getString("lootTable"));
       this.lootTableSeed = compound.getLong("lootTableSeed");
-    } else if (compound.contains("inventory")) {
-      var items = NonNullList.withSize(this.inventory.getContainerSize(), ItemStack.EMPTY);
-      ContainerHelper.loadAllItems(compound.getCompound("inventory"), items);
-      this.inventory = new SimpleContainer(items.toArray(new ItemStack[0]));
+    } else {
+      var items = NonNullList.withSize(this.container.getContainerSize(), ItemStack.EMPTY);
+      ContainerHelper.loadAllItems(compound, items);
+      this.container = new SimpleContainer(items.toArray(new ItemStack[0]));
     }
   }
 
@@ -123,12 +123,11 @@ public class SupplyDrop extends Entity implements MenuProvider {
         compound.putLong("lootTableSeed", this.lootTableSeed);
       }
     } else {
-      var items = NonNullList.withSize(this.inventory.getContainerSize(), ItemStack.EMPTY);
-      for (int i = 0; i < this.inventory.getContainerSize(); i++) {
-        items.set(i, this.inventory.getItem(i));
+      var items = NonNullList.withSize(this.container.getContainerSize(), ItemStack.EMPTY);
+      for (int i = 0; i < this.container.getContainerSize(); i++) {
+        items.set(i, this.container.getItem(i));
       }
-      compound.put("inventory",
-          ContainerHelper.saveAllItems(compound.getCompound("inventory"), items));
+      ContainerHelper.saveAllItems(compound, items);
     }
   }
 
@@ -139,7 +138,7 @@ public class SupplyDrop extends Entity implements MenuProvider {
 
   @Override
   public Packet<?> getAddEntityPacket() {
-    return NetworkHooks.getEntitySpawningPacket(this);
+    return new ClientboundAddEntityPacket(this);
   }
 
   @Override
@@ -150,35 +149,42 @@ public class SupplyDrop extends Entity implements MenuProvider {
 
   @Override
   public boolean hurt(DamageSource source, float amount) {
-    if (!this.level.isClientSide && this.isAlive()) {
-      if (this.isInvulnerableTo(source)) {
-        return false;
-      }
-      this.kill();
+    if (this.level.isClientSide() || this.isRemoved()) {
       return true;
     }
+
+    if (this.isInvulnerableTo(source)) {
+      return false;
+    }
+
+    this.kill();
     return true;
   }
 
-  private void addLoot(@Nullable Player player) {
-    if (this.lootTable != null && this.level.getServer() != null) {
-      LootTable lootTable =
-          this.level.getServer().getLootTables().get(this.lootTable);
-      this.lootTable = null;
-      LootContext.Builder builder = new LootContext.Builder((ServerLevel) this.level)
-          .withParameter(LootContextParams.ORIGIN, this.position())
-          .withOptionalRandomSeed(this.lootTableSeed);
-      builder.withParameter(LootContextParams.KILLER_ENTITY, this);
-      if (player != null) {
-        builder.withLuck(player.getLuck()).withParameter(LootContextParams.THIS_ENTITY, player);
-      }
-      lootTable.fill(this.inventory, builder.create(LootContextParamSets.CHEST));
+  private void unpackLootTable(ServerPlayer player) {
+    if (this.lootTable == null) {
+      return;
     }
+    var lootTable = this.level.getServer().getLootTables().get(this.lootTable);
+    CriteriaTriggers.GENERATE_LOOT.trigger(player, this.lootTable);
+    this.lootTable = null;
+    var builder = new LootContext.Builder(player.getLevel())
+        .withParameter(LootContextParams.ORIGIN, this.position())
+        .withOptionalRandomSeed(this.lootTableSeed);
+    builder.withParameter(LootContextParams.KILLER_ENTITY, this);
+    if (player != null) {
+      builder.withLuck(player.getLuck()).withParameter(LootContextParams.THIS_ENTITY, player);
+    }
+    lootTable.fill(this.container, builder.create(LootContextParamSets.CHEST));
+
   }
 
   @Override
-  public AbstractContainerMenu createMenu(int id, Inventory playerInventory, Player playerEntity) {
-    this.addLoot(playerEntity);
-    return ChestMenu.sixRows(id, playerInventory, this.inventory);
+  public AbstractContainerMenu createMenu(int id, Inventory inventory, Player player) {
+    if (this.lootTable != null && player.isSpectator()) {
+      return null;
+    }
+    this.unpackLootTable((ServerPlayer) player);
+    return ChestMenu.sixRows(id, inventory, this.container);
   }
 }

@@ -39,6 +39,343 @@ public class DecorationBlocks {
   public static final DeferredRegister<Block> deferredRegister =
       DeferredRegister.create(ForgeRegistries.BLOCKS, CraftingDeadDecoration.ID);
 
+  public static final RegistryObject<Block> BLUE_GAS_CAN_1 =
+      deferredRegister.register("blue_gas_can_1",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(5.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.GAS_CAN));
+
+  public static final RegistryObject<Block> BLUE_GAS_CAN_2 =
+      deferredRegister.register("blue_gas_can_2",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(5.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.GAS_CAN));
+
+  public static final RegistryObject<Block> BLUE_GAS_CAN_3 =
+      deferredRegister.register("blue_gas_can_3",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(5.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.DOUBLE_GAS_CAN));
+
+  public static final RegistryObject<Block> GREEN_GAS_CAN_1 =
+      deferredRegister.register("green_gas_can_1",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(5.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.GAS_CAN));
+
+  public static final RegistryObject<Block> GREEN_GAS_CAN_2 =
+      deferredRegister.register("green_gas_can_2",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(5.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.GAS_CAN));
+
+  public static final RegistryObject<Block> GREEN_GAS_CAN_3 =
+      deferredRegister.register("green_gas_can_3",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(5.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.DOUBLE_GAS_CAN));
+
+  public static final RegistryObject<Block> RED_GAS_CAN_1 =
+      deferredRegister.register("red_gas_can_1",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(5.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.GAS_CAN));
+
+  public static final RegistryObject<Block> RED_GAS_CAN_2 =
+      deferredRegister.register("red_gas_can_2",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(5.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.GAS_CAN));
+
+  public static final RegistryObject<Block> RED_GAS_CAN_3 =
+      deferredRegister.register("red_gas_can_3",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(5.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.DOUBLE_GAS_CAN));
+
+  public static final RegistryObject<Block> BOX_STORE_SHELF_1 =
+      deferredRegister.register("box_store_shelf_1",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(5.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.STORE_SHELF));
+
+  public static final RegistryObject<Block> BOX_STORE_SHELF_2 =
+      deferredRegister.register("box_store_shelf_2",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(5.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.STORE_SHELF));
+
+  public static final RegistryObject<Block> BOX_STORE_SHELF_3 =
+      deferredRegister.register("box_store_shelf_3",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(5.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.STORE_SHELF));
+
+  public static final RegistryObject<Block> BOX_STORE_SHELF_4 =
+      deferredRegister.register("box_store_shelf_4",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(5.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.STORE_SHELF));
+
+  public static final RegistryObject<Block> BOTTOM_BOX_STORE_SHELF_1 =
+      deferredRegister.register("bottom_box_store_shelf_1",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(5.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.STORE_SHELF));
+
+  public static final RegistryObject<Block> BOTTOM_BOX_STORE_SHELF_2 =
+      deferredRegister.register("bottom_box_store_shelf_2",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(5.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.STORE_SHELF));
+
+  public static final RegistryObject<Block> BOTTOM_BOX_STORE_SHELF_3 =
+      deferredRegister.register("bottom_box_store_shelf_3",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(5.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.STORE_SHELF));
+
+  public static final RegistryObject<Block> BOTTOM_BOX_STORE_SHELF_4 =
+      deferredRegister.register("bottom_box_store_shelf_4",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(5.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.STORE_SHELF));
+
+  public static final RegistryObject<Block> CAN_STORE_SHELF_1 =
+      deferredRegister.register("can_store_shelf_1",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(5.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.STORE_SHELF));
+
+  public static final RegistryObject<Block> CAN_STORE_SHELF_2 =
+      deferredRegister.register("can_store_shelf_2",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(5.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.STORE_SHELF));
+
+  public static final RegistryObject<Block> CAN_STORE_SHELF_3 =
+      deferredRegister.register("can_store_shelf_3",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(5.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.STORE_SHELF));
+
+
+  public static final RegistryObject<Block> CAN_STORE_SHELF_4 =
+      deferredRegister.register("can_store_shelf_4",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(5.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.STORE_SHELF));
+
+  public static final RegistryObject<Block> BOTTOM_CAN_STORE_SHELF_1 =
+      deferredRegister.register("bottom_can_store_shelf_1",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(5.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.STORE_SHELF));
+
+  public static final RegistryObject<Block> BOTTOM_CAN_STORE_SHELF_2 =
+      deferredRegister.register("bottom_can_store_shelf_2",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(5.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.STORE_SHELF));
+
+  public static final RegistryObject<Block> BOTTOM_CAN_STORE_SHELF_3 =
+      deferredRegister.register("bottom_can_store_shelf_3",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(5.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.STORE_SHELF));
+
+
+  public static final RegistryObject<Block> BOTTOM_CAN_STORE_SHELF_4 =
+      deferredRegister.register("bottom_can_store_shelf_4",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(5.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.STORE_SHELF));
+
+  public static final RegistryObject<Block> STORE_SHELF_1 =
+      deferredRegister.register("store_shelf_1",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(5.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.STORE_SHELF));
+
+  public static final RegistryObject<Block> STORE_SHELF_2 =
+      deferredRegister.register("store_shelf_2",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(5.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.STORE_SHELF));
+
+  public static final RegistryObject<Block> STORE_SHELF_3 =
+      deferredRegister.register("store_shelf_3",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(5.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.STORE_SHELF));
+
+
+  public static final RegistryObject<Block> STORE_SHELF_4 =
+      deferredRegister.register("store_shelf_4",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(5.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.STORE_SHELF));
+
+  public static final RegistryObject<Block> BOTTOM_STORE_SHELF_1 =
+      deferredRegister.register("bottom_store_shelf_1",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(5.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.STORE_SHELF));
+
+  public static final RegistryObject<Block> BOTTOM_STORE_SHELF_2 =
+      deferredRegister.register("bottom_store_shelf_2",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(5.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.STORE_SHELF));
+
+  public static final RegistryObject<Block> BOTTOM_STORE_SHELF_3 =
+      deferredRegister.register("bottom_store_shelf_3",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(5.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.STORE_SHELF));
+
+
+  public static final RegistryObject<Block> BOTTOM_STORE_SHELF_4 =
+      deferredRegister.register("bottom_store_shelf_4",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(5.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.STORE_SHELF));
+
+  public static final RegistryObject<Block> TOOL_1 =
+      deferredRegister.register("tool_1",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(5.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.TOOL_1));
+
+  public static final RegistryObject<Block> TOOL_2 =
+      deferredRegister.register("tool_2",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(5.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.TOOL_2));
+
+  public static final RegistryObject<Block> TOOL_3 =
+      deferredRegister.register("tool_3",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(5.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.TOOL_3));
+
+  public static final RegistryObject<Block> TOOL_4 =
+      deferredRegister.register("tool_4",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(5.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.TOOL_4));
+
   public static final RegistryObject<Block> TOILET =
       deferredRegister.register("toilet",
           () -> new OrientableBlock(
@@ -172,7 +509,7 @@ public class DecorationBlocks {
                   .strength(5.0F)
                   .sound(SoundType.METAL)
                   .noCollission(),
-              __ -> BlockShapes.LAPTOP));
+              BlockShapes.LAPTOP));
 
   public static final RegistryObject<Block> LAPTOP_2 =
       deferredRegister.register("laptop_2",
@@ -181,7 +518,7 @@ public class DecorationBlocks {
                   .strength(5.0F)
                   .sound(SoundType.METAL)
                   .noCollission(),
-              __ -> BlockShapes.LAPTOP));
+              BlockShapes.LAPTOP));
 
   public static final RegistryObject<Block> LAPTOP_3 =
       deferredRegister.register("laptop_3",
@@ -190,7 +527,7 @@ public class DecorationBlocks {
                   .strength(5.0F)
                   .sound(SoundType.METAL)
                   .noCollission(),
-              __ -> BlockShapes.LAPTOP));
+              BlockShapes.LAPTOP));
 
   public static final RegistryObject<Block> BROKEN_LAPTOP =
       deferredRegister.register("broken_laptop",
@@ -199,7 +536,7 @@ public class DecorationBlocks {
                   .strength(5.0F)
                   .sound(SoundType.METAL)
                   .noCollission(),
-              __ -> BlockShapes.LAPTOP));
+              BlockShapes.LAPTOP));
 
   public static final RegistryObject<Block> YELLOW_GAS_TANK =
       deferredRegister.register("yellow_gas_tank",
@@ -208,7 +545,7 @@ public class DecorationBlocks {
                   .strength(5.0F)
                   .sound(SoundType.METAL)
                   .noOcclusion(),
-              __ -> BlockShapes.GAS_TANK));
+              BlockShapes.GAS_TANK));
 
   public static final RegistryObject<Block> BLUE_GAS_TANK =
       deferredRegister.register("blue_gas_tank",
@@ -217,7 +554,7 @@ public class DecorationBlocks {
                   .strength(5.0F)
                   .sound(SoundType.METAL)
                   .noOcclusion(),
-              __ -> BlockShapes.GAS_TANK));
+              BlockShapes.GAS_TANK));
 
   public static final RegistryObject<Block> GRAY_GAS_TANK =
       deferredRegister.register("gray_gas_tank",
@@ -226,7 +563,7 @@ public class DecorationBlocks {
                   .strength(5.0F)
                   .sound(SoundType.METAL)
                   .noOcclusion(),
-              __ -> BlockShapes.GAS_TANK));
+              BlockShapes.GAS_TANK));
 
   public static final RegistryObject<Block> COMPUTER_1 =
       deferredRegister.register("computer_1",
@@ -264,21 +601,133 @@ public class DecorationBlocks {
                   .noOcclusion(),
               BlockShapes.COMPUTER));
 
-  public static final RegistryObject<Block> BARREL_1 =
-      deferredRegister.register("barrel_1",
+  public static final RegistryObject<Block> BLUE_BARREL_1 =
+      deferredRegister.register("blue_barrel_1",
           () -> new OrientableBlock(
               BlockBehaviour.Properties.of(Material.METAL)
                   .strength(5.0F)
                   .sound(SoundType.METAL),
-              __ -> BlockShapes.BARREL));
+              BlockShapes.BARREL));
 
-  public static final RegistryObject<Block> BARREL_2 =
-      deferredRegister.register("barrel_2",
+  public static final RegistryObject<Block> WORN_BLUE_BARREL_1 =
+      deferredRegister.register("worn_blue_barrel_1",
           () -> new OrientableBlock(
               BlockBehaviour.Properties.of(Material.METAL)
                   .strength(5.0F)
                   .sound(SoundType.METAL),
-              __ -> BlockShapes.BARREL));
+              BlockShapes.BARREL));
+
+  public static final RegistryObject<Block> BLUE_BARREL_2 =
+      deferredRegister.register("blue_barrel_2",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(5.0F)
+                  .sound(SoundType.METAL),
+              BlockShapes.BARREL));
+
+  public static final RegistryObject<Block> WORN_BLUE_BARREL_2 =
+      deferredRegister.register("worn_blue_barrel_2",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(5.0F)
+                  .sound(SoundType.METAL),
+              BlockShapes.BARREL));
+
+  public static final RegistryObject<Block> GRAY_BARREL_1 =
+      deferredRegister.register("gray_barrel_1",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(5.0F)
+                  .sound(SoundType.METAL),
+              BlockShapes.BARREL));
+
+  public static final RegistryObject<Block> WORN_GRAY_BARREL_1 =
+      deferredRegister.register("worn_gray_barrel_1",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(5.0F)
+                  .sound(SoundType.METAL),
+              BlockShapes.BARREL));
+
+  public static final RegistryObject<Block> GRAY_BARREL_2 =
+      deferredRegister.register("gray_barrel_2",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(5.0F)
+                  .sound(SoundType.METAL),
+              BlockShapes.BARREL));
+
+  public static final RegistryObject<Block> WORN_GRAY_BARREL_2 =
+      deferredRegister.register("worn_gray_barrel_2",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(5.0F)
+                  .sound(SoundType.METAL),
+              BlockShapes.BARREL));
+
+  public static final RegistryObject<Block> GREEN_BARREL_1 =
+      deferredRegister.register("green_barrel_1",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(5.0F)
+                  .sound(SoundType.METAL),
+              BlockShapes.BARREL));
+
+  public static final RegistryObject<Block> WORN_GREEN_BARREL_1 =
+      deferredRegister.register("worn_green_barrel_1",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(5.0F)
+                  .sound(SoundType.METAL),
+              BlockShapes.BARREL));
+
+  public static final RegistryObject<Block> GREEN_BARREL_2 =
+      deferredRegister.register("green_barrel_2",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(5.0F)
+                  .sound(SoundType.METAL),
+              BlockShapes.BARREL));
+
+  public static final RegistryObject<Block> WORN_GREEN_BARREL_2 =
+      deferredRegister.register("worn_green_barrel_2",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(5.0F)
+                  .sound(SoundType.METAL),
+              BlockShapes.BARREL));
+
+  public static final RegistryObject<Block> RED_BARREL_1 =
+      deferredRegister.register("red_barrel_1",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(5.0F)
+                  .sound(SoundType.METAL),
+              BlockShapes.BARREL));
+
+  public static final RegistryObject<Block> WORN_RED_BARREL_1 =
+      deferredRegister.register("worn_red_barrel_1",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(5.0F)
+                  .sound(SoundType.METAL),
+              BlockShapes.BARREL));
+
+  public static final RegistryObject<Block> RED_BARREL_2 =
+      deferredRegister.register("red_barrel_2",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(5.0F)
+                  .sound(SoundType.METAL),
+              BlockShapes.BARREL));
+
+  public static final RegistryObject<Block> WORN_RED_BARREL_2 =
+      deferredRegister.register("worn_red_barrel_2",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(5.0F)
+                  .sound(SoundType.METAL),
+              BlockShapes.BARREL));
 
   public static final RegistryObject<Block> OAK_PLANK_BARRICADE_1 =
       deferredRegister.register("oak_plank_barricade_1",
@@ -675,7 +1124,7 @@ public class DecorationBlocks {
           () -> new OrientableBlock(
               Block.Properties.of(Material.METAL)
                   .noOcclusion(),
-              __ -> BlockShapes.DOUBLE_TALL_BLOCK));
+              BlockShapes.DOUBLE_TALL_BLOCK));
 
   public static final RegistryObject<Block> STREET_LIGHT_BASE =
       deferredRegister.register("street_light_base",

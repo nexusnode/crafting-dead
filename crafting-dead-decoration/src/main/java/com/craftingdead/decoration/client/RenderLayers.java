@@ -27,25 +27,25 @@ import net.minecraft.world.level.block.Block;
 class RenderLayers {
 
   static void register() {
-    cutout(DecorationBlocks.WOODEN_PALLET);
-    cutout(DecorationBlocks.STACKED_WOODEN_PALLETS);
+//    cutout(DecorationBlocks.WOODEN_PALLET);
+//    cutout(DecorationBlocks.STACKED_WOODEN_PALLETS);
     cutout(DecorationBlocks.CRATE_ON_WOODEN_PALLET);
-    cutout(DecorationBlocks.CLOTHING_RACK);
-    cutout(DecorationBlocks.BATTEN_LIGHT);
-    cutout(DecorationBlocks.LIT_BATTEN_LIGHT);
+//    cutout(DecorationBlocks.CLOTHING_RACK);
+//    cutout(DecorationBlocks.BATTEN_LIGHT);
+//    cutout(DecorationBlocks.LIT_BATTEN_LIGHT);
 
-    cutout(DecorationBlocks.OAK_PLANK_BARRICADE_1);
-    cutout(DecorationBlocks.OAK_PLANK_BARRICADE_2);
-    cutout(DecorationBlocks.OAK_PLANK_BARRICADE_3);
-    cutout(DecorationBlocks.SPRUCE_PLANK_BARRICADE_1);
-    cutout(DecorationBlocks.SPRUCE_PLANK_BARRICADE_2);
-    cutout(DecorationBlocks.SPRUCE_PLANK_BARRICADE_3);
-    cutout(DecorationBlocks.BIRCH_PLANK_BARRICADE_1);
-    cutout(DecorationBlocks.BIRCH_PLANK_BARRICADE_2);
-    cutout(DecorationBlocks.BIRCH_PLANK_BARRICADE_3);
-    cutout(DecorationBlocks.DARK_OAK_PLANK_BARRICADE_1);
-    cutout(DecorationBlocks.DARK_OAK_PLANK_BARRICADE_2);
-    cutout(DecorationBlocks.DARK_OAK_PLANK_BARRICADE_3);
+//    cutout(DecorationBlocks.OAK_PLANK_BARRICADE_1);
+//    cutout(DecorationBlocks.OAK_PLANK_BARRICADE_2);
+//    cutout(DecorationBlocks.OAK_PLANK_BARRICADE_3);
+//    cutout(DecorationBlocks.SPRUCE_PLANK_BARRICADE_1);
+//    cutout(DecorationBlocks.SPRUCE_PLANK_BARRICADE_2);
+//    cutout(DecorationBlocks.SPRUCE_PLANK_BARRICADE_3);
+//    cutout(DecorationBlocks.BIRCH_PLANK_BARRICADE_1);
+//    cutout(DecorationBlocks.BIRCH_PLANK_BARRICADE_2);
+//    cutout(DecorationBlocks.BIRCH_PLANK_BARRICADE_3);
+//    cutout(DecorationBlocks.DARK_OAK_PLANK_BARRICADE_1);
+//    cutout(DecorationBlocks.DARK_OAK_PLANK_BARRICADE_2);
+//    cutout(DecorationBlocks.DARK_OAK_PLANK_BARRICADE_3);
 
     cutout(DecorationBlocks.COMPUTER_1);
     cutout(DecorationBlocks.COMPUTER_2);
@@ -59,6 +59,9 @@ class RenderLayers {
 
     cutout(DecorationBlocks.TOILET);
     cutout(DecorationBlocks.DIRTY_TOILET);
+
+    cutout(DecorationBlocks.TOOL_2);
+    cutout(DecorationBlocks.TOOL_3);
 
     translucent(DecorationBlocks.WASHING_MACHINE);
     translucent(DecorationBlocks.BROKEN_WASHING_MACHINE);

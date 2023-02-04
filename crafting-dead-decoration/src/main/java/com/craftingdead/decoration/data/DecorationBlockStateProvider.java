@@ -66,8 +66,26 @@ public class DecorationBlockStateProvider extends BlockStateProvider {
     this.horizontalBlock(DecorationBlocks.DARK_OAK_PLANK_BARRICADE_1);
     this.horizontalBlock(DecorationBlocks.DARK_OAK_PLANK_BARRICADE_2);
     this.horizontalBlock(DecorationBlocks.DARK_OAK_PLANK_BARRICADE_3);
-    this.horizontalBlock(DecorationBlocks.BARREL_1);
-    this.horizontalBlock(DecorationBlocks.BARREL_2);
+
+    this.horizontalBlock(DecorationBlocks.BLUE_BARREL_1);
+    this.horizontalBlock(DecorationBlocks.WORN_BLUE_BARREL_1);
+    this.horizontalBlock(DecorationBlocks.BLUE_BARREL_2);
+    this.horizontalBlock(DecorationBlocks.WORN_BLUE_BARREL_2);
+
+    this.horizontalBlock(DecorationBlocks.GRAY_BARREL_1);
+    this.horizontalBlock(DecorationBlocks.WORN_GRAY_BARREL_1);
+    this.horizontalBlock(DecorationBlocks.GRAY_BARREL_2);
+    this.horizontalBlock(DecorationBlocks.WORN_GRAY_BARREL_2);
+
+    this.horizontalBlock(DecorationBlocks.GREEN_BARREL_1);
+    this.horizontalBlock(DecorationBlocks.WORN_GREEN_BARREL_1);
+    this.horizontalBlock(DecorationBlocks.GREEN_BARREL_2);
+    this.horizontalBlock(DecorationBlocks.WORN_GREEN_BARREL_2);
+
+    this.horizontalBlock(DecorationBlocks.RED_BARREL_1);
+    this.horizontalBlock(DecorationBlocks.WORN_RED_BARREL_1);
+    this.horizontalBlock(DecorationBlocks.RED_BARREL_2);
+    this.horizontalBlock(DecorationBlocks.WORN_RED_BARREL_2);
 
     this.horizontalBlock(DecorationBlocks.COMPUTER_1);
     this.horizontalBlock(DecorationBlocks.COMPUTER_2);
@@ -99,6 +117,48 @@ public class DecorationBlockStateProvider extends BlockStateProvider {
     this.horizontalBlock(DecorationBlocks.FULL_TOILET);
     this.horizontalBlock(DecorationBlocks.DIRTY_TOILET);
     this.horizontalBlock(DecorationBlocks.FULL_DIRTY_TOILET);
+
+    this.horizontalBlock(DecorationBlocks.TOOL_1);
+    this.horizontalBlock(DecorationBlocks.TOOL_2);
+    this.horizontalBlock(DecorationBlocks.TOOL_3);
+    this.horizontalBlock(DecorationBlocks.TOOL_4);
+
+    this.horizontalBlock(DecorationBlocks.BOX_STORE_SHELF_1);
+    this.horizontalBlock(DecorationBlocks.BOX_STORE_SHELF_2);
+    this.horizontalBlock(DecorationBlocks.BOX_STORE_SHELF_3);
+    this.horizontalBlock(DecorationBlocks.BOX_STORE_SHELF_4);
+    this.horizontalBlock(DecorationBlocks.BOTTOM_BOX_STORE_SHELF_1);
+    this.horizontalBlock(DecorationBlocks.BOTTOM_BOX_STORE_SHELF_2);
+    this.horizontalBlock(DecorationBlocks.BOTTOM_BOX_STORE_SHELF_3);
+    this.horizontalBlock(DecorationBlocks.BOTTOM_BOX_STORE_SHELF_4);
+
+    this.horizontalBlock(DecorationBlocks.CAN_STORE_SHELF_1);
+    this.horizontalBlock(DecorationBlocks.CAN_STORE_SHELF_2);
+    this.horizontalBlock(DecorationBlocks.CAN_STORE_SHELF_3);
+    this.horizontalBlock(DecorationBlocks.CAN_STORE_SHELF_4);
+    this.horizontalBlock(DecorationBlocks.BOTTOM_CAN_STORE_SHELF_1);
+    this.horizontalBlock(DecorationBlocks.BOTTOM_CAN_STORE_SHELF_2);
+    this.horizontalBlock(DecorationBlocks.BOTTOM_CAN_STORE_SHELF_3);
+    this.horizontalBlock(DecorationBlocks.BOTTOM_CAN_STORE_SHELF_4);
+
+    this.horizontalBlock(DecorationBlocks.STORE_SHELF_1);
+    this.horizontalBlock(DecorationBlocks.STORE_SHELF_2);
+    this.horizontalBlock(DecorationBlocks.STORE_SHELF_3);
+    this.horizontalBlock(DecorationBlocks.STORE_SHELF_4);
+    this.horizontalBlock(DecorationBlocks.BOTTOM_STORE_SHELF_1);
+    this.horizontalBlock(DecorationBlocks.BOTTOM_STORE_SHELF_2);
+    this.horizontalBlock(DecorationBlocks.BOTTOM_STORE_SHELF_3);
+    this.horizontalBlock(DecorationBlocks.BOTTOM_STORE_SHELF_4);
+
+    this.horizontalBlock(DecorationBlocks.BLUE_GAS_CAN_1);
+    this.horizontalBlock(DecorationBlocks.BLUE_GAS_CAN_2);
+    this.horizontalBlock(DecorationBlocks.BLUE_GAS_CAN_3);
+    this.horizontalBlock(DecorationBlocks.GREEN_GAS_CAN_1);
+    this.horizontalBlock(DecorationBlocks.GREEN_GAS_CAN_2);
+    this.horizontalBlock(DecorationBlocks.GREEN_GAS_CAN_3);
+    this.horizontalBlock(DecorationBlocks.RED_GAS_CAN_1);
+    this.horizontalBlock(DecorationBlocks.RED_GAS_CAN_2);
+    this.horizontalBlock(DecorationBlocks.RED_GAS_CAN_3);
   }
 
   private void simpleBlock(RegistryObject<? extends Block> block) {

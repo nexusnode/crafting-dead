@@ -30,8 +30,31 @@ import net.minecraft.world.phys.shapes.VoxelShape;
  */
 public class BlockShapes {
 
+  public static final Function<Direction, VoxelShape> DOUBLE_GAS_CAN =
+      unitOrientableShape(Block.box(0.0D, 0.0D, 0.0D, 16.0D, 9.0D, 16.0D));
+
+  public static final Function<Direction, VoxelShape> GAS_CAN =
+      rotatedOrientableShape(Block.box(6.0D, 0.0D, 3.0D, 11.0D, 9.0D, 13.0D));
+
+  public static final Function<Direction, VoxelShape> STORE_SHELF =
+      rotatedOrientableShape(Block.box(0.0D, 0.0D, 7.5D, 16.0D, 16.0D, 15.5D));
+
+  public static final Function<Direction, VoxelShape> TOOL_1 =
+      unitOrientableShape(Block.box(1.0D, 0.0D, 1.0D, 15.0D, 16.0D, 15.0D));
+
+  public static final Function<Direction, VoxelShape> TOOL_2 =
+      rotatedOrientableShape(Shapes.or(
+          Block.box(1.0D, 0.0D, 1.0D, 2.0D, 15.0D, 15.0D),
+          Block.box(1.0D, 0.0D, 14.0D, 15.0D, 15.0D, 15.0D)));
+
+  public static final Function<Direction, VoxelShape> TOOL_3 =
+      unitOrientableShape(Block.box(0.0D, 0.0D, 0.0D, 16.0D, 5.0D, 16.0D));
+
+  public static final Function<Direction, VoxelShape> TOOL_4 =
+      unitOrientableShape(Block.box(1.0D, 0.0D, 1.0D, 15.0D, 11.0D, 15.0D));
+
   public static final Function<Direction, VoxelShape> TOILET =
-      computeOrientableShape(Shapes.or(
+      rotatedOrientableShape(Shapes.or(
           Block.box(3, 4, 2, 5, 8, 12),
           Block.box(11, 4, 2, 13, 8, 12),
           Block.box(5, 4, 2, 11, 8, 4),
@@ -39,61 +62,64 @@ public class BlockShapes {
           Block.box(3, 0, 12, 13, 19, 16)));
 
   public static final Function<Direction, VoxelShape> OLD_TELEVISION =
-      computeOrientableShape(Shapes.or(
+      rotatedOrientableShape(Shapes.or(
           Block.box(2, 0, 7, 14, 12, 15),
           Block.box(0.0D, 0.0D, 0.0D, 16, 14, 7)));
 
   public static final Function<Direction, VoxelShape> TELEVISION =
-      computeOrientableShape(Shapes.or(
+      rotatedOrientableShape(Shapes.or(
           Block.box(3, 0, 6, 13, 1, 11),
           Block.box(-1, 7, 8, 18, 19, 10),
           Block.box(5, 1, 8, 11, 7, 10),
           Block.box(-7, 3, 7, 23, 22, 8)));
 
-  public static final VoxelShape LAPTOP = Block.box(1.0D, 0.0D, 1.0D, 15.0D, 1.0D, 15.0D);
+  public static final Function<Direction, VoxelShape> LAPTOP =
+      unitOrientableShape(Block.box(1.0D, 0.0D, 1.0D, 15.0D, 1.0D, 15.0D));
 
-  public static final VoxelShape GAS_TANK = Block.box(3, 1, 3, 13, 14, 13);
+  public static final Function<Direction, VoxelShape> GAS_TANK =
+      unitOrientableShape(Block.box(3, 1, 3, 13, 14, 13));
 
   public static final Function<Direction, VoxelShape> COMPUTER =
-      computeOrientableShape(Shapes.or(
+      rotatedOrientableShape(Shapes.or(
           Shapes.block(),
           Block.box(17, 0, 1, 24, 16, 14)));
 
-  public static final VoxelShape BARREL = Block.box(2, 0, 2, 14, 15, 14);
+  public static final Function<Direction, VoxelShape> BARREL =
+      unitOrientableShape(Block.box(2, 0, 2, 14, 15, 14));
 
   public static final Function<Direction, VoxelShape> PLANK_BARRICADE_1 =
-      computeOrientableShape(Shapes.or(
+      rotatedOrientableShape(Shapes.or(
           Block.box(-3, 8.75, 15, 19, 11.75, 16),
           Block.box(-2, 1, 15, 18, 4, 16)));
 
   public static final Function<Direction, VoxelShape> PLANK_BARRICADE_2 =
-      computeOrientableShape(Shapes.or(
+      rotatedOrientableShape(Shapes.or(
           Block.box(-3, 1, 15, 19, 5, 16),
           Block.box(-3, 6, 15, 19, 10, 16),
           Block.box(-3, 11, 15, 19, 15, 16)));
 
   public static final Function<Direction, VoxelShape> PLANK_BARRICADE_3 =
-      computeOrientableShape(Shapes.or(
+      rotatedOrientableShape(Shapes.or(
           Block.box(-3, 1, 15, 19, 5, 16),
           Block.box(-3, 11, 15, 19, 15, 16)));
 
   public static final Function<Direction, VoxelShape> BATTEN_LIGHT =
-      computeOrientableShape(Shapes.or(
+      rotatedOrientableShape(Shapes.or(
           Block.box(7.5, 13, 1, 8.5, 16, 2),
           Block.box(7.5, 13, 14, 8.5, 16, 15),
           Block.box(5.5, 12, 0, 10.5, 13, 16)));
 
   public static final Function<Direction, VoxelShape> LIGHT_SWITCH =
-      computeOrientableShape(Block.box(6, 6, 15, 10, 11, 16));
+      rotatedOrientableShape(Block.box(6, 6, 15, 10, 11, 16));
 
   public static final Function<Direction, VoxelShape> ELECTRICAL_SOCKET =
-      computeOrientableShape(Block.box(5.5, 6, 15, 10.5, 13, 16));
+      rotatedOrientableShape(Block.box(5.5, 6, 15, 10.5, 13, 16));
 
   public static final Function<Direction, VoxelShape> SECURITY_CAMERA =
-      computeOrientableShape(Block.box(5.5D, 3.0D, 11.0D, 10.5D, 13.0D, 16.0D));
+      rotatedOrientableShape(Block.box(5.5D, 3.0D, 11.0D, 10.5D, 13.0D, 16.0D));
 
   public static final Function<Direction, VoxelShape> ABANDONED_CAMPFIRE =
-      computeOrientableShape(Shapes.or(
+      rotatedOrientableShape(Shapes.or(
           Block.box(2, 0, 2, 14, 2, 14),
           Block.box(1, 0, 7.5, 15, 14, 8.5)));
 
@@ -160,13 +186,13 @@ public class BlockShapes {
       Block.box(12, 0.25, 5.92893, 13, 0.5, 10.07107));
 
   public static final Function<Direction, VoxelShape> CONCRETE_BARRIER =
-      computeOrientableShape(Shapes.or(
+      rotatedOrientableShape(Shapes.or(
           Block.box(0, 0, 7, 16, 14, 9),
           Block.box(0, 0, 9, 16, 2, 11),
           Block.box(0, 0, 5, 16, 2, 7)));
 
   public static final Function<Direction, VoxelShape> POLE_BARRIER =
-      computeOrientableShape(Shapes.or(
+      rotatedOrientableShape(Shapes.or(
           Block.box(1, 0, 7, 3, 13, 9),
           Block.box(13, 0, 7, 15, 13, 9),
           Block.box(0, 9.3, 6, 16, 12.3, 7),
@@ -175,7 +201,7 @@ public class BlockShapes {
           Block.box(13, 13, 7, 15, 15.5, 9)));
 
   public static final Function<Direction, VoxelShape> ROAD_BARRIER =
-      computeOrientableShape(Shapes.or(
+      rotatedOrientableShape(Shapes.or(
           Block.box(12, -1, 3.75, 15, 12, 4.75),
           Block.box(1, -1, 3.75, 4, 12, 4.75),
           Block.box(12, -1, 11.1795, 15, 12, 12.1795),
@@ -186,14 +212,14 @@ public class BlockShapes {
           Block.box(0, 4, 3.67234, 16, 8, 4.67234)));
 
   public static final Function<Direction, VoxelShape> SLAB_CONCRETE_BARRIER =
-      computeOrientableShape(Shapes.or(
+      rotatedOrientableShape(Shapes.or(
           Block.box(0, 8, 7, 16, 22, 9),
           Block.box(0, 8, 9, 16, 10, 11),
           Block.box(0, 8, 5, 16, 10, 7),
           Block.box(0, 0, 0, 16, 8, 16)));
 
   public static final Function<Direction, VoxelShape> SLAB_STEEL_POLE_BARRIER =
-      computeOrientableShape(Shapes.or(
+      rotatedOrientableShape(Shapes.or(
           Block.box(0, 0, 0, 16, 8, 16),
           Block.box(1, 8, 7, 3, 21, 9),
           Block.box(13, 8, 7, 15, 21, 9),
@@ -201,21 +227,21 @@ public class BlockShapes {
           Block.box(0, 13.3, 6, 16, 16.3, 7)));
 
   public static final Function<Direction, VoxelShape> SLAB_STRIPED_CONCRETE_BARRIER =
-      computeOrientableShape(Shapes.or(
+      rotatedOrientableShape(Shapes.or(
           Block.box(0, 8, 7, 16, 22, 9),
           Block.box(0, 8, 9, 16, 10, 11),
           Block.box(0, 8, 5, 16, 10, 7),
           Block.box(0, 0, 0, 16, 8, 16)));
 
   public static final Function<Direction, VoxelShape> STEEL_POLE_BARRIER =
-      computeOrientableShape(Shapes.or(
+      rotatedOrientableShape(Shapes.or(
           Block.box(13, 0, 7, 15, 13, 9),
           Block.box(1, 0, 7, 3, 13, 9),
           Block.box(0, 9.3, 6, 16, 12.3, 7),
           Block.box(0, 5.3, 6, 16, 8.3, 7)));
 
   public static final Function<Direction, VoxelShape> STOP_SIGN =
-      computeOrientableShape(Shapes.or(
+      rotatedOrientableShape(Shapes.or(
           Block.box(7, -16, 7, 9, -10, 9),
           Block.box(7.5, -10, 7.5, 8.5, 31, 8.5),
           Block.box(0, 20.68629, 7.25, 16, 27.31371, 7.5),
@@ -224,42 +250,42 @@ public class BlockShapes {
           Block.box(4.68629, 16, 7.27, 11.31371, 32, 7.52)));
 
   public static final Function<Direction, VoxelShape> STREET_LIGHT_CURVE =
-      computeOrientableShape(Shapes.or(
+      rotatedOrientableShape(Shapes.or(
           Block.box(7, 0, 7, 9, 16, 9),
           Block.box(7, 7, 0, 9, 9, 7)));
 
   public static final Function<Direction, VoxelShape> STREET_LIGHT_DOUBLE_CURVE =
-      computeOrientableShape(Shapes.or(
+      rotatedOrientableShape(Shapes.or(
           Block.box(7, 0, 7, 9, 16, 9),
           Block.box(7, 7, 0, 9, 9, 7),
           Block.box(7, 7, 9, 9, 9, 16)));
 
   public static final Function<Direction, VoxelShape> STREET_LIGHT_HORIZONTAL =
-      computeOrientableShape(Block.box(7, 7, 0, 9, 9, 16));
+      rotatedOrientableShape(Block.box(7, 7, 0, 9, 9, 16));
 
   public static final Function<Direction, VoxelShape> STREET_LIGHT_VERTICAL_CROSS =
-      computeOrientableShape(Shapes.or(
+      rotatedOrientableShape(Shapes.or(
           Block.box(7, 0, 7, 9, 16, 9),
           Block.box(7, 7, 0, 9, 9, 16)));
 
   public static final Function<Direction, VoxelShape> STRIPED_CONCRETE_BARRIER =
-      computeOrientableShape(Shapes.or(
+      rotatedOrientableShape(Shapes.or(
           Block.box(0, 0, 7, 16, 14, 9),
           Block.box(0, 0, 9, 16, 2, 11),
           Block.box(0, 0, 5, 16, 2, 7)));
 
   public static final Function<Direction, VoxelShape> TRAFFIC_LIGHT =
-      computeOrientableShape(Block.box(5, 0, 21, 11, 16, 23));
+      rotatedOrientableShape(Block.box(5, 0, 21, 11, 16, 23));
 
   public static final Function<Direction, VoxelShape> UNLIT_POLE_BARRIER =
-      computeOrientableShape(Shapes.or(
+      rotatedOrientableShape(Shapes.or(
           Block.box(13, 0, 7, 15, 13, 9),
           Block.box(1, 0, 7, 3, 13, 9),
           Block.box(0, 9.3, 6, 16, 12.3, 7),
           Block.box(0, 5.3, 6, 16, 8.3, 7)));
 
   public static final Function<Direction, VoxelShape> CHAIR =
-      computeOrientableShape(Shapes.or(
+      rotatedOrientableShape(Shapes.or(
           Block.box(12, 0, 2, 14, 2, 4),
           Block.box(1.5, 1.5, 1.5, 14.5, 3.5, 14.5),
           Block.box(1, 3, 1, 15, 8, 15),
@@ -273,7 +299,7 @@ public class BlockShapes {
           Block.box(3.5, 10, 13.75, 12.5, 11.5, 14.25)));
 
   public static final Function<Direction, VoxelShape> TALL_CHAIR =
-      computeOrientableShape(Shapes.or(
+      rotatedOrientableShape(Shapes.or(
           Block.box(4, 10, 12.5, 12, 23, 13.5),
           Block.box(2, 9, 2, 14, 10, 14),
           Block.box(12, 0, 12, 14.025, 8, 14.025),
@@ -284,12 +310,12 @@ public class BlockShapes {
           Block.box(2, 0, 2, 4, 9, 4)));
 
   public static final Function<Direction, VoxelShape> RADIO =
-      computeOrientableShape(Shapes.or(
+      rotatedOrientableShape(Shapes.or(
           Block.box(12.5, 9.25, 7.5, 13.5, 16.25, 8.5),
           Block.box(1, 0, 6, 15, 9, 10)));
 
   public static final Function<Direction, VoxelShape> MILITARY_RADIO =
-      computeOrientableShape(Shapes.or(
+      rotatedOrientableShape(Shapes.or(
           Block.box(9, 18, 11, 11, 19, 13),
           Block.box(12, 18, 11, 14, 19, 13),
           Block.box(2.25, 18, 11.25, 3.75, 21, 12.75),
@@ -298,7 +324,7 @@ public class BlockShapes {
           Block.box(2.5, 21, 11.5, 3.5, 32, 12.5)));
 
   public static final Function<Direction, VoxelShape> SINK =
-      computeOrientableShape(Shapes.or(
+      rotatedOrientableShape(Shapes.or(
           Block.box(5, 0, 9, 11, 11, 16),
           Block.box(2, 11, 13, 14, 16, 16),
           Block.box(2, 11, 6, 14, 16, 7),
@@ -311,7 +337,7 @@ public class BlockShapes {
           Block.box(10.25, 16, 13.75, 11.75, 17, 15.25)));
 
   public static final Function<Direction, VoxelShape> COUNTER_SINK =
-      computeOrientableShape(Shapes.or(
+      rotatedOrientableShape(Shapes.or(
           Block.box(2, 10.75, 12, 14, 15.75, 15),
           Block.box(2, 10.75, 5, 14, 15.75, 6),
           Block.box(13, 10.75, 6, 14, 15.75, 12),
@@ -327,17 +353,17 @@ public class BlockShapes {
           Block.box(14, 12.5, 5, 16, 16, 16)));
 
   public static final Function<Direction, VoxelShape> COUNTER_CORNER =
-      computeOrientableShape(Shapes.or(
+      rotatedOrientableShape(Shapes.or(
           Block.box(0.5, 12.5, 0.5, 16, 16, 16),
           Block.box(2, 0, 2, 16, 12.5, 16)));
 
   public static final Function<Direction, VoxelShape> COUNTER =
-      computeOrientableShape(Shapes.or(
+      rotatedOrientableShape(Shapes.or(
           Block.box(0, 12.5, 0.5, 16, 16, 16),
           Block.box(0, 0, 2, 16, 12.5, 16)));
 
   public static final Function<Direction, VoxelShape> FRIDGE =
-      computeOrientableShape(Shapes.or(
+      rotatedOrientableShape(Shapes.or(
           Block.box(13, 1.75, 2, 14, 21.75, 3),
           Block.box(13, 23.75, 2, 14, 31.25, 3),
           Block.box(1.25, 23.25, 3.5, 14.75, 31.75, 4),
@@ -346,7 +372,11 @@ public class BlockShapes {
           Block.box(1, 23, 2.5, 15, 32, 3.5),
           Block.box(1, 0, 4, 15, 32, 16)));
 
-  protected static final VoxelShape DOUBLE_TALL_BLOCK = Block.box(0, 0, 0, 16, 32, 16);
+  public static final Function<Direction, VoxelShape> DOUBLE_TALL_BLOCK =
+      unitOrientableShape(Block.box(0, 0, 0, 16, 32, 16));
+
+  public static final Function<Direction, VoxelShape> BLOCK =
+      unitOrientableShape(Shapes.block());
 
   /**
    * Rotates a shape and creates a map for each direction
@@ -354,7 +384,7 @@ public class BlockShapes {
    * @param in - initial north facing shape
    * @return rotated shapes for each direction
    */
-  public static Function<Direction, VoxelShape> computeOrientableShape(VoxelShape in) {
+  public static Function<Direction, VoxelShape> rotatedOrientableShape(VoxelShape in) {
     var orientedShapes = new EnumMap<Direction, VoxelShape>(Direction.class);
     for (var direction : Direction.values()) {
       var buffer = new VoxelShape[] {in, Shapes.empty()};
@@ -370,5 +400,9 @@ public class BlockShapes {
       orientedShapes.put(direction, buffer[0]);
     }
     return orientedShapes::get;
+  }
+
+  public static Function<Direction, VoxelShape> unitOrientableShape(VoxelShape in) {
+    return __ -> in;
   }
 }
