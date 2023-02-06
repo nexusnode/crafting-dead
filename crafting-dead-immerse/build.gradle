@@ -10,6 +10,8 @@ repositories {
     }
 }
 
+
+
 mixin {
     add sourceSets.main, 'craftingdeadimmerse.refmap.json'
 }
@@ -92,23 +94,26 @@ configurations {
 
 dependencies {
     implementation project(':crafting-dead-core')
-    shadedLibrary(group: 'org.lwjgl', name: 'lwjgl-yoga', version: lwjgl_version) {
-        exclude group: 'org.lwjgl', module: 'lwjgl'
+    minecraftEmbed(group: 'org.lwjgl', name: 'lwjgl-yoga', version: "[${lwjgl_version}]") {
+        transitive = false
     }
 
     lwjgl_natives.each {
         lwjgl_native_library(group: 'org.lwjgl', name: 'lwjgl-yoga', version: lwjgl_version, classifier: it) {
-            exclude group: 'org.lwjgl', module: 'lwjgl'
+             transitive = false
         }
     }
 
     skija_natives.each {
-        shadedLibrary group: 'io.github.humbleui', name: it, version: '0.106.0'
+        minecraftEmbed group: 'io.github.humbleui', name: it, version: '[0.106.0]'
     }
+    // Skija transitive JarJar dependencies
+    jarJar group: 'io.github.humbleui', name: 'skija-shared', version: '[0.106.0]'
+    jarJar group: 'io.github.humbleui', name: 'types', version: '[0.1.1]'
 
-	shadedLibrary group: 'net.java.timingframework', name: 'timingframework-core', version: '7.3.1'
+	minecraftEmbed group: 'net.java.timingframework', name: 'timingframework-core', version: '[7.3.1]'
 
-    shadedLibrary (group: 'io.sentry', name: 'sentry', version: '5.6.0') {
+    minecraftEmbed(group: 'io.sentry', name: 'sentry', version: '[5.6.0]') {
         exclude group: 'com.google.code.gson', module: 'gson'
     }
     
@@ -117,7 +122,11 @@ dependencies {
     runtimeOnly fg.deobf("net.rocketpowered:rocket-connector:${minecraft_version}-0.0.12")
 }
 
-shadowJar {
+reobf { jarJar { } }
+
+jarJar.enable()
+
+tasks.withType(Jar) {
     into 'lwjgl-natives', {
         exclude 'META-INF/'
         from {   

@@ -4,10 +4,7 @@ plugins {
     id 'eclipse'
     id 'org.cadixdev.licenser'
     id 'org.spongepowered.mixin'
-    id 'com.github.johnrengelman.shadow'
 }
-
-import com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocation
 
 group = 'com.craftingdead'
 version = "${minecraft_version}-${mod_version}." + (System.env.GITHUB_RUN_NUMBER ?: "homebaked")
@@ -30,12 +27,6 @@ repositories {
     }
 }
 
-configurations {    
-    shadedLibrary
-    shaded.extendsFrom shadedLibrary
-    minecraftLibrary.extendsFrom shadedLibrary
-}
-
 dependencies {
     minecraft group: 'net.minecraftforge', name:'forge', version: "${minecraft_version}-${forge_version}"
     implementation group: 'org.spongepowered', name: 'mixin', version: "${mixin_version}"
@@ -44,16 +35,6 @@ dependencies {
 }
 
 sourceSets.main.resources { srcDir 'src/generated/resources' }
-
-reobf {
-    shadowJar { }
-}
-
-shadowJar {
-    configurations = [project.configurations.shaded]
-    archiveClassifier = ''
-    finalizedBy 'reobfShadowJar'
-}
 
 jar {
     archiveBaseName = project.name
