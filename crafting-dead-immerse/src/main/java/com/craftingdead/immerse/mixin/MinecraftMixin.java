@@ -28,14 +28,19 @@ import io.sentry.Sentry;
 import net.minecraft.CrashReport;
 import net.minecraft.SharedConstants;
 import net.minecraft.client.Minecraft;
+import net.minecraftforge.fml.ModLoader;
 
 @Mixin(Minecraft.class)
 public abstract class MinecraftMixin {
 
   @Inject(method = "resizeDisplay", at = @At("RETURN"))
   public void resizeDisplay(CallbackInfo callbackInfo) {
-    CraftingDeadImmerse.getInstance().getClientDist().getGraphicsContext()
-        .init((float) ((Minecraft) (Object) this).getWindow().getGuiScale());
+    // If some mod crashed during the game initialization Crafting Dead may not be completely
+    // initialized
+    if (ModLoader.isLoadingStateValid()) {
+      CraftingDeadImmerse.getInstance().getClientDist().getGraphicsContext()
+          .init((float) ((Minecraft) (Object) this).getWindow().getGuiScale());
+    }
   }
 
   /**
