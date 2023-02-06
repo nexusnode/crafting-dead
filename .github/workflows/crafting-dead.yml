@@ -32,6 +32,7 @@ jobs:
        ./gradlew crafting-dead-core:build
        ./gradlew crafting-dead-immerse:build
        ./gradlew crafting-dead-survival:build
+       ./gradlew crafting-dead-decoration:build
     - uses: actions/upload-artifact@v2
       with:
         name: crafting-dead
