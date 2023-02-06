@@ -39,3 +39,4 @@ jobs:
           ./crafting-dead-core/build/libs/*.jar
           ./crafting-dead-immerse/build/libs/*.jar
           ./crafting-dead-survival/build/libs/*.jar
+          ./crafting-dead-decoration/build/libs/*.jar
