@@ -2,6 +2,10 @@ plugins {
     id 'crafting-dead'
 }
 
+mixin {
+    add sourceSets.main, 'craftingdeadsurvival.refmap.json'
+}
+
 minecraft {
     runs {
         client {

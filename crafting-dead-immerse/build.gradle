@@ -10,8 +10,6 @@ repositories {
     }
 }
 
-
-
 mixin {
     add sourceSets.main, 'craftingdeadimmerse.refmap.json'
 }
