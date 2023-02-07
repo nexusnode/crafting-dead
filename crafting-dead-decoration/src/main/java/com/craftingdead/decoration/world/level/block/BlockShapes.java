@@ -30,6 +30,9 @@ import net.minecraft.world.phys.shapes.VoxelShape;
  */
 public class BlockShapes {
 
+  public static final Function<Direction, VoxelShape> POSTER =
+      rotatedOrientableShape(Block.box(0, 0, 15, 16, 16, 16));
+
   public static final Function<Direction, VoxelShape> DOUBLE_GAS_CAN =
       unitOrientableShape(Block.box(0.0D, 0.0D, 0.0D, 16.0D, 9.0D, 16.0D));
 

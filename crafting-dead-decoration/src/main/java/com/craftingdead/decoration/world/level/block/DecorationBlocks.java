@@ -39,6 +39,15 @@ public class DecorationBlocks {
   public static final DeferredRegister<Block> deferredRegister =
       DeferredRegister.create(ForgeRegistries.BLOCKS, CraftingDeadDecoration.ID);
 
+  public static final RegistryObject<Block> AA_POSTER =
+      deferredRegister.register("aa_poster",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.WOOD)
+                  .strength(0.5F)
+                  .sound(SoundType.WOOL)
+                  .noOcclusion(),
+              BlockShapes.POSTER, true));
+
   public static final RegistryObject<Block> BLUE_GAS_CAN_1 =
       deferredRegister.register("blue_gas_can_1",
           () -> new OrientableBlock(

@@ -42,6 +42,11 @@ public class DecorationItems {
         }
       };
 
+  public static final RegistryObject<BlockItem> AA_POSTER =
+      deferredRegister.register("aa_poster",
+          () -> new BlockItem(DecorationBlocks.AA_POSTER.get(),
+              new Item.Properties().tab(TAB)));
+
   public static final RegistryObject<BlockItem> BLUE_GAS_CAN_1 =
       deferredRegister.register("blue_gas_can_1",
           () -> new BlockItem(DecorationBlocks.BLUE_GAS_CAN_1.get(),

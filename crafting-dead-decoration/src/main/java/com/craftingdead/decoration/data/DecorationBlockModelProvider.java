@@ -75,6 +75,8 @@ public class DecorationBlockModelProvider extends BlockModelProvider {
     this.modelVariant("blue", "gas_can", 3);
     this.modelVariant("green", "gas_can", 3);
     this.modelVariant("red", "gas_can", 3);
+
+    this.textureVariant(DecorationBlocks.AA_POSTER, "poster");
   }
 
   private void bottomStoreShelfs(String model) {

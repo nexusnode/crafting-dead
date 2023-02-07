@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "craftingdeaddecoration:block/aa_poster"
+    },
+    "facing=south": {
+      "model": "craftingdeaddecoration:block/aa_poster",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "craftingdeaddecoration:block/aa_poster",
+      "y": 270
+    },
+    "facing=east": {
+      "model": "craftingdeaddecoration:block/aa_poster",
+      "y": 90
+    }
+  }
+}

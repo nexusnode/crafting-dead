@@ -1,0 +1,6 @@
+{
+  "parent": "craftingdeaddecoration:block/poster",
+  "textures": {
+    "texture": "craftingdeaddecoration:block/aa_poster"
+  }
+}
