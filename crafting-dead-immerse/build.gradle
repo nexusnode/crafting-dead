@@ -104,7 +104,9 @@ dependencies {
     jarJar group: 'flare', name: 'flare-commons', version: '[0.0.2]'
     jarJar group: 'com.esotericsoftware', name: 'reflectasm', version: '[1.11.9]'
 
-    lwjgl group: 'org.lwjgl', name: 'lwjgl-yoga', version: "[${lwjgl_version}]"
+    lwjgl(group: 'org.lwjgl', name: 'lwjgl-yoga', version: "[${lwjgl_version}]") {
+        exclude group: 'org.lwjgl', module: 'lwjgl'
+    }
     lwjgl_natives.each {
         lwjglNative(group: 'org.lwjgl', name: 'lwjgl-yoga', version: lwjgl_version, classifier: it) {
              transitive = false
