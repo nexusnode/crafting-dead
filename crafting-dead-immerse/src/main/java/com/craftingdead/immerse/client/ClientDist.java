@@ -341,8 +341,8 @@ public class ClientDist implements ModDist {
         || event.getScreen() instanceof JoinMultiplayerScreen) {
       if (this.minecraft.screen instanceof ViewScreen screen
           && screen.getRoot() instanceof MainMenuView) {
-//        event.setCanceled(true);
-//        return;
+        event.setCanceled(true);
+        return;
       }
       event.setScreen(MainMenuView.createScreen());
     }
