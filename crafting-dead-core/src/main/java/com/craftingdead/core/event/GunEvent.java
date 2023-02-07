@@ -113,13 +113,13 @@ public abstract class GunEvent extends Event {
   }
 
   @Cancelable
-  public static class HitBlock extends Action {
+  public static class BlockHit extends Action {
 
     private final BlockHitResult result;
     private final BlockState blockState;
     private final Level level;
 
-    public HitBlock(Gun gun, ItemStack itemStack, BlockHitResult result, BlockState blockState,
+    public BlockHit(Gun gun, ItemStack itemStack, BlockHitResult result, BlockState blockState,
         LivingExtension<?, ?> living, Level level) {
       super(gun, itemStack, living);
       this.result = result;
@@ -141,14 +141,62 @@ public abstract class GunEvent extends Event {
   }
 
   @Cancelable
-  public static class HitEntity extends Action {
+  public static class EntityHit extends Action {
 
     private final Entity target;
     private final Vec3 hitPos;
     private float damage;
     private boolean headshot;
 
-    public HitEntity(
+    public EntityHit(
+        Gun gun,
+        ItemStack itemStack,
+        LivingExtension<?, ?> living,
+        Entity target,
+        float damage,
+        Vec3 hitPos,
+        boolean headshot) {
+      super(gun, itemStack, living);
+
+      this.target = target;
+      this.hitPos = hitPos;
+      this.damage = damage;
+      this.headshot = headshot;
+    }
+
+    public Entity target() {
+      return this.target;
+    }
+
+    public Vec3 hitPos() {
+      return this.hitPos;
+    }
+
+    public boolean headshot() {
+      return this.headshot;
+    }
+
+    public void headshot(boolean headshot) {
+      this.headshot = headshot;
+    }
+
+    public float damage() {
+      return this.damage;
+    }
+
+    public void damage(float damage) {
+      this.damage = damage;
+    }
+  }
+
+  public static class EntityDamaged extends Action {
+
+    private final Entity target;
+    private final Vec3 hitPos;
+    private float damage;
+    private boolean headshot;
+
+    public EntityDamaged(
         Gun gun,
         ItemStack itemStack,
         LivingExtension<?, ?> living,

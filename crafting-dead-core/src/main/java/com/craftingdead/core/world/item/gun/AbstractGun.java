@@ -540,7 +540,7 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
 
     // Post gun hit entity event
     var event =
-        new GunEvent.HitEntity(this, this.itemStack, living, hitEntity, damage, hitPos, headshot);
+        new GunEvent.EntityHit(this, this.itemStack, living, hitEntity, damage, hitPos, headshot);
     if (MinecraftForge.EVENT_BUS.post(event)) {
       return;
     }
@@ -569,6 +569,9 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
       hitEntity.setSecondsOnFire(100);
     }
 
+    MinecraftForge.EVENT_BUS.post(new GunEvent.EntityDamaged(this, this.itemStack, living, hitEntity,
+        damage, hitPos, headshot));
+
     if (hitEntity instanceof LivingEntity hitLivingEntity
         && entity instanceof ServerPlayer player) {
       // Alert client of hit (real hit as opposed to client prediction)
@@ -587,7 +590,7 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
 
     // Post gun hit block event
     var event =
-        new GunEvent.HitBlock(this, itemStack, result, blockState, living, level);
+        new GunEvent.BlockHit(this, itemStack, result, blockState, living, level);
     if (MinecraftForge.EVENT_BUS.post(event)) {
       return;
     }

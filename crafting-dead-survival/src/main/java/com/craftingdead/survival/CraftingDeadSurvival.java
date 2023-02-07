@@ -320,7 +320,7 @@ public class CraftingDeadSurvival {
   }
 
   @SubscribeEvent
-  public void handleGunHitEntity(GunEvent.HitEntity event) {
+  public void handleGunHitEntity(GunEvent.EntityHit event) {
     event.target().getCapability(LivingExtension.CAPABILITY)
         .resolve()
         .flatMap(living -> living.getHandler(SurvivalPlayerHandler.TYPE))

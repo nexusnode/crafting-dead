@@ -279,7 +279,7 @@ public class LogicalServer extends SavedData {
   }
 
   @SubscribeEvent
-  public void handleGunHitEntity(GunEvent.HitEntity event) {
+  public void handleGunHitEntity(GunEvent.EntityDamaged event) {
     if (!event.living().level().isClientSide()
         && this.gameWrapper.getGame().killFeedEnabled()
         && event.target() instanceof Player player
