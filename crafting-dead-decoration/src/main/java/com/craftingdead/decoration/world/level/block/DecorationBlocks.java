@@ -39,6 +39,14 @@ public class DecorationBlocks {
   public static final DeferredRegister<Block> deferredRegister =
       DeferredRegister.create(ForgeRegistries.BLOCKS, CraftingDeadDecoration.ID);
 
+  public static final RegistryObject<Block> FUSE_BOX =
+      deferredRegister.register("fuse_box",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(5.0F)
+                  .sound(SoundType.METAL),
+              BlockShapes.FUSE_BOX, true));
+
   public static final RegistryObject<Block> AA_POSTER =
       deferredRegister.register("aa_poster",
           () -> new OrientableBlock(

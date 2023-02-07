@@ -30,6 +30,9 @@ import net.minecraft.world.phys.shapes.VoxelShape;
  */
 public class BlockShapes {
 
+  public static final Function<Direction, VoxelShape> FUSE_BOX =
+      rotatedOrientableShape(Block.box(1, 0, 13, 15, 20, 16));
+
   public static final Function<Direction, VoxelShape> POSTER =
       rotatedOrientableShape(Block.box(0, 0, 15, 16, 16, 16));
 

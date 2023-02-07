@@ -42,6 +42,11 @@ public class DecorationItems {
         }
       };
 
+  public static final RegistryObject<BlockItem> FUSE_BOX =
+      deferredRegister.register("fuse_box",
+          () -> new BlockItem(DecorationBlocks.FUSE_BOX.get(),
+              new Item.Properties().tab(TAB)));
+
   public static final RegistryObject<BlockItem> AA_POSTER =
       deferredRegister.register("aa_poster",
           () -> new BlockItem(DecorationBlocks.AA_POSTER.get(),
