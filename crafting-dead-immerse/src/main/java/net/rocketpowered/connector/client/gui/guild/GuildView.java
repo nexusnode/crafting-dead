@@ -62,23 +62,23 @@ public class GuildView extends ParentView {
 
     this.manageMembersButtonView = new TextView(new Properties().focusable(true))
         .setText(ManageMembersView.TITLE);
-    this.manageMembersButtonView.addListener(ActionEvent.class,
+    this.manageMembersButtonView.eventBus().subscribe(ActionEvent.class,
         event -> this.setContentView(manageMembersView));
 
     this.yourGuildButtonView = new TextView(new Properties().focusable(true))
         .setText(YourGuildView.TITLE);
-    this.yourGuildButtonView.addListener(ActionEvent.class,
+    this.yourGuildButtonView.eventBus().subscribe(ActionEvent.class,
         event -> this.setContentView(this.yourGuildView));
 
     this.invitesButtonView = new TextView(new Properties().focusable(true))
         .setText(InvitesView.TITLE);
-    this.invitesButtonView.addListener(ActionEvent.class,
+    this.invitesButtonView.eventBus().subscribe(ActionEvent.class,
         event -> this.setContentView(this.invitesView));
     this.sideBarView.addChild(this.invitesButtonView);
 
     this.createGuildButtonView = new TextView(new Properties().focusable(true))
         .setText(CreateGuildDialogView.TITLE);
-    this.createGuildButtonView.addListener(ActionEvent.class,
+    this.createGuildButtonView.eventBus().subscribe(ActionEvent.class,
         event -> this.setContentView(new CreateGuildDialogView((name, tag) -> {
           Rocket.gameClientInterface()
               .ifPresentOrElse(connection -> connection.createGuild(name, tag)

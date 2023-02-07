@@ -177,7 +177,7 @@ public class ManageMembersView extends ParentView {
     if (view.hasParent()) {
       view.updateMember(member);
     } else {
-      view.addListener(RemovedEvent.class,
+      view.eventBus().subscribe(RemovedEvent.class,
           __ -> this.memberViews.remove(member.user().id(), view));
       this.membersListView.addChild(view);
     }

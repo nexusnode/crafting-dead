@@ -33,13 +33,8 @@ public class ImageView extends View {
     if (this.image != null) {
       this.image.close();
     }
-
     this.image = image;
-
-    if (this.hasLayout()) {
-      this.getLayout().markDirty();
-    }
-
+    this.getLayout().markDirty();
     return this;
   }
 

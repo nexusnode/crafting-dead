@@ -16,6 +16,7 @@ import com.craftingdead.immerse.client.util.RenderUtil;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableSet;
 import com.mojang.blaze3d.vertex.PoseStack;
+import flare.eventbus.EventBus;
 import io.github.humbleui.skija.Canvas;
 import io.github.humbleui.skija.ClipMode;
 import io.github.humbleui.skija.FilterBlurMode;
@@ -29,10 +30,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.Mth;
-import net.minecraftforge.eventbus.api.BusBuilder;
-import net.minecraftforge.eventbus.api.Event;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.IEventBus;
 import sm0keysa1m0n.bliss.Bliss;
 import sm0keysa1m0n.bliss.BoxSide;
 import sm0keysa1m0n.bliss.BoxSizing;
@@ -56,6 +53,7 @@ import sm0keysa1m0n.bliss.view.event.MouseEnterEvent;
 import sm0keysa1m0n.bliss.view.event.MouseEvent;
 import sm0keysa1m0n.bliss.view.event.MouseLeaveEvent;
 import sm0keysa1m0n.bliss.view.event.RemovedEvent;
+import sm0keysa1m0n.bliss.view.event.ViewEvent;
 
 public class View implements Comparable<View>, StyleNode {
 
@@ -77,11 +75,7 @@ public class View implements Comparable<View>, StyleNode {
 
   protected final GraphicsContext graphicsContext = Bliss.instance().getGraphicsContext();
 
-  /**
-   * To be replaced by an alternative library.
-   */
-  @Deprecated(forRemoval = true)
-  private final IEventBus eventBus = BusBuilder.builder().build();
+  private final EventBus<ViewEvent> eventBus = EventBus.create(ViewEvent.class, false);
 
   private final ViewStyle style;
 
@@ -129,7 +123,6 @@ public class View implements Comparable<View>, StyleNode {
 
     this.style = new ViewStyle(this);
 
-    this.eventBus.start();
     this.getStyleManager().addState(States.ENABLED);
   }
 
@@ -140,12 +133,12 @@ public class View implements Comparable<View>, StyleNode {
   protected void added() {
     this.style.getStyleManager().refresh();
     this.added = true;
-    this.post(new AddedEvent());
+    this.eventBus.publish(new AddedEvent());
   }
 
   protected void removed() {
     this.added = false;
-    this.post(new RemovedEvent());
+    this.eventBus.publish(new RemovedEvent());
   }
 
   protected void setLayout(Layout layout) {
@@ -159,6 +152,10 @@ public class View implements Comparable<View>, StyleNode {
   }
 
   protected void layout() {
+    if (!this.isAdded()) {
+      return;
+    }
+
     this.fullHeight = this.computeFullHeight();
     this.scrollOffset = this.clampScrollOffset(this.scrollOffset);
   }
@@ -733,18 +730,18 @@ public class View implements Comparable<View>, StyleNode {
     this.getStyleManager().addState(States.HOVER);
     this.getStyleManager().notifyListeners();
 
-    this.post(new MouseEnterEvent());
+    this.eventBus.publish(new MouseEnterEvent());
   }
 
   public void mouseLeft(double mouseX, double mouseY) {
     this.getStyleManager().removeState(States.HOVER);
     this.getStyleManager().notifyListeners();
 
-    this.post(new MouseLeaveEvent());
+    this.eventBus.publish(new MouseLeaveEvent());
   }
 
   public void mouseMoved(double mouseX, double mouseY) {
-    this.post(new MouseEvent.MoveEvent(mouseX, mouseY));
+    this.eventBus.publish(new MouseEvent.MoveEvent(mouseX, mouseY));
   }
 
   public boolean tryFocus(boolean visible) {
@@ -792,8 +789,8 @@ public class View implements Comparable<View>, StyleNode {
    * @return <code>true</code> if drag events should be captured
    */
   public boolean mousePressed(double mouseX, double mouseY, int button) {
-    if (this.post(new MouseEvent.ButtonEvent(mouseX, mouseY, button,
-        GLFW.GLFW_PRESS)) == Event.Result.ALLOW) {
+    if (this.eventBus.publishCancellable(
+        new MouseEvent.ButtonEvent(mouseX, mouseY, button, GLFW.GLFW_PRESS))) {
       return false;
     }
 
@@ -821,14 +818,14 @@ public class View implements Comparable<View>, StyleNode {
     var deltaTime = currentTime - this.lastClickTimeMs;
     this.lastClickTimeMs = currentTime;
     if (!this.doubleClick || deltaTime < DOUBLE_CLICK_DURATION_MS) {
-      this.post(new ActionEvent());
+      this.eventBus.publish(new ActionEvent());
     }
 
     return false;
   }
 
   public void mouseReleased(double mouseX, double mouseY, int button) {
-    this.post(new MouseEvent.ButtonEvent(mouseX, mouseY, button, GLFW.GLFW_RELEASE));
+    this.eventBus.publish(new MouseEvent.ButtonEvent(mouseX, mouseY, button, GLFW.GLFW_RELEASE));
   }
 
   public void mouseDragged(double mouseX, double mouseY, int button,
@@ -841,33 +838,33 @@ public class View implements Comparable<View>, StyleNode {
           + ((float) deltaY) * this.fullHeight / this.getScaledHeight());
       return;
     }
-    this.post(new MouseEvent.DragEvent(mouseX, mouseY, button, deltaX, deltaY));
+    this.eventBus.publish(new MouseEvent.DragEvent(mouseX, mouseY, button, deltaX, deltaY));
   }
 
   public void mouseScrolled(double mouseX, double mouseY, double scrollDelta) {
     if (this.isScrollbarEnabled()) {
       this.scrollVelocity += (float) (-scrollDelta * SCROLL_CHUNK);
     }
-    this.post(new MouseEvent.ScrollEvent(mouseX, mouseY, scrollDelta));
+    this.eventBus.publish(new MouseEvent.ScrollEvent(mouseX, mouseY, scrollDelta));
   }
 
   public void keyPressed(int keyCode, int scanCode, int modifiers) {
-    if (this.post(
-        new KeyEvent(keyCode, scanCode, GLFW.GLFW_PRESS, modifiers)) == Event.Result.ALLOW) {
+    if (this.eventBus.publishCancellable(
+        new KeyEvent(keyCode, scanCode, GLFW.GLFW_PRESS, modifiers))) {
       return;
     }
 
-    if (keyCode == GLFW.GLFW_KEY_ENTER && this.post(new ActionEvent()) == Event.Result.ALLOW) {
-      return;
+    if (keyCode == GLFW.GLFW_KEY_ENTER) {
+      this.eventBus.publish(new ActionEvent());
     }
   }
 
   public void keyReleased(int keyCode, int scanCode, int modifiers) {
-    this.post(new KeyEvent(keyCode, scanCode, GLFW.GLFW_RELEASE, modifiers));
+    this.eventBus.publish(new KeyEvent(keyCode, scanCode, GLFW.GLFW_RELEASE, modifiers));
   }
 
   public void charTyped(char codePoint, int modifiers) {
-    this.post(new CharTypeEvent(codePoint, modifiers));
+    this.eventBus.publish(new CharTypeEvent(codePoint, modifiers));
   }
 
   public Optional<View> changeFocus(boolean forward) {
@@ -910,38 +907,13 @@ public class View implements Comparable<View>, StyleNode {
   }
 
   public final void addActionSound(SoundEvent soundEvent) {
-    this.addListener(ActionEvent.class, event -> this.minecraft.getSoundManager()
+    this.eventBus.subscribe(ActionEvent.class, event -> this.minecraft.getSoundManager()
         .play(SimpleSoundInstance.forUI(soundEvent, 1.0F)));
   }
 
   public final void addHoverSound(SoundEvent soundEvent) {
-    this.addListener(MouseEnterEvent.class, event -> this.minecraft.getSoundManager()
+    this.eventBus.subscribe(MouseEnterEvent.class, event -> this.minecraft.getSoundManager()
         .play(SimpleSoundInstance.forUI(soundEvent, 1.0F)));
-  }
-
-  public final <T extends Event> void addListener(Class<T> eventType, Consumer<T> consumer) {
-    this.addListener(eventType, consumer, true);
-  }
-
-  public final <T extends Event> void addListener(Class<T> eventType, Consumer<T> consumer,
-      boolean consumeEvent) {
-    this.eventBus.addListener(EventPriority.NORMAL, true, eventType, event -> {
-      if (event.hasResult() && consumeEvent) {
-        event.setResult(Event.Result.ALLOW);
-      }
-      consumer.accept(event);
-    });
-  }
-
-  /**
-   * Submit the event for dispatch to appropriate listeners.
-   *
-   * @param event - The event to dispatch to listeners
-   * @return true if the event was cancelled
-   */
-  public final Event.Result post(Event event) {
-    this.eventBus.post(event);
-    return event.getResult();
   }
 
   public final float getScaledContentX() {
@@ -1180,7 +1152,7 @@ public class View implements Comparable<View>, StyleNode {
   }
 
   public final boolean hasLayout() {
-    return this.layout != null;
+    return this.layout != Layout.NILL;
   }
 
   public final Layout getLayout() {
@@ -1283,6 +1255,10 @@ public class View implements Comparable<View>, StyleNode {
 
   public ViewStyle getStyle() {
     return this.style;
+  }
+
+  public EventBus<ViewEvent> eventBus() {
+    return this.eventBus;
   }
 
   public static final class Properties {

@@ -89,7 +89,7 @@ public class Theme {
     view.addChild(new TextView(new View.Properties().id("label")).setText(text));
 
     view.addActionSound(ImmerseSoundEvents.BUTTON_CLICK.get());
-    view.addListener(ActionEvent.class, event -> actionListener.run());
+    view.eventBus().subscribe(ActionEvent.class, event -> actionListener.run());
 
     return view;
   }
@@ -100,7 +100,7 @@ public class Theme {
     view.setImage(MinecraftUtil.createImageAccess(image));
     view.addActionSound(ImmerseSoundEvents.BUTTON_CLICK.get());
     view.addHoverSound(ImmerseSoundEvents.MAIN_MENU_HOVER.get());
-    view.addListener(ActionEvent.class, event -> actionListener.run());
+    view.eventBus().subscribe(ActionEvent.class, event -> actionListener.run());
     return view;
   }
 
@@ -136,8 +136,8 @@ public class Theme {
         .setRepeatBehavior(RepeatBehavior.REVERSE)
         .build();
 
-    view.addListener(AddedEvent.class, __ -> animator.start());
-    view.addListener(RemovedEvent.class, __ -> animator.stop());
+    view.eventBus().subscribe(AddedEvent.class, __ -> animator.start());
+    view.eventBus().subscribe(RemovedEvent.class, __ -> animator.stop());
 
     return view;
   }

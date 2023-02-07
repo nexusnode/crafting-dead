@@ -9,6 +9,7 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import org.jetbrains.annotations.Nullable;
+import com.craftingdead.immerse.client.gui.screen.menu.play.list.server.MutableServerListView;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.world.phys.Vec2;
 import sm0keysa1m0n.bliss.Bliss;
@@ -242,9 +243,14 @@ public class ParentView extends View {
       return;
     }
 
+    if (!this.isAdded()) {
+      return;
+    }
+
     var wasScrollbarEnabled = this.isScrollbarEnabled();
     this.layoutParent.layout(this.getContentWidth(), this.getContentHeight());
     this.children.forEach(View::layout);
+
     super.layout();
 
     // Re-layout to account for scrollbar width.

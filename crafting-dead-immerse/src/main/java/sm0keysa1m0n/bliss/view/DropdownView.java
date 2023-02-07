@@ -70,7 +70,7 @@ public class DropdownView extends View {
 
   public DropdownView(Properties properties) {
     super(properties.focusable(true));
-    this.addListener(ActionEvent.class, event -> {
+    this.eventBus().subscribe(ActionEvent.class, event -> {
       if (this.expanded) {
         this.getFocusedItem().select();
       }

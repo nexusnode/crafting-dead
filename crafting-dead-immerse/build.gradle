@@ -90,11 +90,20 @@ configurations {
     lwjglNative
     minecraftLibrary.extendsFrom lwjgl
     minecraftLibrary.extendsFrom lwjglNative
+    
+    library
+    minecraftLibrary.extendsFrom library
+    jarJar.extendsFrom library
 }
 
 dependencies {
     implementation project(':crafting-dead-core')
-    
+
+    library group: 'flare', name: 'flare-eventbus', version: '[2.0.1]'
+    // eventbus transitive dependencies
+    jarJar group: 'flare', name: 'flare-commons', version: '[0.0.2]'
+    jarJar group: 'com.esotericsoftware', name: 'reflectasm', version: '[1.11.9]'
+
     lwjgl group: 'org.lwjgl', name: 'lwjgl-yoga', version: "[${lwjgl_version}]"
     lwjgl_natives.each {
         lwjglNative(group: 'org.lwjgl', name: 'lwjgl-yoga', version: lwjgl_version, classifier: it) {
@@ -103,21 +112,21 @@ dependencies {
     }
 
     skija_natives.each {
-        minecraftEmbed group: 'io.github.humbleui', name: it, version: '[0.106.0]'
+        library group: 'io.github.humbleui', name: it, version: '[0.106.0]'
     }
     // Skija transitive JarJar dependencies
     jarJar group: 'io.github.humbleui', name: 'skija-shared', version: '[0.106.0]'
     jarJar group: 'io.github.humbleui', name: 'types', version: '[0.1.1]'
 
-	minecraftEmbed group: 'net.java.timingframework', name: 'timingframework-core', version: '[7.3.1]'
+	library group: 'net.java.timingframework', name: 'timingframework-core', version: '[7.3.1]'
 
-    minecraftEmbed(group: 'io.sentry', name: 'sentry', version: '[5.6.0]') {
+    library(group: 'io.sentry', name: 'sentry', version: '[5.6.0]') {
         exclude group: 'com.google.code.gson', module: 'gson'
     }
     
-    minecraftLibrary group: 'net.rocketpowered', name: 'rocket-sdk', version: '0.0.7'
+    minecraftLibrary group: 'net.rocketpowered', name: 'rocket-sdk', version: '0.0.8'
 
-    runtimeOnly fg.deobf("net.rocketpowered:rocket-connector:${minecraft_version}-0.0.12")
+    runtimeOnly fg.deobf("net.rocketpowered:rocket-connector:${minecraft_version}-0.0.13")
 }
 
 reobf { jarJar { } }
@@ -125,14 +134,16 @@ reobf { jarJar { } }
 jarJar.enable()
 
 tasks.withType(Jar) {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
     into 'lwjgl-natives', {
         exclude 'META-INF/'
         from {   
             project.configurations.lwjglNative.collect { it.isDirectory() ? it : zipTree(it) }
         }
     }
+
     from {
-        exclude 'META-INF/'
         project.configurations.lwjgl.collect { it.isDirectory() ? it : zipTree(it) }
     }
 }

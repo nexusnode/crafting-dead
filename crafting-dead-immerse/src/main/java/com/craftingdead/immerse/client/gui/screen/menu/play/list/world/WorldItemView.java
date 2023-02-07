@@ -86,7 +86,7 @@ class WorldItemView extends ParentView {
       }
     }
 
-    this.addListener(ActionEvent.class, event -> this.joinWorld(), true);
+    this.eventBus().subscribe(ActionEvent.class, __ -> this.joinWorld());
     this.addChild(new ImageView(new Properties().id("icon"))
         .setImage(ImageAccess.forImage(this.iconImage)));
 

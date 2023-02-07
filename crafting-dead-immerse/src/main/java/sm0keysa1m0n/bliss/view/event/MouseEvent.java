@@ -1,10 +1,8 @@
 package sm0keysa1m0n.bliss.view.event;
 
 import org.lwjgl.glfw.GLFW;
-import net.minecraftforge.eventbus.api.Cancelable;
-import net.minecraftforge.eventbus.api.Event;
 
-public abstract class MouseEvent extends Event {
+public abstract class MouseEvent implements ViewEvent {
 
   private final double mouseX;
   private final double mouseY;
@@ -22,7 +20,6 @@ public abstract class MouseEvent extends Event {
     return this.mouseY;
   }
 
-  @Cancelable
   public static class MoveEvent extends MouseEvent {
 
     public MoveEvent(double mouseX, double mouseY) {
@@ -30,7 +27,6 @@ public abstract class MouseEvent extends Event {
     }
   }
 
-  @Cancelable
   public static class ButtonEvent extends MouseEvent {
 
     private final int button;
@@ -64,7 +60,6 @@ public abstract class MouseEvent extends Event {
     }
   }
 
-  @Cancelable
   public static class DragEvent extends MouseEvent {
 
     private final int button;
@@ -91,7 +86,6 @@ public abstract class MouseEvent extends Event {
     }
   }
 
-  @Cancelable
   public static class ScrollEvent extends MouseEvent {
 
     private final double scrollDelta;

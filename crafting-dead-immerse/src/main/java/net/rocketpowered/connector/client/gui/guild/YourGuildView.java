@@ -211,7 +211,8 @@ public class YourGuildView extends ParentView {
     if (view.hasParent()) {
       view.updateMember(member);
     } else {
-      view.addListener(RemovedEvent.class, __ -> this.memberViews.remove(member.user().id(), view));
+      view.eventBus().subscribe(RemovedEvent.class,
+          __ -> this.memberViews.remove(member.user().id(), view));
       this.membersView.addChild(view);
     }
   }

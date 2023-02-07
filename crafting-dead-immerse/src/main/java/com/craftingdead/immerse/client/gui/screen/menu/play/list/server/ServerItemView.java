@@ -64,7 +64,7 @@ class ServerItemView extends ParentView {
     this.pingView = new TextView(new Properties().id("ping"));
     this.playerCountView = new TextView(new Properties().id("players"));
 
-    this.addListener(ActionEvent.class, event -> this.connect());
+    this.eventBus().subscribe(ActionEvent.class, event -> this.connect());
     this.addChild(this.descriptionView);
     this.addChild(new TextView(new Properties().id("map"))
         .setText(new TextComponent(this.serverEntry.map() == null ? "-" : this.serverEntry.map())
@@ -137,6 +137,7 @@ class ServerItemView extends ParentView {
         .publishOn(Schedulers.fromExecutor(this.minecraft))
         .doOnNext(this::handlePingResult)
         .doOnError(PingError.class, this::handlePingError)
+        .onErrorComplete()
         .subscribe();
   }
 

@@ -25,7 +25,7 @@ public class TabsView extends ParentView {
       Consumer<TabView> customizer) {
     var view = new TabView(selectedListener);
     view.addChild(new TextView(new Properties()).setText(text));
-    view.addListener(ActionEvent.class, event -> this.selectTab(view));
+    view.eventBus().subscribe(ActionEvent.class, event -> this.selectTab(view));
     customizer.accept(view);
     this.addChild(view);
     return this;
