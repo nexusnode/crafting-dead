@@ -86,18 +86,18 @@ def lwjgl_natives = ['natives-windows', 'natives-linux', 'natives-macos']
 def skija_natives = ['skija-macos-x64', 'skija-macos-arm64', 'skija-linux', 'skija-windows']
 
 configurations {
-    lwjgl_native_library
-    minecraftLibrary.extendsFrom lwjgl_native_library
+    lwjgl
+    lwjglNative
+    minecraftLibrary.extendsFrom lwjgl
+    minecraftLibrary.extendsFrom lwjglNative
 }
 
 dependencies {
     implementation project(':crafting-dead-core')
-    minecraftEmbed(group: 'org.lwjgl', name: 'lwjgl-yoga', version: "[${lwjgl_version}]") {
-        transitive = false
-    }
-
+    
+    lwjgl group: 'org.lwjgl', name: 'lwjgl-yoga', version: "[${lwjgl_version}]"
     lwjgl_natives.each {
-        lwjgl_native_library(group: 'org.lwjgl', name: 'lwjgl-yoga', version: lwjgl_version, classifier: it) {
+        lwjglNative(group: 'org.lwjgl', name: 'lwjgl-yoga', version: lwjgl_version, classifier: it) {
              transitive = false
         }
     }
@@ -128,8 +128,12 @@ tasks.withType(Jar) {
     into 'lwjgl-natives', {
         exclude 'META-INF/'
         from {   
-            project.configurations.lwjgl_native_library.collect { it.isDirectory() ? it : zipTree(it) }
+            project.configurations.lwjglNative.collect { it.isDirectory() ? it : zipTree(it) }
         }
+    }
+    from {
+        exclude 'META-INF/'
+        project.configurations.lwjgl.collect { it.isDirectory() ? it : zipTree(it) }
     }
 }
 
