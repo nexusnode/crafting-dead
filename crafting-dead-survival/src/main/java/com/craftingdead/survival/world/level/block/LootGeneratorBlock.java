@@ -76,6 +76,14 @@ public class LootGeneratorBlock extends AirBlock {
 
   @SuppressWarnings("deprecation")
   @Override
+  public void onPlace(BlockState blockState, Level level, BlockPos pos, BlockState lastState,
+      boolean moved) {
+    super.onPlace(blockState, level, pos, lastState, moved);
+    level.scheduleTick(pos, this, 0);
+  }
+
+  @SuppressWarnings("deprecation")
+  @Override
   public BlockState updateShape(BlockState blockState, Direction direction,
       BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
     level.scheduleTick(pos, this, 0);

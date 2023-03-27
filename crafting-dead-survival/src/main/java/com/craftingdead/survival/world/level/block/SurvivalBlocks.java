@@ -101,7 +101,6 @@ public class SurvivalBlocks {
     return new LootGeneratorBlock(
         BlockBehaviour.Properties.of(Material.STRUCTURAL_AIR)
             .strength(5.0F, 5.0F)
-            .randomTicks()
             .noOcclusion()
             .noCollission(),
         lootBlock, particleOptions, refreshDelayTicks, enabled);
