@@ -11,6 +11,17 @@ displayURL = "www.craftingdead.com"
 modId = "craftingdeadimmerse"
 version = "${file.jarVersion}"
 
+[[mods]]
+modId="clientresetpacket"
+version="2.0.0"
+displayName="Client Reset Packet"
+displayURL="https://github.com/m1lc0lm/Forge-Client-Reset-Packet"
+credits="https://github.com/EnvyWare/Forge-Client-Reset-Packet"
+authors="Malcolm (m1lcolm), Just-Chaldea, EnyWare"
+description='''
+Adds a reset packet to Minecraft Forge to allow Modern Forge (1.13+) support on proxies.
+'''
+
 [[dependencies.craftingdeadimmerse]]
 mandatory = true
 modId = "craftingdead"
