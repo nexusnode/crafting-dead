@@ -2,13 +2,13 @@
   "container.equipment": "装备",
   "enchantment.craftingdead.armor_penetration": "护甲穿透",
 
-  "key.reload": "装填弹匣",
+  "key.reload": "装填弹药",
   "key.remove_magazine": "移除弹匣",
   "key.toggle_fire_mode": "切换开火模式",
   "key.equipment_menu":"打开/关闭装备菜单",
 
   "tutorial.open_equipment_menu.title":"打开装备菜单",
-  "tutorial.open_equipment_menu.description": "按下%s",
+  "tutorial.open_equipment_menu.description": "按下%s键",
 
   "death.attack.bullet": "%s被%s射杀",
   "death.attack.bullet.item": "%s被%s使用%s射杀",
