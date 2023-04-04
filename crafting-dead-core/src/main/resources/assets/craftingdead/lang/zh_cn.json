@@ -403,7 +403,7 @@
   "clothing.movement_speed": "移动速度：",
   "clothing.immune_to_fire": "免疫火焰",
   "magazine.armor_penetration": "护甲穿透：",
-  "magazine.amount": "数量：",
+  "magazine.amount": "弹容：",
   "magazine.entity_hit_recovery_chance": "命中实体恢复概率：",
   "magazine.block_hit_recovery_chance": "命中方块恢复概率：",
   "gun.ammo_amount": "弹药：",
