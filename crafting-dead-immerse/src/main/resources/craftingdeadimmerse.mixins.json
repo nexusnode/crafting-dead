@@ -15,11 +15,7 @@
         "FireBlockMixin",
         "ServerPlayerMixin",
         "MinecraftServerMixin",
-        "ChunkMapMixin",
-        "MixinFMLHandshakeHandler",
-        "MixinNetworkFilters",
-        "MixinNetworkManager",
-        "VanillaPacketFilterAccessor"
+        "ChunkMapMixin"
     ],
     "injectors": {
         "defaultRequire": 1
