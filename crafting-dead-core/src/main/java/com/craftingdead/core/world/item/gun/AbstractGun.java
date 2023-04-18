@@ -413,7 +413,8 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
   }
 
   protected boolean canShoot(LivingExtension<?, ?> living) {
-    return !living.getActionObserver().isPresent() && !living.entity().isSprinting()
+    return !living.getActionObserver().isPresent()
+        && !living.entity().isSprinting()
         && !living.entity().isSpectator()
         && !(living instanceof PlayerExtension<?> player && player.isHandcuffed());
   }
@@ -569,8 +570,9 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
       hitEntity.setSecondsOnFire(100);
     }
 
-    MinecraftForge.EVENT_BUS.post(new GunEvent.EntityDamaged(this, this.itemStack, living, hitEntity,
-        damage, hitPos, headshot));
+    MinecraftForge.EVENT_BUS
+        .post(new GunEvent.EntityDamaged(this, this.itemStack, living, hitEntity,
+            damage, hitPos, headshot));
 
     if (hitEntity instanceof LivingEntity hitLivingEntity
         && entity instanceof ServerPlayer player) {

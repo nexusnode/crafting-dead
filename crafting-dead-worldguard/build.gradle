@@ -1,0 +1,25 @@
+plugins {
+    id 'crafting-dead'
+}
+
+repositories {
+    maven {
+        url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/'
+        content {
+            includeGroup 'org.bukkit'
+            includeGroup 'org.spigotmc'
+        }
+    }
+    maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
+    maven { url 'https://oss.sonatype.org/content/repositories/central' }
+    maven { url 'https://maven.enginehub.org/repo' }
+}
+
+dependencies {
+    implementation project(':crafting-dead-core')
+    implementation project(':crafting-dead-survival')
+    implementation project(':crafting-dead-immerse')
+
+    implementation group: 'org.spigotmc', name: 'spigot-api', version: '1.18.2-R0.1-SNAPSHOT'
+    implementation group: 'com.sk89q.worldguard', name: 'worldguard-bukkit', version: '7.0.7'
+}

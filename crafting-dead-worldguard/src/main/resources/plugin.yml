@@ -1,0 +1,6 @@
+name: CraftingDeadWorldGuard
+version: 1.0
+description: Provides Crafting Dead WorldGuard flags.
+depend: [WorldGuard]
+author: Sm0keySa1m0n
+main: com.craftingdead.worldguard.CraftingDeadWorldGuard

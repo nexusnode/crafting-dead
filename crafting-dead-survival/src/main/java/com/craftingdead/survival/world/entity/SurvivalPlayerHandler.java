@@ -23,6 +23,8 @@ import com.craftingdead.core.world.entity.extension.LivingHandlerType;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.core.world.entity.extension.PlayerHandler;
 import com.craftingdead.survival.CraftingDeadSurvival;
+import com.craftingdead.survival.event.BleedEvent;
+import com.craftingdead.survival.event.BreakLegEvent;
 import com.craftingdead.survival.world.effect.SurvivalMobEffects;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.FriendlyByteBuf;
@@ -33,6 +35,7 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.monster.Zombie;
+import net.minecraftforge.common.MinecraftForge;
 
 public class SurvivalPlayerHandler implements PlayerHandler {
 
@@ -124,7 +127,8 @@ public class SurvivalPlayerHandler implements PlayerHandler {
 
     if (!invulnerable
         && CraftingDeadSurvival.serverConfig.bleedingEnabled.get()
-        && (source.getDirectEntity() != null || source.isExplosion())) {
+        && (source.getDirectEntity() != null || source.isExplosion())
+        && !MinecraftForge.EVENT_BUS.post(new BleedEvent(this.player.entity()))) {
       float bleedChance = 0.1F * amount;
       if (random.nextFloat() < bleedChance
           && !this.player.entity().hasEffect(SurvivalMobEffects.BLEEDING.get())) {
@@ -142,7 +146,8 @@ public class SurvivalPlayerHandler implements PlayerHandler {
         && CraftingDeadSurvival.serverConfig.brokenLegsEnabled.get()
         && !this.player.entity().hasEffect(SurvivalMobEffects.BROKEN_LEG.get())
         && source == DamageSource.FALL
-        && random.nextFloat() < legBreakChance) {
+        && random.nextFloat() < legBreakChance
+        && !MinecraftForge.EVENT_BUS.post(new BreakLegEvent(this.player.entity()))) {
       this.player.entity()
           .displayClientMessage(new TranslatableComponent("message.broken_leg")
               .withStyle(ChatFormatting.RED, ChatFormatting.BOLD), true);

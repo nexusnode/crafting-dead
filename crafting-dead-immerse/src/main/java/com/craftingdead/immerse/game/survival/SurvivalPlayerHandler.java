@@ -29,6 +29,7 @@ import com.craftingdead.core.world.entity.extension.LivingHandlerType;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.core.world.entity.extension.PlayerHandler;
 import com.craftingdead.immerse.CraftingDeadImmerse;
+import com.craftingdead.immerse.event.WaterDecayEvent;
 import com.craftingdead.immerse.world.ImmerseDamageSource;
 import com.craftingdead.immerse.world.level.extension.LegacyBase;
 import com.craftingdead.immerse.world.level.extension.LevelExtension;
@@ -45,6 +46,7 @@ import net.minecraft.world.Difficulty;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.BlockSnapshot;
 
 public class SurvivalPlayerHandler implements PlayerHandler {
@@ -127,7 +129,9 @@ public class SurvivalPlayerHandler implements PlayerHandler {
           this.waterTicks = 0;
         }
       } else if (this.waterTicks >= settings.decayIntervalTicks()) {
-        this.setWater(this.getWater() - settings.decayAmountFor(entity));
+        if (!MinecraftForge.EVENT_BUS.post(new WaterDecayEvent(this.player.entity()))) {
+          this.setWater(this.getWater() - settings.decayAmountFor(entity));
+        }
         this.waterTicks = 0;
       }
     }
