@@ -62,6 +62,13 @@ class RenderLayers {
     cutout(DecorationBlocks.TOILET);
     cutout(DecorationBlocks.DIRTY_TOILET);
 
+    cutout(DecorationBlocks.SLEEPINGBAG);
+    cutout(DecorationBlocks.SLEEPINGBAG_RED);
+    cutout(DecorationBlocks.SLEEPINGBAG_BLUE);
+    cutout(DecorationBlocks.SLEEPINGBAG_GREEN);
+    cutout(DecorationBlocks.SLEEPINGBAG_ORANGE);
+    cutout(DecorationBlocks.SLEEPINGBAG_BLACK);
+
     cutout(DecorationBlocks.TOOL_2);
     cutout(DecorationBlocks.TOOL_3);
 

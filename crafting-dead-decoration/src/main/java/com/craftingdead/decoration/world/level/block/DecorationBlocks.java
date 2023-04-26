@@ -393,6 +393,61 @@ public class DecorationBlocks {
                   .noOcclusion(),
               BlockShapes.TOOL_4));
 
+  public static final RegistryObject<block> SLEEPINGBAG =
+      deferredRegister.register("sleepingbag",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(5.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.SLEEPINGBAG));
+
+  public static final RegistryObject<block> SLEEPINGBAG_BLUE =
+      deferredRegister.register("sleepingbag_blue",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.WOOL)
+                  .strength(5.0F)
+                  .sound(SoundType.WOOL)
+                  .noOcclusion(),
+              BlockShapes.SLEEPINGBAG));
+
+public static final RegistryObject<block> SLEEPINGBAG_GREEN =
+        deferredRegister.register("sleepingbag_green",
+            () -> new OrientableBlock(
+                BlockBehaviour.Properties.of(Material.WOOL)
+                    .strength(5.0F)
+                    .sound(SoundType.WOOL)
+                    .noOcclusion(),
+                BlockShapes.SLEEPINGBAG));
+
+public static final RegistryObject<block> SLEEPINGBAG_RED =
+        deferredRegister.register("sleepingbag_red",
+            () -> new OrientableBlock(
+                BlockBehaviour.Properties.of(Material.WOOL)
+                    .strength(5.0F)
+                    .sound(SoundType.WOOL)
+                    .noOcclusion(),
+                BlockShapes.SLEEPINGBAG));
+
+public static final RegistryObject<block> SLEEPINGBAG_ORANGE =
+        deferredRegister.register("sleepingbag_orange",
+            () -> new OrientableBlock(
+                BlockBehaviour.Properties.of(Material.WOOL)
+                    .strength(5.0F)
+                    .sound(SoundType.WOOL)
+                    .noOcclusion(),
+                BlockShapes.SLEEPINGBAG));
+        
+public static final RegistryObject<block> SLEEPINGBAG_BLACK =
+        deferredRegister.register("sleepingbag_black",
+            () -> new OrientableBlock(
+                BlockBehaviour.Properties.of(Material.WOOL)
+                    .strength(5.0F)
+                    .sound(SoundType.WOOL)
+                    .noOcclusion(),
+                BlockShapes.SLEEPINGBAG));
+
+
   public static final RegistryObject<Block> TOILET =
       deferredRegister.register("toilet",
           () -> new OrientableBlock(

@@ -210,6 +210,32 @@ public class DecorationItems {
           () -> new BlockItem(DecorationBlocks.TOOL_4.get(),
               new Item.Properties().tab(TAB)));
 
+
+  public static final RegistryObject<BlockItem> SLEEPINGBAG =
+      deferredRegister.register("sleepingbag",
+          () -> new BlockItem(DecorationBlocks.SLEEPINGBAG.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<BlockItem> SLEEPINGBAG_BLACK =
+      deferredRegister.register("sleepingbag_black",
+          () -> new BlockItem(DecorationBlocks.SLEEPINGBAG_BLACK.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<BlockItem> SLEEPINGBAG_BLUE =
+      deferredRegister.register("sleepingbag_blue",
+          () -> new BlockItem(DecorationBlocks.SLEEPINGBAG_BLUE.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<BlockItem> SLEEPINGBAG_RED =
+      deferredRegister.register("sleepingbag_red",
+          () -> new BlockItem(DecorationBlocks.SLEEPINGBAG_RED.get(),
+              new Item.Properties().tab(TAB)));
+    public static final RegistryObject<BlockItem> SLEEPINGBAG_GREEN =
+      deferredRegister.register("sleepingbag_green",
+          () -> new BlockItem(DecorationBlocks.SLEEPINGBAG_GREEN.get(),
+              new Item.Properties().tab(TAB)));
+    public static final RegistryObject<BlockItem> SLEEPINGBAG_ORANGE =
+      deferredRegister.register("sleepingbag_orange",
+          () -> new BlockItem(DecorationBlocks.SLEEPINGBAG_ORANGE.get(),
+              new Item.Properties().tab(TAB)));
+
   public static final RegistryObject<BlockItem> TOILET =
       deferredRegister.register("toilet",
           () -> new BlockItem(DecorationBlocks.TOILET.get(),

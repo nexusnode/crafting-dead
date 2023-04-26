@@ -342,6 +342,22 @@ public class BlockShapes {
           Block.box(4.25, 16, 13.75, 5.75, 17, 15.25),
           Block.box(10.25, 16, 13.75, 11.75, 17, 15.25)));
 
+public static final Function<Direction, VoxelShape> SLEEPINGBAG =
+rotatedOrientableShape(Shapes.or(
+    Block.box(2, 10.75, 12, 14, 15.75, 15),
+    Block.box(2, 10.75, 5, 14, 15.75, 6),
+    Block.box(13, 10.75, 6, 14, 15.75, 12),
+    Block.box(2, 10.75, 6, 3, 15.75, 12),
+    Block.box(7.25, 15.75, 12.75, 8.75, 20.75, 14.25),
+    Block.box(7.25, 19.25, 10.25, 8.75, 20.75, 12.75),
+    Block.box(4.25, 15.75, 12.75, 5.75, 16.75, 14.25),
+    Block.box(10.25, 15.75, 12.75, 11.75, 16.75, 14.25),
+    Block.box(0, 0, 2, 16, 12.5, 16),
+    Block.box(0, 12.5, 0.5, 16, 16, 5),
+    Block.box(0, 12.5, 5, 2, 16, 16),
+    Block.box(2, 12.5, 15, 14, 16, 16),
+    Block.box(14, 12.5, 5, 16, 16, 16)));
+
   public static final Function<Direction, VoxelShape> COUNTER_SINK =
       rotatedOrientableShape(Shapes.or(
           Block.box(2, 10.75, 12, 14, 15.75, 15),

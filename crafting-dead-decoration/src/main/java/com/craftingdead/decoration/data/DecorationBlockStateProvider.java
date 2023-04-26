@@ -118,6 +118,14 @@ public class DecorationBlockStateProvider extends BlockStateProvider {
     this.horizontalBlock(DecorationBlocks.DIRTY_TOILET);
     this.horizontalBlock(DecorationBlocks.FULL_DIRTY_TOILET);
 
+
+    this.horizontalBlock(DecorationBlocks.SLEEPINGBAG);
+    this.horizontalBlock(DecorationBlocks.SLEEPINGBAG_BLACK);
+    this.horizontalBlock(DecorationBlocks.SLEEPINGBAG_BLUE);
+    this.horizontalBlock(DecorationBlocks.SLEEPINGBAG_GREEN);
+    this.horizontalBlock(DecorationBlocks.SLEEPINGBAG_RED);
+    this.horizontalBlock(DecorationBlocks.SLEEPINGBAG_ORANGE);
+
     this.horizontalBlock(DecorationBlocks.TOOL_1);
     this.horizontalBlock(DecorationBlocks.TOOL_2);
     this.horizontalBlock(DecorationBlocks.TOOL_3);
