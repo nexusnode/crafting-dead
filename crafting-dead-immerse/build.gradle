@@ -2,14 +2,6 @@ plugins {
     id 'crafting-dead'
 }
 
-repositories {
-    mavenCentral()
-    google()
-    maven {
-        url 'https://maven.tarbits.co.uk/releases'
-    }
-}
-
 mixin {
     add sourceSets.main, 'craftingdeadimmerse.refmap.json'
 }

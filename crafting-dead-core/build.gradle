@@ -3,16 +3,6 @@ plugins {
     id 'java-library'
 }
 
-repositories {
-	maven {
-        name 'cursemaven'
-        url 'https://www.cursemaven.com/'
-        content {
-            includeGroup 'curse.maven'
-        }
-    }
-}
-
 dependencies {}
 
 jar {

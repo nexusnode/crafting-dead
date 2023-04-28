@@ -20,7 +20,12 @@ java {
 }
 
 repositories {
-	mavenCentral()
+    maven {
+        url 'https://maven.tarbits.co.uk/releases'
+        mavenContent {
+            releasesOnly()
+        }
+    }
     maven {
         name 'sponge'
         url 'https://repo.spongepowered.org/repository/maven-public/'
