@@ -16,13 +16,13 @@
  * https://craftingdead.net/terms.php
  */
 
-package com.craftingdead.immerse.world.food;
+package com.craftingdead.survival.world.food;
 
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.food.FoodProperties;
 
-public class ImmerseFoods {
+public class SurvivalFoods {
 
   public static final FoodProperties POWER_BAR =
       new FoodProperties.Builder().nutrition(4).saturationMod(0.3F).build();

@@ -16,7 +16,7 @@
  * https://craftingdead.net/terms.php
  */
 
-package com.craftingdead.immerse.world.item;
+package com.craftingdead.survival.world.item;
 
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
@@ -24,6 +24,7 @@ import com.craftingdead.core.capability.CapabilityUtil;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.immerse.game.survival.SurvivalPlayerHandler;
 import com.craftingdead.immerse.world.item.hydration.Hydration;
+import com.craftingdead.survival.CraftingDeadSurvival;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
@@ -55,7 +56,14 @@ public class DrinkItem extends Item {
 
   @Override
   public ICapabilityProvider initCapabilities(ItemStack itemStack, @Nullable CompoundTag tag) {
-    return CapabilityUtil.provider(() -> Hydration.fixed(this.water), Hydration.CAPABILITY);
+    return CraftingDeadSurvival.instance().isImmerseLoaded()
+        ? createHydrationProvider(this.water)
+        : null;
+  }
+
+  // Static to avoid class loading Hydration if immerse is not present.
+  private static ICapabilityProvider createHydrationProvider(int water) {
+    return CapabilityUtil.provider(() -> Hydration.fixed(water), Hydration.CAPABILITY);
   }
 
   @Override
@@ -98,10 +106,15 @@ public class DrinkItem extends Item {
 
   @Override
   public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
-    var handler =
-        PlayerExtension.getOrThrow(player).getHandlerOrThrow(SurvivalPlayerHandler.TYPE);
-    return handler.getWater() < handler.getMaxWater()
+    return CraftingDeadSurvival.instance().isImmerseLoaded() && checkWater(player)
         ? ItemUtils.startUsingInstantly(level, player, hand)
         : InteractionResultHolder.pass(player.getItemInHand(hand));
+  }
+
+  // Static to avoid class loading SurvivalPlayerHandler if immerse is not present.
+  private static boolean checkWater(Player player) {
+    var handler = PlayerExtension.getOrThrow(player)
+        .getHandlerOrThrow(SurvivalPlayerHandler.TYPE);
+    return handler.getWater() < handler.getMaxWater();
   }
 }

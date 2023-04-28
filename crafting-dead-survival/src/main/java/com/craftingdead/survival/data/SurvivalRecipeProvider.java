@@ -90,6 +90,96 @@ public class SurvivalRecipeProvider extends RecipeProvider {
         .define('f', ModItems.FIRST_AID_KIT.get())
         .unlockedBy("has_redstone_torch", has(Items.REDSTONE_TORCH))
         .save(consumer);
+
+    ShapelessRecipeBuilder.shapeless(SurvivalItems.OPEN_CANNED_SWEETCORN.get())
+        .requires(SurvivalItems.CANNED_SWEETCORN.get())
+        .requires(Ingredient.of(
+            SurvivalItems.CAN_OPENER.get(),
+            SurvivalItems.SCREWDRIVER.get(),
+            SurvivalItems.MULTI_TOOL.get()))
+        .unlockedBy("has_canned_corn", has(SurvivalItems.CANNED_SWEETCORN.get()))
+        .save(consumer);
+
+    ShapelessRecipeBuilder.shapeless(SurvivalItems.OPEN_CANNED_BEANS.get())
+        .requires(SurvivalItems.CANNED_BEANS.get())
+        .requires(Ingredient.of(
+            SurvivalItems.CAN_OPENER.get(),
+            SurvivalItems.SCREWDRIVER.get(),
+            SurvivalItems.MULTI_TOOL.get()))
+        .unlockedBy("has_canned_beans", has(SurvivalItems.CANNED_BEANS.get()))
+        .save(consumer);
+
+    ShapelessRecipeBuilder.shapeless(SurvivalItems.OPEN_CANNED_TUNA.get())
+        .requires(SurvivalItems.CANNED_TUNA.get())
+        .requires(Ingredient.of(
+            SurvivalItems.CAN_OPENER.get(),
+            SurvivalItems.SCREWDRIVER.get(),
+            SurvivalItems.MULTI_TOOL.get()))
+        .unlockedBy("has_canned_tuna", has(SurvivalItems.CANNED_TUNA.get()))
+        .save(consumer);
+
+    ShapelessRecipeBuilder.shapeless(SurvivalItems.OPEN_CANNED_PEACHES.get())
+        .requires(SurvivalItems.CANNED_PEACHES.get())
+        .requires(Ingredient.of(
+            SurvivalItems.CAN_OPENER.get(),
+            SurvivalItems.SCREWDRIVER.get(),
+            SurvivalItems.MULTI_TOOL.get()))
+        .unlockedBy("has_canned_peaches", has(SurvivalItems.CANNED_PEACHES.get()))
+        .save(consumer);
+
+    ShapelessRecipeBuilder.shapeless(SurvivalItems.OPEN_CANNED_PASTA.get())
+        .requires(SurvivalItems.CANNED_PASTA.get())
+        .requires(Ingredient.of(
+            SurvivalItems.CAN_OPENER.get(),
+            SurvivalItems.SCREWDRIVER.get(),
+            SurvivalItems.MULTI_TOOL.get()))
+        .unlockedBy("has_canned_pasta", has(SurvivalItems.CANNED_PASTA.get()))
+        .save(consumer);
+
+    ShapelessRecipeBuilder.shapeless(SurvivalItems.OPEN_CANNED_CORNED_BEEF.get())
+        .requires(SurvivalItems.CANNED_CORNED_BEEF.get())
+        .requires(Ingredient.of(
+            SurvivalItems.CAN_OPENER.get(),
+            SurvivalItems.SCREWDRIVER.get(),
+            SurvivalItems.MULTI_TOOL.get()))
+        .unlockedBy("has_canned_corned_beef", has(SurvivalItems.CANNED_CORNED_BEEF.get()))
+        .save(consumer);
+
+    ShapelessRecipeBuilder.shapeless(SurvivalItems.OPEN_CANNED_CUSTARD.get())
+        .requires(SurvivalItems.CANNED_CUSTARD.get())
+        .requires(Ingredient.of(
+            SurvivalItems.CAN_OPENER.get(),
+            SurvivalItems.SCREWDRIVER.get(),
+            SurvivalItems.MULTI_TOOL.get()))
+        .unlockedBy("has_canned_custard", has(SurvivalItems.CANNED_CUSTARD.get()))
+        .save(consumer);
+
+    ShapelessRecipeBuilder.shapeless(SurvivalItems.OPEN_CANNED_PICKLES.get())
+        .requires(SurvivalItems.CANNED_PICKLES.get())
+        .requires(Ingredient.of(
+            SurvivalItems.CAN_OPENER.get(),
+            SurvivalItems.SCREWDRIVER.get(),
+            SurvivalItems.MULTI_TOOL.get()))
+        .unlockedBy("has_canned_pickles", has(SurvivalItems.CANNED_PICKLES.get()))
+        .save(consumer);
+
+    ShapelessRecipeBuilder.shapeless(SurvivalItems.OPEN_CANNED_DOG_FOOD.get())
+        .requires(SurvivalItems.CANNED_DOG_FOOD.get())
+        .requires(Ingredient.of(
+            SurvivalItems.CAN_OPENER.get(),
+            SurvivalItems.SCREWDRIVER.get(),
+            SurvivalItems.MULTI_TOOL.get()))
+        .unlockedBy("has_canned_dog_food", has(SurvivalItems.CANNED_DOG_FOOD.get()))
+        .save(consumer);
+
+    ShapelessRecipeBuilder.shapeless(SurvivalItems.OPEN_CANNED_TOMATO_SOUP.get())
+        .requires(SurvivalItems.CANNED_TOMATO_SOUP.get())
+        .requires(Ingredient.of(
+            SurvivalItems.CAN_OPENER.get(),
+            SurvivalItems.SCREWDRIVER.get(),
+            SurvivalItems.MULTI_TOOL.get()))
+        .unlockedBy("has_canned_tomato_soup", has(SurvivalItems.CANNED_TOMATO_SOUP.get()))
+        .save(consumer);
   }
 
   @Override

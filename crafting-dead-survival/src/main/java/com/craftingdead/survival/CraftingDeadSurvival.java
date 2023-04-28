@@ -34,6 +34,7 @@ import com.craftingdead.survival.client.ClientDist;
 import com.craftingdead.survival.data.SurvivalItemTagsProvider;
 import com.craftingdead.survival.data.SurvivalRecipeProvider;
 import com.craftingdead.survival.data.loot.SurvivalLootTableProvider;
+import com.craftingdead.survival.data.models.SurvivalModelProvider;
 import com.craftingdead.survival.particles.SurvivalParticleTypes;
 import com.craftingdead.survival.server.ServerDist;
 import com.craftingdead.survival.world.action.SurvivalActionTypes;
@@ -55,7 +56,6 @@ import com.craftingdead.survival.world.item.enchantment.SurvivalEnchantments;
 import com.craftingdead.survival.world.level.block.SurvivalBlocks;
 import com.mojang.logging.LogUtils;
 import net.minecraft.core.BlockPos;
-import net.minecraft.data.DataGenerator;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -89,6 +89,7 @@ import net.minecraftforge.event.world.BiomeLoadingEvent;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
@@ -118,6 +119,8 @@ public class CraftingDeadSurvival {
 
   private final ModDist modDist;
 
+  private final boolean immerseLoaded = ModList.get().isLoaded("craftingdeadimmerse");
+
   public CraftingDeadSurvival() {
     instance = this;
 
@@ -145,7 +148,11 @@ public class CraftingDeadSurvival {
     return this.modDist;
   }
 
-  public CraftingDeadSurvival getInstance() {
+  public boolean isImmerseLoaded() {
+    return this.immerseLoaded;
+  }
+
+  public static CraftingDeadSurvival instance() {
     return instance;
   }
 
@@ -194,13 +201,17 @@ public class CraftingDeadSurvival {
   }
 
   private void handleGatherData(GatherDataEvent event) {
-    DataGenerator dataGenerator = event.getGenerator();
+    var generator = event.getGenerator();
     if (event.includeServer()) {
-      dataGenerator.addProvider(new SurvivalItemTagsProvider(dataGenerator,
-          new ForgeBlockTagsProvider(dataGenerator, event.getExistingFileHelper()),
+      generator.addProvider(new SurvivalItemTagsProvider(generator,
+          new ForgeBlockTagsProvider(generator, event.getExistingFileHelper()),
           event.getExistingFileHelper()));
-      dataGenerator.addProvider(new SurvivalRecipeProvider(dataGenerator));
-      dataGenerator.addProvider(new SurvivalLootTableProvider(dataGenerator));
+      generator.addProvider(new SurvivalRecipeProvider(generator));
+      generator.addProvider(new SurvivalLootTableProvider(generator));
+    }
+
+    if (event.includeClient()) {
+      generator.addProvider(new SurvivalModelProvider(generator));
     }
   }
 

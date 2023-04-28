@@ -20,13 +20,9 @@ package com.craftingdead.immerse.world.action;
 
 import com.craftingdead.core.world.action.ActionType;
 import com.craftingdead.core.world.action.ActionTypes;
-import com.craftingdead.core.world.action.item.BlockItemActionType;
 import com.craftingdead.core.world.action.item.ItemActionType;
 import com.craftingdead.immerse.CraftingDeadImmerse;
-import com.craftingdead.immerse.world.item.ImmerseItems;
 import com.craftingdead.immerse.world.level.block.ImmerseBlocks;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.tags.FluidTags;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.RegistryObject;
@@ -35,17 +31,6 @@ public class ImmerseActionTypes {
 
   public static final DeferredRegister<ActionType<?>> deferredRegister =
       DeferredRegister.create(ActionTypes.REGISTRY_KEY, CraftingDeadImmerse.ID);
-
-  public static final RegistryObject<ItemActionType<?>> FILL_WATER_CANTEEN =
-      deferredRegister.register("fill_water_canteen",
-          () -> BlockItemActionType.builder()
-              .durationSeconds(3)
-              .forFluid(FluidTags.WATER)
-              .forItem(ImmerseItems.EMPTY_WATER_CANTEEN)
-              .finishSound(SoundEvents.BOTTLE_FILL)
-              .resultItem(ImmerseItems.WATER_CANTEEN)
-              .consumeItemInCreative(true)
-              .build());
 
   public static final RegistryObject<ItemActionType<?>> BUILD_BASE_CENTER =
       deferredRegister.register("build_base_center",

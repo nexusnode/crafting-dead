@@ -24,6 +24,7 @@ import com.craftingdead.core.world.action.ActionTypes;
 import com.craftingdead.core.world.action.TargetSelector;
 import com.craftingdead.core.world.action.item.BlockItemActionType;
 import com.craftingdead.core.world.action.item.EntityItemActionType;
+import com.craftingdead.core.world.action.item.ItemActionType;
 import com.craftingdead.core.world.item.ModItems;
 import com.craftingdead.survival.CraftingDeadSurvival;
 import com.craftingdead.survival.world.effect.SurvivalMobEffects;
@@ -114,5 +115,16 @@ public class SurvivalActionTypes {
               .duration(16)
               .effect(() -> new MobEffectInstance(SurvivalMobEffects.INFECTION.get(), 9999999))
               .resultItem(ModItems.SYRINGE)
+              .build());
+
+  public static final RegistryObject<ItemActionType<?>> FILL_WATER_CANTEEN =
+      deferredRegister.register("fill_water_canteen",
+          () -> BlockItemActionType.builder()
+              .durationSeconds(3)
+              .forFluid(FluidTags.WATER)
+              .forItem(SurvivalItems.EMPTY_WATER_CANTEEN)
+              .finishSound(SoundEvents.BOTTLE_FILL)
+              .resultItem(SurvivalItems.WATER_CANTEEN)
+              .consumeItemInCreative(true)
               .build());
 }

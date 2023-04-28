@@ -16,7 +16,7 @@
  * https://craftingdead.net/terms.php
  */
 
-package com.craftingdead.immerse.data.models;
+package com.craftingdead.survival.data.models;
 
 import java.nio.file.Path;
 import java.util.Map;
@@ -34,14 +34,14 @@ import net.minecraft.data.DataProvider;
 import net.minecraft.data.HashCache;
 import net.minecraft.resources.ResourceLocation;
 
-public class ImmerseModelProvider implements DataProvider {
+public class SurvivalModelProvider implements DataProvider {
 
   private static final Logger logger = LogManager.getLogger();
   private static final Gson gson =
       new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
   private final DataGenerator generator;
 
-  public ImmerseModelProvider(DataGenerator generator) {
+  public SurvivalModelProvider(DataGenerator generator) {
     this.generator = generator;
   }
 
@@ -54,12 +54,12 @@ public class ImmerseModelProvider implements DataProvider {
       }
     };
 
-    new ImmerseItemModelGenerators(modelConsumer).run();
+    new SurvivalItemModelGenerators(modelConsumer).run();
 
     Path outputFolder = this.generator.getOutputFolder();
 
     this.saveCollection(directoryCache, outputFolder, models,
-        ImmerseModelProvider::createModelPath);
+        SurvivalModelProvider::createModelPath);
   }
 
   private <T> void saveCollection(HashCache p_240081_1_, Path p_240081_2_,
