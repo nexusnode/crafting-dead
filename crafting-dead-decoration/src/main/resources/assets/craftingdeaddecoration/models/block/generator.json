@@ -1,6 +1,5 @@
 {
 	"credit": "Made with Blockbench",
-	"parent": "generator_01",
 	"texture_size": [128, 128],
 	"textures": {
 		"texture": "craftingdeaddecoration:block/generator",

@@ -3,7 +3,7 @@
 	"texture_size": [64, 64],
 	"textures": {
 		"texture": "craftingdeaddecoration:block/ammo_box_bullets",
-		"particle": "craftingdeaddecoration:block/ammo_box_bullets"
+		"particle": "#texture"
 	},
 	"elements": [
 		{
