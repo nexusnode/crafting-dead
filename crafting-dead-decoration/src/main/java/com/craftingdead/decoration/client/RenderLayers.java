@@ -62,13 +62,6 @@ class RenderLayers {
     cutout(DecorationBlocks.TOILET);
     cutout(DecorationBlocks.DIRTY_TOILET);
 
-    cutout(DecorationBlocks.SLEEPINGBAG);
-    cutout(DecorationBlocks.SLEEPINGBAG_RED);
-    cutout(DecorationBlocks.SLEEPINGBAG_BLUE);
-    cutout(DecorationBlocks.SLEEPINGBAG_GREEN);
-    cutout(DecorationBlocks.SLEEPINGBAG_ORANGE);
-    cutout(DecorationBlocks.SLEEPINGBAG_BLACK);
-
     cutout(DecorationBlocks.TOOL_2);
     cutout(DecorationBlocks.TOOL_3);
 
@@ -102,7 +95,21 @@ class RenderLayers {
     cutout(DecorationBlocks.BROWN_CHAIR);
     cutout(DecorationBlocks.LIGHT_SWITCH);
     cutout(DecorationBlocks.ELECTRICAL_SOCKET);
+    cutout(DecorationBlocks.ABANDONED_CAMPFIRE_POT);
     cutout(DecorationBlocks.ABANDONED_CAMPFIRE);
+    cutout(DecorationBlocks.AMMO_BOX_BULLETS);
+    cutout(DecorationBlocks.BODY_PART_1);
+    cutout(DecorationBlocks.BODY_PART_2);
+    cutout(DecorationBlocks.BODY_PART_3);
+    cutout(DecorationBlocks.BREAKER_BOX_1);
+    cutout(DecorationBlocks.BREAKER_BOX_2);
+    cutout(DecorationBlocks.BREAKER_BOX_3);
+    cutout(DecorationBlocks.BREAKER_BOX_4);
+    cutout(DecorationBlocks.BREAKER_BOX_5);
+    cutout(DecorationBlocks.GENERATOR);
+    cutout(DecorationBlocks.MILITARY_BED);
+    cutout(DecorationBlocks.MILITARY_BED_FRAME);
+    cutout(DecorationBlocks.MILITARY_BED_WITH_BOX);
   }
 
   private static void cutout(Supplier<? extends Block> block) {

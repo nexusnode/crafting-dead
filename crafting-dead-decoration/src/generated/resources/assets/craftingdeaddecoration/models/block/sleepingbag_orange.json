@@ -1,0 +1,6 @@
+{
+  "parent": "craftingdeaddecoration:block/sleepingbag",
+  "textures": {
+    "texture": "craftingdeaddecoration:block/sleepingbag_orange"
+  }
+}

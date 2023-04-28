@@ -109,6 +109,111 @@ public class BlockShapes {
           Block.box(-3, 1, 15, 19, 5, 16),
           Block.box(-3, 11, 15, 19, 15, 16)));
 
+    public static final Function<Direction, VoxelShape> MATTRESS_1 =
+    rotatedOrientableShape(Block.box(1, 0, 1, 15, 3, 29));
+
+    public static final Function<Direction, VoxelShape> MATTRESS_2 =
+    rotatedOrientableShape(Block.box(1, 0, 1, 15, 3, 29));
+
+    public static final Function<Direction, VoxelShape> MATTRESS_3 =
+    rotatedOrientableShape(Block.box(1, 0, 1, 15, 9, 29));
+
+    public static final Function<Direction, VoxelShape> MILITARY_BED =
+    rotatedOrientableShape(Shapes.or(
+    Block.box(0, 0, 0, 16, 16, 1),
+    Block.box(0, 0, 31, 16, 16, 32),
+    Block.box(0, 4, 1, 16, 8, 31)));
+
+    public static final Function<Direction, VoxelShape> POWER_BOX =
+    rotatedOrientableShape(Block.box(0, 0, 0, 16, 8, 16));
+
+    public static final Function<Direction, VoxelShape> BREAKER_BOX =
+    rotatedOrientableShape(Shapes.or(
+        Block.box(0.125, 0.0625, 0.9375, 0.875, 1, 1),
+        Block.box(0.8125, 0.0625, 0.8125, 0.875, 1, 0.9375),
+        Block.box(-0.5625, 0.0625, 0.75, 0.1875, 1, 0.8125),
+        Block.box(0.1875, 0.125, 0.921875, 0.8125, 0.9375, 0.921875),
+        Block.box(0.1875, 0.0625, 0.8125, 0.8125, 0.125, 0.9375),
+        Block.box(0.1875, 0.9375, 0.8125, 0.8125, 1, 0.9375),
+        Block.box(0.53125, 0.3125, 0.84375, 0.65625, 0.75, 0.90625),
+        Block.box(0.34375, 0.3125, 0.84375, 0.46875, 0.75, 0.90625),
+        Block.box(0.3125, 0.1875, 0.875, 0.6875, 0.875, 0.9375),
+        Block.box(0.1875, -0.1875, 0.990625, 0.8125, 0.0625, 0.990625),
+        Block.box(0.125, 0.0625, 0.75, 0.875, 1, 0.8125),
+        Block.box(0.125, 0.0625, 0.8125, 0.1875, 1, 0.9375),
+        Block.box(0.125, 0.0625, 0.75, 0.875, 1, 0.8125),
+        Block.box(0.1875, 1, 0.9375, 0.3125, 1.25, 1)));
+
+public static final Function<Direction, VoxelShape> GENERATOR =
+    rotatedOrientableShape(Shapes.or(
+        Block.box(0.125, 0.125, 0.9375, 0.875, 0.1875, 1),
+        Block.box(0.0625, 0.1875, 0, 0.125, 0.75, 0.0625),
+        Block.box(0.0625, 0.1875, 0.9375, 0.125, 0.75, 1),
+        Block.box(0.0625, 0.75, 0, 0.125, 0.8125, 1),
+        Block.box(0.875, 0.1875, 0.9375, 0.9375, 0.75, 1),
+        Block.box(0.875, 0.125, 0, 0.9375, 0.1875, 1),
+        Block.box(0.875, 0.1875, 0, 0.9375, 0.75, 0.0625),
+        Block.box(0.875, 0.75, 0, 0.9375, 0.8125, 1),
+        Block.box(0.5625, 0.3125, 0, 0.75, 0.5, 0.125),
+        Block.box(0.5, 0.25, 0.125, 0.8125, 0.5625, 0.9375),
+        Block.box(0.0625, 0.375, 0.125, 0.25, 0.6875, 0.5625),
+        Block.box(0.25, 0.4375, 0.125, 0.4375, 0.5625, 0.5625),
+        Block.box(0.59375, 0.5, 0.03125, 0.71875, 0.5625, 0.09375),
+        Block.box(0.03125, 0.421875, 0.15625, 0.09375, 0.609375, 0.40625),
+        Block.box(0.03125, 0.421875, 0.46875, 0.09375, 0.484375, 0.53125),
+        Block.box(0.03125, 0.5, 0.46875, 0.09375, 0.5625, 0.53125),
+        Block.box(0.03125, 0.578125, 0.46875, 0.09375, 0.640625, 0.53125),
+        Block.box(0.625, 0.875, 0.75, 0.8125, 0.9375, 0.9375),
+        Block.box(0.0625, 0.375, 0.625, 0.25, 0.6875, 0.875),
+        Block.box(0.25, 0.4375, 0.625, 0.4375, 0.6875, 0.875),
+        Block.box(0, 0, 0.8125, 0.0625, 0.3125, 1.125),
+        Block.box(0.9375, 0, 0.8125, 1, 0.3125, 1.125),
+        Block.box(0.0625, 0, 0.125, 0.125, 0.125, 0.25),
+        Block.box(0.875, 0, 0.125, 0.9375, 0.125, 0.25),
+        Block.box(0.0625, 0.125, 0, 0.125, 0.1875, 1),
+        Block.box(0.125, 0.125, 0, 0.875, 0.1875, 0.0625),
+        Block.box(0.125, 0.5625, 0, 0.875, 0.875, 1)));
+
+public static final Function<Direction, VoxelShape> BODY_PART_2 =
+        rotatedOrientableShape(Shapes.or(
+        Block.box(0, 0.006250000000000002, 0, 2, 0.006250000000000002, 1),
+        Block.box(0, 0, 0.375, 0.6875, 0.25, 0.625),
+        Block.box(0.6875, 0.0625, 0.4375, 0.875, 0.1875, 0.5625)));
+
+    public static final Function<Direction, VoxelShape> BODY_PART_3 =
+        rotatedOrientableShape(Shapes.or(
+        Block.box(0.18826310389368783, 0, 0.22600381885706328, 0.6257631038936878, 0.125, 0.8510038188570632),
+        Block.box(0.18826310389368783, 0.125, 0.3510038188570633, 0.43826310389368783, 0.25, 0.8510038188570632),
+        Block.box(0.43826310389368783, 0.125, 0.6010038188570632, 0.5632631038936878, 0.1875, 0.6635038188570632),
+        Block.box(0.43826310389368783, 0.125, 0.4760038188570633, 0.5632631038936878, 0.1875, 0.5385038188570632),
+        Block.box(0.18826310389368783, 0, 0.10100381885706328, 0.43826310389368783, 0.125, 0.22600381885706328),
+        Block.box(0.18826310389368783, 0.125, 0.22600381885706328, 0.37576310389368783, 0.1875, 0.3510038188570633),
+        Block.box(0.43826310389368783, 0.125, 0.7260038188570632, 0.5632631038936878, 0.1875, 0.7885038188570632)));
+
+public static final Function<Direction, VoxelShape> BODY_PART_1 =
+        rotatedOrientableShape(Shapes.or(
+            Block.box(-0.375, 0.00625, -0.4375, 1.3125, 0.00625, 1.6875),
+            Block.box(0.25, 0.1875, 0.8125, 0.75, 0.375, 1),
+            Block.box(0.25, 0, 0.4375, 0.75, 0.25, 0.8125),
+            Block.box(0.75, -0.00625, 0.0625, 1, 0.24375, 0.8125),
+            Block.box(-0.0625, -0.00625, 0.5625, 0.25, 0.24375, 0.8125),
+            Block.box(0.25, 0, 0.125, 0.75, 0.0625, 0.3125),
+            Block.box(0.4375, 0.0625, 0, 0.5625, 0.125, 0.25),
+            Block.box(0.3125, 0.0625, 0.25, 0.6875, 0.1875, 0.3125),
+            Block.box(0.375, 0, 0.0625, 0.6875, 0.0625, 0.125),
+            Block.box(-0.25, 0.056249999999999994, 0.625, -0.0625, 0.18125, 0.75),
+            Block.box(0.25, 0, 0.3125, 0.75, 0.21875, 0.4375),
+            Block.box(0.375, 0.1875, 0.375, 0.6875, 0.25, 0.4375),
+            Block.box(0.25, -0.125, 0.8125, 0.75, 0.1875, 1.25),
+            Block.box(0.25, 0.1875, 1, 0.375, 0.3125, 1.1875),
+            Block.box(0.625, 0.1875, 1, 0.75, 0.25, 1.125),
+            Block.box(0.25, -0.125, 1.25, 0.75, 0.125, 1.3125),
+            Block.box(0.625, 0, 1.4375, 0.75, 0.0625, 1.5625),
+            Block.box(0.27854517530826745, 0, 1.4560062871369086, 0.34104517530826745, 0.0625, 1.5810062871369086),
+            Block.box(0.125, 0, 1.4375, 0.25, 0.125, 1.5625),
+            Block.box(0.375, 0, -0.1875, 0.6875, 0.0625, -0.125),
+            Block.box(0.2789371586084975, 0, -0.23123179799545657, 0.4039371586084975, 0.0625, -0.16873179799545657)));
+
   public static final Function<Direction, VoxelShape> BATTEN_LIGHT =
       rotatedOrientableShape(Shapes.or(
           Block.box(7.5, 13, 1, 8.5, 16, 2),
@@ -124,10 +229,28 @@ public class BlockShapes {
   public static final Function<Direction, VoxelShape> SECURITY_CAMERA =
       rotatedOrientableShape(Block.box(5.5D, 3.0D, 11.0D, 10.5D, 13.0D, 16.0D));
 
+  public static final Function<Direction, VoxelShape> AMMO_BOX_BULLETS =
+  rotatedOrientableShape(Shapes.or(
+    Block.box(-3, 3, 9, 1, 6, 16),
+    Block.box(-0.1875, 0.1875, 0.5625, 0.0625, 0.375, 1),
+    Block.box(0.175791875, 0, 0.3206975, 0.425791875, 0.1875, 0.7581975),
+    Block.box(0.3972225, 0, 0.645681875, 0.8347225, 0.1875, 0.895681875),
+    Block.box(0.58125, 0, 0.25, 0.625, 0.09375, 0.29375),
+    Block.box(0.5875, 0.09375, 0.25625, 0.61875, 0.140625, 0.2875),
+    Block.box(0.548635, -0.00078125, 0.2259525, 0.642385, 0.04296875, 0.2697025),
+    Block.box(0.642385, 0.00546875, 0.2322025, 0.68926, 0.03671875, 0.2634525),
+    Block.box(0.7125, 0.09375, 0.31875, 0.74375, 0.140625, 0.35),
+    Block.box(0.70625, 0, 0.3125, 0.75, 0.09375, 0.35625)));
+
   public static final Function<Direction, VoxelShape> ABANDONED_CAMPFIRE =
       rotatedOrientableShape(Shapes.or(
           Block.box(2, 0, 2, 14, 2, 14),
           Block.box(1, 0, 7.5, 15, 14, 8.5)));
+
+    public static final Function<Direction, VoxelShape> ABANDONED_CAMPFIRE_POT =
+        rotatedOrientableShape(Shapes.or(
+              Block.box(2, 0, 2, 14, 2, 14),
+              Block.box(1, 0, 7.5, 15, 14, 8.5)));
 
   public static final VoxelShape WOODEN_PALLET = Block.box(0.0D, 0.0D, 0.0D, 16.0D, 3.0D, 16.0D);
 
@@ -342,21 +465,10 @@ public class BlockShapes {
           Block.box(4.25, 16, 13.75, 5.75, 17, 15.25),
           Block.box(10.25, 16, 13.75, 11.75, 17, 15.25)));
 
-public static final Function<Direction, VoxelShape> SLEEPINGBAG =
-rotatedOrientableShape(Shapes.or(
-    Block.box(2, 10.75, 12, 14, 15.75, 15),
-    Block.box(2, 10.75, 5, 14, 15.75, 6),
-    Block.box(13, 10.75, 6, 14, 15.75, 12),
-    Block.box(2, 10.75, 6, 3, 15.75, 12),
-    Block.box(7.25, 15.75, 12.75, 8.75, 20.75, 14.25),
-    Block.box(7.25, 19.25, 10.25, 8.75, 20.75, 12.75),
-    Block.box(4.25, 15.75, 12.75, 5.75, 16.75, 14.25),
-    Block.box(10.25, 15.75, 12.75, 11.75, 16.75, 14.25),
-    Block.box(0, 0, 2, 16, 12.5, 16),
-    Block.box(0, 12.5, 0.5, 16, 16, 5),
-    Block.box(0, 12.5, 5, 2, 16, 16),
-    Block.box(2, 12.5, 15, 14, 16, 16),
-    Block.box(14, 12.5, 5, 16, 16, 16)));
+    public static final Function<Direction, VoxelShape> SLEEPINGBAG =
+    rotatedOrientableShape(Shapes.or(
+        Block.box(1, 5.25, 2, 15, 5.25, 30),
+        Block.box (0, 0, 0, 2, 16, 1)));
 
   public static final Function<Direction, VoxelShape> COUNTER_SINK =
       rotatedOrientableShape(Shapes.or(

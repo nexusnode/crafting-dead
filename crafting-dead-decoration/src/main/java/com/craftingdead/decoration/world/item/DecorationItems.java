@@ -193,6 +193,101 @@ public class DecorationItems {
           () -> new BlockItem(DecorationBlocks.BOTTOM_STORE_SHELF_4.get(),
               new Item.Properties().tab(TAB)));
 
+    public static final RegistryObject<BlockItem> BODY_PART_1 =
+      deferredRegister.register("body_part_1",
+          () -> new BlockItem(DecorationBlocks.BODY_PART_1.get(),
+              new Item.Properties().tab(TAB)));
+
+    public static final RegistryObject<BlockItem> BODY_PART_2 =
+        deferredRegister.register("body_part_2",
+            () -> new BlockItem(DecorationBlocks.BODY_PART_2.get(),
+                new Item.Properties().tab(TAB)));
+
+    public static final RegistryObject<BlockItem> BODY_PART_3 =
+        deferredRegister.register("body_part_3",
+            () -> new BlockItem(DecorationBlocks.BODY_PART_3.get(),
+                new Item.Properties().tab(TAB)));
+
+public static final RegistryObject<BlockItem> ABANDONED_CAMPFIRE_POT =
+      deferredRegister.register("abandoned_campfire_pot",
+          () -> new BlockItem(DecorationBlocks.ABANDONED_CAMPFIRE_POT.get(),
+              new Item.Properties().tab(TAB)));
+
+    public static final RegistryObject<BlockItem> BREAKER_BOX_1 =
+        deferredRegister.register("breaker_box_1",
+            () -> new BlockItem(DecorationBlocks.BREAKER_BOX_1.get(),
+                new Item.Properties().tab(TAB)));
+
+    public static final RegistryObject<BlockItem> GENERATOR = 
+        deferredRegister.register("generator",
+            () -> new BlockItem(DecorationBlocks.GENERATOR.get(),
+                new Item.Properties().tab(TAB)));
+
+    public static final RegistryObject<BlockItem> MATTRESS_1 =
+        deferredRegister.register("mattress_1",
+            () -> new BlockItem(DecorationBlocks.MATTRESS_1.get(),
+                new Item.Properties().tab(TAB)));
+
+    public static final RegistryObject<BlockItem> MATTRESS_2 =
+        deferredRegister.register("mattress_2",
+            () -> new BlockItem(DecorationBlocks.MATTRESS_2.get(),
+                new Item.Properties().tab(TAB)));
+
+    public static final RegistryObject<BlockItem> MATTRESS_3 =
+        deferredRegister.register("mattress_3",
+            () -> new BlockItem(DecorationBlocks.MATTRESS_3.get(),
+                new Item.Properties().tab(TAB)));
+
+    public static final RegistryObject<BlockItem> MILITARY_BED =
+        deferredRegister.register("military_bed",
+            () -> new BlockItem(DecorationBlocks.MILITARY_BED.get(),
+                new Item.Properties().tab(TAB)));
+
+    public static final RegistryObject<BlockItem> MILITARY_BED_FRAME =
+        deferredRegister.register("military_bed_frame",
+            () -> new BlockItem(DecorationBlocks.MILITARY_BED_FRAME.get(),
+                new Item.Properties().tab(TAB)));
+
+    public static final RegistryObject<BlockItem> MILITARY_BED_FUNGI =
+        deferredRegister.register("military_bed_fungi",
+            () -> new BlockItem(DecorationBlocks.MILITARY_BED_FUNGI.get(),
+                new Item.Properties().tab(TAB)));
+
+    public static final RegistryObject<BlockItem> MILITARY_BED_WITH_BOX =
+        deferredRegister.register("military_bed_with_box",
+            () -> new BlockItem(DecorationBlocks.MILITARY_BED_WITH_BOX.get(),
+                new Item.Properties().tab(TAB)));
+
+    public static final RegistryObject<BlockItem> MILITARY_BED_WITH_GUN =
+        deferredRegister.register("military_bed_with_gun",
+            () -> new BlockItem(DecorationBlocks.MILITARY_BED_WITH_GUN.get(),
+                new Item.Properties().tab(TAB)));
+
+    public static final RegistryObject<BlockItem> POWER_BOX =
+        deferredRegister.register("power_box",
+            () -> new BlockItem(DecorationBlocks.POWER_BOX.get(),
+                new Item.Properties().tab(TAB)));
+
+    public static final RegistryObject<BlockItem> BREAKER_BOX_2 =
+        deferredRegister.register("breaker_box_2",
+            () -> new BlockItem(DecorationBlocks.BREAKER_BOX_2.get(),
+                new Item.Properties().tab(TAB)));
+        
+    public static final RegistryObject<BlockItem> BREAKER_BOX_3 =
+        deferredRegister.register("breaker_box_3",
+            () -> new BlockItem(DecorationBlocks.BREAKER_BOX_3.get(),
+                new Item.Properties().tab(TAB)));
+
+    public static final RegistryObject<BlockItem> BREAKER_BOX_4 = 
+        deferredRegister.register("breaker_box_4",
+            () -> new BlockItem(DecorationBlocks.BREAKER_BOX_4.get(),
+                new Item.Properties().tab(TAB)));  
+
+    public static final RegistryObject<BlockItem> BREAKER_BOX_5 = 
+        deferredRegister.register("breaker_box_5",
+            () -> new BlockItem(DecorationBlocks.BREAKER_BOX_5.get(),
+                new Item.Properties().tab(TAB)));
+
   public static final RegistryObject<BlockItem> TOOL_1 =
       deferredRegister.register("tool_1",
           () -> new BlockItem(DecorationBlocks.TOOL_1.get(),
@@ -205,12 +300,17 @@ public class DecorationItems {
       deferredRegister.register("tool_3",
           () -> new BlockItem(DecorationBlocks.TOOL_3.get(),
               new Item.Properties().tab(TAB)));
+  
   public static final RegistryObject<BlockItem> TOOL_4 =
       deferredRegister.register("tool_4",
           () -> new BlockItem(DecorationBlocks.TOOL_4.get(),
               new Item.Properties().tab(TAB)));
 
-
+  public static final RegistryObject<BlockItem> AMMO_BOX_BULLETS =
+	      deferredRegister.register("ammo_box_bullets",
+	          () -> new BlockItem(DecorationBlocks.AMMO_BOX_BULLETS.get(),
+	              new Item.Properties().tab(TAB))); 
+ 
   public static final RegistryObject<BlockItem> SLEEPINGBAG =
       deferredRegister.register("sleepingbag",
           () -> new BlockItem(DecorationBlocks.SLEEPINGBAG.get(),
@@ -219,22 +319,22 @@ public class DecorationItems {
       deferredRegister.register("sleepingbag_black",
           () -> new BlockItem(DecorationBlocks.SLEEPINGBAG_BLACK.get(),
               new Item.Properties().tab(TAB)));
-  public static final RegistryObject<BlockItem> SLEEPINGBAG_BLUE =
+    public static final RegistryObject<BlockItem> SLEEPINGBAG_BLUE =
       deferredRegister.register("sleepingbag_blue",
           () -> new BlockItem(DecorationBlocks.SLEEPINGBAG_BLUE.get(),
               new Item.Properties().tab(TAB)));
-  public static final RegistryObject<BlockItem> SLEEPINGBAG_RED =
-      deferredRegister.register("sleepingbag_red",
-          () -> new BlockItem(DecorationBlocks.SLEEPINGBAG_RED.get(),
-              new Item.Properties().tab(TAB)));
     public static final RegistryObject<BlockItem> SLEEPINGBAG_GREEN =
-      deferredRegister.register("sleepingbag_green",
-          () -> new BlockItem(DecorationBlocks.SLEEPINGBAG_GREEN.get(),
-              new Item.Properties().tab(TAB)));
+        deferredRegister.register("sleepingbag_green",
+            () -> new BlockItem(DecorationBlocks.SLEEPINGBAG_GREEN.get(),
+                new Item.Properties().tab(TAB)));
+    public static final RegistryObject<BlockItem> SLEEPINGBAG_RED =
+        deferredRegister.register("sleepingbag_red",
+            () -> new BlockItem(DecorationBlocks.SLEEPINGBAG_RED.get(),
+                new Item.Properties().tab(TAB)));
     public static final RegistryObject<BlockItem> SLEEPINGBAG_ORANGE =
-      deferredRegister.register("sleepingbag_orange",
-          () -> new BlockItem(DecorationBlocks.SLEEPINGBAG_ORANGE.get(),
-              new Item.Properties().tab(TAB)));
+        deferredRegister.register("sleepingbag_orange",
+            () -> new BlockItem(DecorationBlocks.SLEEPINGBAG_ORANGE.get(),
+                new Item.Properties().tab(TAB)));
 
   public static final RegistryObject<BlockItem> TOILET =
       deferredRegister.register("toilet",

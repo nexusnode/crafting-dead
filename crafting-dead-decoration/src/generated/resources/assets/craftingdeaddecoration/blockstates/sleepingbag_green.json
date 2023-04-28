@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "craftingdeaddecoration:block/sleepingbag_green"
+    },
+    "facing=south": {
+      "model": "craftingdeaddecoration:block/sleepingbag_green",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "craftingdeaddecoration:block/sleepingbag_green",
+      "y": 270
+    },
+    "facing=east": {
+      "model": "craftingdeaddecoration:block/sleepingbag_green",
+      "y": 90
+    }
+  }
+}

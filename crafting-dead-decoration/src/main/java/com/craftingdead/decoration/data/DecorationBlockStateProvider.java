@@ -45,7 +45,27 @@ public class DecorationBlockStateProvider extends BlockStateProvider {
     this.horizontalBlock(DecorationBlocks.BROKEN_WASHING_MACHINE);
     this.horizontalBlock(DecorationBlocks.LIGHT_SWITCH);
     this.horizontalBlock(DecorationBlocks.ELECTRICAL_SOCKET);
+    this.horizontalBlock(DecorationBlocks.AMMO_BOX_BULLETS);
     this.horizontalBlock(DecorationBlocks.ABANDONED_CAMPFIRE);
+    this.horizontalBlock(DecorationBlocks.ABANDONED_CAMPFIRE_POT);
+    this.horizontalBlock(DecorationBlocks.BODY_PART_1);
+    this.horizontalBlock(DecorationBlocks.BODY_PART_2);
+    this.horizontalBlock(DecorationBlocks.BODY_PART_3);
+    this.horizontalBlock(DecorationBlocks.GENERATOR);
+    this.horizontalBlock(DecorationBlocks.BREAKER_BOX_1);
+    this.horizontalBlock(DecorationBlocks.BREAKER_BOX_2);
+    this.horizontalBlock(DecorationBlocks.BREAKER_BOX_3);
+    this.horizontalBlock(DecorationBlocks.BREAKER_BOX_4);
+    this.horizontalBlock(DecorationBlocks.BREAKER_BOX_5);
+    this.horizontalBlock(DecorationBlocks.MATTRESS_1);
+    this.horizontalBlock(DecorationBlocks.MATTRESS_2);
+    this.horizontalBlock(DecorationBlocks.MATTRESS_3);
+    this.horizontalBlock(DecorationBlocks.MILITARY_BED);
+    this.horizontalBlock(DecorationBlocks.MILITARY_BED_FRAME);
+    this.horizontalBlock(DecorationBlocks.MILITARY_BED_FUNGI);
+    this.horizontalBlock(DecorationBlocks.MILITARY_BED_WITH_BOX);
+    this.horizontalBlock(DecorationBlocks.MILITARY_BED_WITH_GUN);
+    this.horizontalBlock(DecorationBlocks.POWER_BOX);
 
     this.horizontalBlock(DecorationBlocks.CLOTHING_RACK.get(),
         state -> this.blockModel("clothing_rack_"
@@ -117,7 +137,6 @@ public class DecorationBlockStateProvider extends BlockStateProvider {
     this.horizontalBlock(DecorationBlocks.FULL_TOILET);
     this.horizontalBlock(DecorationBlocks.DIRTY_TOILET);
     this.horizontalBlock(DecorationBlocks.FULL_DIRTY_TOILET);
-
 
     this.horizontalBlock(DecorationBlocks.SLEEPINGBAG);
     this.horizontalBlock(DecorationBlocks.SLEEPINGBAG_BLACK);
