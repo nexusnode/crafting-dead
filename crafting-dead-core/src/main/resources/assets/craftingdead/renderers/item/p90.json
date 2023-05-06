@@ -105,12 +105,12 @@
             }
         }
     },
-"magazine_transforms": {
-    "craftingdead:p90_magazine": {
-        "translation": [
-            0,
-            0,
-            0
+    "magazine_transforms": {
+        "craftingdead:p90_magazine": {
+            "translation": [
+                0,
+                0,
+                0
             ]
         }
     },
@@ -155,7 +155,6 @@
                 0.1,
                 -0.6,
                 -12
-        
             ]
         },
         "craftingdead:tactical_grip": {
@@ -171,11 +170,28 @@
                 5,
                 0
             ]
-        }        
+        }
     },
     "back_transform": {
-        "scale": [0.5, 0.5, 0.5],
-        "rotation": [0, 0, 180],
-        "translation": [2, 0, -0.1]
+        "scale": [
+            0.5,
+            0.5,
+            0.5
+        ],
+        "rotation": [
+            0,
+            0,
+            180
+        ],
+        "translation": [
+            2,
+            0,
+            -0.1
+        ]
+    },
+    "animation_properties": {
+        "shoot_animation_length": 5,
+        "shoot_animation_bounce": 2.0,
+        "shoot_animation_kickback": 0.15
     }
 }

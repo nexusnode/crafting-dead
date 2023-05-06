@@ -18,14 +18,16 @@
 
 package com.craftingdead.core.client.animation.gun;
 
+import com.craftingdead.core.client.animation.AnimationProperties;
 import com.craftingdead.core.client.animation.TimedAnimation;
 import com.craftingdead.core.util.EasingFunction;
+import com.craftingdead.core.world.item.gun.Gun;
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.entity.HumanoidArm;
-import net.minecraft.util.Mth;
 import com.mojang.math.Quaternion;
 import com.mojang.math.Vector3f;
+import net.minecraft.util.Mth;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.HumanoidArm;
 
 public class ShootAnimation extends TimedAnimation {
 
@@ -74,15 +76,8 @@ public class ShootAnimation extends TimedAnimation {
   @Override
   public void applyCamera(float partialTick, Vector3f rotations) {}
 
-  public static ShootAnimation rifle() {
-    return new ShootAnimation(5, 2.0F, 0.25F);
-  }
-
-  public static ShootAnimation submachineGun() {
-    return new ShootAnimation(5, 2.0F, 0.15F);
-  }
-
-  public static ShootAnimation pistol() {
-    return new ShootAnimation(7, 3.5F, 0.5F);
+  public static ShootAnimation fromProperties(Gun gun, AnimationProperties properties) {
+    return new ShootAnimation(properties.shootAnimationLength(), properties.shootAnimationBounce(),
+        properties.shootAnimationKickback());
   }
 }
