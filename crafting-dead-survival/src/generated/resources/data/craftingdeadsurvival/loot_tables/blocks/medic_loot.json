@@ -7,57 +7,57 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "weight": 50,
+          "weight": 30,
           "name": "craftingdeadsurvival:bloody_rag"
         },
         {
           "type": "minecraft:item",
-          "weight": 50,
+          "weight": 30,
           "name": "craftingdeadsurvival:dirty_rag"
         },
         {
           "type": "minecraft:item",
-          "weight": 70,
+          "weight": 30,
           "name": "craftingdeadsurvival:clean_rag"
         },
         {
           "type": "minecraft:item",
-          "weight": 70,
+          "weight": 40,
           "name": "craftingdeadsurvival:splint"
         },
         {
           "type": "minecraft:item",
-          "weight": 80,
+          "weight": 30,
           "name": "craftingdead:first_aid_kit"
         },
         {
           "type": "minecraft:item",
-          "weight": 50,
+          "weight": 25,
           "name": "craftingdead:adrenaline_syringe"
         },
         {
           "type": "minecraft:item",
-          "weight": 50,
+          "weight": 30,
           "name": "craftingdead:syringe"
         },
         {
           "type": "minecraft:item",
-          "weight": 50,
+          "weight": 10,
           "name": "craftingdead:blood_syringe"
         },
         {
           "type": "minecraft:item",
-          "weight": 50,
+          "weight": 10,
           "name": "craftingdeadsurvival:rbi_syringe"
         },
         {
           "type": "minecraft:item",
-          "weight": 50,
+          "weight": 25,
           "name": "craftingdeadsurvival:cure_syringe"
         },
         {
           "type": "minecraft:item",
-          "weight": 60,
+          "weight": 20,
           "name": "craftingdead:bandage"
         },
         {
@@ -142,47 +142,52 @@
         },
         {
           "type": "minecraft:item",
-          "weight": 80,
+          "weight": 10,
+          "name": "craftingdeadsurvival:empty_water_canteen"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 10,
           "name": "minecraft:bread"
         },
         {
           "type": "minecraft:item",
-          "weight": 20,
+          "weight": 10,
           "name": "minecraft:apple"
         },
         {
           "type": "minecraft:item",
-          "weight": 30,
+          "weight": 10,
           "name": "minecraft:mushroom_stew"
         },
         {
           "type": "minecraft:item",
-          "weight": 80,
+          "weight": 10,
           "name": "minecraft:cooked_porkchop"
         },
         {
           "type": "minecraft:item",
-          "weight": 20,
+          "weight": 10,
           "name": "minecraft:cookie"
         },
         {
           "type": "minecraft:item",
-          "weight": 20,
+          "weight": 10,
           "name": "minecraft:melon_slice"
         },
         {
           "type": "minecraft:item",
-          "weight": 20,
+          "weight": 10,
           "name": "minecraft:carrot"
         },
         {
           "type": "minecraft:item",
-          "weight": 40,
+          "weight": 10,
           "name": "minecraft:cooked_chicken"
         },
         {
           "type": "minecraft:item",
-          "weight": 20,
+          "weight": 10,
           "name": "minecraft:baked_potato"
         }
       ]

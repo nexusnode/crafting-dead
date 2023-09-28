@@ -7,97 +7,117 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "weight": 40,
+          "weight": 15,
           "name": "craftingdead:first_aid_kit"
         },
         {
           "type": "minecraft:item",
-          "weight": 40,
+          "weight": 20,
           "name": "craftingdead:bandage"
         },
         {
           "type": "minecraft:item",
-          "weight": 25,
+          "weight": 20,
+          "name": "craftingdeadsurvival:splint"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 10,
+          "name": "craftingdeadsurvival:mre"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 10,
+          "name": "craftingdeadsurvival:empty_water_canteen"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 10,
+          "name": "craftingdeadsurvival:water_canteen"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 10,
           "name": "craftingdead:black_tactical_vest"
         },
         {
           "type": "minecraft:item",
-          "weight": 25,
+          "weight": 10,
           "name": "craftingdead:grey_tactical_vest"
         },
         {
           "type": "minecraft:item",
-          "weight": 25,
+          "weight": 5,
           "name": "craftingdead:riot_vest"
         },
         {
           "type": "minecraft:item",
-          "weight": 10,
+          "weight": 20,
           "name": "craftingdead:black_ballistic_hat"
         },
         {
           "type": "minecraft:item",
-          "weight": 10,
+          "weight": 20,
           "name": "craftingdead:chief_fireman_hat"
         },
         {
           "type": "minecraft:item",
-          "weight": 10,
+          "weight": 20,
           "name": "craftingdead:fireman_hat"
         },
         {
           "type": "minecraft:item",
-          "weight": 10,
+          "weight": 20,
           "name": "craftingdead:gas_mask"
         },
         {
           "type": "minecraft:item",
-          "weight": 10,
+          "weight": 20,
           "name": "craftingdead:grey_army_helmet"
         },
         {
           "type": "minecraft:item",
-          "weight": 10,
+          "weight": 20,
           "name": "craftingdead:juggernaut_helmet"
         },
         {
           "type": "minecraft:item",
-          "weight": 10,
+          "weight": 20,
           "name": "craftingdead:knight_hat"
         },
         {
           "type": "minecraft:item",
-          "weight": 10,
+          "weight": 20,
           "name": "craftingdead:nv_goggles_hat"
         },
         {
           "type": "minecraft:item",
-          "weight": 10,
+          "weight": 20,
           "name": "craftingdead:riot_hat"
         },
         {
           "type": "minecraft:item",
-          "weight": 10,
+          "weight": 20,
           "name": "craftingdead:scuba_mask"
         },
         {
           "type": "minecraft:item",
-          "weight": 10,
+          "weight": 20,
           "name": "craftingdead:sas_clothing"
         },
         {
           "type": "minecraft:item",
-          "weight": 10,
+          "weight": 20,
           "name": "craftingdead:police_clothing"
         },
         {
           "type": "minecraft:item",
-          "weight": 10,
+          "weight": 20,
           "name": "craftingdead:swat_clothing"
         },
         {
           "type": "minecraft:item",
-          "weight": 10,
+          "weight": 20,
           "name": "craftingdead:sheriff_clothing"
         },
         {
@@ -107,22 +127,22 @@
         },
         {
           "type": "minecraft:item",
-          "weight": 10,
+          "weight": 20,
           "name": "craftingdead:fireman_clothing"
         },
         {
           "type": "minecraft:item",
-          "weight": 10,
+          "weight": 20,
           "name": "craftingdead:business_clothing"
         },
         {
           "type": "minecraft:item",
-          "weight": 10,
+          "weight": 20,
           "name": "craftingdead:sec_guard_clothing"
         },
         {
           "type": "minecraft:item",
-          "weight": 10,
+          "weight": 20,
           "name": "craftingdead:scuba_clothing"
         },
         {
@@ -172,12 +192,12 @@
         },
         {
           "type": "minecraft:item",
-          "weight": 30,
+          "weight": 20,
           "name": "craftingdead:p90_magazine"
         },
         {
           "type": "minecraft:item",
-          "weight": 30,
+          "weight": 20,
           "name": "craftingdead:vector_magazine"
         },
         {
@@ -212,7 +232,7 @@
         },
         {
           "type": "minecraft:item",
-          "weight": 40,
+          "weight": 20,
           "name": "craftingdead:taser_cartridge"
         },
         {
@@ -272,7 +292,7 @@
         },
         {
           "type": "minecraft:item",
-          "weight": 35,
+          "weight": 20,
           "name": "craftingdead:taser"
         },
         {

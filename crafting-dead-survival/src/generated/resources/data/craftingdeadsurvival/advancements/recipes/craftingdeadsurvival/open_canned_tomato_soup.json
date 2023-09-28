@@ -1,0 +1,34 @@
+{
+  "parent": "minecraft:recipes/root",
+  "rewards": {
+    "recipes": [
+      "craftingdeadsurvival:open_canned_tomato_soup"
+    ]
+  },
+  "criteria": {
+    "has_canned_tomato_soup": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "craftingdeadsurvival:canned_tomato_soup"
+            ]
+          }
+        ]
+      }
+    },
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "craftingdeadsurvival:open_canned_tomato_soup"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_canned_tomato_soup",
+      "has_the_recipe"
+    ]
+  ]
+}

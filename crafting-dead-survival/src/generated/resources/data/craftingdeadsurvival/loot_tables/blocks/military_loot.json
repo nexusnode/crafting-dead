@@ -7,17 +7,17 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "weight": 20,
+          "weight": 10,
           "name": "craftingdead:first_aid_kit"
         },
         {
           "type": "minecraft:item",
-          "weight": 20,
+          "weight": 10,
           "name": "craftingdead:adrenaline_syringe"
         },
         {
           "type": "minecraft:item",
-          "weight": 20,
+          "weight": 10,
           "name": "craftingdead:bandage"
         },
         {
@@ -27,28 +27,63 @@
         },
         {
           "type": "minecraft:item",
-          "weight": 20,
+          "weight": 10,
+          "name": "craftingdeadsurvival:mre"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 10,
+          "name": "craftingdeadsurvival:empty_water_canteen"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 10,
+          "name": "craftingdeadsurvival:water_canteen"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 15,
           "name": "craftingdead:black_tactical_vest"
         },
         {
           "type": "minecraft:item",
-          "weight": 20,
-          "name": "craftingdead:grey_tactical_vest"
-        },
-        {
-          "type": "minecraft:item",
-          "weight": 20,
-          "name": "craftingdead:green_tactical_vest"
-        },
-        {
-          "type": "minecraft:item",
-          "weight": 20,
+          "weight": 15,
           "name": "craftingdead:ghillie_tactical_vest"
         },
         {
           "type": "minecraft:item",
-          "weight": 20,
+          "weight": 15,
+          "name": "craftingdead:green_tactical_vest"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 15,
+          "name": "craftingdead:grey_tactical_vest"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 15,
           "name": "craftingdead:tan_tactical_vest"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 15,
+          "name": "craftingdead:large_grey_backpack"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 15,
+          "name": "craftingdead:large_green_backpack"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 15,
+          "name": "craftingdead:large_tan_backpack"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 15,
+          "name": "craftingdead:large_black_backpack"
         },
         {
           "type": "minecraft:item",

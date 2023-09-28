@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "craftingdeadsurvival:canned_dog_food"
+    },
+    [
+      {
+        "item": "craftingdeadsurvival:can_opener"
+      },
+      {
+        "item": "craftingdeadsurvival:screwdriver"
+      },
+      {
+        "item": "craftingdeadsurvival:multi_tool"
+      }
+    ]
+  ],
+  "result": {
+    "item": "craftingdeadsurvival:open_canned_dog_food"
+  }
+}

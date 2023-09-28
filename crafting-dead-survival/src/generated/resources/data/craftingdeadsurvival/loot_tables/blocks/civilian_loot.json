@@ -7,12 +7,12 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "weight": 25,
+          "weight": 5,
           "name": "craftingdeadsurvival:bloody_rag"
         },
         {
           "type": "minecraft:item",
-          "weight": 25,
+          "weight": 5,
           "name": "craftingdeadsurvival:dirty_rag"
         },
         {
@@ -287,12 +287,12 @@
         },
         {
           "type": "minecraft:item",
-          "weight": 30,
+          "weight": 15,
           "name": "craftingdead:trench_gun_shells"
         },
         {
           "type": "minecraft:item",
-          "weight": 30,
+          "weight": 15,
           "name": "craftingdead:mossberg_shells"
         },
         {
@@ -357,7 +357,7 @@
         },
         {
           "type": "minecraft:item",
-          "weight": 15,
+          "weight": 10,
           "name": "craftingdead:trench_gun"
         },
         {
@@ -512,47 +512,317 @@
         },
         {
           "type": "minecraft:item",
-          "weight": 80,
+          "weight": 15,
           "name": "minecraft:bread"
         },
         {
           "type": "minecraft:item",
-          "weight": 20,
+          "weight": 15,
           "name": "minecraft:apple"
         },
         {
           "type": "minecraft:item",
-          "weight": 30,
+          "weight": 15,
           "name": "minecraft:mushroom_stew"
         },
         {
           "type": "minecraft:item",
-          "weight": 80,
+          "weight": 15,
           "name": "minecraft:cooked_porkchop"
         },
         {
           "type": "minecraft:item",
-          "weight": 20,
+          "weight": 15,
           "name": "minecraft:cookie"
         },
         {
           "type": "minecraft:item",
-          "weight": 20,
+          "weight": 15,
           "name": "minecraft:melon_slice"
         },
         {
           "type": "minecraft:item",
-          "weight": 20,
+          "weight": 15,
           "name": "minecraft:carrot"
         },
         {
           "type": "minecraft:item",
-          "weight": 40,
+          "weight": 15,
+          "name": "craftingdeadsurvival:canned_sweetcorn"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 15,
+          "name": "craftingdeadsurvival:canned_beans"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 15,
+          "name": "craftingdeadsurvival:canned_tuna"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 15,
+          "name": "craftingdeadsurvival:canned_peaches"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 15,
+          "name": "craftingdeadsurvival:canned_pasta"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 15,
+          "name": "craftingdeadsurvival:canned_corned_beef"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 15,
+          "name": "craftingdeadsurvival:canned_custard"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 15,
+          "name": "craftingdeadsurvival:canned_pickles"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 15,
+          "name": "craftingdeadsurvival:canned_dog_food"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 15,
+          "name": "craftingdeadsurvival:canned_tomato_soup"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 15,
+          "name": "craftingdeadsurvival:can_opener"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 15,
+          "name": "craftingdeadsurvival:empty_water_bottle"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 15,
+          "name": "craftingdeadsurvival:water_bottle"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 15,
+          "name": "craftingdeadsurvival:empty_water_canteen"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 10,
+          "name": "craftingdeadsurvival:power_bar"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 10,
+          "name": "craftingdeadsurvival:candy_bar"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 10,
+          "name": "craftingdeadsurvival:cereal"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdeadsurvival:orange"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 10,
+          "name": "craftingdeadsurvival:rotten_orange"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdeadsurvival:pear"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 10,
+          "name": "craftingdeadsurvival:rotten_pear"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 10,
+          "name": "craftingdeadsurvival:rice_bag"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 10,
+          "name": "craftingdeadsurvival:rotten_apple"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 10,
+          "name": "craftingdeadsurvival:noodles"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 10,
+          "name": "craftingdeadsurvival:rotten_melon_slice"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 10,
+          "name": "craftingdeadsurvival:rotten_blueberry"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdeadsurvival:blueberry"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 10,
+          "name": "craftingdeadsurvival:rotten_raspberry"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdeadsurvival:raspberry"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdeadsurvival:chips"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdeadsurvival:ranch_chips"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdeadsurvival:cheesy_chips"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdeadsurvival:salted_chips"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdeadsurvival:popcorn"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdeadsurvival:nutty_cereal"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdeadsurvival:emerald_cereal"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdeadsurvival:flake_cereal"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdeadsurvival:multi_tool"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:small_red_backpack"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:small_orange_backpack"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:small_yellow_backpack"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:small_green_backpack"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:small_blue_backpack"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:small_purple_backpack"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:medium_red_backpack"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:medium_orange_backpack"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:medium_yellow_backpack"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:medium_green_backpack"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:medium_blue_backpack"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:medium_purple_backpack"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:medium_grey_backpack"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:medium_black_backpack"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:medium_ghillie_backpack"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "craftingdead:medium_white_backpack"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 15,
           "name": "minecraft:cooked_chicken"
         },
         {
           "type": "minecraft:item",
-          "weight": 20,
+          "weight": 15,
           "name": "minecraft:baked_potato"
         }
       ]

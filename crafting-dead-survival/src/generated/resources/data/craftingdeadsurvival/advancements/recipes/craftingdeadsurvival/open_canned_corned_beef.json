@@ -1,0 +1,34 @@
+{
+  "parent": "minecraft:recipes/root",
+  "rewards": {
+    "recipes": [
+      "craftingdeadsurvival:open_canned_corned_beef"
+    ]
+  },
+  "criteria": {
+    "has_canned_corned_beef": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "craftingdeadsurvival:canned_corned_beef"
+            ]
+          }
+        ]
+      }
+    },
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "craftingdeadsurvival:open_canned_corned_beef"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_canned_corned_beef",
+      "has_the_recipe"
+    ]
+  ]
+}
