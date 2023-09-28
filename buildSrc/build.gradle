@@ -3,7 +3,7 @@ plugins {
 }
 
 repositories {
-    gradlePluginPortal() // so that external plugins can be resolved in dependencies section
+    gradlePluginPortal()
     maven { 
         name 'forge'
         url 'https://maven.minecraftforge.net/'
@@ -15,7 +15,7 @@ repositories {
 }
 
 dependencies {
-    implementation group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
+    implementation group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '[6.0,6.2)'
     implementation group: 'gradle.plugin.org.cadixdev.gradle', name: 'licenser', version: '0.6.1'
     implementation group: 'org.spongepowered', name: 'mixingradle', version: '0.7.+', changing: true
 }

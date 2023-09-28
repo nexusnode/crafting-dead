@@ -17,18 +17,14 @@ jar {
 }
 
 mixin {
-	add sourceSets.main, "craftingdead.refmap.json"
+	add sourceSets.main, 'craftingdead.refmap.json'
 }
 
 minecraft {    
     accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
     runs {
-        client {
-            taskName 'runCoreClient'
- 
-            workingDirectory project.file('run/client')
-
+        configureEach {
             property 'forge.logging.console.level', 'debug'
             
             args '--mixin', 'craftingdead.mixins.json'
@@ -38,41 +34,25 @@ minecraft {
                     source sourceSets.main
                 }
             }
+        }
+
+        client {
+            taskName 'runCoreClient'
+            workingDirectory project.file('run/client')
         }
 
         server {
             taskName 'runCoreServer'
-        
             workingDirectory project.file('run/server')
-
-            property 'forge.logging.console.level', 'debug'
-            
-            args '--mixin', 'craftingdead.mixins.json'
-            
-            mods {
-                craftingdead {
-                    source sourceSets.main
-                }
-            }
         }
         
         data {
-            taskName 'runCoreData'
-      
+            taskName 'runCoreData'      
             workingDirectory project.file('run/data')
-
-            property 'forge.logging.markers', 'SCAN,REGISTRIES'
-            property 'forge.logging.console.level', 'debug'
 
             args '--mod', 'craftingdead', '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
 
             environment 'target', 'fmluserdevdata'
-
-            mods {
-                craftingdead {
-                    source sourceSets.main
-                }
-            }
         }
     }
 }
