@@ -73,6 +73,9 @@ minecraft {
 dependencies {
     implementation project(':crafting-dead-core')
     implementation project(':crafting-dead-immerse')
+    
+    // Dirty hacks for depending on immerse
+    minecraftLibrary group: 'net.rocketpowered', name: 'rocket-sdk', version: '0.0.8'
 }
 
 jar {

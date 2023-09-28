@@ -117,9 +117,8 @@ dependencies {
     library(group: 'io.sentry', name: 'sentry', version: '[5.6.0]') {
         exclude group: 'com.google.code.gson', module: 'gson'
     }
-    
-    minecraftLibrary group: 'net.rocketpowered', name: 'rocket-sdk', version: '0.0.8'
 
+    minecraftLibrary group: 'net.rocketpowered', name: 'rocket-sdk', version: '0.0.8'
     implementation fg.deobf("net.rocketpowered:rocket-connector:${minecraft_version}-0.0.13")
 }
 
