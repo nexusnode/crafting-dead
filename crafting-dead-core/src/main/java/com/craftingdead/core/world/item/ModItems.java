@@ -1949,11 +1949,11 @@ public class ModItems {
       .register("grey_gun_bag", ModItems::gunBag);
 
   private static StorageItem weakVest() {
-    return vest(4.0F, 1.5F);
+    return vest(10.0F, 1.5F);
   }
 
   private static StorageItem strongVest() {
-    return vest(8.0F, 3.0F);
+    return vest(20.0F, 3.0F);
   }
 
   private static StorageItem vest(float armor, float armorToughness) {
