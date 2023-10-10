@@ -1605,7 +1605,7 @@ public class ModItems {
               .attributeModifier(Attributes.ARMOR, new AttributeModifier(
                   ClothingItem.ARMOR_MODIFIER_ID,
                   "Armor modifier",
-                  5,
+                  8,
                   AttributeModifier.Operation.ADDITION))
               .attributeModifier(Attributes.MOVEMENT_SPEED, new AttributeModifier(
                   ClothingItem.ARMOR_MODIFIER_ID,
