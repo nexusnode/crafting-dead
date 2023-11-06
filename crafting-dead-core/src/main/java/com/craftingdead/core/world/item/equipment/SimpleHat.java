@@ -18,40 +18,13 @@
 
 package com.craftingdead.core.world.item.equipment;
 
-public class SimpleHat implements Hat {
+import com.google.common.collect.Multimap;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 
-  private final boolean waterBreathing;
-  private final boolean nightVision;
-  private final float headshotReductionPercentage;
-  private final boolean immuneToFlashes;
-
-  public SimpleHat(
-      boolean waterBreathing, boolean nightVision,
-      float headshotReductionPercentage,
-      boolean immuneToFlashes) {
-    this.waterBreathing = waterBreathing;
-    this.nightVision = nightVision;
-    this.headshotReductionPercentage = headshotReductionPercentage;
-    this.immuneToFlashes = immuneToFlashes;
-  }
-
-  @Override
-  public boolean waterBreathing() {
-    return this.waterBreathing;
-  }
-
-  @Override
-  public boolean nightVision() {
-    return this.nightVision;
-  }
-
-  @Override
-  public float headshotReductionPercentage() {
-    return this.headshotReductionPercentage;
-  }
-
-  @Override
-  public boolean immuneToFlashes() {
-    return this.immuneToFlashes;
-  }
-}
+public record SimpleHat(
+    Multimap<Attribute, AttributeModifier> attributeModifier,
+    boolean waterBreathing,
+    boolean nightVision,
+    float headshotReductionPercentage,
+    boolean immuneToFlashes) implements Hat {}

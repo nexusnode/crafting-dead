@@ -1242,7 +1242,7 @@ public class ModItems {
   // ================================================================================
 
   public static final RegistryObject<Item> ARMY_HELMET = deferredRegister.register("army_helmet",
-      () -> new HatItem((HatItem.Properties) new HatItem.Properties()
+      () -> new HatItem((HatItem.Properties) hatArmor(2.0F, 1.0F)
           .setHeadshotReductionPercentage(0.2F)
           .stacksTo(1)
           .tab(COSMETICS_TAB)));
@@ -1254,7 +1254,7 @@ public class ModItems {
 
   public static final RegistryObject<Item> BLACK_BALLISTIC_HAT =
       deferredRegister.register("black_ballistic_hat",
-          () -> new HatItem((HatItem.Properties) new HatItem.Properties()
+          () -> new HatItem((HatItem.Properties) hatArmor(2.0F, 1.0F)
               .setHeadshotReductionPercentage(0.2F)
               .stacksTo(1)
               .tab(COSMETICS_TAB)));
@@ -1267,7 +1267,7 @@ public class ModItems {
 
   public static final RegistryObject<Item> BLUE_HARD_HAT =
       deferredRegister.register("blue_hard_hat",
-          () -> new HatItem((HatItem.Properties) new HatItem.Properties()
+          () -> new HatItem((HatItem.Properties) hatArmor(2.0F, 0.0F)
               .setHeadshotReductionPercentage(0.2F)
               .stacksTo(1)
               .tab(COSMETICS_TAB)));
@@ -1278,20 +1278,20 @@ public class ModItems {
           .tab(COSMETICS_TAB)));
 
   public static final RegistryObject<Item> CAMO_HELMET = deferredRegister.register("camo_helmet",
-      () -> new HatItem((HatItem.Properties) new HatItem.Properties()
+      () -> new HatItem((HatItem.Properties) hatArmor(2.0F, 1.0F)
           .setHeadshotReductionPercentage(0.2F)
           .stacksTo(1)
           .tab(COSMETICS_TAB)));
 
   public static final RegistryObject<Item> CLONE_HAT = deferredRegister.register("clone_hat",
-      () -> new HatItem((HatItem.Properties) new HatItem.Properties()
+      () -> new HatItem((HatItem.Properties) hatArmor(2.0F, 1.0F)
           .setHeadshotReductionPercentage(0.2F)
           .stacksTo(1)
           .tab(COSMETICS_TAB)));
 
   public static final RegistryObject<Item> COMBAT_BDU_HELMET =
       deferredRegister.register("combat_bdu_helmet",
-          () -> new HatItem((HatItem.Properties) new HatItem.Properties()
+          () -> new HatItem((HatItem.Properties) hatArmor(2.0F, 1.0F)
               .setHeadshotReductionPercentage(0.2F)
               .stacksTo(1)
               .tab(COSMETICS_TAB)));
@@ -1341,28 +1341,28 @@ public class ModItems {
 
   public static final RegistryObject<Item> GREEN_ARMY_HELMET =
       deferredRegister.register("green_army_helmet",
-          () -> new HatItem((HatItem.Properties) new HatItem.Properties()
+          () -> new HatItem((HatItem.Properties) hatArmor(2.0F, 1.0F)
               .setHeadshotReductionPercentage(0.2F)
               .stacksTo(1)
               .tab(COSMETICS_TAB)));
 
   public static final RegistryObject<Item> GREEN_BALLISTIC_HELMET =
       deferredRegister.register("green_ballistic_helmet",
-          () -> new HatItem((HatItem.Properties) new HatItem.Properties()
+          () -> new HatItem((HatItem.Properties) hatArmor(2.0F, 1.0F)
               .setHeadshotReductionPercentage(0.2F)
               .stacksTo(1)
               .tab(COSMETICS_TAB)));
 
   public static final RegistryObject<Item> GREEN_HARD_HAT =
       deferredRegister.register("green_hard_hat",
-          () -> new HatItem((HatItem.Properties) new HatItem.Properties()
+          () -> new HatItem((HatItem.Properties) hatArmor(2.0F, 0.0F)
               .setHeadshotReductionPercentage(0.2F)
               .stacksTo(1)
               .tab(COSMETICS_TAB)));
 
   public static final RegistryObject<Item> GREY_ARMY_HELMET =
       deferredRegister.register("grey_army_helmet",
-          () -> new HatItem((HatItem.Properties) new HatItem.Properties()
+          () -> new HatItem((HatItem.Properties) hatArmor(2.0F, 1.0F)
               .setHeadshotReductionPercentage(0.2F)
               .stacksTo(1)
               .tab(COSMETICS_TAB)));
@@ -1411,7 +1411,7 @@ public class ModItems {
 
   public static final RegistryObject<Item> ORANGE_HARD_HAT =
       deferredRegister.register("orange_hard_hat",
-          () -> new HatItem((HatItem.Properties) new HatItem.Properties()
+          () -> new HatItem((HatItem.Properties) hatArmor(2.0F, 0.0F)
               .setHeadshotReductionPercentage(0.2F)
               .stacksTo(1)
               .tab(COSMETICS_TAB)));
@@ -1442,7 +1442,7 @@ public class ModItems {
           .tab(COSMETICS_TAB)));
 
   public static final RegistryObject<Item> RIOT_HAT = deferredRegister.register("riot_hat",
-      () -> new HatItem((HatItem.Properties) new HatItem.Properties()
+      () -> new HatItem((HatItem.Properties) hatArmor(2.0F, 1.0F)
           .setHeadshotReductionPercentage(0.2F)
           .stacksTo(1)
           .tab(COSMETICS_TAB)));
@@ -1471,7 +1471,7 @@ public class ModItems {
 
   public static final RegistryObject<Item> SPETSNAZ_HELMET =
       deferredRegister.register("spetsnaz_helmet",
-          () -> new HatItem((HatItem.Properties) new HatItem.Properties()
+          () -> new HatItem((HatItem.Properties) hatArmor(2.0F, 1.0F)
               .setHeadshotReductionPercentage(0.2F)
               .stacksTo(1)
               .tab(COSMETICS_TAB)));
@@ -1493,14 +1493,14 @@ public class ModItems {
 
   public static final RegistryObject<Item> WINTER_MILITARY_HELMET =
       deferredRegister.register("winter_military_helmet",
-          () -> new HatItem((HatItem.Properties) new HatItem.Properties()
+          () -> new HatItem((HatItem.Properties) hatArmor(2.0F, 1.0F)
               .setHeadshotReductionPercentage(0.2F)
               .stacksTo(1)
               .tab(COSMETICS_TAB)));
 
   public static final RegistryObject<Item> YELLOW_HARD_HAT =
       deferredRegister.register("yellow_hard_hat",
-          () -> new HatItem((HatItem.Properties) new HatItem.Properties()
+          () -> new HatItem((HatItem.Properties) hatArmor(2.0F, 0.0F)
               .setHeadshotReductionPercentage(0.2F)
               .stacksTo(1)
               .tab(COSMETICS_TAB)));
@@ -1947,6 +1947,16 @@ public class ModItems {
 
   public static final RegistryObject<Item> GREY_GUN_BAG = deferredRegister
       .register("grey_gun_bag", ModItems::gunBag);
+
+  private static HatItem.Properties hatArmor(float armor, float armorToughness) {
+    return new HatItem.Properties()
+        .attributeModifier(Attributes.ARMOR,
+            new AttributeModifier(HatItem.ARMOR_MODIFIER_ID, "Armor modifier",
+                armor, AttributeModifier.Operation.ADDITION))
+        .attributeModifier(Attributes.ARMOR_TOUGHNESS,
+            new AttributeModifier(HatItem.ARMOR_MODIFIER_ID, "Armor toughness",
+                armorToughness, AttributeModifier.Operation.ADDITION));
+  }
 
   private static StorageItem weakVest() {
     return vest(10.0F, 1.5F);

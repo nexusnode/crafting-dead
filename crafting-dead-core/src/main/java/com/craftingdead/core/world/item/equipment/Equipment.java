@@ -47,7 +47,7 @@ public interface Equipment {
 
     private final int index;
 
-    private Slot(int index) {
+    Slot(int index) {
       this.index = index;
     }
 

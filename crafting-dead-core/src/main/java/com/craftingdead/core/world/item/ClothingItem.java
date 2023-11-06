@@ -76,7 +76,7 @@ public class ClothingItem extends EquipmentItem {
 
   public static class Properties extends Item.Properties {
 
-    private ImmutableMultimap.Builder<Attribute, AttributeModifier> attributeModifiers =
+    private final ImmutableMultimap.Builder<Attribute, AttributeModifier> attributeModifiers =
         ImmutableMultimap.builder();
     private boolean fireImmunity;
     private boolean enhancesSwimming;
