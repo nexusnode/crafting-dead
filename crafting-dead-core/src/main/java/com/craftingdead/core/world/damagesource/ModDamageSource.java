@@ -35,7 +35,6 @@ public class ModDamageSource {
   public static DamageSource gun(LivingEntity source, boolean headshot) {
     var messageId = headshot ? BULLET_HEADSHOT_DAMAGE_TYPE : BULLET_BODY_DAMAGE_TYPE;
     return new EntityDamageSource(messageId, source)
-        .bypassArmor()
         .setProjectile()
         .setExplosion();
   }
