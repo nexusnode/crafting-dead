@@ -100,7 +100,7 @@ public final class EntityItemActionType<T extends LivingExtension<?, ?>>
 
   public record EffectAction(Supplier<MobEffectInstance> effect, float chance) {}
 
-  public record CustomAction<T extends LivingExtension<?, ?>> (
+  public record CustomAction<T extends LivingExtension<?, ?>>(
       BiConsumer<LivingExtension<?, ?>, T> consumer,
       float chance) {}
 

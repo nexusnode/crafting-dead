@@ -444,121 +444,120 @@ public class ClientDist implements ModDist {
 
   @SubscribeEvent
   public void handleClientTick(TickEvent.ClientTickEvent event) {
-    switch (event.phase) {
-      case START:
-        var player = this.getPlayerExtension().orElse(null);
-        if (player != null) {
-          var gun = player.mainHandGun().orElse(null);
+    if (event.phase != TickEvent.Phase.START) {
+      return;
+    }
 
-          var levelFocused = !this.minecraft.isPaused() && this.minecraft.getOverlay() == null
-              && (this.minecraft.screen == null);
+    var player = this.getPlayerExtension().orElse(null);
+    if (player != null) {
+      var gun = player.mainHandGun().orElse(null);
 
-          this.cameraManager.tick();
+      var levelFocused = !this.minecraft.isPaused() && this.minecraft.getOverlay() == null
+          && (this.minecraft.screen == null);
 
-          if (!levelFocused || player.entity().isSpectator()) {
-            // Stop gun actions if level not focused.
-            if (gun != null) {
-              if (gun.isTriggerPressed()) {
-                gun.setTriggerPressed(player, false, true);
-              }
-              if (gun.isPerformingSecondaryAction()) {
-                gun.setPerformingSecondaryAction(player, false, true);
-              }
-            }
-            return;
+      this.cameraManager.tick();
+
+      if (!levelFocused || player.entity().isSpectator()) {
+        // Stop gun actions if level not focused.
+        if (gun != null) {
+          if (gun.isTriggerPressed()) {
+            gun.setTriggerPressed(player, false, true);
           }
-
-          // Update gun input
-          if (gun != null) {
-            while (TOGGLE_FIRE_MODE.consumeClick()) {
-              gun.toggleFireMode(player, true);
-            }
-            while (RELOAD.consumeClick()) {
-              gun.getAmmoProvider().reload(player);
-            }
-            while (REMOVE_MAGAZINE.consumeClick()) {
-              gun.getAmmoProvider().unload(player);
-            }
+          if (gun.isPerformingSecondaryAction()) {
+            gun.setPerformingSecondaryAction(player, false, true);
           }
-
-          // Update crouching
-          if (this.minecraft.player.isShiftKeyDown() != this.wasSneaking) {
-            if (this.minecraft.player.isShiftKeyDown()) {
-              final long currentTime = Util.getMillis();
-              if (currentTime - this.lastSneakPressTime <= DOUBLE_CLICK_DURATION) {
-                player.setCrouching(true, true);
-              }
-              this.lastSneakPressTime = Util.getMillis();
-            } else {
-              player.setCrouching(false, true);
-            }
-            this.wasSneaking = this.minecraft.player.isShiftKeyDown();
-          }
-
-          // Update tutorial
-          while (OPEN_EQUIPMENT_MENU.consumeClick()) {
-            NetworkChannel.PLAY.getSimpleChannel().sendToServer(new OpenEquipmentMenuMessage());
-            if (this.minecraft.getTutorial().instance instanceof ModTutorialStepInstance) {
-              ((ModTutorialStepInstance) this.minecraft.getTutorial().instance).openEquipmentMenu();
-            }
-          }
-          TutorialSteps currentTutorialStep = this.minecraft.options.tutorialStep;
-          if (this.lastTutorialStep != currentTutorialStep) {
-            if (currentTutorialStep == TutorialSteps.NONE) {
-              this.setTutorialStep(clientConfig.tutorialStep.get());
-            }
-            this.lastTutorialStep = currentTutorialStep;
-          }
-
-          // Update adrenaline effects
-          if (this.minecraft.player.hasEffect(ModMobEffects.ADRENALINE.get())) {
-            this.wasAdrenalineActive = true;
-            this.effectsManager.setHighpassLevels(1.0F, 0.015F);
-            this.effectsManager.setDirectHighpassForAll();
-          } else if (this.wasAdrenalineActive) {
-            this.wasAdrenalineActive = false;
-            this.effectsManager.removeFilterForAll();
-          }
-
         }
-        break;
-      default:
-        break;
+        return;
+      }
+
+      // Update gun input
+      if (gun != null) {
+        while (TOGGLE_FIRE_MODE.consumeClick()) {
+          gun.toggleFireMode(player, true);
+        }
+        while (RELOAD.consumeClick()) {
+          gun.getAmmoProvider().reload(player);
+        }
+        while (REMOVE_MAGAZINE.consumeClick()) {
+          gun.getAmmoProvider().unload(player);
+        }
+      }
+
+      // Update crouching
+      if (this.minecraft.player.isShiftKeyDown() != this.wasSneaking) {
+        if (this.minecraft.player.isShiftKeyDown()) {
+          final long currentTime = Util.getMillis();
+          if (currentTime - this.lastSneakPressTime <= DOUBLE_CLICK_DURATION) {
+            player.setCrouching(true, true);
+          }
+          this.lastSneakPressTime = Util.getMillis();
+        } else {
+          player.setCrouching(false, true);
+        }
+        this.wasSneaking = this.minecraft.player.isShiftKeyDown();
+      }
+
+      // Update tutorial
+      while (OPEN_EQUIPMENT_MENU.consumeClick()) {
+        NetworkChannel.PLAY.getSimpleChannel().sendToServer(new OpenEquipmentMenuMessage());
+        if (this.minecraft.getTutorial().instance instanceof ModTutorialStepInstance) {
+          ((ModTutorialStepInstance) this.minecraft.getTutorial().instance).openEquipmentMenu();
+        }
+      }
+      TutorialSteps currentTutorialStep = this.minecraft.options.tutorialStep;
+      if (this.lastTutorialStep != currentTutorialStep) {
+        if (currentTutorialStep == TutorialSteps.NONE) {
+          this.setTutorialStep(clientConfig.tutorialStep.get());
+        }
+        this.lastTutorialStep = currentTutorialStep;
+      }
+
+      // Update adrenaline effects
+      if (this.minecraft.player.hasEffect(ModMobEffects.ADRENALINE.get())) {
+        this.wasAdrenalineActive = true;
+        this.effectsManager.setHighpassLevels(1.0F, 0.015F);
+        this.effectsManager.setDirectHighpassForAll();
+      } else if (this.wasAdrenalineActive) {
+        this.wasAdrenalineActive = false;
+        this.effectsManager.removeFilterForAll();
+      }
+
     }
   }
 
   @SubscribeEvent
   public void handleRawMouse(InputEvent.RawMouseEvent event) {
     var player = this.getPlayerExtension().orElse(null);
-    if (player != null && this.minecraft.getOverlay() == null
-        && this.minecraft.screen == null && !player.entity().isSpectator()) {
-      var gun = player.mainHandGun().orElse(null);
-      if (this.minecraft.options.keyAttack.matchesMouse(event.getButton())) {
-        var triggerPressed = event.getAction() == GLFW.GLFW_PRESS;
-        if (gun != null) {
-          // Allow minecraft to register release, preventing from certain actions freezing when the
-          // player swap items
-          if (triggerPressed) {
-            event.setCanceled(true);
-          }
-          gun.setTriggerPressed(player, triggerPressed, true);
-        }
-      } else if (this.minecraft.options.keyUse.matchesMouse(event.getButton())) {
-        if (gun != null) {
-          switch (gun.getSecondaryActionTrigger()) {
-            case HOLD:
-              gun.setPerformingSecondaryAction(player, event.getAction() == GLFW.GLFW_PRESS, true);
-              break;
-            case TOGGLE:
-              if (event.getAction() == GLFW.GLFW_PRESS) {
-                gun.setPerformingSecondaryAction(player, !gun.isPerformingSecondaryAction(), true);
-              }
-              break;
-            default:
-              break;
-          }
+    if (player == null
+        || this.minecraft.getOverlay() != null
+        || this.minecraft.screen != null
+        || player.entity().isSpectator()) {
+      return;
+    }
+
+    var gun = player.mainHandGun().orElse(null);
+    if (this.minecraft.options.keyAttack.matchesMouse(event.getButton())) {
+      var triggerPressed = event.getAction() == GLFW.GLFW_PRESS;
+      if (gun != null) {
+        // Allow minecraft to register release, preventing from certain actions freezing when the
+        // player swap items
+        if (triggerPressed) {
           event.setCanceled(true);
         }
+        gun.setTriggerPressed(player, triggerPressed, true);
+      }
+    } else if (this.minecraft.options.keyUse.matchesMouse(event.getButton())) {
+      if (gun != null) {
+        switch (gun.getSecondaryActionTrigger()) {
+          case HOLD -> gun.setPerformingSecondaryAction(
+              player, event.getAction() == GLFW.GLFW_PRESS, true);
+          case TOGGLE -> {
+            if (event.getAction() == GLFW.GLFW_PRESS) {
+              gun.setPerformingSecondaryAction(player, !gun.isPerformingSecondaryAction(), true);
+            }
+          }
+        }
+        event.setCanceled(true);
       }
     }
   }

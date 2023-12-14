@@ -42,7 +42,7 @@ public class FastZombie extends Zombie {
         .add(Attributes.MAX_HEALTH, 10.0D)
         .add(Attributes.ATTACK_DAMAGE, 1.0D)
         .add(Attributes.FOLLOW_RANGE, 30.0D)
-        .add(Attributes.MOVEMENT_SPEED, 0.4D)
+        .add(Attributes.MOVEMENT_SPEED, 0.33D)
         .add(Attributes.ATTACK_KNOCKBACK, 1.5D);
   }
 
