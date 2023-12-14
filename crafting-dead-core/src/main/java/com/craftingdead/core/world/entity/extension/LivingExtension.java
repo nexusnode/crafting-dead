@@ -18,6 +18,7 @@
 
 package com.craftingdead.core.world.entity.extension;
 
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.Random;
 import javax.annotation.Nonnull;
@@ -282,17 +283,27 @@ public interface LivingExtension<E extends LivingEntity, H extends LivingHandler
 
   ItemStack setItemInSlot(Equipment.Slot slot, ItemStack itemStack);
 
-  default void breakItem(ItemStack itemStack) {
-    if (!itemStack.isEmpty()) {
-      if (!this.entity().isSilent()) {
-        this.level().playLocalSound(this.entity().getX(), this.entity().getY(),
-            this.entity().getZ(), SoundEvents.ITEM_BREAK,
-            this.entity().getSoundSource(), 0.8F,
-            0.8F + this.level().getRandom().nextFloat() * 0.4F, false);
-      }
+  default ItemStack clearSlot(Equipment.Slot slot) {
+    return this.setItemInSlot(slot, ItemStack.EMPTY);
+  }
 
-      this.spawnItemParticles(itemStack, 5);
+  default void clearEquipment() {
+    Arrays.stream(Equipment.Slot.values()).forEach(this::clearSlot);
+  }
+
+  default void breakItem(ItemStack itemStack) {
+    if (itemStack.isEmpty()) {
+      return;
     }
+
+    if (!this.entity().isSilent()) {
+      this.level().playLocalSound(this.entity().getX(), this.entity().getY(),
+          this.entity().getZ(), SoundEvents.ITEM_BREAK,
+          this.entity().getSoundSource(), 0.8F,
+          0.8F + this.level().getRandom().nextFloat() * 0.4F, false);
+    }
+
+    this.spawnItemParticles(itemStack, 5);
   }
 
   default void spawnItemParticles(ItemStack itemStack, int count) {
