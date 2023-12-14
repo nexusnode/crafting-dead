@@ -148,27 +148,27 @@ public class SurvivalItems {
           .tab(TAB)));
 
   public static final RegistryObject<Item> DIRTY_RAG = deferredRegister.register("dirty_rag",
-      () -> new ActionItem(SurvivalActionTypes.WASH_RAG, new Item.Properties().tab(TAB)));
+      () -> new ActionItem(SurvivalActionTypes.WASH_RAG, new Item.Properties().tab(TAB).stacksTo(3)));
 
   public static final RegistryObject<Item> BLOODY_RAG = deferredRegister.register("bloody_rag",
-      () -> new ActionItem(SurvivalActionTypes.WASH_RAG, new Item.Properties().tab(TAB)));
+      () -> new ActionItem(SurvivalActionTypes.WASH_RAG, new Item.Properties().tab(TAB).stacksTo(3)));
 
   public static final RegistryObject<Item> CLEAN_RAG = deferredRegister.register("clean_rag",
-      () -> new ActionItem(SurvivalActionTypes.USE_CLEAN_RAG, new Item.Properties().tab(TAB)));
+      () -> new ActionItem(SurvivalActionTypes.USE_CLEAN_RAG, new Item.Properties().tab(TAB).stacksTo(3)));
 
   public static final RegistryObject<Item> SPLINT = deferredRegister.register("splint",
       () -> new ActionItem(SurvivalActionTypes.USE_SPLINT, new Item.Properties()
-          .stacksTo(1)
+          .stacksTo(3)
           .tab(TAB)));
 
   public static final RegistryObject<Item> RBI_SYRINGE = deferredRegister.register("rbi_syringe",
       () -> new ActionItem(SurvivalActionTypes.USE_RBI_SYRINGE, new ActionItem.Properties()
-          .stacksTo(1)
+          .stacksTo(3)
           .tab(TAB)));
 
   public static final RegistryObject<Item> CURE_SYRINGE = deferredRegister.register("cure_syringe",
       () -> new ActionItem(SurvivalActionTypes.USE_CURE_SYRINGE, new ActionItem.Properties()
-          .stacksTo(1)
+          .stacksTo(3)
           .tab(TAB)));
 
   // ================================================================================
@@ -202,11 +202,11 @@ public class SurvivalItems {
 
   public static final RegistryObject<Item> EMPTY_WATER_BOTTLE =
       deferredRegister.register("empty_water_bottle",
-          () -> new Item(new Item.Properties().tab(TAB)));
+          () -> new Item(new Item.Properties().tab(TAB).stacksTo(3)));
 
   public static final RegistryObject<Item> WATER_BOTTLE =
       deferredRegister.register("water_bottle",
-          () -> new DrinkItem(new Item.Properties().tab(TAB), 8, EMPTY_WATER_BOTTLE));
+          () -> new DrinkItem(new Item.Properties().tab(TAB).stacksTo(3), 8, EMPTY_WATER_BOTTLE));
 
   public static final RegistryObject<Item> EMPTY_WATER_CANTEEN =
       deferredRegister.register("empty_water_canteen",
@@ -219,179 +219,179 @@ public class SurvivalItems {
 
   public static final RegistryObject<Item> POWER_BAR =
       deferredRegister.register("power_bar",
-          () -> new Item(new Item.Properties().tab(TAB).food(SurvivalFoods.POWER_BAR)));
+          () -> new Item(new Item.Properties().tab(TAB).food(SurvivalFoods.POWER_BAR).stacksTo(3)));
 
   public static final RegistryObject<Item> CANDY_BAR =
       deferredRegister.register("candy_bar",
-          () -> new Item(new Item.Properties().tab(TAB).food(SurvivalFoods.CANDY_BAR)));
+          () -> new Item(new Item.Properties().tab(TAB).food(SurvivalFoods.CANDY_BAR).stacksTo(3)));
 
   public static final RegistryObject<Item> CEREAL =
       deferredRegister.register("cereal",
-          () -> new Item(new Item.Properties().tab(TAB).food(SurvivalFoods.CEREAL)));
+          () -> new Item(new Item.Properties().tab(TAB).food(SurvivalFoods.CEREAL).stacksTo(3)));
 
   public static final RegistryObject<Item> CANNED_SWEETCORN =
       deferredRegister.register("canned_sweetcorn",
-          () -> new Item(new Item.Properties().tab(TAB)));
+          () -> new Item(new Item.Properties().tab(TAB).stacksTo(3)));
 
   public static final RegistryObject<Item> OPEN_CANNED_SWEETCORN =
       deferredRegister.register("open_canned_sweetcorn",
-          () -> new Item(new Item.Properties().tab(TAB).food(SurvivalFoods.CANNED_CORN)));
+          () -> new Item(new Item.Properties().tab(TAB).food(SurvivalFoods.CANNED_CORN).stacksTo(3)));
 
   public static final RegistryObject<Item> CANNED_BEANS =
       deferredRegister.register("canned_beans",
-          () -> new Item(new Item.Properties().tab(TAB)));
+          () -> new Item(new Item.Properties().tab(TAB).stacksTo(3)));
 
   public static final RegistryObject<Item> OPEN_CANNED_BEANS =
       deferredRegister.register("open_canned_beans",
-          () -> new Item(new Item.Properties().tab(TAB).food(SurvivalFoods.CANNED_BEANS)));
+          () -> new Item(new Item.Properties().tab(TAB).food(SurvivalFoods.CANNED_BEANS).stacksTo(3)));
 
   public static final RegistryObject<Item> CANNED_TUNA =
       deferredRegister.register("canned_tuna",
-          () -> new Item(new Item.Properties().tab(TAB)));
+          () -> new Item(new Item.Properties().tab(TAB).stacksTo(3)));
 
   public static final RegistryObject<Item> OPEN_CANNED_TUNA =
       deferredRegister.register("open_canned_tuna",
-          () -> new Item(new Item.Properties().tab(TAB).food(SurvivalFoods.CANNED_TUNA)));
+          () -> new Item(new Item.Properties().tab(TAB).food(SurvivalFoods.CANNED_TUNA).stacksTo(3)));
 
   public static final RegistryObject<Item> CANNED_PEACHES =
       deferredRegister.register("canned_peaches",
-          () -> new Item(new Item.Properties().tab(TAB)));
+          () -> new Item(new Item.Properties().tab(TAB).stacksTo(3)));
 
   public static final RegistryObject<Item> OPEN_CANNED_PEACHES =
       deferredRegister.register("open_canned_peaches",
-          () -> new Item(new Item.Properties().tab(TAB).food(SurvivalFoods.CANNED_PEACHES)));
+          () -> new Item(new Item.Properties().tab(TAB).food(SurvivalFoods.CANNED_PEACHES).stacksTo(3)));
 
   public static final RegistryObject<Item> CANNED_PASTA =
       deferredRegister.register("canned_pasta",
-          () -> new Item(new Item.Properties().tab(TAB)));
+          () -> new Item(new Item.Properties().tab(TAB).stacksTo(3)));
 
   public static final RegistryObject<Item> OPEN_CANNED_PASTA =
       deferredRegister.register("open_canned_pasta",
-          () -> new Item(new Item.Properties().tab(TAB).food(SurvivalFoods.CANNED_PASTA)));
+          () -> new Item(new Item.Properties().tab(TAB).food(SurvivalFoods.CANNED_PASTA).stacksTo(3)));
 
   public static final RegistryObject<Item> CANNED_CORNED_BEEF =
       deferredRegister.register("canned_corned_beef",
-          () -> new Item(new Item.Properties().tab(TAB)));
+          () -> new Item(new Item.Properties().tab(TAB).stacksTo(3)));
 
   public static final RegistryObject<Item> OPEN_CANNED_CORNED_BEEF =
       deferredRegister.register("open_canned_corned_beef",
-          () -> new Item(new Item.Properties().tab(TAB).food(SurvivalFoods.CANNED_BACON)));
+          () -> new Item(new Item.Properties().tab(TAB).food(SurvivalFoods.CANNED_BACON).stacksTo(3)));
 
   public static final RegistryObject<Item> CANNED_CUSTARD =
       deferredRegister.register("canned_custard",
-          () -> new Item(new Item.Properties().tab(TAB)));
+          () -> new Item(new Item.Properties().tab(TAB).stacksTo(3)));
 
   public static final RegistryObject<Item> OPEN_CANNED_CUSTARD =
       deferredRegister.register("open_canned_custard",
-          () -> new Item(new Item.Properties().tab(TAB).food(SurvivalFoods.CANNED_CUSTARD)));
+          () -> new Item(new Item.Properties().tab(TAB).food(SurvivalFoods.CANNED_CUSTARD).stacksTo(3)));
 
   public static final RegistryObject<Item> CANNED_PICKLES =
       deferredRegister.register("canned_pickles",
-          () -> new Item(new Item.Properties().tab(TAB)));
+          () -> new Item(new Item.Properties().tab(TAB).stacksTo(3)));
 
   public static final RegistryObject<Item> OPEN_CANNED_PICKLES =
       deferredRegister.register("open_canned_pickles",
-          () -> new Item(new Item.Properties().tab(TAB).food(SurvivalFoods.CANNED_PICKLES)));
+          () -> new Item(new Item.Properties().tab(TAB).food(SurvivalFoods.CANNED_PICKLES).stacksTo(3)));
 
   public static final RegistryObject<Item> CANNED_DOG_FOOD =
       deferredRegister.register("canned_dog_food",
-          () -> new Item(new Item.Properties().tab(TAB)));
+          () -> new Item(new Item.Properties().tab(TAB).stacksTo(3)));
 
   public static final RegistryObject<Item> OPEN_CANNED_DOG_FOOD =
       deferredRegister.register("open_canned_dog_food",
-          () -> new Item(new Item.Properties().tab(TAB).food(SurvivalFoods.CANNED_DOG_FOOD)));
+          () -> new Item(new Item.Properties().tab(TAB).food(SurvivalFoods.CANNED_DOG_FOOD).stacksTo(3)));
 
   public static final RegistryObject<Item> CANNED_TOMATO_SOUP =
       deferredRegister.register("canned_tomato_soup",
-          () -> new Item(new Item.Properties().tab(TAB)));
+          () -> new Item(new Item.Properties().tab(TAB).stacksTo(3)));
 
   public static final RegistryObject<Item> OPEN_CANNED_TOMATO_SOUP =
       deferredRegister.register("open_canned_tomato_soup",
-          () -> new Item(new Item.Properties().tab(TAB).food(SurvivalFoods.CANNED_TOMATO_SOUP)));
+          () -> new Item(new Item.Properties().tab(TAB).food(SurvivalFoods.CANNED_TOMATO_SOUP).stacksTo(3)));
 
   public static final RegistryObject<Item> MRE =
       deferredRegister.register("mre",
-          () -> new Item(new Item.Properties().tab(TAB).food(SurvivalFoods.MRE)));
+          () -> new Item(new Item.Properties().tab(TAB).food(SurvivalFoods.MRE).stacksTo(3)));
 
   public static final RegistryObject<Item> ORANGE =
       deferredRegister.register("orange",
-          () -> new Item(new Item.Properties().tab(TAB).food(SurvivalFoods.ORANGE)));
+          () -> new Item(new Item.Properties().tab(TAB).food(SurvivalFoods.ORANGE).stacksTo(3)));
 
   public static final RegistryObject<Item> ROTTEN_ORANGE =
       deferredRegister.register("rotten_orange",
-          () -> new Item(new Item.Properties().tab(TAB).food(SurvivalFoods.ROTTEN_ORANGE)));
+          () -> new Item(new Item.Properties().tab(TAB).food(SurvivalFoods.ROTTEN_ORANGE).stacksTo(3)));
 
   public static final RegistryObject<Item> PEAR =
       deferredRegister.register("pear",
-          () -> new Item(new Item.Properties().tab(TAB).food(SurvivalFoods.PEAR)));
+          () -> new Item(new Item.Properties().tab(TAB).food(SurvivalFoods.PEAR).stacksTo(3)));
 
   public static final RegistryObject<Item> ROTTEN_PEAR =
       deferredRegister.register("rotten_pear",
-          () -> new Item(new Item.Properties().tab(TAB).food(SurvivalFoods.ROTTEN_PEAR)));
+          () -> new Item(new Item.Properties().tab(TAB).food(SurvivalFoods.ROTTEN_PEAR).stacksTo(3)));
 
   public static final RegistryObject<Item> RICE_BAG =
       deferredRegister.register("rice_bag",
-          () -> new Item(new Item.Properties().tab(TAB).food(SurvivalFoods.RICE_BAG)));
+          () -> new Item(new Item.Properties().tab(TAB).food(SurvivalFoods.RICE_BAG).stacksTo(3)));
 
   public static final RegistryObject<Item> ROTTEN_APPLE =
       deferredRegister.register("rotten_apple",
-          () -> new Item(new Item.Properties().tab(TAB).food(SurvivalFoods.ROTTEN_APPLE)));
+          () -> new Item(new Item.Properties().tab(TAB).food(SurvivalFoods.ROTTEN_APPLE).stacksTo(3)));
 
   public static final RegistryObject<Item> NOODLES =
       deferredRegister.register("noodles",
-          () -> new Item(new Item.Properties().tab(TAB).food(SurvivalFoods.NOODLES)));
+          () -> new Item(new Item.Properties().tab(TAB).food(SurvivalFoods.NOODLES).stacksTo(3)));
 
   public static final RegistryObject<Item> ROTTEN_MELON_SLICE =
       deferredRegister.register("rotten_melon_slice",
-          () -> new Item(new Item.Properties().tab(TAB).food(SurvivalFoods.ROTTEN_MELON_SLICE)));
+          () -> new Item(new Item.Properties().tab(TAB).food(SurvivalFoods.ROTTEN_MELON_SLICE).stacksTo(3)));
 
   public static final RegistryObject<Item> BLUEBERRY =
       deferredRegister.register("blueberry",
-          () -> new Item(new Item.Properties().tab(TAB).food(SurvivalFoods.BLUEBERRY)));
+          () -> new Item(new Item.Properties().tab(TAB).food(SurvivalFoods.BLUEBERRY).stacksTo(3)));
 
   public static final RegistryObject<Item> ROTTEN_BLUEBERRY =
       deferredRegister.register("rotten_blueberry",
-          () -> new Item(new Item.Properties().tab(TAB).food(SurvivalFoods.ROTTEN_BLUEBERRY)));
+          () -> new Item(new Item.Properties().tab(TAB).food(SurvivalFoods.ROTTEN_BLUEBERRY).stacksTo(3)));
 
   public static final RegistryObject<Item> RASPBERRY =
       deferredRegister.register("raspberry",
-          () -> new Item(new Item.Properties().tab(TAB).food(SurvivalFoods.RASPBERRY)));
+          () -> new Item(new Item.Properties().tab(TAB).food(SurvivalFoods.RASPBERRY).stacksTo(3)));
 
   public static final RegistryObject<Item> ROTTEN_RASPBERRY =
       deferredRegister.register("rotten_raspberry",
-          () -> new Item(new Item.Properties().tab(TAB).food(SurvivalFoods.ROTTEN_RASPBERRY)));
+          () -> new Item(new Item.Properties().tab(TAB).food(SurvivalFoods.ROTTEN_RASPBERRY).stacksTo(3)));
 
   public static final RegistryObject<Item> CHIPS =
       deferredRegister.register("chips",
-          () -> new Item(new Item.Properties().tab(TAB).food(SurvivalFoods.CHIPS)));
+          () -> new Item(new Item.Properties().tab(TAB).food(SurvivalFoods.CHIPS).stacksTo(3)));
 
   public static final RegistryObject<Item> RANCH_CHIPS =
       deferredRegister.register("ranch_chips",
-          () -> new Item(new Item.Properties().tab(TAB).food(SurvivalFoods.RANCH_CHIPS)));
+          () -> new Item(new Item.Properties().tab(TAB).food(SurvivalFoods.RANCH_CHIPS).stacksTo(3)));
 
   public static final RegistryObject<Item> CHEESY_CHIPS =
       deferredRegister.register("cheesy_chips",
-          () -> new Item(new Item.Properties().tab(TAB).food(SurvivalFoods.CHEESY_CHIPS)));
+          () -> new Item(new Item.Properties().tab(TAB).food(SurvivalFoods.CHEESY_CHIPS).stacksTo(3)));
 
   public static final RegistryObject<Item> SALTED_CHIPS =
       deferredRegister.register("salted_chips",
-          () -> new Item(new Item.Properties().tab(TAB).food(SurvivalFoods.SALTED_CHIPS)));
+          () -> new Item(new Item.Properties().tab(TAB).food(SurvivalFoods.SALTED_CHIPS).stacksTo(3)));
 
   public static final RegistryObject<Item> POPCORN =
       deferredRegister.register("popcorn",
-          () -> new Item(new Item.Properties().tab(TAB).food(SurvivalFoods.POPCORN)));
+          () -> new Item(new Item.Properties().tab(TAB).food(SurvivalFoods.POPCORN).stacksTo(3)));
 
   public static final RegistryObject<Item> NUTTY_CEREAL =
       deferredRegister.register("nutty_cereal",
-          () -> new Item(new Item.Properties().tab(TAB).food(SurvivalFoods.NUTTY_CEREAL)));
+          () -> new Item(new Item.Properties().tab(TAB).food(SurvivalFoods.NUTTY_CEREAL).stacksTo(3)));
 
   public static final RegistryObject<Item> EMERALD_CEREAL =
       deferredRegister.register("emerald_cereal",
-          () -> new Item(new Item.Properties().tab(TAB).food(SurvivalFoods.EMERALD_CEREAL)));
+          () -> new Item(new Item.Properties().tab(TAB).food(SurvivalFoods.EMERALD_CEREAL).stacksTo(3)));
 
   public static final RegistryObject<Item> FLAKE_CEREAL =
       deferredRegister.register("flake_cereal",
-          () -> new Item(new Item.Properties().tab(TAB).food(SurvivalFoods.FLAKE_CEREAL)));
+          () -> new Item(new Item.Properties().tab(TAB).food(SurvivalFoods.FLAKE_CEREAL).stacksTo(3)));
 
   // ================================================================================
   // Tools

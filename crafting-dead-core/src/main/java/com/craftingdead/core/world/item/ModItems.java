@@ -1848,31 +1848,31 @@ public class ModItems {
   public static final RegistryObject<ActionItem> FIRST_AID_KIT =
       deferredRegister.register("first_aid_kit",
           () -> new ActionItem(ActionTypes.USE_FIRST_AID_KIT, new Item.Properties()
-              .stacksTo(1)
+              .stacksTo(3)
               .tab(MEDICAL_TAB)));
 
   public static final RegistryObject<ActionItem> ADRENALINE_SYRINGE =
       deferredRegister.register("adrenaline_syringe",
           () -> new ActionItem(ActionTypes.USE_ADRENALINE_SYRINGE, new Item.Properties()
-              .stacksTo(1)
+              .stacksTo(3)
               .tab(MEDICAL_TAB)));
 
   public static final RegistryObject<ActionItem> SYRINGE =
       deferredRegister.register("syringe",
           () -> new ActionItem(ActionTypes.USE_SYRINGE, new Item.Properties()
-              .stacksTo(1)
+              .stacksTo(3)
               .tab(MEDICAL_TAB)));
 
   public static final RegistryObject<ActionItem> BLOOD_SYRINGE =
       deferredRegister.register("blood_syringe",
           () -> new ActionItem(ActionTypes.USE_BLOOD_SYRINGE, new Item.Properties()
-              .stacksTo(1)
+              .stacksTo(3)
               .tab(MEDICAL_TAB)));
 
   public static final RegistryObject<ActionItem> BANDAGE =
       deferredRegister.register("bandage",
           () -> new ActionItem(ActionTypes.USE_BANDAGE, new Item.Properties()
-              .stacksTo(1)
+              .stacksTo(3)
               .tab(MEDICAL_TAB)));
 
   // ================================================================================
