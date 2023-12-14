@@ -19,6 +19,7 @@
 package com.craftingdead.core.util;
 
 import java.util.Optional;
+import com.craftingdead.core.tags.ModBlockTags;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
@@ -133,7 +134,7 @@ public class RayTraceUtil {
         lastBlockPos = blockPos;
 
         var blockState = level.getBlockState(blockPos);
-        if (blockState.canOcclude()) {
+        if (blockState.canOcclude() && !blockState.is(ModBlockTags.BULLETS_PASS_THROUGH)) {
           break;
         }
 
