@@ -72,11 +72,11 @@ import net.minecraftforge.common.data.ForgeBlockTagsProvider;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
+import net.minecraftforge.event.entity.living.LivingChangeTargetEvent;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
-import net.minecraftforge.event.entity.living.LivingSetAttackTargetEvent;
 import net.minecraftforge.event.entity.player.AttackEntityEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
@@ -265,10 +265,10 @@ public class CraftingDead {
   }
 
   @SubscribeEvent(priority = EventPriority.LOWEST)
-  public void handleLivingSetTarget(LivingSetAttackTargetEvent event) {
-    if (event.getTarget() != null && event.getEntityLiving() instanceof Mob mob) {
+  public void handleLivingSetTarget(LivingChangeTargetEvent event) {
+    if (event.getNewTarget() != null && event.getEntityLiving() instanceof Mob mob) {
       if (mob.hasEffect(ModMobEffects.FLASH_BLINDNESS.get())) {
-        mob.setTarget(null);
+        event.setNewTarget(null);
       }
     }
   }
