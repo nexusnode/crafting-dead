@@ -21,6 +21,7 @@ package com.craftingdead.worldguard;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
+import java.util.Set;
 import org.bukkit.World;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.slf4j.Logger;
@@ -29,8 +30,7 @@ import com.craftingdead.core.event.GrenadeThrowEvent;
 import com.craftingdead.core.event.GunEvent;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.immerse.event.WaterDecayEvent;
-import com.craftingdead.survival.event.BleedEvent;
-import com.craftingdead.survival.event.BreakLegEvent;
+import com.craftingdead.survival.world.effect.SurvivalMobEffects;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.LocalPlayer;
@@ -38,13 +38,19 @@ import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.BukkitPlayer;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
+import com.sk89q.worldguard.protection.flags.BooleanFlag;
 import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.flags.registry.FlagConflictException;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.entity.living.PotionEvent;
+import net.minecraftforge.eventbus.api.Event;
 
 public class CraftingDeadWorldGuard extends JavaPlugin {
 
@@ -52,14 +58,18 @@ public class CraftingDeadWorldGuard extends JavaPlugin {
   private static final MethodHandle getWorld;
   private static final MethodHandle getBukkitEntity;
   private static final MethodHandle getHandle;
+  private static final MethodHandle getEffect;
+  private static final MethodHandle hasEffect;
+  private static final MethodHandle removeEffect;
 
+  public static final StateFlag INFECTION = new StateFlag("infection", true);
   public static final StateFlag BROKEN_LEGS = new StateFlag("broken-legs", true);
   public static final StateFlag BLEEDING = new StateFlag("bleeding", true);
   public static final StateFlag THIRST = new StateFlag("thirst", true);
   public static final StateFlag SHOOTING = new StateFlag("shooting", true);
   public static final StateFlag GRENADE_THROWING = new StateFlag("grenade-throwing", true);
-  public static final StateFlag CLEAR_EQUIPMENT_ON_EXIT =
-      new StateFlag("clear-equipment-on-exit", false);
+  public static final BooleanFlag CLEAR_EQUIPMENT_ON_EXIT =
+      new BooleanFlag("clear-equipment-on-exit");
 
   static {
     try {
@@ -79,6 +89,17 @@ public class CraftingDeadWorldGuard extends JavaPlugin {
           craftEntity,
           "getHandle",
           MethodType.methodType(Entity.class));
+
+      hasEffect = lookup.findVirtual(LivingEntity.class, "m_21023_",
+          MethodType.methodType(boolean.class,
+              Class.forName("net.minecraft.world.effect.MobEffectList")));
+      removeEffect = lookup.findVirtual(LivingEntity.class, "m_21195_",
+          MethodType.methodType(boolean.class,
+              Class.forName("net.minecraft.world.effect.MobEffectList")));
+
+      getEffect = lookup.findVirtual(MobEffectInstance.class, "m_19544_",
+          MethodType.methodType(Class.forName("net.minecraft.world.effect.MobEffectList")));
+
     } catch (Throwable t) {
       throw new ExceptionInInitializerError(t);
     }
@@ -87,6 +108,7 @@ public class CraftingDeadWorldGuard extends JavaPlugin {
   @Override
   public void onLoad() {
     logger.info("Loading Crafting Dead WorldGuard...");
+    registerFlag(INFECTION);
     registerFlag(BROKEN_LEGS);
     registerFlag(BLEEDING);
     registerFlag(THIRST);
@@ -94,12 +116,8 @@ public class CraftingDeadWorldGuard extends JavaPlugin {
     registerFlag(GRENADE_THROWING);
     registerFlag(CLEAR_EQUIPMENT_ON_EXIT);
 
-    var sessionManager = WorldGuard.getInstance().getPlatform().getSessionManager();
-    sessionManager.registerHandler(ClearEquipmentOnExitFlag.FACTORY, null);
-
     var forgeBus = MinecraftForge.EVENT_BUS;
-    forgeBus.addListener(this::handleBreakLeg);
-    forgeBus.addListener(this::handleBleed);
+    forgeBus.addListener(this::handlePotionApplicable);
     forgeBus.addListener(this::handleWaterDecay);
     forgeBus.addListener(this::handleGunEntityHit);
     forgeBus.addListener(this::handleGunBlockHit);
@@ -108,16 +126,73 @@ public class CraftingDeadWorldGuard extends JavaPlugin {
     logger.info("Crafting Dead WorldGuard loaded.");
   }
 
-  private void handleBreakLeg(BreakLegEvent event) {
-    var localPlayer = toWorldGuardPlayer(event.getPlayer());
-    var regions = getApplicableRegions(event.getPlayer());
-    event.setCanceled(!regions.testState(localPlayer, BROKEN_LEGS));
+  @Override
+  public void onEnable() {
+    var sessionManager = WorldGuard.getInstance().getPlatform().getSessionManager();
+    sessionManager.registerHandler(
+        HandlerAdapter.createFactory(
+            this::handleEnter,
+            this::handleExit),
+        null);
   }
 
-  private void handleBleed(BleedEvent event) {
-    var localPlayer = toWorldGuardPlayer(event.getPlayer());
-    var regions = getApplicableRegions(event.getPlayer());
-    event.setCanceled(!regions.testState(localPlayer, BLEEDING));
+  private void handleEnter(PlayerExtension<?> extension, Set<ProtectedRegion> regions) {
+    var stopBleeding = false;
+    var stopBrokenLegs = false;
+
+    for (var region : regions) {
+      if (region.getFlag(BLEEDING) == StateFlag.State.DENY) {
+        stopBleeding = true;
+      }
+
+      if (region.getFlag(BROKEN_LEGS) == StateFlag.State.DENY) {
+        stopBrokenLegs = true;
+      }
+    }
+
+    if (stopBleeding && hasEffect(extension.entity(), SurvivalMobEffects.BLEEDING.get())) {
+      removeEffect(extension.entity(), SurvivalMobEffects.BLEEDING.get());
+    }
+
+    if (stopBrokenLegs && hasEffect(extension.entity(), SurvivalMobEffects.BROKEN_LEG.get())) {
+      removeEffect(extension.entity(), SurvivalMobEffects.BROKEN_LEG.get());
+    }
+  }
+
+  private void handleExit(PlayerExtension<?> extension, Set<ProtectedRegion> regions) {
+    var clearEquipment = false;
+
+    for (var region : regions) {
+      if (region.getFlag(CLEAR_EQUIPMENT_ON_EXIT) == Boolean.TRUE) {
+        clearEquipment = true;
+      }
+    }
+
+    if (clearEquipment) {
+      extension.clearEquipment();
+    }
+  }
+
+  private void handlePotionApplicable(PotionEvent.PotionApplicableEvent event) {
+    if (event.getEntity() instanceof Player player) {
+      var localPlayer = toWorldGuardPlayer(player);
+      var regions = getApplicableRegions(player);
+      var effect = getEffect(event.getPotionEffect());
+
+
+      StateFlag flag = null;
+      if (effect == SurvivalMobEffects.INFECTION.get()) {
+        flag = INFECTION;
+      } else if (effect == SurvivalMobEffects.BROKEN_LEG.get()) {
+        flag = BROKEN_LEGS;
+      } else if (effect == SurvivalMobEffects.BLEEDING.get()) {
+        flag = BLEEDING;
+      }
+
+      if (flag != null && !regions.testState(localPlayer, flag)) {
+        event.setResult(Event.Result.DENY);
+      }
+    }
   }
 
   private void handleWaterDecay(WaterDecayEvent event) {
@@ -161,7 +236,7 @@ public class CraftingDeadWorldGuard extends JavaPlugin {
 
   private static World adapt(Level level) {
     try {
-      return (World) getWorld.invokeExact(level);
+      return (World) getWorld.invoke(level);
     } catch (Throwable e) {
       throw new RuntimeException(e);
     }
@@ -169,7 +244,7 @@ public class CraftingDeadWorldGuard extends JavaPlugin {
 
   private static org.bukkit.entity.Entity adapt(Entity entity) {
     try {
-      return (org.bukkit.entity.Entity) getBukkitEntity.invokeExact(entity);
+      return (org.bukkit.entity.Entity) getBukkitEntity.invoke(entity);
     } catch (Throwable e) {
       throw new RuntimeException(e);
     }
@@ -186,7 +261,31 @@ public class CraftingDeadWorldGuard extends JavaPlugin {
 
   private static Entity toEntity(org.bukkit.entity.Entity entity) {
     try {
-      return (Entity) getHandle.invokeExact(entity);
+      return (Entity) getHandle.invoke(entity);
+    } catch (Throwable e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  private static Object getEffect(MobEffectInstance effectInstance) {
+    try {
+      return getEffect.invoke(effectInstance);
+    } catch (Throwable e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  private static boolean hasEffect(LivingEntity entity, Object effect) {
+    try {
+      return (boolean) hasEffect.invoke(entity, effect);
+    } catch (Throwable e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  private static boolean removeEffect(LivingEntity entity, Object effect) {
+    try {
+      return (boolean) removeEffect.invoke(entity, effect);
     } catch (Throwable e) {
       throw new RuntimeException(e);
     }

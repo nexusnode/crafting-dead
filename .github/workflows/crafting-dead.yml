@@ -33,7 +33,7 @@ jobs:
        ./gradlew crafting-dead-immerse:build
        ./gradlew crafting-dead-survival:build
        ./gradlew crafting-dead-decoration:build
-       ./gradlew crafting-dead-worldguard:build
+       ./gradlew crafting-dead-worldguard:jar
     - uses: actions/upload-artifact@v2
       with:
         name: crafting-dead

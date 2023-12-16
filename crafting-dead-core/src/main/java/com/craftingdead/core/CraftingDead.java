@@ -366,14 +366,10 @@ public class CraftingDead {
 
   @SubscribeEvent
   public void handlePlayerTick(TickEvent.PlayerTickEvent event) {
-    switch (event.phase) {
-      case END:
-        event.player.getCapability(LivingExtension.CAPABILITY)
-            .map(PlayerExtension.class::cast)
-            .ifPresent(PlayerExtension::playerTick);
-        break;
-      default:
-        break;
+    if (event.phase == TickEvent.Phase.END) {
+      event.player.getCapability(LivingExtension.CAPABILITY)
+          .map(PlayerExtension.class::cast)
+          .ifPresent(PlayerExtension::playerTick);
     }
   }
 

@@ -23,8 +23,6 @@ import com.craftingdead.core.world.entity.extension.LivingHandlerType;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.core.world.entity.extension.PlayerHandler;
 import com.craftingdead.survival.CraftingDeadSurvival;
-import com.craftingdead.survival.event.BleedEvent;
-import com.craftingdead.survival.event.BreakLegEvent;
 import com.craftingdead.survival.world.effect.SurvivalMobEffects;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.FriendlyByteBuf;
@@ -35,7 +33,6 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.monster.Zombie;
-import net.minecraftforge.common.MinecraftForge;
 
 public class SurvivalPlayerHandler implements PlayerHandler {
 
@@ -80,21 +77,21 @@ public class SurvivalPlayerHandler implements PlayerHandler {
   }
 
   private void updateEffects() {
-    boolean invulnerable = this.player.entity().getAbilities().invulnerable
+    var invulnerable = this.player.entity().getAbilities().invulnerable
         || this.player.level().getDifficulty() == Difficulty.PEACEFUL;
 
-    if ((invulnerable || !CraftingDeadSurvival.serverConfig.bleedingEnabled.get())
-        && this.player.entity().hasEffect(SurvivalMobEffects.BLEEDING.get())) {
+    if (this.player.entity().hasEffect(SurvivalMobEffects.BLEEDING.get())
+        && (invulnerable || !CraftingDeadSurvival.serverConfig.bleedingEnabled.get())) {
       this.player.entity().removeEffect(SurvivalMobEffects.BLEEDING.get());
     }
 
-    if ((invulnerable || !CraftingDeadSurvival.serverConfig.brokenLegsEnabled.get())
-        && this.player.entity().hasEffect(SurvivalMobEffects.BROKEN_LEG.get())) {
+    if (this.player.entity().hasEffect(SurvivalMobEffects.BROKEN_LEG.get()) &&
+        (invulnerable || !CraftingDeadSurvival.serverConfig.brokenLegsEnabled.get())) {
       this.player.entity().removeEffect(SurvivalMobEffects.BROKEN_LEG.get());
     }
 
-    if ((invulnerable || !CraftingDeadSurvival.serverConfig.infectionEnabled.get())
-        && this.player.entity().hasEffect(SurvivalMobEffects.INFECTION.get())) {
+    if (this.player.entity().hasEffect(SurvivalMobEffects.INFECTION.get()) &&
+        (invulnerable || !CraftingDeadSurvival.serverConfig.infectionEnabled.get())) {
       this.player.entity().removeEffect(SurvivalMobEffects.INFECTION.get());
     }
   }
@@ -108,15 +105,15 @@ public class SurvivalPlayerHandler implements PlayerHandler {
   }
 
   public void infect(float chance) {
-    final var entity = this.player.entity();
+    var entity = this.player.entity();
     if (!entity.isCreative()
         && entity.getLevel().getDifficulty() != Difficulty.PEACEFUL
         && entity.getRandom().nextFloat() < chance
         && !entity.hasEffect(SurvivalMobEffects.INFECTION.get())
-        && CraftingDeadSurvival.serverConfig.infectionEnabled.get()) {
+        && CraftingDeadSurvival.serverConfig.infectionEnabled.get()
+        && entity.addEffect(new MobEffectInstance(SurvivalMobEffects.INFECTION.get(), 9999999))) {
       entity.displayClientMessage(new TranslatableComponent("message.infected")
           .withStyle(ChatFormatting.RED, ChatFormatting.BOLD), true);
-      entity.addEffect(new MobEffectInstance(SurvivalMobEffects.INFECTION.get(), 9999999));
     }
   }
 
@@ -127,33 +124,31 @@ public class SurvivalPlayerHandler implements PlayerHandler {
 
     if (!invulnerable
         && CraftingDeadSurvival.serverConfig.bleedingEnabled.get()
-        && (source.getDirectEntity() != null || source.isExplosion())
-        && !MinecraftForge.EVENT_BUS.post(new BleedEvent(this.player.entity()))) {
-      float bleedChance = 0.1F * amount;
+        && !this.player.entity().hasEffect(SurvivalMobEffects.BLEEDING.get())
+        && (source.getDirectEntity() != null || source.isExplosion())) {
+      var bleedChance = 0.1F * amount;
       if (random.nextFloat() < bleedChance
-          && !this.player.entity().hasEffect(SurvivalMobEffects.BLEEDING.get())) {
-        this.player.entity()
-            .displayClientMessage(new TranslatableComponent("message.bleeding")
-                .withStyle(ChatFormatting.RED, ChatFormatting.BOLD), true);
-        this.player.entity()
-            .addEffect(new MobEffectInstance(SurvivalMobEffects.BLEEDING.get(), 9999999));
+          && this.player.entity().addEffect(
+              new MobEffectInstance(SurvivalMobEffects.BLEEDING.get(), 9999999))) {
+        this.player.entity().displayClientMessage(new TranslatableComponent("message.bleeding")
+            .withStyle(ChatFormatting.RED, ChatFormatting.BOLD), true);
       }
     }
 
-    var legBreakChance =
-        0.25F * this.player.entity().fallDistance / this.player.entity().getMaxFallDistance();
     if (!invulnerable
         && CraftingDeadSurvival.serverConfig.brokenLegsEnabled.get()
         && !this.player.entity().hasEffect(SurvivalMobEffects.BROKEN_LEG.get())
-        && source == DamageSource.FALL
-        && random.nextFloat() < legBreakChance
-        && !MinecraftForge.EVENT_BUS.post(new BreakLegEvent(this.player.entity()))) {
-      this.player.entity()
-          .displayClientMessage(new TranslatableComponent("message.broken_leg")
-              .withStyle(ChatFormatting.RED, ChatFormatting.BOLD), true);
-      this.player.entity().addEffect(
-          new MobEffectInstance(SurvivalMobEffects.BROKEN_LEG.get(), 9999999, 4));
-      this.player.entity().addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 100, 1));
+        && source == DamageSource.FALL) {
+      var legBreakChance =
+          0.25F * this.player.entity().fallDistance / this.player.entity().getMaxFallDistance();
+      if (random.nextFloat() < legBreakChance
+          && this.player.entity().addEffect(
+              new MobEffectInstance(SurvivalMobEffects.BROKEN_LEG.get(), 9999999, 4))) {
+        this.player.entity()
+            .displayClientMessage(new TranslatableComponent("message.broken_leg")
+                .withStyle(ChatFormatting.RED, ChatFormatting.BOLD), true);
+        this.player.entity().addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 100, 1));
+      }
     }
 
     return amount;

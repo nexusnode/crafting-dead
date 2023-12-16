@@ -482,24 +482,10 @@ class BaseLivingExtension<E extends LivingEntity, H extends LivingHandler>
     return this.entity;
   }
 
-  // public float[] getEquipmentDropChances() {
-  // return Arrays.copyOf(this.equipmentDropChances, this.equipmentDropChances.length);
-  // }
-
   @Override
   public float getEquipmentDropChance(Equipment.Slot slot) {
     return this.equipmentDropChances[slot.getIndex()];
   }
-
-  // public void setEquipmentDropChances(float[] newChances) throws IllegalArgumentException {
-  // if (newChances.length < this.equipmentDropChances.length) {
-  // throw new IllegalArgumentException(
-  // String.format("Missing drop chances. Expected %s but %s was provided.",
-  // this.equipmentDropChances.length, newChances.length));
-  // }
-  //
-  // this.equipmentDropChances = Arrays.copyOf(newChances, this.equipmentDropChances.length);
-  // }
 
   @Override
   public void setEquipmentDropChance(Equipment.Slot slot, float chance) {
