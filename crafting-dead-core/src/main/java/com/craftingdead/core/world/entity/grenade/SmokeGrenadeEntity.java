@@ -19,7 +19,7 @@
 package com.craftingdead.core.world.entity.grenade;
 
 import java.util.OptionalInt;
-import com.craftingdead.core.CraftingDead;
+import com.craftingdead.core.ServerConfig;
 import com.craftingdead.core.particle.GrenadeSmokeParticleData;
 import com.craftingdead.core.world.entity.ModEntityTypes;
 import com.craftingdead.core.world.item.GrenadeItem;
@@ -56,7 +56,7 @@ public class SmokeGrenadeEntity extends Grenade {
   @Override
   public OptionalInt getMinimumTicksUntilAutoDeactivation() {
     return OptionalInt.of(
-        CraftingDead.serverConfig.explosivesSmokeGrenadeTicksBeforeDeactivation.get());
+        ServerConfig.instance.explosivesSmokeGrenadeTicksBeforeDeactivation.get());
   }
 
   @Override
@@ -79,7 +79,7 @@ public class SmokeGrenadeEntity extends Grenade {
   public void onGrenadeTick() {
     int activatedTicksCount = this.getActivatedTicksCount();
     double radius = Mth.lerp(Math.min(activatedTicksCount, 30D) / 30D, 2D, 5D)
-        * CraftingDead.serverConfig.explosivesSmokeGrenadeRadius.get();
+        * ServerConfig.instance.explosivesSmokeGrenadeRadius.get();
 
     if (this.level.isClientSide()) {
       if (activatedTicksCount % 10 == 0) {

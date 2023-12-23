@@ -32,7 +32,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import com.craftingdead.core.CraftingDead;
+import com.craftingdead.core.ServerConfig;
 import com.craftingdead.core.client.animation.Animation;
 import com.craftingdead.core.world.item.combatslot.CombatSlot;
 import com.craftingdead.core.world.item.gun.FireMode;
@@ -120,7 +120,7 @@ public abstract class GunItem extends ProjectileWeaponItem {
   public AmmoProvider createAmmoProvider() {
     AmmoProvider ammoProvider =
         new MagazineAmmoProvider(this.getDefaultMagazine().getDefaultInstance());
-    if (CraftingDead.serverConfig.reloadGunComeEmptyMag.get()) {
+    if (ServerConfig.instance.reloadGunComeEmptyMag.get()) {
       ammoProvider.getExpectedMagazine().setSize(0);
     }
     return ammoProvider;
@@ -177,7 +177,7 @@ public abstract class GunItem extends ProjectileWeaponItem {
               .withStyle(ChatFormatting.RED);
       var headshotDamageText = new TextComponent(
           String.valueOf((int) (configuration.getDamage()
-              * CraftingDead.serverConfig.headshotBonusDamage.get())))
+              * ServerConfig.instance.headshotBonusDamage.get())))
                   .withStyle(ChatFormatting.RED);
       var accuracyText =
           new TextComponent((int) (configuration.getAccuracyPercent() * 100.0F) + "%")

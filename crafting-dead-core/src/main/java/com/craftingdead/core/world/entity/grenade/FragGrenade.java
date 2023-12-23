@@ -19,7 +19,7 @@
 package com.craftingdead.core.world.entity.grenade;
 
 import java.util.OptionalInt;
-import com.craftingdead.core.CraftingDead;
+import com.craftingdead.core.ServerConfig;
 import com.craftingdead.core.world.entity.ExplosionSource;
 import com.craftingdead.core.world.entity.ModEntityTypes;
 import com.craftingdead.core.world.item.GrenadeItem;
@@ -45,7 +45,7 @@ public class FragGrenade extends Grenade implements ExplosionSource {
   @Override
   public OptionalInt getMinimumTicksUntilAutoActivation() {
     return OptionalInt.of(
-        CraftingDead.serverConfig.explosivesFragGrenadeTicksBeforeActivation.get());
+        ServerConfig.instance.explosivesFragGrenadeTicksBeforeActivation.get());
   }
 
   @Override
@@ -58,8 +58,8 @@ public class FragGrenade extends Grenade implements ExplosionSource {
         this.kill();
         this.level.explode(this, this.createDamageSource(), null,
             this.getX(), this.getY() + this.getBbHeight(), this.getZ(),
-            CraftingDead.serverConfig.explosivesFragGrenadeRadius.get().floatValue(), false,
-            CraftingDead.serverConfig.explosivesFragGrenadeExplosionMode.get());
+            ServerConfig.instance.explosivesFragGrenadeRadius.get().floatValue(), false,
+            ServerConfig.instance.explosivesFragGrenadeExplosionMode.get());
       }
     }
   }
@@ -74,11 +74,11 @@ public class FragGrenade extends Grenade implements ExplosionSource {
 
   @Override
   public float getDamageMultiplier() {
-    return CraftingDead.serverConfig.explosivesFragGrenadeDamageMultiplier.get().floatValue();
+    return ServerConfig.instance.explosivesFragGrenadeDamageMultiplier.get().floatValue();
   }
 
   @Override
   public double getKnockbackMultiplier() {
-    return CraftingDead.serverConfig.explosivesFragGrenadeKnockbackMultiplier.get();
+    return ServerConfig.instance.explosivesFragGrenadeKnockbackMultiplier.get();
   }
 }

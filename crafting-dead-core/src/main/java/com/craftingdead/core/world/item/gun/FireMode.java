@@ -18,22 +18,22 @@
 
 package com.craftingdead.core.world.item.gun;
 
-import com.craftingdead.core.CraftingDead;
-import com.mojang.serialization.Codec;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.IntSupplier;
 import java.util.stream.Collectors;
-import org.jetbrains.annotations.Nullable;
-import net.minecraft.util.StringRepresentable;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import com.craftingdead.core.ServerConfig;
+import com.mojang.serialization.Codec;
+import net.minecraft.util.StringRepresentable;
 
 public enum FireMode implements StringRepresentable {
 
   AUTO("auto"),
-  BURST("burst", CraftingDead.serverConfig.burstfireShotsPerBurst::get),
+  BURST("burst", ServerConfig.instance.burstfireShotsPerBurst::get),
   SEMI("semi", () -> 1);
 
   public static final Codec<FireMode> CODEC =

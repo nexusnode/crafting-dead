@@ -18,7 +18,8 @@
 
 package com.craftingdead.core.world.action;
 
-import com.craftingdead.core.CraftingDead;
+import org.jetbrains.annotations.Nullable;
+import com.craftingdead.core.ServerConfig;
 import com.craftingdead.core.client.animation.Animation;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.item.gun.Gun;
@@ -26,7 +27,6 @@ import com.craftingdead.core.world.item.gun.GunAnimationEvent;
 import com.craftingdead.core.world.item.gun.ammoprovider.AmmoProvider;
 import com.craftingdead.core.world.item.gun.ammoprovider.MagazineAmmoProvider;
 import com.craftingdead.core.world.item.gun.magazine.Magazine;
-import org.jetbrains.annotations.Nullable;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
@@ -108,8 +108,9 @@ public class RemoveMagazineAction extends TimedAction {
         this.ammoProvider.setMagazineStack(ItemStack.EMPTY);
         if (!this.oldMagazineStack.isEmpty()
             && this.performer().entity() instanceof Player
-            && !(this.oldMagazineStack.getCapability(Magazine.CAPABILITY).map(Magazine::isEmpty).orElse(true)
-            && CraftingDead.serverConfig.reloadDestroyMagWhenEmpty.get())) {
+            && !(this.oldMagazineStack.getCapability(Magazine.CAPABILITY).map(Magazine::isEmpty)
+                .orElse(true)
+                && ServerConfig.instance.reloadDestroyMagWhenEmpty.get())) {
           ((Player) this.performer().entity()).addItem(this.oldMagazineStack);
         }
       }

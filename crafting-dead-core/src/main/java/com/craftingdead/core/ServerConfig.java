@@ -24,7 +24,16 @@ import net.minecraft.world.level.Explosion.BlockInteraction;
 import net.minecraftforge.common.ForgeConfigSpec;
 
 public class ServerConfig {
-  
+
+  public static final ServerConfig instance;
+  public static final ForgeConfigSpec configSpec;
+
+  static {
+    var pair = new ForgeConfigSpec.Builder().configure(ServerConfig::new);
+    configSpec = pair.getRight();
+    instance = pair.getLeft();
+  }
+
   public final ForgeConfigSpec.EnumValue<HitMarker.Mode> hitMarkerMode;
   public final ForgeConfigSpec.BooleanValue killSoundEnabled;
 
@@ -39,43 +48,43 @@ public class ServerConfig {
   // Reload Values
   // ================================================================================
 
-// TODO: Implement those once individual ammo/bullets are added - juanmuscaria
-//  public final ForgeConfigSpec.BooleanValue reloadReloadBulletsIndividually;
-//  public final ForgeConfigSpec.BooleanValue reloadTakeAmmoOnReload;
-//  public final ForgeConfigSpec.BooleanValue reloadTakeAmmoAsMagazine;
+  // TODO: Implement those once individual ammo/bullets are added - juanmuscaria
+  // public final ForgeConfigSpec.BooleanValue reloadReloadBulletsIndividually;
+  // public final ForgeConfigSpec.BooleanValue reloadTakeAmmoOnReload;
+  // public final ForgeConfigSpec.BooleanValue reloadTakeAmmoAsMagazine;
   public final ForgeConfigSpec.BooleanValue reloadGunComeEmptyMag;
   public final ForgeConfigSpec.IntValue reloadDuration;
   public final ForgeConfigSpec.BooleanValue reloadDestroyMagWhenEmpty;
   // Sub Category Dual Wield
-// TODO : Implement those once dual wielding is added - juanmuscaria
-//  public final ForgeConfigSpec.IntValue reloadDualWieldSingleReloadDuration;
-//  public final ForgeConfigSpec.BooleanValue reloadDualWieldSoundsSingleReload;
-//  public final ForgeConfigSpec.BooleanValue reloadDualWieldSoundsShootWithNoAmmo;
+  // TODO : Implement those once dual wielding is added - juanmuscaria
+  // public final ForgeConfigSpec.IntValue reloadDualWieldSingleReloadDuration;
+  // public final ForgeConfigSpec.BooleanValue reloadDualWieldSoundsSingleReload;
+  // public final ForgeConfigSpec.BooleanValue reloadDualWieldSoundsShootWithNoAmmo;
 
   // ================================================================================
   // Scope Values
   // ================================================================================
 
   public final ForgeConfigSpec.BooleanValue scopeAttachmentsAllowed;
-// TODO: Implement when pre define attachments are added - juanmuscaria
-//  public final ForgeConfigSpec.BooleanValue scopeAttachmentOverride;
-// TODO: Implement those when Night/Thermal vision scopes are added - juanmuscaria
-//  public final ForgeConfigSpec.BooleanValue scopeNightVision;
-//  public final ForgeConfigSpec.BooleanValue scopeThermalVision;
+  // TODO: Implement when pre define attachments are added - juanmuscaria
+  // public final ForgeConfigSpec.BooleanValue scopeAttachmentOverride;
+  // TODO: Implement those when Night/Thermal vision scopes are added - juanmuscaria
+  // public final ForgeConfigSpec.BooleanValue scopeNightVision;
+  // public final ForgeConfigSpec.BooleanValue scopeThermalVision;
   public final ForgeConfigSpec.DoubleValue scopeZoomMultiplier;
-//  public final ForgeConfigSpec.BooleanValue scopeZoomBeforeShooting;
+  // public final ForgeConfigSpec.BooleanValue scopeZoomBeforeShooting;
 
   // ================================================================================
   // Riot Shield Values
   // ================================================================================
-// TODO: Implement those when riot shield is added - juanmuscaria
-//  public final ForgeConfigSpec.BooleanValue riotShieldEnable;
-//  public final ForgeConfigSpec.BooleanValue riotShieldDoNotBlockProjectiles;
-//  public final ForgeConfigSpec.BooleanValue riotShieldDoNotBlockMeleeAttacks;
-//  public final ForgeConfigSpec.BooleanValue riotShieldDurabilityBasedOnDamage;
-//  public final ForgeConfigSpec.IntValue riotShieldDurabilityLossPerHit;
-//  public final ForgeConfigSpec.BooleanValue riotShieldForcefieldMode;
-//  public final ForgeConfigSpec.BooleanValue riotShieldOnlyWorksWhileBlocking;
+  // TODO: Implement those when riot shield is added - juanmuscaria
+  // public final ForgeConfigSpec.BooleanValue riotShieldEnable;
+  // public final ForgeConfigSpec.BooleanValue riotShieldDoNotBlockProjectiles;
+  // public final ForgeConfigSpec.BooleanValue riotShieldDoNotBlockMeleeAttacks;
+  // public final ForgeConfigSpec.BooleanValue riotShieldDurabilityBasedOnDamage;
+  // public final ForgeConfigSpec.IntValue riotShieldDurabilityLossPerHit;
+  // public final ForgeConfigSpec.BooleanValue riotShieldForcefieldMode;
+  // public final ForgeConfigSpec.BooleanValue riotShieldOnlyWorksWhileBlocking;
 
   // ================================================================================
   // Headshot Values
@@ -140,15 +149,14 @@ public class ServerConfig {
   public final ForgeConfigSpec.IntValue explosivesSmokeGrenadeTicksBeforeDeactivation;
   public final ForgeConfigSpec.BooleanValue explosivesDispenseGrenades;
 
-
-  ServerConfig(ForgeConfigSpec.Builder builder) {
+  private ServerConfig(ForgeConfigSpec.Builder builder) {
     this.hitMarkerMode = builder
         .translation("options.craftingdead.server.hit_marker_mode")
         .defineEnum("hitMarkerMode", HitMarker.Mode.HIT_AND_KILL);
     this.killSoundEnabled = builder
         .translation("options.craftingdead.server.kill_sound_enabled")
         .define("killSoundEnabled", true);
-    
+
     // Burst-fire configuration
     builder
         .comment("Some guns allow 'burstfire', where it can fire multiple shots at the same time",
@@ -162,7 +170,8 @@ public class ServerConfig {
       this.burstfireShotsPerBurst = builder
           .translation("options.craftingdead.server.burstfire.shots_per_burst")
           .comment("The amount of shots per fired burst")
-          .defineInRange("shotsPerBurst", 3, 1, Integer.MAX_VALUE);}
+          .defineInRange("shotsPerBurst", 3, 1, Integer.MAX_VALUE);
+    }
     builder.pop();
 
     // Reload configuration
@@ -170,15 +179,15 @@ public class ServerConfig {
         .comment("Tweak multiple behaviours on how guns should be reloaded as well it's ammo")
         .push("reload");
     {
-//      this.reloadReloadBulletsIndividually = builder
-//          .translation("")
-//          .define("Reload Bullets Individually", true);
-//      this.reloadTakeAmmoOnReload = builder
-//          .translation("")
-//          .define("Take Ammo On Reload", true);
-//      this.reloadTakeAmmoAsMagazine = builder
-//          .translation("")
-//          .define("Take Ammo As Magazine", true);
+      // this.reloadReloadBulletsIndividually = builder
+      // .translation("")
+      // .define("Reload Bullets Individually", true);
+      // this.reloadTakeAmmoOnReload = builder
+      // .translation("")
+      // .define("Take Ammo On Reload", true);
+      // this.reloadTakeAmmoAsMagazine = builder
+      // .translation("")
+      // .define("Take Ammo As Magazine", true);
       this.reloadGunComeEmptyMag = builder
           .translation("options.craftingdead.server.reload.gun_comes_empty_mag")
           .comment("Defines whenever a gun should come with am empty magazine when crafted")
@@ -189,24 +198,25 @@ public class ServerConfig {
           .defineInRange("duration", 0, 0, 20 * 10);
       this.reloadDestroyMagWhenEmpty = builder
           .translation("options.craftingdead.server.destroy_mag_when_empty")
-          .comment("When empty, magazines will be destroyed instead of being given back to the player when reloading")
+          .comment(
+              "When empty, magazines will be destroyed instead of being given back to the player when reloading")
           .define("destroyMagWhenEmpty", false);
 
       // Sub category Dual Wield
-//      builder
-//          .push("Dual Wield");
-//      {
-//        this.reloadDualWieldSingleReloadDuration = builder
-//            .translation("")
-//            .defineInRange("Single Reload Duration", 0, 0, 0);
-//        this.reloadDualWieldSoundsSingleReload = builder
-//            .translation("")
-//            .define("Sounds Single Reload", true);
-//        this.reloadDualWieldSoundsShootWithNoAmmo = builder
-//            .translation("")
-//            .define("Sounds Shoot With No Ammo", true);
-//      }
-//      builder.pop();
+      // builder
+      // .push("Dual Wield");
+      // {
+      // this.reloadDualWieldSingleReloadDuration = builder
+      // .translation("")
+      // .defineInRange("Single Reload Duration", 0, 0, 0);
+      // this.reloadDualWieldSoundsSingleReload = builder
+      // .translation("")
+      // .define("Sounds Single Reload", true);
+      // this.reloadDualWieldSoundsShootWithNoAmmo = builder
+      // .translation("")
+      // .define("Sounds Shoot With No Ammo", true);
+      // }
+      // builder.pop();
     }
     builder.pop();
 
@@ -220,52 +230,52 @@ public class ServerConfig {
           .comment("Defines if attachments can be added by the player",
               "Guns with pre existing attachments or that where added before this option was toggled will remain unchanged")
           .define("attachmentsAllowed", true);
-//      this.scopeAttachmentOverride = builder
-//          .translation("")
-//          .define("AttatchmentOverride", false);
-//      this.scopeNightVision = builder
-//          .translation("")
-//          .define("Night Vision", true);
-//      this.scopeThermalVision = builder
-//          .translation("")
-//          .define("Thermal Vision", true);
+      // this.scopeAttachmentOverride = builder
+      // .translation("")
+      // .define("AttatchmentOverride", false);
+      // this.scopeNightVision = builder
+      // .translation("")
+      // .define("Night Vision", true);
+      // this.scopeThermalVision = builder
+      // .translation("")
+      // .define("Thermal Vision", true);
       this.scopeZoomMultiplier = builder
           .translation("options.craftingdead.server.zoom_amount_multiplier")
           .comment("Additional zoom given to the base scope zoom (Multiplier)")
           .defineInRange("zoomMultiplier", 1D, 0.1D, 3D);
-//      this.scopeZoomBeforeShooting = builder
-//          .translation("")
-//          .define("Zoom Before Shooting", true);
+      // this.scopeZoomBeforeShooting = builder
+      // .translation("")
+      // .define("Zoom Before Shooting", true);
     }
     builder.pop();
 
     // Riot Shield configuration
-//    builder
-//        .push("Riot Shield");
-//    {
-//      this.riotShieldEnable = builder
-//          .translation("")
-//          .define("Enable", true);
-//      this.riotShieldDoNotBlockProjectiles = builder
-//          .translation("")
-//          .define("Do Not Block Projectiles", true);
-//      this.riotShieldDoNotBlockMeleeAttacks = builder
-//          .translation("")
-//          .define("Do Not Block Melee Attacks", true);
-//      this.riotShieldDurabilityBasedOnDamage = builder
-//          .translation("")
-//          .define("Durability Based On Damage", true);
-//      this.riotShieldDurabilityLossPerHit = builder
-//          .translation("")
-//          .defineInRange("Durability Loss Per Hit", 0, 0, 0);
-//      this.riotShieldForcefieldMode = builder
-//          .translation("")
-//          .define("Forcefield Mode", true);
-//      this.riotShieldOnlyWorksWhileBlocking = builder
-//          .translation("")
-//          .define("Only Works While Blocking", true);
-//    }
-//    builder.pop();
+    // builder
+    // .push("Riot Shield");
+    // {
+    // this.riotShieldEnable = builder
+    // .translation("")
+    // .define("Enable", true);
+    // this.riotShieldDoNotBlockProjectiles = builder
+    // .translation("")
+    // .define("Do Not Block Projectiles", true);
+    // this.riotShieldDoNotBlockMeleeAttacks = builder
+    // .translation("")
+    // .define("Do Not Block Melee Attacks", true);
+    // this.riotShieldDurabilityBasedOnDamage = builder
+    // .translation("")
+    // .define("Durability Based On Damage", true);
+    // this.riotShieldDurabilityLossPerHit = builder
+    // .translation("")
+    // .defineInRange("Durability Loss Per Hit", 0, 0, 0);
+    // this.riotShieldForcefieldMode = builder
+    // .translation("")
+    // .define("Forcefield Mode", true);
+    // this.riotShieldOnlyWorksWhileBlocking = builder
+    // .translation("")
+    // .define("Only Works While Blocking", true);
+    // }
+    // builder.pop();
 
     // Headshot configuration
     builder

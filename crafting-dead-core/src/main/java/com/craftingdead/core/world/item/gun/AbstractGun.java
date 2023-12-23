@@ -33,7 +33,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
-import com.craftingdead.core.CraftingDead;
+import com.craftingdead.core.ServerConfig;
 import com.craftingdead.core.event.GunEvent;
 import com.craftingdead.core.network.NetworkChannel;
 import com.craftingdead.core.network.SynchedData;
@@ -215,7 +215,7 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
     this.attachments = Map.copyOf(event.getAttachments());
 
     this.fireModeInfiniteIterator = Iterables.cycle(Iterables.filter(this.getFireModes(),
-        (mode) -> mode != FireMode.BURST || CraftingDead.serverConfig.burstfireEnabled.get()))
+        (mode) -> mode != FireMode.BURST || ServerConfig.instance.burstfireEnabled.get()))
         .iterator();
     this.fireMode = this.fireModeInfiniteIterator.next();
 
@@ -496,13 +496,13 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
       boolean playSound) {
     final var entity = living.entity();
     var damage = this.getDamage();
-    if (CraftingDead.serverConfig.damageDropOffEnable.get()) {
+    if (ServerConfig.instance.damageDropOffEnable.get()) {
       var distance = hitEntity.distanceTo(living.entity());
       // Ensure minimum damage
       var minDamage =
-          Math.min(damage, CraftingDead.serverConfig.damageDropOffMinimumDamage.get().floatValue());
+          Math.min(damage, ServerConfig.instance.damageDropOffMinimumDamage.get().floatValue());
       damage = Math.max(minDamage, damage
-          - (float) (((CraftingDead.serverConfig.damageDropOffLoss.get() / 100) * this.getRange())
+          - (float) (((ServerConfig.instance.damageDropOffLoss.get() / 100) * this.getRange())
               * distance));
     }
 
@@ -522,7 +522,7 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
     if (hitEntity instanceof LivingEntity) {
       var hitLiving = LivingExtension.getOrThrow((LivingEntity) hitEntity);
       double chinHeight = (hitEntity.getY() + hitEntity.getEyeHeight() - 0.2F);
-      headshot = CraftingDead.serverConfig.headshotEnabled.get() &&
+      headshot = ServerConfig.instance.headshotEnabled.get() &&
           (hitEntity instanceof Player || hitEntity instanceof Zombie
               || hitEntity instanceof Skeleton || hitEntity instanceof Creeper
               || hitEntity instanceof EnderMan || hitEntity instanceof Witch
@@ -535,7 +535,7 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
             .map(Hat.class::cast)
             .map(Hat::headshotReductionPercentage)
             .orElse(0.0F);
-        damage *= headshotDamagePercent * CraftingDead.serverConfig.headshotBonusDamage.get();
+        damage *= headshotDamagePercent * ServerConfig.instance.headshotBonusDamage.get();
       }
     }
 

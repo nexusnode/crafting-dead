@@ -18,7 +18,9 @@
 
 package com.craftingdead.core.world.item;
 
+import com.craftingdead.core.CommonConfig;
 import com.craftingdead.core.CraftingDead;
+import com.craftingdead.core.ServerConfig;
 import com.craftingdead.core.client.animation.gun.InspectAnimation;
 import com.craftingdead.core.client.animation.gun.ReloadAnimation;
 import com.craftingdead.core.client.animation.gun.ShootAnimation;
@@ -1006,7 +1008,7 @@ public class ModItems {
           () -> new GrenadeItem((GrenadeItem.Properties) new GrenadeItem.Properties()
               .setGrenadeEntitySupplier(
                   FunctionalUtil.nullsafeFunction(FireGrenadeEntity::new, FireGrenadeEntity::new))
-              .setEnabledSupplier(CraftingDead.serverConfig.explosivesFireGrenadeEnabled::get)
+              .setEnabledSupplier(ServerConfig.instance.explosivesFireGrenadeEnabled::get)
               .stacksTo(3)
               .tab(COMBAT_TAB)));
 
@@ -1015,7 +1017,7 @@ public class ModItems {
           () -> new GrenadeItem((GrenadeItem.Properties) new GrenadeItem.Properties()
               .setGrenadeEntitySupplier(
                   FunctionalUtil.nullsafeFunction(SmokeGrenadeEntity::new, SmokeGrenadeEntity::new))
-              .setEnabledSupplier(CraftingDead.serverConfig.explosivesSmokeGrenadeEnabled::get)
+              .setEnabledSupplier(ServerConfig.instance.explosivesSmokeGrenadeEnabled::get)
               .stacksTo(3)
               .tab(COMBAT_TAB)));
 
@@ -1024,7 +1026,7 @@ public class ModItems {
           () -> new GrenadeItem((GrenadeItem.Properties) new GrenadeItem.Properties()
               .setGrenadeEntitySupplier(
                   FunctionalUtil.nullsafeFunction(FlashGrenadeEntity::new, FlashGrenadeEntity::new))
-              .setEnabledSupplier(CraftingDead.serverConfig.explosivesFlashGrenadeEnabled::get)
+              .setEnabledSupplier(ServerConfig.instance.explosivesFlashGrenadeEnabled::get)
               .stacksTo(3)
               .tab(COMBAT_TAB)));
 
@@ -1033,7 +1035,7 @@ public class ModItems {
           () -> new GrenadeItem((GrenadeItem.Properties) new GrenadeItem.Properties()
               .setGrenadeEntitySupplier(
                   FunctionalUtil.nullsafeFunction(DecoyGrenadeEntity::new, DecoyGrenadeEntity::new))
-              .setEnabledSupplier(CraftingDead.serverConfig.explosivesDecoyGrenadeEnabled::get)
+              .setEnabledSupplier(ServerConfig.instance.explosivesDecoyGrenadeEnabled::get)
               .stacksTo(3)
               .tab(COMBAT_TAB)));
 
@@ -1042,7 +1044,7 @@ public class ModItems {
           () -> new GrenadeItem((GrenadeItem.Properties) new GrenadeItem.Properties()
               .setGrenadeEntitySupplier(
                   FunctionalUtil.nullsafeFunction(FragGrenade::new, FragGrenade::new))
-              .setEnabledSupplier(CraftingDead.serverConfig.explosivesFragGrenadeEnabled::get)
+              .setEnabledSupplier(ServerConfig.instance.explosivesFragGrenadeEnabled::get)
               .stacksTo(1)
               .tab(COMBAT_TAB)));
 
@@ -1051,7 +1053,7 @@ public class ModItems {
           () -> new GrenadeItem((GrenadeItem.Properties) new GrenadeItem.Properties()
               .setGrenadeEntitySupplier(
                   FunctionalUtil.nullsafeFunction(C4Explosive::new, C4Explosive::new))
-              .setEnabledSupplier(CraftingDead.serverConfig.explosivesC4Enabled::get)
+              .setEnabledSupplier(ServerConfig.instance.explosivesC4Enabled::get)
               .setThrowSpeed(0.75F)
               .stacksTo(1)
               .tab(COMBAT_TAB)));
@@ -1061,7 +1063,7 @@ public class ModItems {
           () -> new GrenadeItem((GrenadeItem.Properties) new GrenadeItem.Properties()
               .setGrenadeEntitySupplier(
                   FunctionalUtil.nullsafeFunction(C4Explosive::new, C4Explosive::new))
-              .setEnabledSupplier(CraftingDead.serverConfig.explosivesC4Enabled::get)
+              .setEnabledSupplier(ServerConfig.instance.explosivesC4Enabled::get)
               .setSticky(true)
               .setThrowSpeed(0.75F)
               .stacksTo(1)
@@ -1959,11 +1961,15 @@ public class ModItems {
   }
 
   private static StorageItem weakVest() {
-    return vest(10.0F, 1.5F);
+    return vest(
+        CommonConfig.instance.weakVestArmor.get().floatValue(),
+        CommonConfig.instance.weakVestArmorToughness.get().floatValue());
   }
 
   private static StorageItem strongVest() {
-    return vest(20.0F, 3.0F);
+    return vest(
+        CommonConfig.instance.strongVestArmor.get().floatValue(),
+        CommonConfig.instance.strongVestArmorToughness.get().floatValue());
   }
 
   private static StorageItem vest(float armor, float armorToughness) {

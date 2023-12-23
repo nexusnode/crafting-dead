@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
 import org.jetbrains.annotations.Nullable;
-import com.craftingdead.core.CraftingDead;
+import com.craftingdead.core.ServerConfig;
 import com.craftingdead.core.capability.CapabilityUtil;
 import com.craftingdead.core.event.GrenadeThrowEvent;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
@@ -152,7 +152,7 @@ public class GrenadeItem extends Item {
 
     @Override
     protected ItemStack execute(BlockSource source, ItemStack itemStack) {
-      if (CraftingDead.serverConfig.explosivesDispenseGrenades.get()
+      if (ServerConfig.instance.explosivesDispenseGrenades.get()
           && itemStack.getItem() instanceof GrenadeItem grenadeItem) {
         var direction = source.getBlockState().getValue(DispenserBlock.FACING);
         var grenadeEntity = grenadeItem.grenadeEntitySupplier.apply(null, source.getLevel());

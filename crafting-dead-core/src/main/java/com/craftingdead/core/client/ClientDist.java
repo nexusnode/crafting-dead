@@ -24,6 +24,7 @@ import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.ModDist;
+import com.craftingdead.core.ServerConfig;
 import com.craftingdead.core.client.crosshair.CrosshairManager;
 import com.craftingdead.core.client.gui.IngameGui;
 import com.craftingdead.core.client.gui.screen.inventory.EquipmentScreen;
@@ -272,9 +273,9 @@ public class ClientDist implements ModDist {
   }
 
   public void handleHit(Vec3 hitPos, boolean dead) {
-    CraftingDead.serverConfig.hitMarkerMode.get().createHitMarker(hitPos, dead)
+    ServerConfig.instance.hitMarkerMode.get().createHitMarker(hitPos, dead)
         .ifPresent(this.ingameGui::setHitMarker);
-    if (dead && CraftingDead.serverConfig.killSoundEnabled.get()) {
+    if (dead && ServerConfig.instance.killSoundEnabled.get()) {
       // Plays a sound that follows the player
       SoundEvent soundEvent = ForgeRegistries.SOUND_EVENTS.getValue(
           new ResourceLocation(ClientDist.clientConfig.killSound.get()));

@@ -64,7 +64,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.brewing.BrewingRecipeRegistry;
 import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
@@ -108,15 +107,6 @@ public class CraftingDead {
    */
   private static final Logger logger = LogUtils.getLogger();
 
-  public static final ServerConfig serverConfig;
-  public static final ForgeConfigSpec serverConfigSpec;
-
-  static {
-    var pair = new ForgeConfigSpec.Builder().configure(ServerConfig::new);
-    serverConfigSpec = pair.getRight();
-    serverConfig = pair.getLeft();
-  }
-
   /**
    * Singleton.
    */
@@ -137,7 +127,8 @@ public class CraftingDead {
     modEventBus.addListener(this::handleGatherData);
     modEventBus.addListener(this::handleRegisterCapabilities);
 
-    ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, serverConfigSpec);
+    ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, CommonConfig.configSpec);
+    ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, ServerConfig.configSpec);
 
     ModEntityTypes.deferredRegister.register(modEventBus);
     ModItems.deferredRegister.register(modEventBus);

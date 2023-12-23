@@ -18,7 +18,7 @@
 
 package com.craftingdead.core.world.entity.grenade;
 
-import com.craftingdead.core.CraftingDead;
+import com.craftingdead.core.ServerConfig;
 import com.craftingdead.core.world.entity.ExplosionSource;
 import com.craftingdead.core.world.entity.ModEntityTypes;
 import com.craftingdead.core.world.item.GrenadeItem;
@@ -63,10 +63,10 @@ public class FireGrenadeEntity extends Grenade implements ExplosionSource {
     if (activated) {
       if (!this.level.isClientSide()) {
         this.kill();
-        var fireRadius = CraftingDead.serverConfig.explosivesFireGrenadeRadius.get().floatValue();
+        var fireRadius = ServerConfig.instance.explosivesFireGrenadeRadius.get().floatValue();
         this.level.explode(this, this.createDamageSource(), null,
             this.getX(), this.getY() + this.getBbHeight(), this.getZ(), fireRadius, true,
-            CraftingDead.serverConfig.explosivesFireGrenadeExplosionMode.get());
+            ServerConfig.instance.explosivesFireGrenadeExplosionMode.get());
 
         BlockPos.betweenClosedStream(this.blockPosition().offset(-fireRadius, 0, -fireRadius),
             this.blockPosition().offset(fireRadius, 0, fireRadius)).forEach(blockPos -> {
@@ -100,14 +100,13 @@ public class FireGrenadeEntity extends Grenade implements ExplosionSource {
 
   @Override
   public float getDamageMultiplier() {
-    return CraftingDead.serverConfig.explosivesFireGrenadeDamageMultiplier.get().floatValue();
+    return ServerConfig.instance.explosivesFireGrenadeDamageMultiplier.get().floatValue();
   }
 
   @Override
   public double getKnockbackMultiplier() {
-    return CraftingDead.serverConfig.explosivesFireGrenadeKnockbackMultiplier.get();
+    return ServerConfig.instance.explosivesFireGrenadeKnockbackMultiplier.get();
   }
 
-  protected record BounceSound(SoundEvent soundEvent, float volume, float pitch) {
-  }
+  protected record BounceSound(SoundEvent soundEvent, float volume, float pitch) {}
 }

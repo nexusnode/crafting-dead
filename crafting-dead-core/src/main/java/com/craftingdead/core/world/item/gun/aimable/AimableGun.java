@@ -19,7 +19,7 @@
 package com.craftingdead.core.world.item.gun.aimable;
 
 import java.util.Optional;
-import com.craftingdead.core.CraftingDead;
+import com.craftingdead.core.ServerConfig;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.item.GunItem;
 import com.craftingdead.core.world.item.gun.AbstractGunClient;
@@ -83,7 +83,7 @@ public class AimableGun extends TypedGun implements Scope {
     return this.hasIronSight()
         ? 2.0F
         : this.getAttachmentMultiplier(Attachment.MultiplierType.ZOOM)
-            + CraftingDead.serverConfig.scopeZoomMultiplier.get().floatValue();
+            + ServerConfig.instance.scopeZoomMultiplier.get().floatValue();
   }
 
   @Override

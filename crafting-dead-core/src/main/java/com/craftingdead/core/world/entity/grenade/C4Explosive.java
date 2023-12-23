@@ -19,7 +19,7 @@
 package com.craftingdead.core.world.entity.grenade;
 
 import java.util.Optional;
-import com.craftingdead.core.CraftingDead;
+import com.craftingdead.core.ServerConfig;
 import com.craftingdead.core.world.entity.ExplosionSource;
 import com.craftingdead.core.world.entity.ModEntityTypes;
 import com.craftingdead.core.world.entity.grenade.FireGrenadeEntity.BounceSound;
@@ -72,7 +72,8 @@ public class C4Explosive extends Grenade implements ExplosionSource {
       if (!this.level.isClientSide()) {
         this.kill();
         if (knockbackPenalty == 0) {
-          // Getting entity by type crashes the server for some reason, this method works fine with no big performance impact
+          // Getting entity by type crashes the server for some reason, this method works fine with
+          // no big performance impact
           var others = this.level.getEntities(this, this.getBoundingBox().inflate(2)).stream()
               .filter(e -> e instanceof C4Explosive)
               .map(e -> (C4Explosive) e).toList();
@@ -84,8 +85,8 @@ public class C4Explosive extends Grenade implements ExplosionSource {
 
         this.level.explode(this, this.createDamageSource(), null,
             this.getX(), this.getY() + this.getBbHeight(), this.getZ(),
-            CraftingDead.serverConfig.explosivesC4Radius.get().floatValue(), false,
-            CraftingDead.serverConfig.explosivesC4ExplosionMode.get());
+            ServerConfig.instance.explosivesC4Radius.get().floatValue(), false,
+            ServerConfig.instance.explosivesC4ExplosionMode.get());
       }
     }
   }
@@ -122,12 +123,13 @@ public class C4Explosive extends Grenade implements ExplosionSource {
 
   @Override
   public float getDamageMultiplier() {
-    return CraftingDead.serverConfig.explosivesC4KnockbackMultiplier.get().floatValue();
+    return ServerConfig.instance.explosivesC4KnockbackMultiplier.get().floatValue();
   }
 
   @Override
   public double getKnockbackMultiplier() {
-    return CraftingDead.serverConfig.explosivesC4DamageMultiplier.get() / (knockbackPenalty > 0 ? knockbackPenalty : 1);
+    return ServerConfig.instance.explosivesC4DamageMultiplier.get()
+        / (knockbackPenalty > 0 ? knockbackPenalty : 1);
   }
 
   public void setKnockbackPenalty(int penalty) {

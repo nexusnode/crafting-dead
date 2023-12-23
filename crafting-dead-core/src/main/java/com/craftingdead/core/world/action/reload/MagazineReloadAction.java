@@ -20,7 +20,7 @@ package com.craftingdead.core.world.action.reload;
 
 import java.util.List;
 import java.util.Optional;
-import com.craftingdead.core.CraftingDead;
+import com.craftingdead.core.ServerConfig;
 import com.craftingdead.core.event.CollectMagazineItemHandlers;
 import com.craftingdead.core.world.action.ActionType;
 import com.craftingdead.core.world.action.ActionTypes;
@@ -81,7 +81,7 @@ public class MagazineReloadAction extends AbstractReloadAction {
         && this.performer().entity() instanceof Player
         && !(this.oldMagazineStack.getCapability(Magazine.CAPABILITY).map(Magazine::isEmpty)
             .orElse(true)
-            && CraftingDead.serverConfig.reloadDestroyMagWhenEmpty.get())) {
+            && ServerConfig.instance.reloadDestroyMagWhenEmpty.get())) {
       ((Player) this.performer().entity()).addItem(this.oldMagazineStack);
     }
   }

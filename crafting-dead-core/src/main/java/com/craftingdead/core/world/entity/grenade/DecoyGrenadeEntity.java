@@ -19,7 +19,7 @@
 package com.craftingdead.core.world.entity.grenade;
 
 import java.util.OptionalInt;
-import com.craftingdead.core.CraftingDead;
+import com.craftingdead.core.ServerConfig;
 import com.craftingdead.core.world.entity.ModEntityTypes;
 import com.craftingdead.core.world.item.GrenadeItem;
 import com.craftingdead.core.world.item.ModItems;
@@ -84,7 +84,7 @@ public class DecoyGrenadeEntity extends Grenade {
   @Override
   public OptionalInt getMinimumTicksUntilAutoDeactivation() {
     return OptionalInt.of(
-        CraftingDead.serverConfig.explosivesDecoyGrenadeTicksBeforeDeactivation.get());
+        ServerConfig.instance.explosivesDecoyGrenadeTicksBeforeDeactivation.get());
   }
 
   @Override

@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.jetbrains.annotations.Nullable;
-import com.craftingdead.core.CraftingDead;
+import com.craftingdead.core.ServerConfig;
 import com.craftingdead.core.event.LivingExtensionEvent;
 import com.craftingdead.core.network.NetworkChannel;
 import com.craftingdead.core.network.message.play.CancelActionMessage;
@@ -354,17 +354,17 @@ class BaseLivingExtension<E extends LivingEntity, H extends LivingHandler>
     var damage = this.handlers.values().stream().reduce(amount,
         (result, extension) -> extension.handleDamaged(source, result), (u, t) -> t);
     if (source.getEntity() instanceof Player player) {
-      if (CraftingDead.serverConfig.backstabEnabled.get()) {
+      if (ServerConfig.instance.backstabEnabled.get()) {
         var usedMeleeWeapon = player.getItemInHand(player.getUsedItemHand())
             .getItem() instanceof MeleeWeaponItem;
         if (usedMeleeWeapon && !EntityUtil.canSee(this.entity(), player, 90F)) {
-          damage *= CraftingDead.serverConfig.backstabBonusDamage.get().floatValue();
+          damage *= ServerConfig.instance.backstabBonusDamage.get().floatValue();
         }
       }
 
-      if (CraftingDead.serverConfig.criticalHitEnable.get()) {
-        if (CraftingDead.serverConfig.criticalHitChance.get() > player.getRandom().nextFloat()) {
-          damage *= CraftingDead.serverConfig.criticalHitBonusDamage.get().floatValue();
+      if (ServerConfig.instance.criticalHitEnable.get()) {
+        if (ServerConfig.instance.criticalHitChance.get() > player.getRandom().nextFloat()) {
+          damage *= ServerConfig.instance.criticalHitBonusDamage.get().floatValue();
         }
       }
     }

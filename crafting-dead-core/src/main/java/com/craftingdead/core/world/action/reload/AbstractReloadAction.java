@@ -18,13 +18,13 @@
 
 package com.craftingdead.core.world.action.reload;
 
-import com.craftingdead.core.CraftingDead;
+import org.jetbrains.annotations.Nullable;
+import com.craftingdead.core.ServerConfig;
 import com.craftingdead.core.client.animation.Animation;
 import com.craftingdead.core.world.action.TimedAction;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.item.gun.Gun;
 import com.craftingdead.core.world.item.gun.GunAnimationEvent;
-import org.jetbrains.annotations.Nullable;
 import net.minecraft.client.Minecraft;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.item.ItemStack;
@@ -54,7 +54,7 @@ public abstract class AbstractReloadAction extends TimedAction {
 
   @Override
   protected int getTotalDurationTicks() {
-    return this.gun.getReloadDurationTicks() + CraftingDead.serverConfig.reloadDuration.get();
+    return this.gun.getReloadDurationTicks() + ServerConfig.instance.reloadDuration.get();
   }
 
   @Override

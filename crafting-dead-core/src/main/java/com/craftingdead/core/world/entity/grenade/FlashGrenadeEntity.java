@@ -20,6 +20,7 @@ package com.craftingdead.core.world.entity.grenade;
 
 import java.util.OptionalInt;
 import com.craftingdead.core.CraftingDead;
+import com.craftingdead.core.ServerConfig;
 import com.craftingdead.core.particle.FlashParticleOptions;
 import com.craftingdead.core.world.effect.FlashBlindnessMobEffect;
 import com.craftingdead.core.world.effect.ModMobEffects;
@@ -69,13 +70,13 @@ public class FlashGrenadeEntity extends Grenade {
   @Override
   public OptionalInt getMinimumTicksUntilAutoActivation() {
     return OptionalInt.of(
-        CraftingDead.serverConfig.explosivesFlashGrenadeTicksBeforeActivation.get());
+        ServerConfig.instance.explosivesFlashGrenadeTicksBeforeActivation.get());
   }
 
   @Override
   public OptionalInt getMinimumTicksUntilAutoDeactivation() {
     return OptionalInt.of(
-        CraftingDead.serverConfig.explosivesFlashGrenadeTicksBeforeDeactivation.get());
+        ServerConfig.instance.explosivesFlashGrenadeTicksBeforeDeactivation.get());
   }
 
   @Override
@@ -92,7 +93,7 @@ public class FlashGrenadeEntity extends Grenade {
     } else {
       this.playSound(SoundEvents.GENERIC_EXPLODE, 3F, 1.2F);
 
-      var flashRange = CraftingDead.serverConfig.explosivesFlashRadius.get();
+      var flashRange = ServerConfig.instance.explosivesFlashRadius.get();
       this.level.getEntities(this, this.getBoundingBox().inflate(flashRange),
           (entity) -> entity instanceof LivingEntity && !(entity instanceof Player))
           .stream()
@@ -133,7 +134,7 @@ public class FlashGrenadeEntity extends Grenade {
         .map(Hat::immuneToFlashes)
         .orElse(false);
 
-    var flashRange = CraftingDead.serverConfig.explosivesFlashRadius.get();
+    var flashRange = ServerConfig.instance.explosivesFlashRadius.get();
     if (visible && !immuneToFlashes) {
       double distanceProportion =
           Mth.clamp(this.distanceTo(viewerEntity) / flashRange, 0F, 1F);

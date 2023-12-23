@@ -18,9 +18,9 @@
 
 package com.craftingdead.core.world.item;
 
-import com.craftingdead.core.CraftingDead;
-import com.craftingdead.core.world.entity.grenade.Grenade;
 import java.util.List;
+import com.craftingdead.core.ServerConfig;
+import com.craftingdead.core.world.entity.grenade.Grenade;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
@@ -43,7 +43,7 @@ public class RemoteDetonatorItem extends Item {
 
   @Override
   public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
-    if (!CraftingDead.serverConfig.explosivesRemoteDetonatorEnabled.get()) {
+    if (!ServerConfig.instance.explosivesRemoteDetonatorEnabled.get()) {
       return InteractionResultHolder.pass(player.getItemInHand(hand));
     }
     var item = player.getItemInHand(hand);
@@ -54,7 +54,7 @@ public class RemoteDetonatorItem extends Item {
           SoundSource.PLAYERS, 0.8F, 1.2F);
 
       serverLevel.getEntities(player,
-          player.getBoundingBox().inflate(CraftingDead.serverConfig.explosivesRemoteDetonatorRange.get()), (entity) -> {
+          player.getBoundingBox().inflate(ServerConfig.instance.explosivesRemoteDetonatorRange.get()), (entity) -> {
             if (!(entity instanceof Grenade)) {
               return false;
             }
@@ -73,7 +73,7 @@ public class RemoteDetonatorItem extends Item {
   public void appendHoverText(ItemStack stack, Level level,
       List<Component> lines, TooltipFlag tooltipFlag) {
     super.appendHoverText(stack, level, lines, tooltipFlag);
-    lines.add(new TranslatableComponent("remote_detonator.information", CraftingDead.serverConfig.explosivesRemoteDetonatorRange.get())
+    lines.add(new TranslatableComponent("remote_detonator.information", ServerConfig.instance.explosivesRemoteDetonatorRange.get())
         .withStyle(ChatFormatting.GRAY));
   }
 }

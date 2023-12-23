@@ -21,6 +21,7 @@ package com.craftingdead.core.world.item.gun;
 import java.util.Optional;
 import java.util.Set;
 import com.craftingdead.core.CraftingDead;
+import com.craftingdead.core.ServerConfig;
 import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.item.GunItem;
 import com.craftingdead.core.world.item.combatslot.CombatSlot;
@@ -60,7 +61,7 @@ public abstract class TypedGun extends AbstractGun {
 
   @Override
   public boolean isAcceptedAttachment(ItemStack itemStack) {
-    return CraftingDead.serverConfig.scopeAttachmentsAllowed.get() &&
+    return ServerConfig.instance.scopeAttachmentsAllowed.get() &&
         (itemStack.getItem() instanceof AttachmentLike
             && this.item.getAcceptedAttachments()
                 .contains(((AttachmentLike) itemStack.getItem()).asAttachment()));
