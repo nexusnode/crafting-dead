@@ -13,3 +13,5 @@ copy, reproduce or otherwise use any of the source code available online at any 
 https://github.com/nexusnode/crafting-dead/blob/1.18.x/LICENSE.txt
 
 https://craftingdead.net/terms.php
+
+https://craftingdead.net/privacy.php
