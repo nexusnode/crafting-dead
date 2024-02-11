@@ -7,7 +7,8 @@ Starting out as a mod for Minecraft 1.5, Crafting Dead has been around for many 
 Crafting Dead adds in a multitude of zombies and guns, along with cosmetics and medical supplies. The guns are fully customisable with attachments and paints; they are competitive ready with accurate hit detection, latency compensation and recoil. Medical supplies include first aid kits, adrenaline and bandages enabling you to quickly escape, attack and recover from combat situations.
 
 # Discord
-![Discord Banner 2](https://discord.com/api/guilds/473735245636698153/widget.json)
+![Discord Banner 4](https://discordapp.com/api/guilds/473735245636698153/widget.png?style=banner4)
+https://discord.gg/craftingdead
 
 # Contributing
 Pull requests are always welcome, however please adhere to the following guidlines:
