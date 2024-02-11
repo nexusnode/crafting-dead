@@ -8,6 +8,7 @@ Crafting Dead adds in a multitude of zombies and guns, along with cosmetics and 
 
 # Discord
 ![Discord Banner 2](https://discordapp.com/api/guilds/473735245636698153/widget.png?style=banner2)
+
 [Click here to join](https://discord.gg/craftingdead)
 
 # Contributing
