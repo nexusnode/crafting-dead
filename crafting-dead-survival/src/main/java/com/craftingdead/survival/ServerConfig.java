@@ -82,6 +82,7 @@ public class ServerConfig {
   public final ForgeConfigSpec.DoubleValue zombieHandDropChance;
   public final ForgeConfigSpec.DoubleValue zombieClothingDropChance;
   public final ForgeConfigSpec.DoubleValue zombieAttackKnockback;
+  public final ForgeConfigSpec.DoubleValue fastZombieSpeed;
 
   // ================================================================================
   // Abilities Values
@@ -212,6 +213,10 @@ public class ServerConfig {
           .translation("options.craftingdeadsurvival.server.zombies.giant_zombie.damage")
           .comment("Defines how much damage the zombie deals (2 damage points points = 1 heart)")
           .defineInRange("giantZombieAttackDamage", 50.0D, 0.0D, 2048.0D);
+      this.fastZombieSpeed = builder
+              .translation("options.craftingdeadsurvival.server.zombies.fast_zombie.speed")
+              .comment("Defines how fast the zombie moves")
+              .defineInRange("fastZombieSpeed", 0.33D, 0.0D, 2048.0D);
 
       builder
           .comment("Configure how zombies should spawn",
