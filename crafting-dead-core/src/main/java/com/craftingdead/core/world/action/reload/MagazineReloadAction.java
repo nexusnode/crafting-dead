@@ -59,9 +59,6 @@ public class MagazineReloadAction extends AbstractReloadAction {
 
   @Override
   public boolean start(boolean simulate) {
-    if(this.performer.entity().isCrouching()) {
-      return false;	
-    }	
     var result = this.findMagazine(this.performer());
     if (!result.isPresent()) {
       return false;
@@ -78,12 +75,6 @@ public class MagazineReloadAction extends AbstractReloadAction {
 
   @Override
   protected void loadNewMagazineStack(boolean displayOnly) {
-	  
-    if(this.performer.entity().isCrouching()) {
-	  this.revert();
-	  return;	
-    }
-	  
     this.ammoProvider.setMagazineStack(this.newMagazineStack);
     if (!displayOnly
         && !this.oldMagazineStack.isEmpty()
