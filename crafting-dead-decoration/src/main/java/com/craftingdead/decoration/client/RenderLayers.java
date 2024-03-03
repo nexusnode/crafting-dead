@@ -96,6 +96,19 @@ class RenderLayers {
     cutout(DecorationBlocks.LIGHT_SWITCH);
     cutout(DecorationBlocks.ELECTRICAL_SOCKET);
     cutout(DecorationBlocks.ABANDONED_CAMPFIRE);
+    
+    translucent(DecorationBlocks.QUARTZ_GLASS);
+    translucent(DecorationBlocks.VIBRANT_QUARTZ_GLASS);
+    
+    cutout(DecorationBlocks.SLEEPING_BAG_CLOSED);
+    cutout(DecorationBlocks.SLEEPING_BAG_CLOSED_BLACK);
+    cutout(DecorationBlocks.SLEEPING_BAG_CLOSED_BLUE);
+    cutout(DecorationBlocks.SLEEPING_BAG_CLOSED_DARKGREEN);
+    cutout(DecorationBlocks.SLEEPING_BAG_CLOSED_ORANGE);
+    cutout(DecorationBlocks.SLEEPING_BAG_CLOSED_PINK);
+    cutout(DecorationBlocks.SLEEPING_BAG_CLOSED_PURPLE);
+    cutout(DecorationBlocks.SLEEPING_BAG_CLOSED_RED);
+    cutout(DecorationBlocks.SLEEPING_BAG_CLOSED_YELLOW);
   }
 
   private static void cutout(Supplier<? extends Block> block) {

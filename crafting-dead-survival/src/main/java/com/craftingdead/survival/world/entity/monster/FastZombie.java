@@ -55,6 +55,8 @@ public class FastZombie extends Zombie {
         .setBaseValue(CraftingDeadSurvival.serverConfig.fastZombieMaxHealth.get());
     this.getAttribute(Attributes.ATTACK_DAMAGE)
         .setBaseValue(CraftingDeadSurvival.serverConfig.fastZombieAttackDamage.get());
+    this.getAttribute(Attributes.MOVEMENT_SPEED)
+    	.setBaseValue(CraftingDeadSurvival.serverConfig.fastZombieSpeed.get());
     return groupData;
   }
 }

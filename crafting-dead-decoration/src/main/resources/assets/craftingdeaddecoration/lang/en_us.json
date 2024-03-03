@@ -247,5 +247,26 @@
     "block.craftingdeaddecoration.cherry_planks": "Cherry Planks",
     "block.craftingdeaddecoration.light_switch": "Light Switch",
     "block.craftingdeaddecoration.electrical_socket": "Electrical Socket",
-    "block.craftingdeaddecoration.abandoned_campfire": "Abandoned Campfire"
+    "block.craftingdeaddecoration.abandoned_campfire": "Abandoned Campfire",
+    "block.craftingdeaddecoration.quartz_glass": "Quartz Glass",
+    "block.craftingdeaddecoration.quartz_vibrant_glass": "Vibrant Quartz Glass",
+    "block.craftingdeaddecoration.sleeping_bag_closed": "Closed Sleeping Bag",
+    "block.craftingdeaddecoration.sleeping_bag_closed_black": "Black Closed Sleeping Bag",
+    "block.craftingdeaddecoration.sleeping_bag_closed_blue": "BlueClosed Sleeping Bag",
+    "block.craftingdeaddecoration.sleeping_bag_closed_darkgreen": "Dark Green Closed Sleeping Bag",
+    "block.craftingdeaddecoration.sleeping_bag_closed_orange": "Orange Closed Sleeping Bag",
+    "block.craftingdeaddecoration.sleeping_bag_closed_pink": "Pink Closed Sleeping Bag",
+    "block.craftingdeaddecoration.sleeping_bag_closed_purple": "Purple Closed Sleeping Bag",
+    "block.craftingdeaddecoration.sleeping_bag_closed_red": "Red Closed Sleeping Bag",
+    "block.craftingdeaddecoration.sleeping_bag_closed_yellow": "Yellow Closed Sleeping Bag",
+    "block.craftingdeaddecoration.sleeping_bag_open": "Open Sleeping Bag",
+    "block.craftingdeaddecoration.sleeping_bag_open_black": "Black Open Sleeping Bag",
+    "block.craftingdeaddecoration.sleeping_bag_open_blue": "BlueOpen Sleeping Bag",
+    "block.craftingdeaddecoration.sleeping_bag_open_darkgreen": "Dark Green Open Sleeping Bag",
+    "block.craftingdeaddecoration.sleeping_bag_open_orange": "Orange Open Sleeping Bag",
+    "block.craftingdeaddecoration.sleeping_bag_open_pink": "Pink Open Sleeping Bag",
+    "block.craftingdeaddecoration.sleeping_bag_open_purple": "Purple Open Sleeping Bag",
+    "block.craftingdeaddecoration.sleeping_bag_open_red": "Red Open Sleeping Bag",
+    "block.craftingdeaddecoration.sleeping_bag_open_yellow": "Yellow Open Sleeping Bag"
+    
 }
