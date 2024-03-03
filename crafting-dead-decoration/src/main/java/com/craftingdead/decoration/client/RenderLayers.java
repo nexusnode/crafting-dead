@@ -109,6 +109,8 @@ class RenderLayers {
     cutout(DecorationBlocks.SLEEPING_BAG_CLOSED_PURPLE);
     cutout(DecorationBlocks.SLEEPING_BAG_CLOSED_RED);
     cutout(DecorationBlocks.SLEEPING_BAG_CLOSED_YELLOW);
+    
+    cutout(DecorationBlocks.BOX_OF_BULLETS);
   }
 
   private static void cutout(Supplier<? extends Block> block) {

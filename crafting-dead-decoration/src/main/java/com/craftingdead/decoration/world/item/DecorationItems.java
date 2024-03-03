@@ -1102,6 +1102,11 @@ public class DecorationItems {
           () -> new BlockItem(DecorationBlocks.SLEEPING_BAG_OPEN_YELLOW.get(),
               new Item.Properties().tab(TAB)));
   
+  public static final RegistryObject<Item> BOX_OF_BULLETS =
+      deferredRegister.register("box_of_bullets",
+          () -> new BlockItem(DecorationBlocks.BOX_OF_BULLETS.get(),
+              new Item.Properties().tab(TAB)));
+  
   // AE12 Glass
   public static final RegistryObject<BlockItem> QUARTZ_GLASS =
       deferredRegister.register("quartz_glass",
