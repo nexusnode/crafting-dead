@@ -1658,6 +1658,87 @@ public class DecorationBlocks {
                   .noOcclusion(),
               BlockShapes.SLEEPING_BAG));
   
+  public static final RegistryObject<Block> SLEEPING_BAG_OPEN =
+      deferredRegister.register("sleeping_bag_open",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.CLOTH_DECORATION)
+                  .strength(1.0F)
+                  .sound(SoundType.WOOL)
+                  .noOcclusion(),
+              BlockShapes.SLEEPING_BAG));
+
+  public static final RegistryObject<Block> SLEEPING_BAG_OPEN_BLACK =
+      deferredRegister.register("sleeping_bag_open_black",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.CLOTH_DECORATION)
+                  .strength(1.0F)
+                  .sound(SoundType.WOOL)
+                  .noOcclusion(),
+              BlockShapes.SLEEPING_BAG));
+  
+  public static final RegistryObject<Block> SLEEPING_BAG_OPEN_BLUE =
+      deferredRegister.register("sleeping_bag_open_blue",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.CLOTH_DECORATION)
+                  .strength(1.0F)
+                  .sound(SoundType.WOOL)
+                  .noOcclusion(),
+              BlockShapes.SLEEPING_BAG));
+  
+  public static final RegistryObject<Block> SLEEPING_BAG_OPEN_DARKGREEN =
+      deferredRegister.register("sleeping_bag_open_darkgreen",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.CLOTH_DECORATION)
+                  .strength(1.0F)
+                  .sound(SoundType.WOOL)
+                  .noOcclusion(),
+              BlockShapes.SLEEPING_BAG));
+  
+  public static final RegistryObject<Block> SLEEPING_BAG_OPEN_ORANGE =
+      deferredRegister.register("sleeping_bag_open_orange",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.CLOTH_DECORATION)
+                  .strength(1.0F)
+                  .sound(SoundType.WOOL)
+                  .noOcclusion(),
+              BlockShapes.SLEEPING_BAG));
+  
+  public static final RegistryObject<Block> SLEEPING_BAG_OPEN_PINK =
+      deferredRegister.register("sleeping_bag_open_pink",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.CLOTH_DECORATION)
+                  .strength(1.0F)
+                  .sound(SoundType.WOOL)
+                  .noOcclusion(),
+              BlockShapes.SLEEPING_BAG));
+  
+  public static final RegistryObject<Block> SLEEPING_BAG_OPEN_PURPLE =
+      deferredRegister.register("sleeping_bag_open_purple",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.CLOTH_DECORATION)
+                  .strength(1.0F)
+                  .sound(SoundType.WOOL)
+                  .noOcclusion(),
+              BlockShapes.SLEEPING_BAG));
+  
+  public static final RegistryObject<Block> SLEEPING_BAG_OPEN_RED =
+      deferredRegister.register("sleeping_bag_open_red",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.CLOTH_DECORATION)
+                  .strength(1.0F)
+                  .sound(SoundType.WOOL)
+                  .noOcclusion(),
+              BlockShapes.SLEEPING_BAG));
+  
+  public static final RegistryObject<Block> SLEEPING_BAG_OPEN_YELLOW =
+      deferredRegister.register("sleeping_bag_open_yellow",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.CLOTH_DECORATION)
+                  .strength(1.0F)
+                  .sound(SoundType.WOOL)
+                  .noOcclusion(),
+              BlockShapes.SLEEPING_BAG));
+  
   
   // AE12 Glass Blocks
   public static final RegistryObject<Block> QUARTZ_GLASS =

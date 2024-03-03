@@ -1065,6 +1065,43 @@ public class DecorationItems {
           () -> new BlockItem(DecorationBlocks.SLEEPING_BAG_CLOSED_YELLOW.get(),
               new Item.Properties().tab(TAB)));
   
+  public static final RegistryObject<Item> SLEEPING_BAG_OPEN =
+      deferredRegister.register("sleeping_bag_open",
+          () -> new BlockItem(DecorationBlocks.SLEEPING_BAG_OPEN.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<Item> SLEEPING_BAG_OPEN_BLACK =
+      deferredRegister.register("sleeping_bag_open_black",
+          () -> new BlockItem(DecorationBlocks.SLEEPING_BAG_OPEN_BLACK.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<Item> SLEEPING_BAG_OPEN_BLUE =
+      deferredRegister.register("sleeping_bag_open_blue",
+          () -> new BlockItem(DecorationBlocks.SLEEPING_BAG_OPEN_BLUE.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<Item> SLEEPING_BAG_OPEN_DARKGREEN =
+      deferredRegister.register("sleeping_bag_open_darkgreen",
+          () -> new BlockItem(DecorationBlocks.SLEEPING_BAG_OPEN_DARKGREEN.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<Item> SLEEPING_BAG_OPEN_ORANGE =
+      deferredRegister.register("sleeping_bag_open_orange",
+          () -> new BlockItem(DecorationBlocks.SLEEPING_BAG_OPEN_ORANGE.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<Item> SLEEPING_BAG_OPEN_PINK =
+      deferredRegister.register("sleeping_bag_open_pink",
+          () -> new BlockItem(DecorationBlocks.SLEEPING_BAG_OPEN_PINK.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<Item> SLEEPING_BAG_OPEN_PURPLE =
+      deferredRegister.register("sleeping_bag_open_purple",
+          () -> new BlockItem(DecorationBlocks.SLEEPING_BAG_OPEN_PURPLE.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<Item> SLEEPING_BAG_OPEN_RED =
+      deferredRegister.register("sleeping_bag_open_red",
+          () -> new BlockItem(DecorationBlocks.SLEEPING_BAG_OPEN_RED.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<Item> SLEEPING_BAG_OPEN_YELLOW =
+      deferredRegister.register("sleeping_bag_open_yellow",
+          () -> new BlockItem(DecorationBlocks.SLEEPING_BAG_OPEN_YELLOW.get(),
+              new Item.Properties().tab(TAB)));
+  
   // AE12 Glass
   public static final RegistryObject<BlockItem> QUARTZ_GLASS =
       deferredRegister.register("quartz_glass",

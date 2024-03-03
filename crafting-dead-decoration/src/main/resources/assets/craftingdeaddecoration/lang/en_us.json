@@ -258,6 +258,15 @@
     "block.craftingdeaddecoration.sleeping_bag_closed_pink": "Pink Closed Sleeping Bag",
     "block.craftingdeaddecoration.sleeping_bag_closed_purple": "Purple Closed Sleeping Bag",
     "block.craftingdeaddecoration.sleeping_bag_closed_red": "Red Closed Sleeping Bag",
-    "block.craftingdeaddecoration.sleeping_bag_closed_yellow": "Yellow Closed Sleeping Bag"
+    "block.craftingdeaddecoration.sleeping_bag_closed_yellow": "Yellow Closed Sleeping Bag",
+    "block.craftingdeaddecoration.sleeping_bag_open": "Open Sleeping Bag",
+    "block.craftingdeaddecoration.sleeping_bag_open_black": "Black Open Sleeping Bag",
+    "block.craftingdeaddecoration.sleeping_bag_open_blue": "BlueOpen Sleeping Bag",
+    "block.craftingdeaddecoration.sleeping_bag_open_darkgreen": "Dark Green Open Sleeping Bag",
+    "block.craftingdeaddecoration.sleeping_bag_open_orange": "Orange Open Sleeping Bag",
+    "block.craftingdeaddecoration.sleeping_bag_open_pink": "Pink Open Sleeping Bag",
+    "block.craftingdeaddecoration.sleeping_bag_open_purple": "Purple Open Sleeping Bag",
+    "block.craftingdeaddecoration.sleeping_bag_open_red": "Red Open Sleeping Bag",
+    "block.craftingdeaddecoration.sleeping_bag_open_yellow": "Yellow Open Sleeping Bag"
     
 }

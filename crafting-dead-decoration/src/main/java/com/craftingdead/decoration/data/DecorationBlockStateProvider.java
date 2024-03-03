@@ -176,6 +176,16 @@ public class DecorationBlockStateProvider extends BlockStateProvider {
     this.horizontalBlock(DecorationBlocks.SLEEPING_BAG_CLOSED_PURPLE);
     this.horizontalBlock(DecorationBlocks.SLEEPING_BAG_CLOSED_RED);
     this.horizontalBlock(DecorationBlocks.SLEEPING_BAG_CLOSED_YELLOW);
+    
+    this.horizontalBlock(DecorationBlocks.SLEEPING_BAG_OPEN);
+    this.horizontalBlock(DecorationBlocks.SLEEPING_BAG_OPEN_BLACK);
+    this.horizontalBlock(DecorationBlocks.SLEEPING_BAG_OPEN_BLUE);
+    this.horizontalBlock(DecorationBlocks.SLEEPING_BAG_OPEN_DARKGREEN);
+    this.horizontalBlock(DecorationBlocks.SLEEPING_BAG_OPEN_ORANGE);
+    this.horizontalBlock(DecorationBlocks.SLEEPING_BAG_OPEN_PINK);
+    this.horizontalBlock(DecorationBlocks.SLEEPING_BAG_OPEN_PURPLE);
+    this.horizontalBlock(DecorationBlocks.SLEEPING_BAG_OPEN_RED);
+    this.horizontalBlock(DecorationBlocks.SLEEPING_BAG_OPEN_YELLOW);
   }
 
   private void simpleBlock(RegistryObject<? extends Block> block) {
