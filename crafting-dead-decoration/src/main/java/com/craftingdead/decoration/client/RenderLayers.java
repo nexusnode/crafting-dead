@@ -96,6 +96,9 @@ class RenderLayers {
     cutout(DecorationBlocks.LIGHT_SWITCH);
     cutout(DecorationBlocks.ELECTRICAL_SOCKET);
     cutout(DecorationBlocks.ABANDONED_CAMPFIRE);
+    
+    translucent(DecorationBlocks.QUARTZ_GLASS);
+    translucent(DecorationBlocks.VIBRANT_QUARTZ_GLASS);
   }
 
   private static void cutout(Supplier<? extends Block> block) {

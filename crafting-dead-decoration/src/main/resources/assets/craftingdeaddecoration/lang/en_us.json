@@ -247,5 +247,7 @@
     "block.craftingdeaddecoration.cherry_planks": "Cherry Planks",
     "block.craftingdeaddecoration.light_switch": "Light Switch",
     "block.craftingdeaddecoration.electrical_socket": "Electrical Socket",
-    "block.craftingdeaddecoration.abandoned_campfire": "Abandoned Campfire"
+    "block.craftingdeaddecoration.abandoned_campfire": "Abandoned Campfire",
+    "block.craftingdeaddecoration.quartz_glass": "Quartz Glass",
+    "block.craftingdeaddecoration.quartz_vibrant_glass": "Vibrant Quartz Glass"
 }

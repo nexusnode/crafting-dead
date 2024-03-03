@@ -21,6 +21,7 @@ package com.craftingdead.decoration.world.level.block;
 import com.craftingdead.decoration.CraftingDeadDecoration;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.ChainBlock;
+import net.minecraft.world.level.block.GlassBlock;
 import net.minecraft.world.level.block.LanternBlock;
 import net.minecraft.world.level.block.LeavesBlock;
 import net.minecraft.world.level.block.RotatedPillarBlock;
@@ -1575,4 +1576,22 @@ public class DecorationBlocks {
                   .sound(SoundType.WOOD)
                   .noOcclusion(),
               BlockShapes.ABANDONED_CAMPFIRE));
+  
+  // AE12 Glass Blocks
+  public static final RegistryObject<Block> QUARTZ_GLASS =
+      deferredRegister.register("quartz_glass",
+          () -> new GlassBlock(
+              Block.Properties.of(Material.GLASS)
+                  .strength(1.0F)
+                  .sound(SoundType.GLASS)
+                  .noOcclusion()));
+  
+  public static final RegistryObject<Block> VIBRANT_QUARTZ_GLASS =
+      deferredRegister.register("quartz_vibrant_glass",
+          () -> new GlassBlock(
+              Block.Properties.of(Material.GLASS)
+                  .strength(1.0F)
+                  .sound(SoundType.GLASS)
+                  .noOcclusion()));
+  
 }

@@ -1027,4 +1027,15 @@ public class DecorationItems {
       deferredRegister.register("abandoned_campfire",
           () -> new BlockItem(DecorationBlocks.ABANDONED_CAMPFIRE.get(),
               new Item.Properties().tab(TAB)));
+  
+  // AE12 Glass
+  public static final RegistryObject<BlockItem> QUARTZ_GLASS =
+      deferredRegister.register("quartz_glass",
+          () -> new BlockItem(DecorationBlocks.QUARTZ_GLASS.get(),
+              new Item.Properties().tab(TAB)));
+  
+  public static final RegistryObject<BlockItem> VIBRANT_QUARTZ_GLASS =
+      deferredRegister.register("quartz_vibrant_glass",
+          () -> new BlockItem(DecorationBlocks.VIBRANT_QUARTZ_GLASS.get(),
+              new Item.Properties().tab(TAB)));
 }

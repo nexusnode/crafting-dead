@@ -163,6 +163,9 @@ public class DecorationBlockStateProvider extends BlockStateProvider {
     this.horizontalBlock(DecorationBlocks.AA_POSTER);
 
     this.horizontalBlock(DecorationBlocks.FUSE_BOX);
+    
+    this.simpleBlock(DecorationBlocks.QUARTZ_GLASS);
+    this.simpleBlock(DecorationBlocks.VIBRANT_QUARTZ_GLASS);
   }
 
   private void simpleBlock(RegistryObject<? extends Block> block) {
