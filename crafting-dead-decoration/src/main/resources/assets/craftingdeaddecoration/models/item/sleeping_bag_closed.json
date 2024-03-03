@@ -1,0 +1,7 @@
+{
+	"parent": "craftingdeaddecoration:block/sleepingbags/sleeping_bag_closed",
+	"textures": {
+		"0": "craftingdeaddecoration:block/sleepingbags/sleeping_bag_closed",
+		"particle": "craftingdeaddecoration:block/sleepingbags/sleeping_bag_closed"
+	}
+}

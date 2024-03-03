@@ -77,6 +77,17 @@ public class DecorationBlockModelProvider extends BlockModelProvider {
     this.modelVariant("red", "gas_can", 3);
 
     this.textureVariant(DecorationBlocks.AA_POSTER, "poster");
+    
+    this.textureVariant(DecorationBlocks.SLEEPING_BAG_CLOSED, "sleeping_bag_closed");
+    this.textureVariant(DecorationBlocks.SLEEPING_BAG_CLOSED_BLACK, "sleeping_bag_closed");
+    this.textureVariant(DecorationBlocks.SLEEPING_BAG_CLOSED_BLUE, "sleeping_bag_closed");
+    this.textureVariant(DecorationBlocks.SLEEPING_BAG_CLOSED_DARKGREEN, "sleeping_bag_closed");
+    this.textureVariant(DecorationBlocks.SLEEPING_BAG_CLOSED_ORANGE, "sleeping_bag_closed");
+    this.textureVariant(DecorationBlocks.SLEEPING_BAG_CLOSED_PINK, "sleeping_bag_closed");
+    this.textureVariant(DecorationBlocks.SLEEPING_BAG_CLOSED_PURPLE, "sleeping_bag_closed");
+    this.textureVariant(DecorationBlocks.SLEEPING_BAG_CLOSED_RED, "sleeping_bag_closed");
+    this.textureVariant(DecorationBlocks.SLEEPING_BAG_CLOSED_YELLOW, "sleeping_bag_closed");
+    
   }
 
   private void bottomStoreShelfs(String model) {

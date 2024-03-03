@@ -380,6 +380,9 @@ public class BlockShapes {
 
   public static final Function<Direction, VoxelShape> DOUBLE_TALL_BLOCK =
       unitOrientableShape(Block.box(0, 0, 0, 16, 32, 16));
+  
+  public static final Function<Direction, VoxelShape> SLEEPING_BAG = 
+      unitOrientableShape(Block.box(1, 0, 1, 15, 2, 31));
 
   public static final Function<Direction, VoxelShape> BLOCK =
       unitOrientableShape(Shapes.block());
