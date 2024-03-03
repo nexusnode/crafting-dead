@@ -32,6 +32,9 @@ public class BlockShapes {
 
   public static final Function<Direction, VoxelShape> FUSE_BOX =
       rotatedOrientableShape(Block.box(1, 0, 13, 15, 20, 16));
+  
+  public static final Function<Direction, VoxelShape> BOX_OF_BULLETS =
+      rotatedOrientableShape(Block.box(2, 0, 4, 14, 6, 14));
 
   public static final Function<Direction, VoxelShape> POSTER =
       rotatedOrientableShape(Block.box(0, 0, 15, 16, 16, 16));
