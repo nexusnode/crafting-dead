@@ -1107,6 +1107,12 @@ public class DecorationItems {
           () -> new BlockItem(DecorationBlocks.BOX_OF_BULLETS.get(),
               new Item.Properties().tab(TAB)));
   
+  //HL2Pack Items
+  public static final RegistryObject<Item> ACACIA_BUTTON =
+      deferredRegister.register("acacia_button",
+          () -> new BlockItem(DecorationBlocks.ACACIA_BUTTON.get(),
+              new Item.Properties().tab(TAB)));
+  
   // AE12 Glass
   public static final RegistryObject<BlockItem> QUARTZ_GLASS =
       deferredRegister.register("quartz_glass",

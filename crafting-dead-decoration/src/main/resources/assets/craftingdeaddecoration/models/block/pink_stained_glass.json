@@ -1,0 +1,51 @@
+{
+	"credit": "Made with Blockbench",
+	"texture_size": [512, 512],
+	"textures": {
+		"0": "block/trashdecal02a",
+		"particle": "block/trashdecal02a"
+	},
+	"elements": [
+		{
+			"from": [-16, 0.1, -16],
+			"to": [32, 0.1, 32],
+			"faces": {
+				"up": {"uv": [0, 0, 16, 16], "texture": "#0"}
+			}
+		}
+	],
+	"display": {
+		"thirdperson_righthand": {
+			"translation": [-6, 0, 0]
+		},
+		"thirdperson_lefthand": {
+			"translation": [-6, 0, 0]
+		},
+		"firstperson_righthand": {
+			"rotation": [0, 52, 43.5],
+			"translation": [-1, 5, 0.5],
+			"scale": [0.3, 0.3, 0.3]
+		},
+		"firstperson_lefthand": {
+			"rotation": [0, 52, 43.5],
+			"translation": [-1, 5, 0.5],
+			"scale": [0.3, 0.3, 0.3]
+		},
+		"ground": {
+			"translation": [0, 5.5, 0]
+		},
+		"gui": {
+			"rotation": [90, 0, 0],
+			"scale": [0.32, 0.32, 0.32]
+		},
+		"head": {
+			"rotation": [-90, 0, 0],
+			"translation": [0, -17.25, -0.75]
+		},
+		"fixed": {
+			"rotation": [-90, 0, 0],
+			"translation": [0, 0, -14.85],
+			"scale": [2, 2, 2]
+		}
+	}
+}

@@ -1,0 +1,18 @@
+{
+    "variants": {
+        "": [
+            { "model": "block/crate0" },
+            { "model": "block/crate22.5" },
+            { "model": "block/crate45" },
+            { "model": "block/crate0", "y": 90 },
+            { "model": "block/crate22.5", "y": 90 },
+            { "model": "block/crate45", "y": 90 },
+            { "model": "block/crate0", "y": 180 },
+            { "model": "block/crate22.5", "y": 180 },
+            { "model": "block/crate45", "y": 180 },
+            { "model": "block/crate0", "y": 270 },
+            { "model": "block/crate22.5", "y": 270 },
+            { "model": "block/crate45", "y": 270 }
+        ]
+    }
+}

@@ -1,0 +1,8 @@
+{
+    "variants": {
+        "note=0": { "model": "block/light_floodlight02", "y": 0 },
+        "note=1": { "model": "block/light_floodlight02", "y": 90 },
+        "note=2": { "model": "block/light_floodlight02", "y": 180 },
+        "note=3": { "model": "block/light_floodlight02", "y": 270 }
+    }
+}

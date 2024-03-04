@@ -1,0 +1,11 @@
+{
+    "variants": {
+        "west=false,east=false,south=true,north=true": { "model": "block/railing", "y": 0 },
+		"west=false,east=false,south=false,north=true": { "model": "block/railing", "y": 0 },
+		"west=false,east=false,south=true,north=false": { "model": "block/railing", "y": 0 },
+        "west=true,east=true,south=false,north=false": { "model": "block/railing", "y": 90 },
+		"west=true,east=false,south=false,north=false": { "model": "block/railing", "y": 90 },
+		"west=false,east=true,south=false,north=false": { "model": "block/railing", "y": 90 },
+        "north=false,east=false,south=false,west=false": { "model": "block/nether_brick_fence_post" }
+    }
+}

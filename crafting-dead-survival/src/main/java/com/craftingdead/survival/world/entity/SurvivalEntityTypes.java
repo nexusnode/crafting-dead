@@ -39,7 +39,7 @@ public class SurvivalEntityTypes {
 
   public static final DeferredRegister<EntityType<?>> deferredRegister =
       DeferredRegister.create(ForgeRegistries.ENTITIES, CraftingDeadSurvival.ID);
-
+  
   public static final RegistryObject<EntityType<PipeBomb>> PIPE_BOMB =
       deferredRegister.register("pipe_bomb", () -> create("pipe_bomb",
           EntityType.Builder
