@@ -120,7 +120,7 @@ class RenderLayers {
     translucent(DecorationBlocks.SLEEPING_BAG_OPEN_RED);
     translucent(DecorationBlocks.SLEEPING_BAG_OPEN_YELLOW);
     
-    cutout(DecorationBlocks.BOX_OF_BULLETS);
+    cutout(DecorationBlocks.BOXES_OF_BULLETS);
     
     translucent(DecorationBlocks.FENCE);
   }

@@ -1107,9 +1107,22 @@ public class DecorationItems {
           () -> new BlockItem(DecorationBlocks.SLEEPING_BAG_OPEN_YELLOW.get(),
               new Item.Properties().tab(TAB)));
   
-  public static final RegistryObject<Item> BOX_OF_BULLETS =
+  public static final RegistryObject<Item> BOXES_OF_BULLETS =
       deferredRegister.register("box_of_bullets",
-          () -> new BlockItem(DecorationBlocks.BOX_OF_BULLETS.get(),
+          () -> new BlockItem(DecorationBlocks.BOXES_OF_BULLETS.get(),
+              new Item.Properties().tab(TAB)));
+  
+  public static final RegistryObject<Item> BOXES_OF_SHOTGUN_SHELLS_RED =
+      deferredRegister.register("boxes_of_shotgun_shells_red",
+          () -> new BlockItem(DecorationBlocks.BOXES_OF_SHOTGUN_SHELLS_RED.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<Item> BOXES_OF_SHOTGUN_SHELLS_GREEN =
+      deferredRegister.register("boxes_of_shotgun_shells_green",
+          () -> new BlockItem(DecorationBlocks.BOXES_OF_SHOTGUN_SHELLS_GREEN.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<Item> BOXES_OF_SHOTGUN_SHELLS_BLUE =
+      deferredRegister.register("boxes_of_shotgun_shells_blue",
+          () -> new BlockItem(DecorationBlocks.BOXES_OF_SHOTGUN_SHELLS_BLUE.get(),
               new Item.Properties().tab(TAB)));
   
   //HL2Pack Items

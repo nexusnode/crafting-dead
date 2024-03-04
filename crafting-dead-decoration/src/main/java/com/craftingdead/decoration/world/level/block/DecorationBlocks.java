@@ -51,14 +51,41 @@ public class DecorationBlocks {
                   .sound(SoundType.METAL),
               BlockShapes.FUSE_BOX, true));
   
-  public static final RegistryObject<Block> BOX_OF_BULLETS =
+  public static final RegistryObject<Block> BOXES_OF_BULLETS =
       deferredRegister.register("box_of_bullets",
           () -> new OrientableBlock(
               BlockBehaviour.Properties.of(Material.METAL)
                   .strength(5.0F)
                   .sound(SoundType.METAL)
                   .noCollission(),
-              BlockShapes.BOX_OF_BULLETS, false));
+              BlockShapes.BOXES_OF_BULLETS, false));
+  
+  public static final RegistryObject<Block> BOXES_OF_SHOTGUN_SHELLS_RED =
+      deferredRegister.register("boxes_of_shotgun_shells_red",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(5.0F)
+                  .sound(SoundType.METAL)
+                  .noCollission(),
+              BlockShapes.BOXES_OF_SHOTGUN_SHELLS, false));
+  
+  public static final RegistryObject<Block> BOXES_OF_SHOTGUN_SHELLS_GREEN =
+      deferredRegister.register("boxes_of_shotgun_shells_green",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(5.0F)
+                  .sound(SoundType.METAL)
+                  .noCollission(),
+              BlockShapes.BOXES_OF_SHOTGUN_SHELLS, false));
+  
+  public static final RegistryObject<Block> BOXES_OF_SHOTGUN_SHELLS_BLUE =
+      deferredRegister.register("boxes_of_shotgun_shells_blue",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(5.0F)
+                  .sound(SoundType.METAL)
+                  .noCollission(),
+              BlockShapes.BOXES_OF_SHOTGUN_SHELLS, false));
 
   public static final RegistryObject<Block> AA_POSTER =
       deferredRegister.register("aa_poster",
