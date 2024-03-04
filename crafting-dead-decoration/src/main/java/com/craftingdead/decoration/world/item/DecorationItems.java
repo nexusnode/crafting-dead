@@ -1118,6 +1118,11 @@ public class DecorationItems {
           () -> new BlockItem(DecorationBlocks.FENCE.get(),
               new Item.Properties().tab(TAB)));
   
+  public static final RegistryObject<Item> METAL_DUCT =
+      deferredRegister.register("acacia_stairs",
+          () -> new BlockItem(DecorationBlocks.METAL_DUCT.get(),
+              new Item.Properties().tab(TAB)));
+  
   // AE12 Glass
   public static final RegistryObject<BlockItem> QUARTZ_GLASS =
       deferredRegister.register("quartz_glass",

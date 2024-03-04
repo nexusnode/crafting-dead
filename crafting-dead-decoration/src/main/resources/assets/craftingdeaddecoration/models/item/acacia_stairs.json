@@ -3,8 +3,8 @@
 	"ambientocclusion": false,
 	"texture_size": [256, 256],
 	"textures": {
-		"0": "block/metalduct003a",
-		"particle": "block/metalduct003a"
+		"0": "craftingdeaddecoration:block/metalduct003a",
+		"particle": "craftingdeaddecoration:block/metalduct003a"
 	},
 	"elements": [
 		{

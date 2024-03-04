@@ -1787,6 +1787,16 @@ public class DecorationBlocks {
                   BlockShapes.FENCE,
                   false));
   
+  public static final RegistryObject<Block> METAL_DUCT =
+      deferredRegister.register("acacia_stairs",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.WOOD)
+                  .strength(1.0F)
+                  .sound(SoundType.WOOD)
+                  .noOcclusion(), 
+                  BlockShapes.METAL_DUCT,
+                  false));
+  
   // AE12 Glass Blocks
   public static final RegistryObject<Block> QUARTZ_GLASS =
       deferredRegister.register("quartz_glass",
