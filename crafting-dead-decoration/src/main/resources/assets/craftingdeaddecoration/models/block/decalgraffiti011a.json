@@ -1,8 +1,8 @@
 {
 	"credit": "Made with Blockbench",
 	"textures": {
-		"2": "block/graffiti/decalgraffiti011a",
-		"particle": "block/graffiti/decalgraffiti011a"
+		"2": "craftingdeaddecoration:block/graffiti/decalgraffiti011a",
+		"particle": "craftingdeaddecoration:block/graffiti/decalgraffiti011a"
 	},
 	"elements": [
 		{
