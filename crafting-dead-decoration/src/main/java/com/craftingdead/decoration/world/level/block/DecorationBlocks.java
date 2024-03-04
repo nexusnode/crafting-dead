@@ -1588,6 +1588,15 @@ public class DecorationBlocks {
                   .noOcclusion(),
               BlockShapes.ABANDONED_CAMPFIRE));
   
+  public static final RegistryObject<Block> ABANDONED_CAMPFIRE_WITH_POT =
+      deferredRegister.register("abandoned_campfire_with_pot",
+          () -> new OrientableBlock(
+              Block.Properties.of(Material.WOOD, MaterialColor.PODZOL)
+                  .strength(2.0F)
+                  .sound(SoundType.WOOD)
+                  .noOcclusion(),
+              BlockShapes.ABANDONED_CAMPFIRE_WITH_POT));
+  
   public static final RegistryObject<Block> SLEEPING_BAG_CLOSED =
       deferredRegister.register("sleeping_bag_closed",
           () -> new OrientableBlock(

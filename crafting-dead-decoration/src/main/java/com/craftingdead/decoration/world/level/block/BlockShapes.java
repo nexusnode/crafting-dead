@@ -129,6 +129,10 @@ public class BlockShapes {
 
   public static final Function<Direction, VoxelShape> ABANDONED_CAMPFIRE =
       rotatedOrientableShape(Shapes.or(
+          Block.box(2, 0, 2, 14, 2, 14)));
+  
+  public static final Function<Direction, VoxelShape> ABANDONED_CAMPFIRE_WITH_POT =
+      rotatedOrientableShape(Shapes.or(
           Block.box(2, 0, 2, 14, 2, 14),
           Block.box(1, 0, 7.5, 15, 14, 8.5)));
 

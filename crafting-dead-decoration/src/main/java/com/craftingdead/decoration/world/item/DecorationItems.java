@@ -1028,6 +1028,11 @@ public class DecorationItems {
           () -> new BlockItem(DecorationBlocks.ABANDONED_CAMPFIRE.get(),
               new Item.Properties().tab(TAB)));
   
+  public static final RegistryObject<Item> ABANDONED_CAMPFIRE_WITH_POT =
+      deferredRegister.register("abandoned_campfire_with_pot",
+          () -> new BlockItem(DecorationBlocks.ABANDONED_CAMPFIRE_WITH_POT.get(),
+              new Item.Properties().tab(TAB)));
+  
   public static final RegistryObject<Item> SLEEPING_BAG_CLOSED =
       deferredRegister.register("sleeping_bag_closed",
           () -> new BlockItem(DecorationBlocks.SLEEPING_BAG_CLOSED.get(),
