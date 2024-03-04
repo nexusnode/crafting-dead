@@ -387,6 +387,9 @@ public class BlockShapes {
   public static final Function<Direction, VoxelShape> SLEEPING_BAG =
       rotatedOrientableShape(Shapes.or(Block.box(1, 0, 1, 15, 2, 31)));
 
+  public static final Function<Direction, VoxelShape> FENCE =
+      rotatedOrientableShape(Shapes.or(Block.box(-16, 0, 6, 32, 32, 9)));
+  
   public static final Function<Direction, VoxelShape> BLOCK =
       unitOrientableShape(Shapes.block());
 

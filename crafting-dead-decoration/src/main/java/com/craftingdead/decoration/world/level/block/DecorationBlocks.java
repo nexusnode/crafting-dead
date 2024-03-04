@@ -1779,12 +1779,13 @@ public class DecorationBlocks {
   
   public static final RegistryObject<Block> FENCE =
       deferredRegister.register("acacia_fence_gate",
-          () -> new Block(
+          () -> new OrientableBlock(
               BlockBehaviour.Properties.of(Material.WOOD)
                   .strength(1.0F)
                   .sound(SoundType.WOOD)
-                  .noOcclusion()));
-  
+                  .noOcclusion(), 
+                  BlockShapes.FENCE,
+                  false));
   
   // AE12 Glass Blocks
   public static final RegistryObject<Block> QUARTZ_GLASS =
