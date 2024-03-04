@@ -1807,7 +1807,7 @@ public class DecorationBlocks {
                   BlockShapes.POSTER,
                   true));
   
-  public static final RegistryObject<Block> PAINTING_2 =
+  public static final RegistryObject<Block> CRATE =
       deferredRegister.register("dead_brain_coral",
           () -> new OrientableBlock(
               BlockBehaviour.Properties.of(Material.WOOD)
@@ -1815,7 +1815,7 @@ public class DecorationBlocks {
                   .sound(SoundType.WOOD)
                   .noOcclusion(), 
                   BlockShapes.BLOCK,
-                  true));
+                  false));
   
   // AE12 Glass Blocks
   public static final RegistryObject<Block> QUARTZ_GLASS =

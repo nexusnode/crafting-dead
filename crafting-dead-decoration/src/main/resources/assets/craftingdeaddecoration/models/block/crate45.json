@@ -2,8 +2,8 @@
 	"credit": "Made with Blockbench",
 	"ambientocclusion": false,
 	"textures": {
-		"0": "block/woodcrates01a",
-		"particle": "block/crateface"
+		"0": "craftingdeaddecoration:block/woodcrates01a",
+		"particle": "craftingdeaddecoration:block/crateface"
 	},
 	"elements": [
 		{

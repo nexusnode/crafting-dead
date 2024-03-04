@@ -1128,6 +1128,11 @@ public class DecorationItems {
           () -> new BlockItem(DecorationBlocks.PAINTING_1.get(),
               new Item.Properties().tab(TAB)));
   
+  public static final RegistryObject<Item> CRATE =
+      deferredRegister.register("dead_brain_coral",
+          () -> new BlockItem(DecorationBlocks.CRATE.get(),
+              new Item.Properties().tab(TAB)));
+  
   // AE12 Glass
   public static final RegistryObject<BlockItem> QUARTZ_GLASS =
       deferredRegister.register("quartz_glass",
