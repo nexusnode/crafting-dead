@@ -22,6 +22,7 @@ import com.craftingdead.decoration.CraftingDeadDecoration;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.ButtonBlock;
 import net.minecraft.world.level.block.ChainBlock;
+import net.minecraft.world.level.block.FenceGateBlock;
 import net.minecraft.world.level.block.GlassBlock;
 import net.minecraft.world.level.block.LanternBlock;
 import net.minecraft.world.level.block.LeavesBlock;
@@ -1768,9 +1769,17 @@ public class DecorationBlocks {
               BlockShapes.SLEEPING_BAG));
   
   // Items from HL2Pack
-  public static final RegistryObject<Block> ACACIA_BUTTON =
+  public static final RegistryObject<Block> HEALTH_CHARGER =
       deferredRegister.register("acacia_button",
           () -> new WoodButtonBlock(
+              BlockBehaviour.Properties.of(Material.WOOD)
+                  .strength(1.0F)
+                  .sound(SoundType.WOOD)
+                  .noOcclusion()));
+  
+  public static final RegistryObject<Block> FENCE =
+      deferredRegister.register("acacia_fence_gate",
+          () -> new Block(
               BlockBehaviour.Properties.of(Material.WOOD)
                   .strength(1.0F)
                   .sound(SoundType.WOOD)

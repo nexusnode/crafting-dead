@@ -1108,9 +1108,14 @@ public class DecorationItems {
               new Item.Properties().tab(TAB)));
   
   //HL2Pack Items
-  public static final RegistryObject<Item> ACACIA_BUTTON =
+  public static final RegistryObject<Item> HEALTH_CHARGER =
       deferredRegister.register("acacia_button",
-          () -> new BlockItem(DecorationBlocks.ACACIA_BUTTON.get(),
+          () -> new BlockItem(DecorationBlocks.HEALTH_CHARGER.get(),
+              new Item.Properties().tab(TAB)));
+  
+  public static final RegistryObject<Item> FENCE =
+      deferredRegister.register("acacia_fence_gate",
+          () -> new BlockItem(DecorationBlocks.FENCE.get(),
               new Item.Properties().tab(TAB)));
   
   // AE12 Glass

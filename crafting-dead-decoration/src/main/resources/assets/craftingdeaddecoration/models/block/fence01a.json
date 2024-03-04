@@ -3,9 +3,9 @@
 	"ambientocclusion": false,
 	"texture_size": [512, 512],
 	"textures": {
-		"0": "block/fence_alpha",
-		"1": "block/fence_composite01",
-		"particle": "block/fence_alpha"
+		"0": "craftingdeaddecoration:block/fence_alpha",
+		"1": "craftingdeaddecoration:block/fence_composite01",
+		"particle": "craftingdeaddecoration:block/fence_alpha"
 	},
 	"elements": [
 		{

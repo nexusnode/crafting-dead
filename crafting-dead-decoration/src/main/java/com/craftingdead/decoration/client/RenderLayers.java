@@ -121,6 +121,8 @@ class RenderLayers {
     translucent(DecorationBlocks.SLEEPING_BAG_OPEN_YELLOW);
     
     cutout(DecorationBlocks.BOX_OF_BULLETS);
+    
+    translucent(DecorationBlocks.FENCE);
   }
 
   private static void cutout(Supplier<? extends Block> block) {
