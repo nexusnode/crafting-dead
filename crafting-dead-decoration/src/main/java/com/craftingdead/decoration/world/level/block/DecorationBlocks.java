@@ -1772,17 +1772,17 @@ public class DecorationBlocks {
   public static final RegistryObject<Block> HEALTH_CHARGER =
       deferredRegister.register("acacia_button",
           () -> new WoodButtonBlock(
-              BlockBehaviour.Properties.of(Material.WOOD)
+              BlockBehaviour.Properties.of(Material.METAL)
                   .strength(1.0F)
-                  .sound(SoundType.WOOD)
+                  .sound(SoundType.METAL)
                   .noOcclusion()));
   
   public static final RegistryObject<Block> FENCE =
       deferredRegister.register("acacia_fence_gate",
           () -> new OrientableBlock(
-              BlockBehaviour.Properties.of(Material.WOOD)
-                  .strength(1.0F)
-                  .sound(SoundType.WOOD)
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(2.0F)
+                  .sound(SoundType.METAL)
                   .noOcclusion(), 
                   BlockShapes.FENCE,
                   false));
@@ -1790,9 +1790,9 @@ public class DecorationBlocks {
   public static final RegistryObject<Block> METAL_DUCT =
       deferredRegister.register("acacia_stairs",
           () -> new OrientableBlock(
-              BlockBehaviour.Properties.of(Material.WOOD)
-                  .strength(1.0F)
-                  .sound(SoundType.WOOD)
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(21.0F)
+                  .sound(SoundType.METAL)
                   .noOcclusion(), 
                   BlockShapes.METAL_DUCT,
                   false));
@@ -1805,6 +1805,16 @@ public class DecorationBlocks {
                   .sound(SoundType.WOOD)
                   .noOcclusion(), 
                   BlockShapes.POSTER,
+                  true));
+  
+  public static final RegistryObject<Block> PAINTING_2 =
+      deferredRegister.register("dead_brain_coral",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.WOOD)
+                  .strength(1.0F)
+                  .sound(SoundType.WOOD)
+                  .noOcclusion(), 
+                  BlockShapes.BLOCK,
                   true));
   
   // AE12 Glass Blocks
