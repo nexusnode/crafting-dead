@@ -1895,6 +1895,7 @@ public class DecorationBlocks {
                   .noCollission(), 
                   BlockShapes.BLOCK,
                   false));
+  
   public static final RegistryObject<Block> WALL_BUSH =
       deferredRegister.register("lime_stained_glass_pane",
           () -> new OrientableBlock(
@@ -1905,6 +1906,15 @@ public class DecorationBlocks {
                   .noCollission(), 
                   BlockShapes.WALL_BUSH,
                   false));
+
+  public static final RegistryObject<Block> COBBLESTONE =
+      deferredRegister.register("cobblestone",
+          () -> new Block(
+              BlockBehaviour.Properties.of(Material.STONE)
+                  .strength(1.0F)
+                  .sound(SoundType.STONE)
+                  .noOcclusion()
+                  .noCollission()));
   
   // AE12 Glass Blocks
   public static final RegistryObject<Block> QUARTZ_GLASS =

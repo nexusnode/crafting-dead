@@ -1150,6 +1150,11 @@ public class DecorationItems {
           () -> new BlockItem(DecorationBlocks.WALL_BUSH.get(),
               new Item.Properties().tab(TAB)));
   
+  public static final RegistryObject<Item> COBBLESTONE =
+      deferredRegister.register("cobblestone",
+          () -> new BlockItem(DecorationBlocks.COBBLESTONE.get(),
+              new Item.Properties().tab(TAB)));
+  
   //HL2Pack Items
   public static final RegistryObject<Item> HEALTH_CHARGER =
       deferredRegister.register("acacia_button",
