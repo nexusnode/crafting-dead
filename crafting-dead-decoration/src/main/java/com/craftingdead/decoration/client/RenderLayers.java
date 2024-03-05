@@ -124,7 +124,8 @@ class RenderLayers {
     
     translucent(DecorationBlocks.FENCE);
     translucent(DecorationBlocks.SEWER_OPENING);
-    translucent(DecorationBlocks.NORMAL_GLASS);
+    translucent(DecorationBlocks.HL2_GLASS);
+    translucent(DecorationBlocks.HL2_TRASH);
   }
 
   private static void cutout(Supplier<? extends Block> block) {

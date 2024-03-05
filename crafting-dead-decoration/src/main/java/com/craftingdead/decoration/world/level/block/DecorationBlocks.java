@@ -1865,13 +1865,23 @@ public class DecorationBlocks {
                   BlockShapes.BLOCK,
                   false));
   
-  public static final RegistryObject<Block> NORMAL_GLASS =
+  public static final RegistryObject<Block> HL2_GLASS =
       deferredRegister.register("glass",
           () -> new OrientableBlock(
               BlockBehaviour.Properties.of(Material.GLASS)
                   .strength(1.0F)
                   .sound(SoundType.GLASS)
                   .noOcclusion(), 
+                  BlockShapes.BLOCK,
+                  false));
+  public static final RegistryObject<Block> HL2_TRASH =
+      deferredRegister.register("lime_stained_glass",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.DECORATION)
+                  .strength(1.0F)
+                  .sound(SoundType.WOOL)
+                  .noOcclusion()
+                  .noCollission(), 
                   BlockShapes.BLOCK,
                   false));
   

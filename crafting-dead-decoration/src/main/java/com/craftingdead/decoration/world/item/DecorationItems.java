@@ -1130,9 +1130,14 @@ public class DecorationItems {
           () -> new BlockItem(DecorationBlocks.SEWER_OPENING.get(),
               new Item.Properties().tab(TAB)));
   
-  public static final RegistryObject<Item> NORMAL_GLASS =
+  public static final RegistryObject<Item> HL2_GLASS =
       deferredRegister.register("glass",
-          () -> new BlockItem(DecorationBlocks.NORMAL_GLASS.get(),
+          () -> new BlockItem(DecorationBlocks.HL2_GLASS.get(),
+              new Item.Properties().tab(TAB)));
+  
+  public static final RegistryObject<Item> HL2_TRASH =
+      deferredRegister.register("lime_stained_glass",
+          () -> new BlockItem(DecorationBlocks.HL2_TRASH.get(),
               new Item.Properties().tab(TAB)));
   
   //HL2Pack Items
