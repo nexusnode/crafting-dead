@@ -1854,6 +1854,17 @@ public class DecorationBlocks {
                   BlockShapes.BLOCK,
                   false));
   
+  public static final RegistryObject<Block> SEWER_OPENING =
+      deferredRegister.register("brown_stained_glass",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion()
+                  .noCollission(), 
+                  BlockShapes.BLOCK,
+                  false));
+  
   // AE12 Glass Blocks
   public static final RegistryObject<Block> QUARTZ_GLASS =
       deferredRegister.register("quartz_glass",

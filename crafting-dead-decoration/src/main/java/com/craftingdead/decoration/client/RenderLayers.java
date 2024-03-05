@@ -123,6 +123,8 @@ class RenderLayers {
     cutout(DecorationBlocks.BOXES_OF_BULLETS);
     
     translucent(DecorationBlocks.FENCE);
+    
+    translucent(DecorationBlocks.SEWER_OPENING);
   }
 
   private static void cutout(Supplier<? extends Block> block) {
