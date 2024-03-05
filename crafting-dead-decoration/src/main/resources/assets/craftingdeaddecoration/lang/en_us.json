@@ -268,7 +268,22 @@
     "block.craftingdeaddecoration.sleeping_bag_open_purple": "Purple Open Sleeping Bag",
     "block.craftingdeaddecoration.sleeping_bag_open_red": "Red Open Sleeping Bag",
     "block.craftingdeaddecoration.sleeping_bag_open_yellow": "Yellow Open Sleeping Bag",
-    
-    "block.craftingdeaddecoration.box_of_bullets": "Boxes Of Bullets"
+    "block.craftingdeaddecoration.box_of_bullets": "Boxes Of Bullets",
+    "block.craftingdeaddecoration.acacia_button": "Health Charger",
+    "block.craftingdeaddecoration.acacia_fence_gate": "Iron Fence",
+    "block.craftingdeaddecoration.acacia_stairs": "Metal Duct",
+    "block.craftingdeaddecoration.dead_brain_coral": "Crate",
+    "block.craftingdeaddecoration.black_stained_glass_pane": "Painting",
+    "block.craftingdeaddecoration.abandoned_campfire_with_pot": "Abandoned Campfire With Pot",
+    "block.craftingdeaddecoration.boxes_of_shotgun_shells_red": "Boxes of Shotgun Shell Red",
+    "block.craftingdeaddecoration.boxes_of_shotgun_shells_green": "Boxes of Shotgun Shell Green",
+    "block.craftingdeaddecoration.boxes_of_shotgun_shells_blue": "Boxes of Shotgun Shell Blue",
+    "block.craftingdeaddecoration.brown_stained_glass": "Sewer Opening",
+    "block.craftingdeaddecoration.glass": "Glass",
+    "block.craftingdeaddecoration.lime_stained_glass": "Trash Decal 1",
+    "block.craftingdeaddecoration.pink_stained_glass": "Trash Decal 2",
+    "block.craftingdeaddecoration.lime_stained_glass_pane": "Wall Bush",
+    "block.craftingdeaddecoration.cobblestone": "Stone",
+    "block.craftingdeaddecoration.nether_brick_fence": "Small Iron Fence"
     
 }
