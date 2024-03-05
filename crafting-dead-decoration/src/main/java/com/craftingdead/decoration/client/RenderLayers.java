@@ -126,6 +126,7 @@ class RenderLayers {
     translucent(DecorationBlocks.SEWER_OPENING);
     translucent(DecorationBlocks.HL2_GLASS);
     translucent(DecorationBlocks.HL2_TRASH);
+    translucent(DecorationBlocks.HL2_TRASH_2);
   }
 
   private static void cutout(Supplier<? extends Block> block) {

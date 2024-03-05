@@ -1140,6 +1140,11 @@ public class DecorationItems {
           () -> new BlockItem(DecorationBlocks.HL2_TRASH.get(),
               new Item.Properties().tab(TAB)));
   
+  public static final RegistryObject<Item> HL2_TRASH_2 =
+      deferredRegister.register("pink_stained_glass",
+          () -> new BlockItem(DecorationBlocks.HL2_TRASH_2.get(),
+              new Item.Properties().tab(TAB)));
+  
   //HL2Pack Items
   public static final RegistryObject<Item> HEALTH_CHARGER =
       deferredRegister.register("acacia_button",
