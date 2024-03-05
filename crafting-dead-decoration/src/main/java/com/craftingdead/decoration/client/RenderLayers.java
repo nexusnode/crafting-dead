@@ -100,17 +100,34 @@ class RenderLayers {
     translucent(DecorationBlocks.QUARTZ_GLASS);
     translucent(DecorationBlocks.VIBRANT_QUARTZ_GLASS);
     
-    cutout(DecorationBlocks.SLEEPING_BAG_CLOSED);
-    cutout(DecorationBlocks.SLEEPING_BAG_CLOSED_BLACK);
-    cutout(DecorationBlocks.SLEEPING_BAG_CLOSED_BLUE);
-    cutout(DecorationBlocks.SLEEPING_BAG_CLOSED_DARKGREEN);
-    cutout(DecorationBlocks.SLEEPING_BAG_CLOSED_ORANGE);
-    cutout(DecorationBlocks.SLEEPING_BAG_CLOSED_PINK);
-    cutout(DecorationBlocks.SLEEPING_BAG_CLOSED_PURPLE);
-    cutout(DecorationBlocks.SLEEPING_BAG_CLOSED_RED);
-    cutout(DecorationBlocks.SLEEPING_BAG_CLOSED_YELLOW);
+    translucent(DecorationBlocks.SLEEPING_BAG_CLOSED);
+    translucent(DecorationBlocks.SLEEPING_BAG_CLOSED_BLACK);
+    translucent(DecorationBlocks.SLEEPING_BAG_CLOSED_BLUE);
+    translucent(DecorationBlocks.SLEEPING_BAG_CLOSED_DARKGREEN);
+    translucent(DecorationBlocks.SLEEPING_BAG_CLOSED_ORANGE);
+    translucent(DecorationBlocks.SLEEPING_BAG_CLOSED_PINK);
+    translucent(DecorationBlocks.SLEEPING_BAG_CLOSED_PURPLE);
+    translucent(DecorationBlocks.SLEEPING_BAG_CLOSED_RED);
+    translucent(DecorationBlocks.SLEEPING_BAG_CLOSED_YELLOW);
     
-    cutout(DecorationBlocks.BOX_OF_BULLETS);
+    translucent(DecorationBlocks.SLEEPING_BAG_OPEN);
+    translucent(DecorationBlocks.SLEEPING_BAG_OPEN_BLACK);
+    translucent(DecorationBlocks.SLEEPING_BAG_OPEN_BLUE);
+    translucent(DecorationBlocks.SLEEPING_BAG_OPEN_DARKGREEN);
+    translucent(DecorationBlocks.SLEEPING_BAG_OPEN_ORANGE);
+    translucent(DecorationBlocks.SLEEPING_BAG_OPEN_PINK);
+    translucent(DecorationBlocks.SLEEPING_BAG_OPEN_PURPLE);
+    translucent(DecorationBlocks.SLEEPING_BAG_OPEN_RED);
+    translucent(DecorationBlocks.SLEEPING_BAG_OPEN_YELLOW);
+    
+    cutout(DecorationBlocks.BOXES_OF_BULLETS);
+    
+    translucent(DecorationBlocks.FENCE);
+    translucent(DecorationBlocks.SEWER_OPENING);
+    translucent(DecorationBlocks.HL2_GLASS);
+    translucent(DecorationBlocks.HL2_TRASH);
+    translucent(DecorationBlocks.HL2_TRASH_2);
+    translucent(DecorationBlocks.WALL_BUSH);
   }
 
   private static void cutout(Supplier<? extends Block> block) {

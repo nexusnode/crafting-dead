@@ -1,0 +1,19 @@
+{
+    "variants": {
+        "facing=east": {
+            "model": "craftingdeaddecoration:block/brown_stained_glass",
+            "y": 90
+        },
+        "facing=north": {
+            "model": "craftingdeaddecoration:block/brown_stained_glass"
+        },
+        "facing=west": {
+            "model": "craftingdeaddecoration:block/brown_stained_glass",
+            "y": 270
+        },
+        "facing=south": {
+            "model": "craftingdeaddecoration:block/brown_stained_glass",
+            "y": 180
+        }    
+    }
+}

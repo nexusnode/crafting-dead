@@ -1,0 +1,54 @@
+{
+	"credit": "Made with Blockbench",
+	"texture_size": [256, 256],
+	"textures": {
+		"2": "block/graffiti/lambdaspray_2a",
+		"particle": "block/graffiti/lambdaspray_2a"
+	},
+	"elements": [
+		{
+			"from": [2, 2, 15.45],
+			"to": [14, 14, 15.45],
+			"rotation": {"angle": 0, "axis": "y", "origin": [0, 0, 15.475]},
+			"faces": {
+				"north": {"uv": [0, 0, 12, 12], "texture": "#2"},
+				"south": {"uv": [12, 0, 0, 12], "texture": "#2"}
+			}
+		}
+	],
+	"display": {
+		"thirdperson_righthand": {
+			"rotation": [0, -180, 0],
+			"translation": [0, 0, 1.25],
+			"scale": [0.2, 0.2, 0.2]
+		},
+		"thirdperson_lefthand": {
+			"rotation": [0, -180, 0],
+			"translation": [0, 0, 1.25],
+			"scale": [0.2, 0.2, 0.2]
+		},
+		"firstperson_righthand": {
+			"rotation": [-19, -43, 0],
+			"translation": [-0.5, 5.25, 2.25],
+			"scale": [0.3, 0.3, 0.3]
+		},
+		"firstperson_lefthand": {
+			"rotation": [-19, -43, 0],
+			"translation": [-0.5, 5.5, 2.25],
+			"scale": [0.3, 0.3, 0.3]
+		},
+		"ground": {
+			"rotation": [90, 0, 0],
+			"translation": [0, 3, 0],
+			"scale": [0.3, 0.3, 0.3]
+		},
+		"gui": {
+			"rotation": [0, -180, 0],
+			"scale": [1.5, 1.5, 1.5]
+		},
+		"fixed": {
+			"translation": [0, 0, -15],
+			"scale": [2, 2, 2]
+		}
+	}
+}

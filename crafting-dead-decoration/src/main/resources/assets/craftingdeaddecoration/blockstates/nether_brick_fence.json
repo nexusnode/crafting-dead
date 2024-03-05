@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "craftingdeaddecoration:block/railing"
+    },
+    "facing=south": {
+      "model": "craftingdeaddecoration:block/railing",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "craftingdeaddecoration:block/railing",
+      "y": 90
+    },
+    "facing=east": {
+      "model": "craftingdeaddecoration:block/railing",
+      "y": 270
+    }
+  }
+}

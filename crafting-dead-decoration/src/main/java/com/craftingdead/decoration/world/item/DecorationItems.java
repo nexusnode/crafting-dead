@@ -1028,6 +1028,11 @@ public class DecorationItems {
           () -> new BlockItem(DecorationBlocks.ABANDONED_CAMPFIRE.get(),
               new Item.Properties().tab(TAB)));
   
+  public static final RegistryObject<Item> ABANDONED_CAMPFIRE_WITH_POT =
+      deferredRegister.register("abandoned_campfire_with_pot",
+          () -> new BlockItem(DecorationBlocks.ABANDONED_CAMPFIRE_WITH_POT.get(),
+              new Item.Properties().tab(TAB)));
+  
   public static final RegistryObject<Item> SLEEPING_BAG_CLOSED =
       deferredRegister.register("sleeping_bag_closed",
           () -> new BlockItem(DecorationBlocks.SLEEPING_BAG_CLOSED.get(),
@@ -1102,9 +1107,83 @@ public class DecorationItems {
           () -> new BlockItem(DecorationBlocks.SLEEPING_BAG_OPEN_YELLOW.get(),
               new Item.Properties().tab(TAB)));
   
-  public static final RegistryObject<Item> BOX_OF_BULLETS =
+  public static final RegistryObject<Item> BOXES_OF_BULLETS =
       deferredRegister.register("box_of_bullets",
-          () -> new BlockItem(DecorationBlocks.BOX_OF_BULLETS.get(),
+          () -> new BlockItem(DecorationBlocks.BOXES_OF_BULLETS.get(),
+              new Item.Properties().tab(TAB)));
+  
+  public static final RegistryObject<Item> BOXES_OF_SHOTGUN_SHELLS_RED =
+      deferredRegister.register("boxes_of_shotgun_shells_red",
+          () -> new BlockItem(DecorationBlocks.BOXES_OF_SHOTGUN_SHELLS_RED.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<Item> BOXES_OF_SHOTGUN_SHELLS_GREEN =
+      deferredRegister.register("boxes_of_shotgun_shells_green",
+          () -> new BlockItem(DecorationBlocks.BOXES_OF_SHOTGUN_SHELLS_GREEN.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<Item> BOXES_OF_SHOTGUN_SHELLS_BLUE =
+      deferredRegister.register("boxes_of_shotgun_shells_blue",
+          () -> new BlockItem(DecorationBlocks.BOXES_OF_SHOTGUN_SHELLS_BLUE.get(),
+              new Item.Properties().tab(TAB)));
+  
+  public static final RegistryObject<Item> SEWER_OPENING =
+      deferredRegister.register("brown_stained_glass",
+          () -> new BlockItem(DecorationBlocks.SEWER_OPENING.get(),
+              new Item.Properties().tab(TAB)));
+  
+  public static final RegistryObject<Item> HL2_GLASS =
+      deferredRegister.register("glass",
+          () -> new BlockItem(DecorationBlocks.HL2_GLASS.get(),
+              new Item.Properties().tab(TAB)));
+  
+  public static final RegistryObject<Item> HL2_TRASH =
+      deferredRegister.register("lime_stained_glass",
+          () -> new BlockItem(DecorationBlocks.HL2_TRASH.get(),
+              new Item.Properties().tab(TAB)));
+  
+  public static final RegistryObject<Item> HL2_TRASH_2 =
+      deferredRegister.register("pink_stained_glass",
+          () -> new BlockItem(DecorationBlocks.HL2_TRASH_2.get(),
+              new Item.Properties().tab(TAB)));
+  
+  public static final RegistryObject<Item> WALL_BUSH =
+      deferredRegister.register("lime_stained_glass_pane",
+          () -> new BlockItem(DecorationBlocks.WALL_BUSH.get(),
+              new Item.Properties().tab(TAB)));
+  
+  public static final RegistryObject<Item> COBBLESTONE =
+      deferredRegister.register("cobblestone",
+          () -> new BlockItem(DecorationBlocks.COBBLESTONE.get(),
+              new Item.Properties().tab(TAB)));
+  
+  public static final RegistryObject<Item> SMALL_FENCE =
+      deferredRegister.register("nether_brick_fence",
+          () -> new BlockItem(DecorationBlocks.SMALL_FENCE.get(),
+              new Item.Properties().tab(TAB)));
+  
+  //HL2Pack Items
+  public static final RegistryObject<Item> HEALTH_CHARGER =
+      deferredRegister.register("acacia_button",
+          () -> new BlockItem(DecorationBlocks.HEALTH_CHARGER.get(),
+              new Item.Properties().tab(TAB)));
+  
+  public static final RegistryObject<Item> FENCE =
+      deferredRegister.register("acacia_fence_gate",
+          () -> new BlockItem(DecorationBlocks.FENCE.get(),
+              new Item.Properties().tab(TAB)));
+  
+  public static final RegistryObject<Item> METAL_DUCT =
+      deferredRegister.register("acacia_stairs",
+          () -> new BlockItem(DecorationBlocks.METAL_DUCT.get(),
+              new Item.Properties().tab(TAB)));
+  
+  public static final RegistryObject<Item> PAINTING_1 =
+      deferredRegister.register("black_stained_glass_pane",
+          () -> new BlockItem(DecorationBlocks.PAINTING_1.get(),
+              new Item.Properties().tab(TAB)));
+  
+  public static final RegistryObject<Item> CRATE =
+      deferredRegister.register("dead_brain_coral",
+          () -> new BlockItem(DecorationBlocks.CRATE.get(),
               new Item.Properties().tab(TAB)));
   
   // AE12 Glass

@@ -186,6 +186,9 @@ public class DecorationBlockStateProvider extends BlockStateProvider {
     this.horizontalBlock(DecorationBlocks.SLEEPING_BAG_OPEN_PURPLE);
     this.horizontalBlock(DecorationBlocks.SLEEPING_BAG_OPEN_RED);
     this.horizontalBlock(DecorationBlocks.SLEEPING_BAG_OPEN_YELLOW);
+
+    // HL2Pack
+    this.horizontalBlock(DecorationBlocks.HEALTH_CHARGER);
   }
 
   private void simpleBlock(RegistryObject<? extends Block> block) {

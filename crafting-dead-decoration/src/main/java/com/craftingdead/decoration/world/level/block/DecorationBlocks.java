@@ -20,13 +20,16 @@ package com.craftingdead.decoration.world.level.block;
 
 import com.craftingdead.decoration.CraftingDeadDecoration;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.ButtonBlock;
 import net.minecraft.world.level.block.ChainBlock;
+import net.minecraft.world.level.block.FenceGateBlock;
 import net.minecraft.world.level.block.GlassBlock;
 import net.minecraft.world.level.block.LanternBlock;
 import net.minecraft.world.level.block.LeavesBlock;
 import net.minecraft.world.level.block.RotatedPillarBlock;
 import net.minecraft.world.level.block.SlabBlock;
 import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.WoodButtonBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.material.MaterialColor;
@@ -48,13 +51,41 @@ public class DecorationBlocks {
                   .sound(SoundType.METAL),
               BlockShapes.FUSE_BOX, true));
   
-  public static final RegistryObject<Block> BOX_OF_BULLETS =
+  public static final RegistryObject<Block> BOXES_OF_BULLETS =
       deferredRegister.register("box_of_bullets",
           () -> new OrientableBlock(
               BlockBehaviour.Properties.of(Material.METAL)
                   .strength(5.0F)
-                  .sound(SoundType.METAL),
-              BlockShapes.BOX_OF_BULLETS, false));
+                  .sound(SoundType.METAL)
+                  .noCollission(),
+              BlockShapes.BOXES_OF_BULLETS, false));
+  
+  public static final RegistryObject<Block> BOXES_OF_SHOTGUN_SHELLS_RED =
+      deferredRegister.register("boxes_of_shotgun_shells_red",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(5.0F)
+                  .sound(SoundType.METAL)
+                  .noCollission(),
+              BlockShapes.BOXES_OF_SHOTGUN_SHELLS, false));
+  
+  public static final RegistryObject<Block> BOXES_OF_SHOTGUN_SHELLS_GREEN =
+      deferredRegister.register("boxes_of_shotgun_shells_green",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(5.0F)
+                  .sound(SoundType.METAL)
+                  .noCollission(),
+              BlockShapes.BOXES_OF_SHOTGUN_SHELLS, false));
+  
+  public static final RegistryObject<Block> BOXES_OF_SHOTGUN_SHELLS_BLUE =
+      deferredRegister.register("boxes_of_shotgun_shells_blue",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(5.0F)
+                  .sound(SoundType.METAL)
+                  .noCollission(),
+              BlockShapes.BOXES_OF_SHOTGUN_SHELLS, false));
 
   public static final RegistryObject<Block> AA_POSTER =
       deferredRegister.register("aa_poster",
@@ -1585,13 +1616,23 @@ public class DecorationBlocks {
                   .noOcclusion(),
               BlockShapes.ABANDONED_CAMPFIRE));
   
+  public static final RegistryObject<Block> ABANDONED_CAMPFIRE_WITH_POT =
+      deferredRegister.register("abandoned_campfire_with_pot",
+          () -> new OrientableBlock(
+              Block.Properties.of(Material.WOOD, MaterialColor.PODZOL)
+                  .strength(2.0F)
+                  .sound(SoundType.WOOD)
+                  .noOcclusion(),
+              BlockShapes.ABANDONED_CAMPFIRE_WITH_POT));
+  
   public static final RegistryObject<Block> SLEEPING_BAG_CLOSED =
       deferredRegister.register("sleeping_bag_closed",
           () -> new OrientableBlock(
               BlockBehaviour.Properties.of(Material.CLOTH_DECORATION)
                   .strength(1.0F)
                   .sound(SoundType.WOOL)
-                  .noOcclusion(),
+                  .noOcclusion()
+                  .noCollission(),
               BlockShapes.SLEEPING_BAG));
 
   public static final RegistryObject<Block> SLEEPING_BAG_CLOSED_BLACK =
@@ -1600,7 +1641,8 @@ public class DecorationBlocks {
               BlockBehaviour.Properties.of(Material.CLOTH_DECORATION)
                   .strength(1.0F)
                   .sound(SoundType.WOOL)
-                  .noOcclusion(),
+                  .noOcclusion()
+                  .noCollission(),
               BlockShapes.SLEEPING_BAG));
   
   public static final RegistryObject<Block> SLEEPING_BAG_CLOSED_BLUE =
@@ -1609,7 +1651,8 @@ public class DecorationBlocks {
               BlockBehaviour.Properties.of(Material.CLOTH_DECORATION)
                   .strength(1.0F)
                   .sound(SoundType.WOOL)
-                  .noOcclusion(),
+                  .noOcclusion()
+                  .noCollission(),
               BlockShapes.SLEEPING_BAG));
   
   public static final RegistryObject<Block> SLEEPING_BAG_CLOSED_DARKGREEN =
@@ -1618,7 +1661,8 @@ public class DecorationBlocks {
               BlockBehaviour.Properties.of(Material.CLOTH_DECORATION)
                   .strength(1.0F)
                   .sound(SoundType.WOOL)
-                  .noOcclusion(),
+                  .noOcclusion()
+                  .noCollission(),
               BlockShapes.SLEEPING_BAG));
   
   public static final RegistryObject<Block> SLEEPING_BAG_CLOSED_ORANGE =
@@ -1627,7 +1671,8 @@ public class DecorationBlocks {
               BlockBehaviour.Properties.of(Material.CLOTH_DECORATION)
                   .strength(1.0F)
                   .sound(SoundType.WOOL)
-                  .noOcclusion(),
+                  .noOcclusion()
+                  .noCollission(),
               BlockShapes.SLEEPING_BAG));
   
   public static final RegistryObject<Block> SLEEPING_BAG_CLOSED_PINK =
@@ -1636,7 +1681,8 @@ public class DecorationBlocks {
               BlockBehaviour.Properties.of(Material.CLOTH_DECORATION)
                   .strength(1.0F)
                   .sound(SoundType.WOOL)
-                  .noOcclusion(),
+                  .noOcclusion()
+                  .noCollission(),
               BlockShapes.SLEEPING_BAG));
   
   public static final RegistryObject<Block> SLEEPING_BAG_CLOSED_PURPLE =
@@ -1645,7 +1691,8 @@ public class DecorationBlocks {
               BlockBehaviour.Properties.of(Material.CLOTH_DECORATION)
                   .strength(1.0F)
                   .sound(SoundType.WOOL)
-                  .noOcclusion(),
+                  .noOcclusion()
+                  .noCollission(),
               BlockShapes.SLEEPING_BAG));
   
   public static final RegistryObject<Block> SLEEPING_BAG_CLOSED_RED =
@@ -1654,7 +1701,8 @@ public class DecorationBlocks {
               BlockBehaviour.Properties.of(Material.CLOTH_DECORATION)
                   .strength(1.0F)
                   .sound(SoundType.WOOL)
-                  .noOcclusion(),
+                  .noOcclusion()
+                  .noCollission(),
               BlockShapes.SLEEPING_BAG));
   
   public static final RegistryObject<Block> SLEEPING_BAG_CLOSED_YELLOW =
@@ -1663,7 +1711,8 @@ public class DecorationBlocks {
               BlockBehaviour.Properties.of(Material.CLOTH_DECORATION)
                   .strength(1.0F)
                   .sound(SoundType.WOOL)
-                  .noOcclusion(),
+                  .noOcclusion()
+                  .noCollission(),
               BlockShapes.SLEEPING_BAG));
   
   public static final RegistryObject<Block> SLEEPING_BAG_OPEN =
@@ -1672,7 +1721,8 @@ public class DecorationBlocks {
               BlockBehaviour.Properties.of(Material.CLOTH_DECORATION)
                   .strength(1.0F)
                   .sound(SoundType.WOOL)
-                  .noOcclusion(),
+                  .noOcclusion()
+                  .noCollission(),
               BlockShapes.SLEEPING_BAG));
 
   public static final RegistryObject<Block> SLEEPING_BAG_OPEN_BLACK =
@@ -1681,7 +1731,8 @@ public class DecorationBlocks {
               BlockBehaviour.Properties.of(Material.CLOTH_DECORATION)
                   .strength(1.0F)
                   .sound(SoundType.WOOL)
-                  .noOcclusion(),
+                  .noOcclusion()
+                  .noCollission(),
               BlockShapes.SLEEPING_BAG));
   
   public static final RegistryObject<Block> SLEEPING_BAG_OPEN_BLUE =
@@ -1690,7 +1741,8 @@ public class DecorationBlocks {
               BlockBehaviour.Properties.of(Material.CLOTH_DECORATION)
                   .strength(1.0F)
                   .sound(SoundType.WOOL)
-                  .noOcclusion(),
+                  .noOcclusion()
+                  .noCollission(),
               BlockShapes.SLEEPING_BAG));
   
   public static final RegistryObject<Block> SLEEPING_BAG_OPEN_DARKGREEN =
@@ -1699,7 +1751,8 @@ public class DecorationBlocks {
               BlockBehaviour.Properties.of(Material.CLOTH_DECORATION)
                   .strength(1.0F)
                   .sound(SoundType.WOOL)
-                  .noOcclusion(),
+                  .noOcclusion()
+                  .noCollission(),
               BlockShapes.SLEEPING_BAG));
   
   public static final RegistryObject<Block> SLEEPING_BAG_OPEN_ORANGE =
@@ -1708,7 +1761,8 @@ public class DecorationBlocks {
               BlockBehaviour.Properties.of(Material.CLOTH_DECORATION)
                   .strength(1.0F)
                   .sound(SoundType.WOOL)
-                  .noOcclusion(),
+                  .noOcclusion()
+                  .noCollission(),
               BlockShapes.SLEEPING_BAG));
   
   public static final RegistryObject<Block> SLEEPING_BAG_OPEN_PINK =
@@ -1717,7 +1771,8 @@ public class DecorationBlocks {
               BlockBehaviour.Properties.of(Material.CLOTH_DECORATION)
                   .strength(1.0F)
                   .sound(SoundType.WOOL)
-                  .noOcclusion(),
+                  .noOcclusion()
+                  .noCollission(),
               BlockShapes.SLEEPING_BAG));
   
   public static final RegistryObject<Block> SLEEPING_BAG_OPEN_PURPLE =
@@ -1726,7 +1781,8 @@ public class DecorationBlocks {
               BlockBehaviour.Properties.of(Material.CLOTH_DECORATION)
                   .strength(1.0F)
                   .sound(SoundType.WOOL)
-                  .noOcclusion(),
+                  .noOcclusion()
+                  .noCollission(),
               BlockShapes.SLEEPING_BAG));
   
   public static final RegistryObject<Block> SLEEPING_BAG_OPEN_RED =
@@ -1735,7 +1791,8 @@ public class DecorationBlocks {
               BlockBehaviour.Properties.of(Material.CLOTH_DECORATION)
                   .strength(1.0F)
                   .sound(SoundType.WOOL)
-                  .noOcclusion(),
+                  .noOcclusion()
+                  .noCollission(),
               BlockShapes.SLEEPING_BAG));
   
   public static final RegistryObject<Block> SLEEPING_BAG_OPEN_YELLOW =
@@ -1744,9 +1801,130 @@ public class DecorationBlocks {
               BlockBehaviour.Properties.of(Material.CLOTH_DECORATION)
                   .strength(1.0F)
                   .sound(SoundType.WOOL)
-                  .noOcclusion(),
+                  .noOcclusion()
+                  .noCollission(),
               BlockShapes.SLEEPING_BAG));
   
+  // Items from HL2Pack
+  public static final RegistryObject<Block> HEALTH_CHARGER =
+      deferredRegister.register("acacia_button",
+          () -> new WoodButtonBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion()));
+  
+  public static final RegistryObject<Block> FENCE =
+      deferredRegister.register("acacia_fence_gate",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(2.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(), 
+                  BlockShapes.FENCE,
+                  false));
+  
+  public static final RegistryObject<Block> METAL_DUCT =
+      deferredRegister.register("acacia_stairs",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(21.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(), 
+                  BlockShapes.METAL_DUCT,
+                  false));
+  
+  public static final RegistryObject<Block> PAINTING_1 =
+      deferredRegister.register("black_stained_glass_pane",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.WOOD)
+                  .strength(1.0F)
+                  .sound(SoundType.WOOD)
+                  .noOcclusion(), 
+                  BlockShapes.POSTER,
+                  true));
+  
+  public static final RegistryObject<Block> CRATE =
+      deferredRegister.register("dead_brain_coral",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.WOOD)
+                  .strength(1.0F)
+                  .sound(SoundType.WOOD)
+                  .noOcclusion(), 
+                  BlockShapes.BLOCK,
+                  false));
+  
+  public static final RegistryObject<Block> SEWER_OPENING =
+      deferredRegister.register("brown_stained_glass",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion()
+                  .noCollission(), 
+                  BlockShapes.BLOCK,
+                  false));
+  
+  public static final RegistryObject<Block> HL2_GLASS =
+      deferredRegister.register("glass",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.GLASS)
+                  .strength(1.0F)
+                  .sound(SoundType.GLASS)
+                  .noOcclusion(), 
+                  BlockShapes.BLOCK,
+                  false));
+  
+  public static final RegistryObject<Block> HL2_TRASH =
+      deferredRegister.register("lime_stained_glass",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.DECORATION)
+                  .strength(1.0F)
+                  .sound(SoundType.WOOL)
+                  .noOcclusion()
+                  .noCollission(), 
+                  BlockShapes.BLOCK,
+                  false));
+  public static final RegistryObject<Block> HL2_TRASH_2 =
+      deferredRegister.register("pink_stained_glass",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.DECORATION)
+                  .strength(1.0F)
+                  .sound(SoundType.WOOL)
+                  .noOcclusion()
+                  .noCollission(), 
+                  BlockShapes.BLOCK,
+                  false));
+  
+  public static final RegistryObject<Block> WALL_BUSH =
+      deferredRegister.register("lime_stained_glass_pane",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.GRASS)
+                  .strength(1.0F)
+                  .sound(SoundType.GRASS)
+                  .noOcclusion()
+                  .noCollission(), 
+                  BlockShapes.WALL_BUSH,
+                  false));
+
+  public static final RegistryObject<Block> COBBLESTONE =
+      deferredRegister.register("cobblestone",
+          () -> new Block(
+              BlockBehaviour.Properties.of(Material.STONE)
+                  .strength(1.0F)
+                  .sound(SoundType.STONE)
+                  .noOcclusion()
+                  .noCollission()));
+  
+  public static final RegistryObject<Block> SMALL_FENCE =
+      deferredRegister.register("nether_brick_fence",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+                  BlockShapes.SMALL_FENCE,
+                  false));
   
   // AE12 Glass Blocks
   public static final RegistryObject<Block> QUARTZ_GLASS =

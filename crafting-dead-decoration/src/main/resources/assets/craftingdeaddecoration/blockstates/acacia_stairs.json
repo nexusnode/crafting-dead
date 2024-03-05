@@ -1,0 +1,8 @@
+{
+    "variants": {
+        "facing=east":  { "model": "craftingdeaddecoration:block/air_duct_x", "y": 180 },
+        "facing=west":  { "model": "craftingdeaddecoration:block/air_duct_x" },
+        "facing=south": { "model": "craftingdeaddecoration:block/air_duct_z", "y": 180 },
+        "facing=north": { "model": "craftingdeaddecoration:block/air_duct_z" }
+    }
+}

@@ -1,0 +1,19 @@
+{
+    "variants": {
+        "facing=east": {
+            "model": "craftingdeaddecoration:block/decalgraffiti011a",
+            "y": 90
+        },
+        "facing=north": {
+            "model": "craftingdeaddecoration:block/decalgraffiti011a"
+        },
+        "facing=west": {
+            "model": "craftingdeaddecoration:block/decalgraffiti011a",
+            "y": 270
+        },
+        "facing=south": {
+            "model": "craftingdeaddecoration:block/decalgraffiti011a",
+            "y": 180
+        }    
+    }
+}

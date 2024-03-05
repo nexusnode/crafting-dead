@@ -33,8 +33,11 @@ public class BlockShapes {
   public static final Function<Direction, VoxelShape> FUSE_BOX =
       rotatedOrientableShape(Block.box(1, 0, 13, 15, 20, 16));
   
-  public static final Function<Direction, VoxelShape> BOX_OF_BULLETS =
+  public static final Function<Direction, VoxelShape> BOXES_OF_BULLETS =
       rotatedOrientableShape(Block.box(2, 0, 4, 14, 6, 14));
+  
+  public static final Function<Direction, VoxelShape> BOXES_OF_SHOTGUN_SHELLS =
+      rotatedOrientableShape(Block.box(2, 0, 2, 14, 2, 14));
 
   public static final Function<Direction, VoxelShape> POSTER =
       rotatedOrientableShape(Block.box(0, 0, 15, 16, 16, 16));
@@ -128,6 +131,10 @@ public class BlockShapes {
       rotatedOrientableShape(Block.box(5.5D, 3.0D, 11.0D, 10.5D, 13.0D, 16.0D));
 
   public static final Function<Direction, VoxelShape> ABANDONED_CAMPFIRE =
+      rotatedOrientableShape(Shapes.or(
+          Block.box(2, 0, 2, 14, 2, 14)));
+  
+  public static final Function<Direction, VoxelShape> ABANDONED_CAMPFIRE_WITH_POT =
       rotatedOrientableShape(Shapes.or(
           Block.box(2, 0, 2, 14, 2, 14),
           Block.box(1, 0, 7.5, 15, 14, 8.5)));
@@ -384,9 +391,21 @@ public class BlockShapes {
   public static final Function<Direction, VoxelShape> DOUBLE_TALL_BLOCK =
       unitOrientableShape(Block.box(0, 0, 0, 16, 32, 16));
   
-  public static final Function<Direction, VoxelShape> SLEEPING_BAG = 
-      unitOrientableShape(Block.box(1, 0, 1, 15, 2, 31));
+  public static final Function<Direction, VoxelShape> SLEEPING_BAG =
+      rotatedOrientableShape(Shapes.or(Block.box(1, 0, 1, 15, 2, 31)));
 
+  public static final Function<Direction, VoxelShape> FENCE =
+      rotatedOrientableShape(Shapes.or(Block.box(-16, 0, 6, 32, 32, 9)));
+  
+  public static final Function<Direction, VoxelShape> SMALL_FENCE =
+      rotatedOrientableShape(Shapes.or(Block.box(4, 0, 0, 8, 20, 16)));
+  
+  public static final Function<Direction, VoxelShape> WALL_BUSH =
+      rotatedOrientableShape(Shapes.or(Block.box(-16, 0, 0, 32, 32, 3)));
+  
+  public static final Function<Direction, VoxelShape> METAL_DUCT =
+      rotatedOrientableShape(Shapes.or(Block.box(0, 0, -16, 16, 25, 16)));
+  
   public static final Function<Direction, VoxelShape> BLOCK =
       unitOrientableShape(Shapes.block());
 

@@ -1,0 +1,7 @@
+{
+    "variants": {
+        "axis=y":  { "model": "block/stripped_oak_log", "z": 180 },
+        "axis=z":   { "model": "block/stripped_oak_log", "y": 90 },
+        "axis=x":   { "model": "block/stripped_oak_log", "y": 180 }
+    }
+}
