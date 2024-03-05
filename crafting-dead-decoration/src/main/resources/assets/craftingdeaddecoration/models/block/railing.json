@@ -3,8 +3,8 @@
 	"ambientocclusion": false,
 	"texture_size": [256, 256],
 	"textures": {
-		"0": "block/handrailmetal001a",
-		"particle": "block/handrailmetal001a"
+		"0": "craftingdeaddecoration:block/handrailmetal001a",
+		"particle": "craftingdeaddecoration:block/handrailmetal001a"
 	},
 	"elements": [
 		{

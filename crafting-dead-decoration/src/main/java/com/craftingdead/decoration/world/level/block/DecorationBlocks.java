@@ -1916,6 +1916,16 @@ public class DecorationBlocks {
                   .noOcclusion()
                   .noCollission()));
   
+  public static final RegistryObject<Block> SMALL_FENCE =
+      deferredRegister.register("nether_brick_fence",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+                  BlockShapes.SMALL_FENCE,
+                  false));
+  
   // AE12 Glass Blocks
   public static final RegistryObject<Block> QUARTZ_GLASS =
       deferredRegister.register("quartz_glass",

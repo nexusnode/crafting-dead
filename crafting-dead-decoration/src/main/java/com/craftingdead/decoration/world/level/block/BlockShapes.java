@@ -397,6 +397,9 @@ public class BlockShapes {
   public static final Function<Direction, VoxelShape> FENCE =
       rotatedOrientableShape(Shapes.or(Block.box(-16, 0, 6, 32, 32, 9)));
   
+  public static final Function<Direction, VoxelShape> SMALL_FENCE =
+      rotatedOrientableShape(Shapes.or(Block.box(4, 0, 0, 8, 20, 16)));
+  
   public static final Function<Direction, VoxelShape> WALL_BUSH =
       rotatedOrientableShape(Shapes.or(Block.box(-16, 0, 0, 32, 32, 3)));
   

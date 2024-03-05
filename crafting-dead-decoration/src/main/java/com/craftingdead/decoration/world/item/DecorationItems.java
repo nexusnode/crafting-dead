@@ -1155,6 +1155,11 @@ public class DecorationItems {
           () -> new BlockItem(DecorationBlocks.COBBLESTONE.get(),
               new Item.Properties().tab(TAB)));
   
+  public static final RegistryObject<Item> SMALL_FENCE =
+      deferredRegister.register("nether_brick_fence",
+          () -> new BlockItem(DecorationBlocks.SMALL_FENCE.get(),
+              new Item.Properties().tab(TAB)));
+  
   //HL2Pack Items
   public static final RegistryObject<Item> HEALTH_CHARGER =
       deferredRegister.register("acacia_button",
