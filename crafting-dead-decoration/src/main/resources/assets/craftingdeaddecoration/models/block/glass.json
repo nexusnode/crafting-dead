@@ -1,8 +1,8 @@
 {
 	"credit": "Made with Blockbench",
 	"textures": {
-		"0": "block/glass",
-		"particle": "block/glass"
+		"0": "craftingdeaddecoration:block/glass",
+		"particle": "craftingdeaddecoration:block/glass"
 	},
 	"elements": [
 		{

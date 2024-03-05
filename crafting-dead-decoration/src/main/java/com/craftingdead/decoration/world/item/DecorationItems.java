@@ -1130,6 +1130,11 @@ public class DecorationItems {
           () -> new BlockItem(DecorationBlocks.SEWER_OPENING.get(),
               new Item.Properties().tab(TAB)));
   
+  public static final RegistryObject<Item> NORMAL_GLASS =
+      deferredRegister.register("glass",
+          () -> new BlockItem(DecorationBlocks.NORMAL_GLASS.get(),
+              new Item.Properties().tab(TAB)));
+  
   //HL2Pack Items
   public static final RegistryObject<Item> HEALTH_CHARGER =
       deferredRegister.register("acacia_button",
