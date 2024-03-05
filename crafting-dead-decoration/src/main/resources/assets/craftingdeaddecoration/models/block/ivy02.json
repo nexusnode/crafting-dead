@@ -1,8 +1,8 @@
 {
 	"credit": "Made with Blockbench",
 	"textures": {
-		"0": "block/ivy02",
-		"particle": "block/ivy02"
+		"0": "craftingdeaddecoration:block/ivy02",
+		"particle": "craftingdeaddecoration:block/ivy02"
 	},
 	"elements": [
 		{

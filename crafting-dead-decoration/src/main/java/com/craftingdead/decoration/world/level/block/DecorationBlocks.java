@@ -1874,6 +1874,7 @@ public class DecorationBlocks {
                   .noOcclusion(), 
                   BlockShapes.BLOCK,
                   false));
+  
   public static final RegistryObject<Block> HL2_TRASH =
       deferredRegister.register("lime_stained_glass",
           () -> new OrientableBlock(
@@ -1893,6 +1894,16 @@ public class DecorationBlocks {
                   .noOcclusion()
                   .noCollission(), 
                   BlockShapes.BLOCK,
+                  false));
+  public static final RegistryObject<Block> WALL_BUSH =
+      deferredRegister.register("lime_stained_glass_pane",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.GRASS)
+                  .strength(1.0F)
+                  .sound(SoundType.GRASS)
+                  .noOcclusion()
+                  .noCollission(), 
+                  BlockShapes.WALL_BUSH,
                   false));
   
   // AE12 Glass Blocks
