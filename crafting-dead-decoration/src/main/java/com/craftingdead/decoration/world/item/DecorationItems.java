@@ -1160,6 +1160,11 @@ public class DecorationItems {
           () -> new BlockItem(DecorationBlocks.SMALL_FENCE.get(),
               new Item.Properties().tab(TAB)));
   
+  public static final RegistryObject<Item> TRAFFIC_SIGNS_POLE =
+      deferredRegister.register("traffic_signs_01",
+          () -> new BlockItem(DecorationBlocks.TRAFFIC_SIGNS_POLE.get(),
+              new Item.Properties().tab(TAB)));
+  
   //HL2Pack Items
   public static final RegistryObject<Item> HEALTH_CHARGER =
       deferredRegister.register("acacia_button",
