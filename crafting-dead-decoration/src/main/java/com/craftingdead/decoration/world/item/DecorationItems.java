@@ -1235,6 +1235,31 @@ public class DecorationItems {
           () -> new BlockItem(DecorationBlocks.TRAFFIC_SIGNS_SPEED80.get(),
               new Item.Properties().tab(TAB)));
   
+  public static final RegistryObject<Item> TRAFFIC_SIGNS_DAMAGED_BULLET =
+      deferredRegister.register("traffic_signs_damaged_bullet",
+          () -> new BlockItem(DecorationBlocks.TRAFFIC_SIGNS_DAMAGED_BULLET.get(),
+              new Item.Properties().tab(TAB)));
+  
+  public static final RegistryObject<Item> TRAFFIC_SIGNS_DAMAGED =
+      deferredRegister.register("traffic_signs_damaged",
+          () -> new BlockItem(DecorationBlocks.TRAFFIC_SIGNS_DAMAGED.get(),
+              new Item.Properties().tab(TAB)));
+  
+  public static final RegistryObject<Item> TRAFFIC_SIGNS_NOTSAFE =
+      deferredRegister.register("traffic_signs_notsafe",
+          () -> new BlockItem(DecorationBlocks.TRAFFIC_SIGNS_NOTSAFE.get(),
+              new Item.Properties().tab(TAB)));
+  
+  public static final RegistryObject<Item> TRAFFIC_SIGNS_RADIOACTIVE =
+      deferredRegister.register("traffic_signs_radioactive",
+          () -> new BlockItem(DecorationBlocks.TRAFFIC_SIGNS_RADIOACTIVE.get(),
+              new Item.Properties().tab(TAB)));
+  
+  public static final RegistryObject<Item> TRAFFIC_SIGNS_RADIOACTIVE_DAMAGED =
+      deferredRegister.register("traffic_signs_radioactive_damaged",
+          () -> new BlockItem(DecorationBlocks.TRAFFIC_SIGNS_RADIOACTIVE_DAMAGED.get(),
+              new Item.Properties().tab(TAB)));
+  
   //HL2Pack Items
   public static final RegistryObject<Item> HEALTH_CHARGER =
       deferredRegister.register("acacia_button",

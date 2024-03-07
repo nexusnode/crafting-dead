@@ -299,6 +299,11 @@
   	"block.craftingdeaddecoration.traffic_signs_speed65": "Speed 65 Sign",
   	"block.craftingdeaddecoration.traffic_signs_speed70": "Speed 70 Sign",
   	"block.craftingdeaddecoration.traffic_signs_speed75": "Speed 75 Sign",
-  	"block.craftingdeaddecoration.traffic_signs_speed80": "Speed 80 Sign"
+  	"block.craftingdeaddecoration.traffic_signs_speed80": "Speed 80 Sign",
+  	"block.craftingdeaddecoration.traffic_damaged": "Damaged Stop Sign",
+  	"block.craftingdeaddecoration.traffic_damaged_bullet": "Damaged Stop Sign",
+  	"block.craftingdeaddecoration.traffic_radioactive": "Radioactive Sign",
+  	"block.craftingdeaddecoration.traffic_radioactive_damaged": "Damaged Radioactive Sign",
+  	"block.craftingdeaddecoration.traffic_notsafe": "Not safe Sign"
     
 }

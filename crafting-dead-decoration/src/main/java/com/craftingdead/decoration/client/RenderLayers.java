@@ -144,6 +144,11 @@ class RenderLayers {
     translucent(DecorationBlocks.TRAFFIC_SIGNS_SPEED70);
     translucent(DecorationBlocks.TRAFFIC_SIGNS_SPEED75);
     translucent(DecorationBlocks.TRAFFIC_SIGNS_SPEED80);
+    translucent(DecorationBlocks.TRAFFIC_SIGNS_DAMAGED);
+    translucent(DecorationBlocks.TRAFFIC_SIGNS_DAMAGED_BULLET);
+    translucent(DecorationBlocks.TRAFFIC_SIGNS_RADIOACTIVE);
+    translucent(DecorationBlocks.TRAFFIC_SIGNS_RADIOACTIVE_DAMAGED);
+    translucent(DecorationBlocks.TRAFFIC_SIGNS_NOTSAFE);
   }
 
   private static void cutout(Supplier<? extends Block> block) {

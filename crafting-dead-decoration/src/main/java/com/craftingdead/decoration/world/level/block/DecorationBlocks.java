@@ -1939,6 +1939,51 @@ public class DecorationBlocks {
                   .sound(SoundType.METAL)
                   .noOcclusion(),
               BlockShapes.TRAFFIC_SIGNS_EMPTY));
+  
+  public static final RegistryObject<Block> TRAFFIC_SIGNS_DAMAGED =
+      deferredRegister.register("traffic_signs_damaged",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.TRAFFIC_SIGNS_EMPTY));
+  
+  public static final RegistryObject<Block> TRAFFIC_SIGNS_DAMAGED_BULLET =
+      deferredRegister.register("traffic_signs_damaged_bullet",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.TRAFFIC_SIGNS_EMPTY));
+  
+  public static final RegistryObject<Block> TRAFFIC_SIGNS_NOTSAFE =
+      deferredRegister.register("traffic_signs_notsafe",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.TRAFFIC_SIGNS_EMPTY));
+  
+  public static final RegistryObject<Block> TRAFFIC_SIGNS_RADIOACTIVE =
+      deferredRegister.register("traffic_signs_radioactive",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.TRAFFIC_SIGNS_EMPTY));
+  
+  public static final RegistryObject<Block> TRAFFIC_SIGNS_RADIOACTIVE_DAMAGED =
+      deferredRegister.register("traffic_signs_radioactive_damaged",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.TRAFFIC_SIGNS_EMPTY));
 
   
   
