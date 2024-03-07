@@ -128,6 +128,27 @@ class RenderLayers {
     translucent(DecorationBlocks.HL2_TRASH);
     translucent(DecorationBlocks.HL2_TRASH_2);
     translucent(DecorationBlocks.WALL_BUSH);
+    
+    translucent(DecorationBlocks.TRAFFIC_SIGNS_POLE);
+    translucent(DecorationBlocks.TRAFFIC_SIGNS_EMPTY);
+    translucent(DecorationBlocks.TRAFFIC_SIGNS_SPEED20);
+    translucent(DecorationBlocks.TRAFFIC_SIGNS_SPEED25);
+    translucent(DecorationBlocks.TRAFFIC_SIGNS_SPEED30);
+    translucent(DecorationBlocks.TRAFFIC_SIGNS_SPEED35);
+    translucent(DecorationBlocks.TRAFFIC_SIGNS_SPEED40);
+    translucent(DecorationBlocks.TRAFFIC_SIGNS_SPEED45);
+    translucent(DecorationBlocks.TRAFFIC_SIGNS_SPEED50);
+    translucent(DecorationBlocks.TRAFFIC_SIGNS_SPEED55);
+    translucent(DecorationBlocks.TRAFFIC_SIGNS_SPEED60);
+    translucent(DecorationBlocks.TRAFFIC_SIGNS_SPEED65);
+    translucent(DecorationBlocks.TRAFFIC_SIGNS_SPEED70);
+    translucent(DecorationBlocks.TRAFFIC_SIGNS_SPEED75);
+    translucent(DecorationBlocks.TRAFFIC_SIGNS_SPEED80);
+    translucent(DecorationBlocks.TRAFFIC_SIGNS_DAMAGED);
+    translucent(DecorationBlocks.TRAFFIC_SIGNS_DAMAGED_BULLET);
+    translucent(DecorationBlocks.TRAFFIC_SIGNS_RADIOACTIVE);
+    translucent(DecorationBlocks.TRAFFIC_SIGNS_RADIOACTIVE_DAMAGED);
+    translucent(DecorationBlocks.TRAFFIC_SIGNS_NOTSAFE);
   }
 
   private static void cutout(Supplier<? extends Block> block) {
