@@ -1170,6 +1170,71 @@ public class DecorationItems {
           () -> new BlockItem(DecorationBlocks.TRAFFIC_SIGNS_EMPTY.get(),
               new Item.Properties().tab(TAB)));
   
+  public static final RegistryObject<Item> TRAFFIC_SIGNS_SPEED20 =
+      deferredRegister.register("traffic_signs_speed20",
+          () -> new BlockItem(DecorationBlocks.TRAFFIC_SIGNS_SPEED20.get(),
+              new Item.Properties().tab(TAB)));
+  
+  public static final RegistryObject<Item> TRAFFIC_SIGNS_SPEED25 =
+      deferredRegister.register("traffic_signs_speed25",
+          () -> new BlockItem(DecorationBlocks.TRAFFIC_SIGNS_SPEED25.get(),
+              new Item.Properties().tab(TAB)));
+
+  public static final RegistryObject<Item> TRAFFIC_SIGNS_SPEED30 =
+      deferredRegister.register("traffic_signs_speed30",
+          () -> new BlockItem(DecorationBlocks.TRAFFIC_SIGNS_SPEED30.get(),
+              new Item.Properties().tab(TAB)));
+
+  public static final RegistryObject<Item> TRAFFIC_SIGNS_SPEED35 =
+      deferredRegister.register("traffic_signs_speed35",
+          () -> new BlockItem(DecorationBlocks.TRAFFIC_SIGNS_SPEED35.get(),
+              new Item.Properties().tab(TAB)));
+
+  public static final RegistryObject<Item> TRAFFIC_SIGNS_SPEED40 =
+      deferredRegister.register("traffic_signs_speed40",
+          () -> new BlockItem(DecorationBlocks.TRAFFIC_SIGNS_SPEED40.get(),
+              new Item.Properties().tab(TAB)));
+
+  public static final RegistryObject<Item> TRAFFIC_SIGNS_SPEED45 =
+      deferredRegister.register("traffic_signs_speed45",
+          () -> new BlockItem(DecorationBlocks.TRAFFIC_SIGNS_SPEED45.get(),
+              new Item.Properties().tab(TAB)));
+
+  public static final RegistryObject<Item> TRAFFIC_SIGNS_SPEED50 =
+      deferredRegister.register("traffic_signs_speed50",
+          () -> new BlockItem(DecorationBlocks.TRAFFIC_SIGNS_SPEED50.get(),
+              new Item.Properties().tab(TAB)));
+
+  public static final RegistryObject<Item> TRAFFIC_SIGNS_SPEED55 =
+      deferredRegister.register("traffic_signs_speed55",
+          () -> new BlockItem(DecorationBlocks.TRAFFIC_SIGNS_SPEED55.get(),
+              new Item.Properties().tab(TAB)));
+
+  public static final RegistryObject<Item> TRAFFIC_SIGNS_SPEED60 =
+      deferredRegister.register("traffic_signs_speed60",
+          () -> new BlockItem(DecorationBlocks.TRAFFIC_SIGNS_SPEED60.get(),
+              new Item.Properties().tab(TAB)));
+
+  public static final RegistryObject<Item> TRAFFIC_SIGNS_SPEED65 =
+      deferredRegister.register("traffic_signs_speed65",
+          () -> new BlockItem(DecorationBlocks.TRAFFIC_SIGNS_SPEED65.get(),
+              new Item.Properties().tab(TAB)));
+
+  public static final RegistryObject<Item> TRAFFIC_SIGNS_SPEED70 =
+      deferredRegister.register("traffic_signs_speed70",
+          () -> new BlockItem(DecorationBlocks.TRAFFIC_SIGNS_SPEED70.get(),
+              new Item.Properties().tab(TAB)));
+
+  public static final RegistryObject<Item> TRAFFIC_SIGNS_SPEED75 =
+      deferredRegister.register("traffic_signs_speed75",
+          () -> new BlockItem(DecorationBlocks.TRAFFIC_SIGNS_SPEED75.get(),
+              new Item.Properties().tab(TAB)));
+
+  public static final RegistryObject<Item> TRAFFIC_SIGNS_SPEED80 =
+      deferredRegister.register("traffic_signs_speed80",
+          () -> new BlockItem(DecorationBlocks.TRAFFIC_SIGNS_SPEED80.get(),
+              new Item.Properties().tab(TAB)));
+  
   //HL2Pack Items
   public static final RegistryObject<Item> HEALTH_CHARGER =
       deferredRegister.register("acacia_button",
