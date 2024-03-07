@@ -1815,6 +1815,16 @@ public class DecorationBlocks {
                   .noCollission(),
               BlockShapes.TRAFFIC_SIGNS_POLE));
   
+  public static final RegistryObject<Block> TRAFFIC_SIGNS_EMPTY =
+      deferredRegister.register("traffic_signs_02",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion()
+                  .noCollission(),
+              BlockShapes.TRAFFIC_SIGNS_EMPTY));
+  
   
   // Items from HL2Pack
   public static final RegistryObject<Block> HEALTH_CHARGER =

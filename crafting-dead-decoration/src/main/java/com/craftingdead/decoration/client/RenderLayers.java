@@ -128,6 +128,9 @@ class RenderLayers {
     translucent(DecorationBlocks.HL2_TRASH);
     translucent(DecorationBlocks.HL2_TRASH_2);
     translucent(DecorationBlocks.WALL_BUSH);
+    
+    translucent(DecorationBlocks.TRAFFIC_SIGNS_POLE);
+    translucent(DecorationBlocks.TRAFFIC_SIGNS_EMPTY);
   }
 
   private static void cutout(Supplier<? extends Block> block) {
