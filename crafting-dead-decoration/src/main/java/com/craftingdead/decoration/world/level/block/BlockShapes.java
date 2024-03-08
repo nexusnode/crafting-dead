@@ -416,7 +416,7 @@ public class BlockShapes {
       rotatedOrientableShape(Shapes.or(Block.box(1, 1, 15.75, 15, 15, 16)));
   
   public static final Function<Direction, VoxelShape> TRAFFIC_SIGNS_R =
-      rotatedOrientableShape(Block.box(7.5, -0.5, 7.5, 8.5, 29.5, 8.5));
+      rotatedOrientableShape(Block.box(-13, -0.5, 7.5, 7.5, 29.5, 8.5));
   
   public static final Function<Direction, VoxelShape> BLOCK =
       unitOrientableShape(Shapes.block());
