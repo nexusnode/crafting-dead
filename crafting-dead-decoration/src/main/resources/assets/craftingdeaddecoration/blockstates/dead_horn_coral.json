@@ -1,0 +1,26 @@
+{
+    "variants": {
+        "": [
+            { "model": "block/supplycrate_0", "y": 0, "weight": 10 },
+            { "model": "block/supplycrate_22.5", "y": 0, "weight": 10 },
+            { "model": "block/supplycrate_45", "y": 0, "weight": 10 },
+            { "model": "block/supplycrate_pile", "y": 0, "weight": 30 },
+            { "model": "block/supplycrate_stack", "y": 0, "weight": 30 },
+            { "model": "block/supplycrate_0", "y": 90, "weight": 10 },
+            { "model": "block/supplycrate_22.5", "y": 90, "weight": 10 },
+            { "model": "block/supplycrate_45", "y": 90, "weight": 10 },
+            { "model": "block/supplycrate_pile", "y": 90, "weight": 30 },
+            { "model": "block/supplycrate_stack", "y": 90, "weight": 30 },
+            { "model": "block/supplycrate_0", "y": 180, "weight": 10 },
+            { "model": "block/supplycrate_22.5", "y": 180, "weight": 10 },
+            { "model": "block/supplycrate_45", "y": 180, "weight": 10 },
+            { "model": "block/supplycrate_pile", "y": 180, "weight": 30 },
+            { "model": "block/supplycrate_stack", "y": 180, "weight": 30 },
+            { "model": "block/supplycrate_0", "y": 270, "weight": 10 },
+            { "model": "block/supplycrate_22.5", "y": 270, "weight": 10 },
+            { "model": "block/supplycrate_45", "y": 270, "weight": 10 },
+            { "model": "block/supplycrate_pile", "y": 270, "weight": 30 },
+            { "model": "block/supplycrate_stack", "y": 270, "weight": 30 }
+        ]
+    }
+}

@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "craftingdeaddecoration:block/fence01a"
+    },
+    "facing=south": {
+      "model": "craftingdeaddecoration:block/fence01a",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "craftingdeaddecoration:block/fence01a",
+      "y": 270
+    },
+    "facing=east": {
+      "model": "craftingdeaddecoration:block/fence01a",
+      "y": 90
+    }
+  }
+}

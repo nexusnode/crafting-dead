@@ -21,6 +21,7 @@ package com.craftingdead.decoration.data;
 import java.util.Set;
 import com.craftingdead.decoration.CraftingDeadDecoration;
 import com.craftingdead.decoration.world.level.block.DecorationBlocks;
+import java.util.Map;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.client.model.generators.BlockModelProvider;
@@ -77,6 +78,27 @@ public class DecorationBlockModelProvider extends BlockModelProvider {
     this.modelVariant("red", "gas_can", 3);
 
     this.textureVariant(DecorationBlocks.AA_POSTER, "poster");
+    
+    this.textureVariant(DecorationBlocks.SLEEPING_BAG_CLOSED, "sleeping_bag_closed");
+    this.textureVariant(DecorationBlocks.SLEEPING_BAG_CLOSED_BLACK, "sleeping_bag_closed");
+    this.textureVariant(DecorationBlocks.SLEEPING_BAG_CLOSED_BLUE, "sleeping_bag_closed");
+    this.textureVariant(DecorationBlocks.SLEEPING_BAG_CLOSED_DARKGREEN, "sleeping_bag_closed");
+    this.textureVariant(DecorationBlocks.SLEEPING_BAG_CLOSED_ORANGE, "sleeping_bag_closed");
+    this.textureVariant(DecorationBlocks.SLEEPING_BAG_CLOSED_PINK, "sleeping_bag_closed");
+    this.textureVariant(DecorationBlocks.SLEEPING_BAG_CLOSED_PURPLE, "sleeping_bag_closed");
+    this.textureVariant(DecorationBlocks.SLEEPING_BAG_CLOSED_RED, "sleeping_bag_closed");
+    this.textureVariant(DecorationBlocks.SLEEPING_BAG_CLOSED_YELLOW, "sleeping_bag_closed");
+    
+    this.textureVariant(DecorationBlocks.SLEEPING_BAG_OPEN, "sleeping_bag_open");
+    this.textureVariant(DecorationBlocks.SLEEPING_BAG_OPEN_BLACK, "sleeping_bag_open");
+    this.textureVariant(DecorationBlocks.SLEEPING_BAG_OPEN_BLUE, "sleeping_bag_open");
+    this.textureVariant(DecorationBlocks.SLEEPING_BAG_OPEN_DARKGREEN, "sleeping_bag_open");
+    this.textureVariant(DecorationBlocks.SLEEPING_BAG_OPEN_ORANGE, "sleeping_bag_open");
+    this.textureVariant(DecorationBlocks.SLEEPING_BAG_OPEN_PINK, "sleeping_bag_open");
+    this.textureVariant(DecorationBlocks.SLEEPING_BAG_OPEN_PURPLE, "sleeping_bag_open");
+    this.textureVariant(DecorationBlocks.SLEEPING_BAG_OPEN_RED, "sleeping_bag_open");
+    this.textureVariant(DecorationBlocks.SLEEPING_BAG_OPEN_YELLOW, "sleeping_bag_open");
+
   }
 
   private void bottomStoreShelfs(String model) {

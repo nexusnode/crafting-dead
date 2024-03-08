@@ -1,0 +1,8 @@
+{
+    "variants": {
+        "north=true,west=false,south=false,east=false":  { "model": "block/ivy01", "y": 180 },
+        "north=false,west=true,south=false,east=false":  { "model": "block/ivy01", "y": 90 },
+        "north=false,west=false,south=true,east=false":  { "model": "block/ivy01", "y": 0 },
+        "north=false,west=false,south=false,east=true":  { "model": "block/ivy01", "y": 270 }
+    }
+}

@@ -20,12 +20,16 @@ package com.craftingdead.decoration.world.level.block;
 
 import com.craftingdead.decoration.CraftingDeadDecoration;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.ButtonBlock;
 import net.minecraft.world.level.block.ChainBlock;
+import net.minecraft.world.level.block.FenceGateBlock;
+import net.minecraft.world.level.block.GlassBlock;
 import net.minecraft.world.level.block.LanternBlock;
 import net.minecraft.world.level.block.LeavesBlock;
 import net.minecraft.world.level.block.RotatedPillarBlock;
 import net.minecraft.world.level.block.SlabBlock;
 import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.WoodButtonBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.material.MaterialColor;
@@ -46,6 +50,42 @@ public class DecorationBlocks {
                   .strength(5.0F)
                   .sound(SoundType.METAL),
               BlockShapes.FUSE_BOX, true));
+  
+  public static final RegistryObject<Block> BOXES_OF_BULLETS =
+      deferredRegister.register("box_of_bullets",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(5.0F)
+                  .sound(SoundType.METAL)
+                  .noCollission(),
+              BlockShapes.BOXES_OF_BULLETS, false));
+  
+  public static final RegistryObject<Block> BOXES_OF_SHOTGUN_SHELLS_RED =
+      deferredRegister.register("boxes_of_shotgun_shells_red",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(5.0F)
+                  .sound(SoundType.METAL)
+                  .noCollission(),
+              BlockShapes.BOXES_OF_SHOTGUN_SHELLS, false));
+  
+  public static final RegistryObject<Block> BOXES_OF_SHOTGUN_SHELLS_GREEN =
+      deferredRegister.register("boxes_of_shotgun_shells_green",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(5.0F)
+                  .sound(SoundType.METAL)
+                  .noCollission(),
+              BlockShapes.BOXES_OF_SHOTGUN_SHELLS, false));
+  
+  public static final RegistryObject<Block> BOXES_OF_SHOTGUN_SHELLS_BLUE =
+      deferredRegister.register("boxes_of_shotgun_shells_blue",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(5.0F)
+                  .sound(SoundType.METAL)
+                  .noCollission(),
+              BlockShapes.BOXES_OF_SHOTGUN_SHELLS, false));
 
   public static final RegistryObject<Block> AA_POSTER =
       deferredRegister.register("aa_poster",
@@ -1575,4 +1615,875 @@ public class DecorationBlocks {
                   .sound(SoundType.WOOD)
                   .noOcclusion(),
               BlockShapes.ABANDONED_CAMPFIRE));
+  
+  public static final RegistryObject<Block> ABANDONED_CAMPFIRE_WITH_POT =
+      deferredRegister.register("abandoned_campfire_with_pot",
+          () -> new OrientableBlock(
+              Block.Properties.of(Material.WOOD, MaterialColor.PODZOL)
+                  .strength(2.0F)
+                  .sound(SoundType.WOOD)
+                  .noOcclusion(),
+              BlockShapes.ABANDONED_CAMPFIRE_WITH_POT));
+  
+  public static final RegistryObject<Block> SLEEPING_BAG_CLOSED =
+      deferredRegister.register("sleeping_bag_closed",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.CLOTH_DECORATION)
+                  .strength(1.0F)
+                  .sound(SoundType.WOOL)
+                  .noOcclusion()
+                  .noCollission(),
+              BlockShapes.SLEEPING_BAG));
+
+  public static final RegistryObject<Block> SLEEPING_BAG_CLOSED_BLACK =
+      deferredRegister.register("sleeping_bag_closed_black",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.CLOTH_DECORATION)
+                  .strength(1.0F)
+                  .sound(SoundType.WOOL)
+                  .noOcclusion()
+                  .noCollission(),
+              BlockShapes.SLEEPING_BAG));
+  
+  public static final RegistryObject<Block> SLEEPING_BAG_CLOSED_BLUE =
+      deferredRegister.register("sleeping_bag_closed_blue",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.CLOTH_DECORATION)
+                  .strength(1.0F)
+                  .sound(SoundType.WOOL)
+                  .noOcclusion()
+                  .noCollission(),
+              BlockShapes.SLEEPING_BAG));
+  
+  public static final RegistryObject<Block> SLEEPING_BAG_CLOSED_DARKGREEN =
+      deferredRegister.register("sleeping_bag_closed_darkgreen",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.CLOTH_DECORATION)
+                  .strength(1.0F)
+                  .sound(SoundType.WOOL)
+                  .noOcclusion()
+                  .noCollission(),
+              BlockShapes.SLEEPING_BAG));
+  
+  public static final RegistryObject<Block> SLEEPING_BAG_CLOSED_ORANGE =
+      deferredRegister.register("sleeping_bag_closed_orange",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.CLOTH_DECORATION)
+                  .strength(1.0F)
+                  .sound(SoundType.WOOL)
+                  .noOcclusion()
+                  .noCollission(),
+              BlockShapes.SLEEPING_BAG));
+  
+  public static final RegistryObject<Block> SLEEPING_BAG_CLOSED_PINK =
+      deferredRegister.register("sleeping_bag_closed_pink",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.CLOTH_DECORATION)
+                  .strength(1.0F)
+                  .sound(SoundType.WOOL)
+                  .noOcclusion()
+                  .noCollission(),
+              BlockShapes.SLEEPING_BAG));
+  
+  public static final RegistryObject<Block> SLEEPING_BAG_CLOSED_PURPLE =
+      deferredRegister.register("sleeping_bag_closed_purple",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.CLOTH_DECORATION)
+                  .strength(1.0F)
+                  .sound(SoundType.WOOL)
+                  .noOcclusion()
+                  .noCollission(),
+              BlockShapes.SLEEPING_BAG));
+  
+  public static final RegistryObject<Block> SLEEPING_BAG_CLOSED_RED =
+      deferredRegister.register("sleeping_bag_closed_red",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.CLOTH_DECORATION)
+                  .strength(1.0F)
+                  .sound(SoundType.WOOL)
+                  .noOcclusion()
+                  .noCollission(),
+              BlockShapes.SLEEPING_BAG));
+  
+  public static final RegistryObject<Block> SLEEPING_BAG_CLOSED_YELLOW =
+      deferredRegister.register("sleeping_bag_closed_yellow",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.CLOTH_DECORATION)
+                  .strength(1.0F)
+                  .sound(SoundType.WOOL)
+                  .noOcclusion()
+                  .noCollission(),
+              BlockShapes.SLEEPING_BAG));
+  
+  public static final RegistryObject<Block> SLEEPING_BAG_OPEN =
+      deferredRegister.register("sleeping_bag_open",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.CLOTH_DECORATION)
+                  .strength(1.0F)
+                  .sound(SoundType.WOOL)
+                  .noOcclusion()
+                  .noCollission(),
+              BlockShapes.SLEEPING_BAG));
+
+  public static final RegistryObject<Block> SLEEPING_BAG_OPEN_BLACK =
+      deferredRegister.register("sleeping_bag_open_black",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.CLOTH_DECORATION)
+                  .strength(1.0F)
+                  .sound(SoundType.WOOL)
+                  .noOcclusion()
+                  .noCollission(),
+              BlockShapes.SLEEPING_BAG));
+  
+  public static final RegistryObject<Block> SLEEPING_BAG_OPEN_BLUE =
+      deferredRegister.register("sleeping_bag_open_blue",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.CLOTH_DECORATION)
+                  .strength(1.0F)
+                  .sound(SoundType.WOOL)
+                  .noOcclusion()
+                  .noCollission(),
+              BlockShapes.SLEEPING_BAG));
+  
+  public static final RegistryObject<Block> SLEEPING_BAG_OPEN_DARKGREEN =
+      deferredRegister.register("sleeping_bag_open_darkgreen",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.CLOTH_DECORATION)
+                  .strength(1.0F)
+                  .sound(SoundType.WOOL)
+                  .noOcclusion()
+                  .noCollission(),
+              BlockShapes.SLEEPING_BAG));
+  
+  public static final RegistryObject<Block> SLEEPING_BAG_OPEN_ORANGE =
+      deferredRegister.register("sleeping_bag_open_orange",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.CLOTH_DECORATION)
+                  .strength(1.0F)
+                  .sound(SoundType.WOOL)
+                  .noOcclusion()
+                  .noCollission(),
+              BlockShapes.SLEEPING_BAG));
+  
+  public static final RegistryObject<Block> SLEEPING_BAG_OPEN_PINK =
+      deferredRegister.register("sleeping_bag_open_pink",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.CLOTH_DECORATION)
+                  .strength(1.0F)
+                  .sound(SoundType.WOOL)
+                  .noOcclusion()
+                  .noCollission(),
+              BlockShapes.SLEEPING_BAG));
+  
+  public static final RegistryObject<Block> SLEEPING_BAG_OPEN_PURPLE =
+      deferredRegister.register("sleeping_bag_open_purple",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.CLOTH_DECORATION)
+                  .strength(1.0F)
+                  .sound(SoundType.WOOL)
+                  .noOcclusion()
+                  .noCollission(),
+              BlockShapes.SLEEPING_BAG));
+  
+  public static final RegistryObject<Block> SLEEPING_BAG_OPEN_RED =
+      deferredRegister.register("sleeping_bag_open_red",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.CLOTH_DECORATION)
+                  .strength(1.0F)
+                  .sound(SoundType.WOOL)
+                  .noOcclusion()
+                  .noCollission(),
+              BlockShapes.SLEEPING_BAG));
+  
+  public static final RegistryObject<Block> SLEEPING_BAG_OPEN_YELLOW =
+      deferredRegister.register("sleeping_bag_open_yellow",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.CLOTH_DECORATION)
+                  .strength(1.0F)
+                  .sound(SoundType.WOOL)
+                  .noOcclusion()
+                  .noCollission(),
+              BlockShapes.SLEEPING_BAG));
+  
+  public static final RegistryObject<Block> TRAFFIC_SIGNS_POLE =
+      deferredRegister.register("traffic_signs_01",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.TRAFFIC_SIGNS_POLE));
+  
+  public static final RegistryObject<Block> TRAFFIC_SIGNS_EMPTY =
+      deferredRegister.register("traffic_signs_02",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.TRAFFIC_SIGNS_EMPTY));
+  
+  public static final RegistryObject<Block> TRAFFIC_SIGNS_SPEED20 =
+      deferredRegister.register("traffic_signs_speed20",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.TRAFFIC_SIGNS_EMPTY));
+  
+  public static final RegistryObject<Block> TRAFFIC_SIGNS_SPEED25 =
+      deferredRegister.register("traffic_signs_speed25",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.TRAFFIC_SIGNS_EMPTY));
+
+  public static final RegistryObject<Block> TRAFFIC_SIGNS_SPEED30 =
+      deferredRegister.register("traffic_signs_speed30",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.TRAFFIC_SIGNS_EMPTY));
+  
+  public static final RegistryObject<Block> TRAFFIC_SIGNS_SPEED35 =
+      deferredRegister.register("traffic_signs_speed35",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.TRAFFIC_SIGNS_EMPTY));
+
+  public static final RegistryObject<Block> TRAFFIC_SIGNS_SPEED40 =
+      deferredRegister.register("traffic_signs_speed40",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.TRAFFIC_SIGNS_EMPTY));
+  
+  public static final RegistryObject<Block> TRAFFIC_SIGNS_SPEED45 =
+      deferredRegister.register("traffic_signs_speed450",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.TRAFFIC_SIGNS_EMPTY));
+  
+  public static final RegistryObject<Block> TRAFFIC_SIGNS_SPEED50 =
+      deferredRegister.register("traffic_signs_speed50",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.TRAFFIC_SIGNS_EMPTY));
+  
+  public static final RegistryObject<Block> TRAFFIC_SIGNS_SPEED55 =
+      deferredRegister.register("traffic_signs_speed55",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.TRAFFIC_SIGNS_EMPTY));
+  
+  public static final RegistryObject<Block> TRAFFIC_SIGNS_SPEED60 =
+      deferredRegister.register("traffic_signs_speed60",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.TRAFFIC_SIGNS_EMPTY));
+  
+  public static final RegistryObject<Block> TRAFFIC_SIGNS_SPEED65 =
+      deferredRegister.register("traffic_signs_speed65",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.TRAFFIC_SIGNS_EMPTY));
+
+  public static final RegistryObject<Block> TRAFFIC_SIGNS_SPEED70 =
+      deferredRegister.register("traffic_signs_speed70",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.TRAFFIC_SIGNS_EMPTY));
+
+  public static final RegistryObject<Block> TRAFFIC_SIGNS_SPEED75 =
+      deferredRegister.register("traffic_signs_speed75",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.TRAFFIC_SIGNS_EMPTY));
+
+  public static final RegistryObject<Block> TRAFFIC_SIGNS_SPEED80 =
+      deferredRegister.register("traffic_signs_speed80",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.TRAFFIC_SIGNS_EMPTY));
+  
+  public static final RegistryObject<Block> TRAFFIC_SIGNS_DAMAGED =
+      deferredRegister.register("traffic_signs_damaged",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.TRAFFIC_SIGNS_EMPTY));
+  
+  public static final RegistryObject<Block> TRAFFIC_SIGNS_DAMAGED_BULLET =
+      deferredRegister.register("traffic_signs_damaged_bullet",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.TRAFFIC_SIGNS_EMPTY));
+  
+  public static final RegistryObject<Block> TRAFFIC_SIGNS_NOTSAFE =
+      deferredRegister.register("traffic_signs_notsafe",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.TRAFFIC_SIGNS_EMPTY));
+  
+  public static final RegistryObject<Block> TRAFFIC_SIGNS_RADIOACTIVE =
+      deferredRegister.register("traffic_signs_radioactive",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.TRAFFIC_SIGNS_EMPTY));
+  
+  public static final RegistryObject<Block> TRAFFIC_SIGNS_RADIOACTIVE_DAMAGED =
+      deferredRegister.register("traffic_signs_radioactive_damaged",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.TRAFFIC_SIGNS_EMPTY));
+  
+  public static final RegistryObject<Block> TRAFFIC_SIGNS_03 =
+      deferredRegister.register("traffic_signs_03",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion()
+                  .noCollission(),
+              BlockShapes.TRAFFIC_SIGNS_WALL, true));
+
+  public static final RegistryObject<Block> W_TRAFFIC_SIGNS_SPEED20 =
+      deferredRegister.register("w_traffic_signs_speed20",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion()
+                  .noCollission(),
+              BlockShapes.TRAFFIC_SIGNS_WALL, true));
+  
+  public static final RegistryObject<Block> W_TRAFFIC_SIGNS_SPEED25 =
+      deferredRegister.register("w_traffic_signs_speed25",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion()
+                  .noCollission(),
+              BlockShapes.TRAFFIC_SIGNS_WALL, true));
+
+  public static final RegistryObject<Block> W_TRAFFIC_SIGNS_SPEED30 =
+      deferredRegister.register("w_traffic_signs_speed30",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion()
+                  .noCollission(),
+              BlockShapes.TRAFFIC_SIGNS_WALL, true));
+  
+  public static final RegistryObject<Block> W_TRAFFIC_SIGNS_SPEED35 =
+      deferredRegister.register("w_traffic_signs_speed35",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion()
+                  .noCollission(),
+              BlockShapes.TRAFFIC_SIGNS_WALL, true));
+
+  public static final RegistryObject<Block> W_TRAFFIC_SIGNS_SPEED40 =
+      deferredRegister.register("w_traffic_signs_speed40",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion()
+                  .noCollission(),
+              BlockShapes.TRAFFIC_SIGNS_WALL, true));
+  
+  public static final RegistryObject<Block> W_TRAFFIC_SIGNS_SPEED45 =
+      deferredRegister.register("w_traffic_signs_speed450",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion()
+                  .noCollission(),
+              BlockShapes.TRAFFIC_SIGNS_WALL, true));
+  
+  public static final RegistryObject<Block> W_TRAFFIC_SIGNS_SPEED50 =
+      deferredRegister.register("w_traffic_signs_speed50",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion()
+                  .noCollission(),
+              BlockShapes.TRAFFIC_SIGNS_WALL, true));
+  
+  public static final RegistryObject<Block> W_TRAFFIC_SIGNS_SPEED55 =
+      deferredRegister.register("w_traffic_signs_speed55",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion()
+                  .noCollission(),
+              BlockShapes.TRAFFIC_SIGNS_WALL, true));
+  
+  public static final RegistryObject<Block> W_TRAFFIC_SIGNS_SPEED60 =
+      deferredRegister.register("w_traffic_signs_speed60",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion()
+                  .noCollission(),
+              BlockShapes.TRAFFIC_SIGNS_WALL, true));
+  
+  public static final RegistryObject<Block> W_TRAFFIC_SIGNS_SPEED65 =
+      deferredRegister.register("w_traffic_signs_speed65",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion()
+                  .noCollission(),
+              BlockShapes.TRAFFIC_SIGNS_WALL, true));
+
+  public static final RegistryObject<Block> W_TRAFFIC_SIGNS_SPEED70 =
+      deferredRegister.register("w_traffic_signs_speed70",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion()
+                  .noCollission(),
+              BlockShapes.TRAFFIC_SIGNS_WALL, true));
+
+  public static final RegistryObject<Block> W_TRAFFIC_SIGNS_SPEED75 =
+      deferredRegister.register("w_traffic_signs_speed75",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion()
+                  .noCollission(),
+              BlockShapes.TRAFFIC_SIGNS_WALL, true));
+
+  public static final RegistryObject<Block> W_TRAFFIC_SIGNS_SPEED80 =
+      deferredRegister.register("w_traffic_signs_speed80",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion()
+                  .noCollission(),
+              BlockShapes.TRAFFIC_SIGNS_WALL, true));
+  
+  public static final RegistryObject<Block> W_TRAFFIC_SIGNS_DAMAGED =
+      deferredRegister.register("w_traffic_signs_damaged",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion()
+                  .noCollission(),
+              BlockShapes.TRAFFIC_SIGNS_WALL, true));
+  
+  public static final RegistryObject<Block> W_TRAFFIC_SIGNS_DAMAGED_BULLET =
+      deferredRegister.register("w_traffic_signs_damaged_bullet",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion()
+                  .noCollission(),
+              BlockShapes.TRAFFIC_SIGNS_WALL, true));
+  
+  public static final RegistryObject<Block> W_TRAFFIC_SIGNS_NOTSAFE =
+      deferredRegister.register("w_traffic_signs_notsafe",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion()
+                  .noCollission(),
+              BlockShapes.TRAFFIC_SIGNS_WALL, true));
+  
+  public static final RegistryObject<Block> W_TRAFFIC_SIGNS_RADIOACTIVE =
+      deferredRegister.register("w_traffic_signs_radioactive",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion()
+                  .noCollission(),
+              BlockShapes.TRAFFIC_SIGNS_WALL, true));
+  
+  public static final RegistryObject<Block> W_TRAFFIC_SIGNS_RADIOACTIVE_DAMAGED =
+      deferredRegister.register("w_traffic_signs_radioactive_damaged",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion()
+                  .noCollission(),
+              BlockShapes.TRAFFIC_SIGNS_WALL, true));
+  
+  public static final RegistryObject<Block> TRAFFIC_SIGNS_04 =
+      deferredRegister.register("traffic_signs_04",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.TRAFFIC_SIGNS_R));
+
+  public static final RegistryObject<Block> R_TRAFFIC_SIGNS_SPEED20 =
+      deferredRegister.register("r_traffic_signs_speed20",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.TRAFFIC_SIGNS_R));
+  
+  public static final RegistryObject<Block> R_TRAFFIC_SIGNS_SPEED25 =
+      deferredRegister.register("r_traffic_signs_speed25",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.TRAFFIC_SIGNS_R));
+
+  public static final RegistryObject<Block> R_TRAFFIC_SIGNS_SPEED30 =
+      deferredRegister.register("r_traffic_signs_speed30",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.TRAFFIC_SIGNS_R));
+  
+  public static final RegistryObject<Block> R_TRAFFIC_SIGNS_SPEED35 =
+      deferredRegister.register("r_traffic_signs_speed35",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.TRAFFIC_SIGNS_R));
+
+  public static final RegistryObject<Block> R_TRAFFIC_SIGNS_SPEED40 =
+      deferredRegister.register("r_traffic_signs_speed40",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.TRAFFIC_SIGNS_R));
+  
+  public static final RegistryObject<Block> R_TRAFFIC_SIGNS_SPEED45 =
+      deferredRegister.register("r_traffic_signs_speed450",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.TRAFFIC_SIGNS_R));
+  
+  public static final RegistryObject<Block> R_TRAFFIC_SIGNS_SPEED50 =
+      deferredRegister.register("r_traffic_signs_speed50",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.TRAFFIC_SIGNS_R));
+  
+  public static final RegistryObject<Block> R_TRAFFIC_SIGNS_SPEED55 =
+      deferredRegister.register("r_traffic_signs_speed55",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.TRAFFIC_SIGNS_R));
+  
+  public static final RegistryObject<Block> R_TRAFFIC_SIGNS_SPEED60 =
+      deferredRegister.register("r_traffic_signs_speed60",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.TRAFFIC_SIGNS_R));
+  
+  public static final RegistryObject<Block> R_TRAFFIC_SIGNS_SPEED65 =
+      deferredRegister.register("r_traffic_signs_speed65",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.TRAFFIC_SIGNS_R));
+
+  public static final RegistryObject<Block> R_TRAFFIC_SIGNS_SPEED70 =
+      deferredRegister.register("r_traffic_signs_speed70",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.TRAFFIC_SIGNS_R));
+
+  public static final RegistryObject<Block> R_TRAFFIC_SIGNS_SPEED75 =
+      deferredRegister.register("r_traffic_signs_speed75",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.TRAFFIC_SIGNS_R));
+
+  public static final RegistryObject<Block> R_TRAFFIC_SIGNS_SPEED80 =
+      deferredRegister.register("r_traffic_signs_speed80",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.TRAFFIC_SIGNS_R));
+  
+  public static final RegistryObject<Block> R_TRAFFIC_SIGNS_DAMAGED =
+      deferredRegister.register("r_traffic_signs_damaged",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.TRAFFIC_SIGNS_R));
+  
+  public static final RegistryObject<Block> R_TRAFFIC_SIGNS_DAMAGED_BULLET =
+      deferredRegister.register("r_traffic_signs_damaged_bullet",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.TRAFFIC_SIGNS_R));
+  
+  public static final RegistryObject<Block> R_TRAFFIC_SIGNS_NOTSAFE =
+      deferredRegister.register("r_traffic_signs_notsafe",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.TRAFFIC_SIGNS_R));
+  
+  public static final RegistryObject<Block> R_TRAFFIC_SIGNS_RADIOACTIVE =
+      deferredRegister.register("r_traffic_signs_radioactive",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion()
+                  .noCollission(),
+              BlockShapes.TRAFFIC_SIGNS_R));
+  
+  public static final RegistryObject<Block> R_TRAFFIC_SIGNS_RADIOACTIVE_DAMAGED =
+      deferredRegister.register("r_traffic_signs_radioactive_damaged",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion()
+                  .noCollission(),
+              BlockShapes.TRAFFIC_SIGNS_R));
+  
+  // Items from HL2Pack
+  public static final RegistryObject<Block> HEALTH_CHARGER =
+      deferredRegister.register("acacia_button",
+          () -> new WoodButtonBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion()));
+  
+  public static final RegistryObject<Block> FENCE =
+      deferredRegister.register("acacia_fence_gate",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(2.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(), 
+                  BlockShapes.FENCE,
+                  false));
+  
+  public static final RegistryObject<Block> METAL_DUCT =
+      deferredRegister.register("acacia_stairs",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(21.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(), 
+                  BlockShapes.METAL_DUCT,
+                  false));
+  
+  public static final RegistryObject<Block> PAINTING_1 =
+      deferredRegister.register("black_stained_glass_pane",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.WOOD)
+                  .strength(1.0F)
+                  .sound(SoundType.WOOD)
+                  .noOcclusion(), 
+                  BlockShapes.POSTER,
+                  true));
+  
+  public static final RegistryObject<Block> CRATE =
+      deferredRegister.register("dead_brain_coral",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.WOOD)
+                  .strength(1.0F)
+                  .sound(SoundType.WOOD)
+                  .noOcclusion(), 
+                  BlockShapes.BLOCK,
+                  false));
+  
+  public static final RegistryObject<Block> SEWER_OPENING =
+      deferredRegister.register("brown_stained_glass",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion()
+                  .noCollission(), 
+                  BlockShapes.BLOCK,
+                  false));
+  
+  public static final RegistryObject<Block> HL2_GLASS =
+      deferredRegister.register("glass",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.GLASS)
+                  .strength(1.0F)
+                  .sound(SoundType.GLASS)
+                  .noOcclusion(), 
+                  BlockShapes.BLOCK,
+                  false));
+  
+  public static final RegistryObject<Block> HL2_TRASH =
+      deferredRegister.register("lime_stained_glass",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.DECORATION)
+                  .strength(1.0F)
+                  .sound(SoundType.WOOL)
+                  .noOcclusion()
+                  .noCollission(), 
+                  BlockShapes.BLOCK,
+                  false));
+  public static final RegistryObject<Block> HL2_TRASH_2 =
+      deferredRegister.register("pink_stained_glass",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.DECORATION)
+                  .strength(1.0F)
+                  .sound(SoundType.WOOL)
+                  .noOcclusion()
+                  .noCollission(), 
+                  BlockShapes.BLOCK,
+                  false));
+  
+  public static final RegistryObject<Block> WALL_BUSH =
+      deferredRegister.register("lime_stained_glass_pane",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.GRASS)
+                  .strength(1.0F)
+                  .sound(SoundType.GRASS)
+                  .noOcclusion()
+                  .noCollission(), 
+                  BlockShapes.WALL_BUSH,
+                  false));
+
+  public static final RegistryObject<Block> COBBLESTONE =
+      deferredRegister.register("cobblestone",
+          () -> new Block(
+              BlockBehaviour.Properties.of(Material.STONE)
+                  .strength(1.0F)
+                  .sound(SoundType.STONE)
+                  .noOcclusion()
+                  .noCollission()));
+  
+  public static final RegistryObject<Block> SMALL_FENCE =
+      deferredRegister.register("nether_brick_fence",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+                  BlockShapes.SMALL_FENCE,
+                  false));
+  
+  // AE12 Glass Blocks
+  public static final RegistryObject<Block> QUARTZ_GLASS =
+      deferredRegister.register("quartz_glass",
+          () -> new GlassBlock(
+              Block.Properties.of(Material.GLASS)
+                  .strength(1.0F)
+                  .sound(SoundType.GLASS)
+                  .noOcclusion()));
+  
+  public static final RegistryObject<Block> VIBRANT_QUARTZ_GLASS =
+      deferredRegister.register("quartz_vibrant_glass",
+          () -> new GlassBlock(
+              Block.Properties.of(Material.GLASS)
+                  .strength(1.0F)
+                  .sound(SoundType.GLASS)
+                  .noOcclusion()));
+  
 }

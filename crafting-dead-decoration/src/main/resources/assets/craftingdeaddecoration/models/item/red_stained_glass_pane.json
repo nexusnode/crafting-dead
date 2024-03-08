@@ -1,0 +1,53 @@
+{
+	"credit": "Made with Blockbench",
+	"texture_size": [512, 512],
+	"textures": {
+		"1": "block/graffiti/decalgraffiti010a_decalgraffiti017a_decalgraffiti049a",
+		"particle": "block/graffiti/decalgraffiti010a_decalgraffiti017a_decalgraffiti049a"
+	},
+	"elements": [
+		{
+			"from": [-8, -4, 15.45],
+			"to": [24, 12, 15.45],
+			"rotation": {"angle": 0, "axis": "y", "origin": [0, 0, 15.475]},
+			"faces": {
+				"north": {"uv": [0, 0, 12, 6], "texture": "#1"},
+				"south": {"uv": [0, 0, 12, 6], "texture": "#1"}
+			}
+		}
+	],
+	"display": {
+		"thirdperson_righthand": {
+			"rotation": [0, -180, 0],
+			"translation": [0, 0, 1.25],
+			"scale": [0.2, 0.2, 0.2]
+		},
+		"thirdperson_lefthand": {
+			"rotation": [0, -180, 0],
+			"translation": [0, 0, 1.25],
+			"scale": [0.2, 0.2, 0.2]
+		},
+		"firstperson_righthand": {
+			"rotation": [-19, -43, 0],
+			"translation": [0.75, 5.25, 2.25],
+			"scale": [0.3, 0.3, 0.3]
+		},
+		"firstperson_lefthand": {
+			"rotation": [-19, -43, 0],
+			"translation": [0.75, 5.5, 2.25],
+			"scale": [0.3, 0.3, 0.3]
+		},
+		"ground": {
+			"rotation": [90, 0, 0],
+			"scale": [0.3, 0.3, 0.3]
+		},
+		"gui": {
+			"translation": [0, 2.25, 0],
+			"scale": [0.52344, 0.52344, 0.52344]
+		},
+		"fixed": {
+			"translation": [0, 0, -14.25],
+			"scale": [2, 2, 2]
+		}
+	}
+}

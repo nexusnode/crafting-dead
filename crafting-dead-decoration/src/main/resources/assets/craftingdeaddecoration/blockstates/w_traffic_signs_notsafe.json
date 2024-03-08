@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "craftingdeaddecoration:block/w_traffic_signs_notsafe",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "craftingdeaddecoration:block/w_traffic_signs_notsafe"
+    },
+    "facing=west": {
+      "model": "craftingdeaddecoration:block/w_traffic_signs_notsafe",
+      "y": 270
+    },
+    "facing=south": {
+      "model": "craftingdeaddecoration:block/w_traffic_signs_notsafe",
+      "y": 180
+    }
+  }
+}

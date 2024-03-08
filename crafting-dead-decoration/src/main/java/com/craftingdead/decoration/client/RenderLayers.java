@@ -96,6 +96,99 @@ class RenderLayers {
     cutout(DecorationBlocks.LIGHT_SWITCH);
     cutout(DecorationBlocks.ELECTRICAL_SOCKET);
     cutout(DecorationBlocks.ABANDONED_CAMPFIRE);
+    
+    translucent(DecorationBlocks.QUARTZ_GLASS);
+    translucent(DecorationBlocks.VIBRANT_QUARTZ_GLASS);
+    
+    translucent(DecorationBlocks.SLEEPING_BAG_CLOSED);
+    translucent(DecorationBlocks.SLEEPING_BAG_CLOSED_BLACK);
+    translucent(DecorationBlocks.SLEEPING_BAG_CLOSED_BLUE);
+    translucent(DecorationBlocks.SLEEPING_BAG_CLOSED_DARKGREEN);
+    translucent(DecorationBlocks.SLEEPING_BAG_CLOSED_ORANGE);
+    translucent(DecorationBlocks.SLEEPING_BAG_CLOSED_PINK);
+    translucent(DecorationBlocks.SLEEPING_BAG_CLOSED_PURPLE);
+    translucent(DecorationBlocks.SLEEPING_BAG_CLOSED_RED);
+    translucent(DecorationBlocks.SLEEPING_BAG_CLOSED_YELLOW);
+    
+    translucent(DecorationBlocks.SLEEPING_BAG_OPEN);
+    translucent(DecorationBlocks.SLEEPING_BAG_OPEN_BLACK);
+    translucent(DecorationBlocks.SLEEPING_BAG_OPEN_BLUE);
+    translucent(DecorationBlocks.SLEEPING_BAG_OPEN_DARKGREEN);
+    translucent(DecorationBlocks.SLEEPING_BAG_OPEN_ORANGE);
+    translucent(DecorationBlocks.SLEEPING_BAG_OPEN_PINK);
+    translucent(DecorationBlocks.SLEEPING_BAG_OPEN_PURPLE);
+    translucent(DecorationBlocks.SLEEPING_BAG_OPEN_RED);
+    translucent(DecorationBlocks.SLEEPING_BAG_OPEN_YELLOW);
+    
+    cutout(DecorationBlocks.BOXES_OF_BULLETS);
+    
+    translucent(DecorationBlocks.FENCE);
+    translucent(DecorationBlocks.SEWER_OPENING);
+    translucent(DecorationBlocks.HL2_GLASS);
+    translucent(DecorationBlocks.HL2_TRASH);
+    translucent(DecorationBlocks.HL2_TRASH_2);
+    translucent(DecorationBlocks.WALL_BUSH);
+    
+    translucent(DecorationBlocks.TRAFFIC_SIGNS_POLE);
+    translucent(DecorationBlocks.TRAFFIC_SIGNS_EMPTY);
+    translucent(DecorationBlocks.TRAFFIC_SIGNS_SPEED20);
+    translucent(DecorationBlocks.TRAFFIC_SIGNS_SPEED25);
+    translucent(DecorationBlocks.TRAFFIC_SIGNS_SPEED30);
+    translucent(DecorationBlocks.TRAFFIC_SIGNS_SPEED35);
+    translucent(DecorationBlocks.TRAFFIC_SIGNS_SPEED40);
+    translucent(DecorationBlocks.TRAFFIC_SIGNS_SPEED45);
+    translucent(DecorationBlocks.TRAFFIC_SIGNS_SPEED50);
+    translucent(DecorationBlocks.TRAFFIC_SIGNS_SPEED55);
+    translucent(DecorationBlocks.TRAFFIC_SIGNS_SPEED60);
+    translucent(DecorationBlocks.TRAFFIC_SIGNS_SPEED65);
+    translucent(DecorationBlocks.TRAFFIC_SIGNS_SPEED70);
+    translucent(DecorationBlocks.TRAFFIC_SIGNS_SPEED75);
+    translucent(DecorationBlocks.TRAFFIC_SIGNS_SPEED80);
+    translucent(DecorationBlocks.TRAFFIC_SIGNS_DAMAGED);
+    translucent(DecorationBlocks.TRAFFIC_SIGNS_DAMAGED_BULLET);
+    translucent(DecorationBlocks.TRAFFIC_SIGNS_RADIOACTIVE);
+    translucent(DecorationBlocks.TRAFFIC_SIGNS_RADIOACTIVE_DAMAGED);
+    translucent(DecorationBlocks.TRAFFIC_SIGNS_NOTSAFE);
+    
+    translucent(DecorationBlocks.TRAFFIC_SIGNS_03);
+    translucent(DecorationBlocks.W_TRAFFIC_SIGNS_SPEED20);
+    translucent(DecorationBlocks.W_TRAFFIC_SIGNS_SPEED25);
+    translucent(DecorationBlocks.W_TRAFFIC_SIGNS_SPEED30);
+    translucent(DecorationBlocks.W_TRAFFIC_SIGNS_SPEED35);
+    translucent(DecorationBlocks.W_TRAFFIC_SIGNS_SPEED40);
+    translucent(DecorationBlocks.W_TRAFFIC_SIGNS_SPEED45);
+    translucent(DecorationBlocks.W_TRAFFIC_SIGNS_SPEED50);
+    translucent(DecorationBlocks.W_TRAFFIC_SIGNS_SPEED55);
+    translucent(DecorationBlocks.W_TRAFFIC_SIGNS_SPEED60);
+    translucent(DecorationBlocks.W_TRAFFIC_SIGNS_SPEED65);
+    translucent(DecorationBlocks.W_TRAFFIC_SIGNS_SPEED70);
+    translucent(DecorationBlocks.W_TRAFFIC_SIGNS_SPEED75);
+    translucent(DecorationBlocks.W_TRAFFIC_SIGNS_SPEED80);
+    translucent(DecorationBlocks.W_TRAFFIC_SIGNS_DAMAGED);
+    translucent(DecorationBlocks.W_TRAFFIC_SIGNS_DAMAGED_BULLET);
+    translucent(DecorationBlocks.W_TRAFFIC_SIGNS_RADIOACTIVE);
+    translucent(DecorationBlocks.W_TRAFFIC_SIGNS_RADIOACTIVE_DAMAGED);
+    translucent(DecorationBlocks.W_TRAFFIC_SIGNS_NOTSAFE);
+    
+    translucent(DecorationBlocks.TRAFFIC_SIGNS_04);
+    translucent(DecorationBlocks.R_TRAFFIC_SIGNS_SPEED20);
+    translucent(DecorationBlocks.R_TRAFFIC_SIGNS_SPEED25);
+    translucent(DecorationBlocks.R_TRAFFIC_SIGNS_SPEED30);
+    translucent(DecorationBlocks.R_TRAFFIC_SIGNS_SPEED35);
+    translucent(DecorationBlocks.R_TRAFFIC_SIGNS_SPEED40);
+    translucent(DecorationBlocks.R_TRAFFIC_SIGNS_SPEED45);
+    translucent(DecorationBlocks.R_TRAFFIC_SIGNS_SPEED50);
+    translucent(DecorationBlocks.R_TRAFFIC_SIGNS_SPEED55);
+    translucent(DecorationBlocks.R_TRAFFIC_SIGNS_SPEED60);
+    translucent(DecorationBlocks.R_TRAFFIC_SIGNS_SPEED65);
+    translucent(DecorationBlocks.R_TRAFFIC_SIGNS_SPEED70);
+    translucent(DecorationBlocks.R_TRAFFIC_SIGNS_SPEED75);
+    translucent(DecorationBlocks.R_TRAFFIC_SIGNS_SPEED80);
+    translucent(DecorationBlocks.R_TRAFFIC_SIGNS_DAMAGED);
+    translucent(DecorationBlocks.R_TRAFFIC_SIGNS_DAMAGED_BULLET);
+    translucent(DecorationBlocks.R_TRAFFIC_SIGNS_RADIOACTIVE);
+    translucent(DecorationBlocks.R_TRAFFIC_SIGNS_RADIOACTIVE_DAMAGED);
+    translucent(DecorationBlocks.R_TRAFFIC_SIGNS_NOTSAFE);
   }
 
   private static void cutout(Supplier<? extends Block> block) {

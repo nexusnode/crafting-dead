@@ -1,0 +1,10 @@
+{
+    "variants": {
+        "": [
+            { "model": "block/dead_fire_coral", "y": 0 },
+            { "model": "block/dead_fire_coral", "y": 90 },
+            { "model": "block/dead_fire_coral", "y": 180 },
+            { "model": "block/dead_fire_coral", "y": 270 }
+        ]
+    }
+}

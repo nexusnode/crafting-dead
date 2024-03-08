@@ -1,0 +1,18 @@
+{
+    "variants": {
+        "": [
+            { "model": "block/paintcan", "y": 0, "weight": 100 },
+            { "model": "block/paintcan", "y": 90, "weight": 100 },
+            { "model": "block/paintcan", "y": 180, "weight": 100 },
+            { "model": "block/paintcan", "y": 270, "weight": 100 },
+            { "model": "block/paintcan1", "y": 0, "weight": 37 },
+            { "model": "block/paintcan1", "y": 90, "weight": 37 },
+            { "model": "block/paintcan1", "y": 180, "weight": 37 },
+            { "model": "block/paintcan1", "y": 270, "weight": 37 },
+            { "model": "block/paintcan2", "y": 0, "weight": 15 },
+            { "model": "block/paintcan2", "y": 90, "weight": 15 },
+            { "model": "block/paintcan2", "y": 180, "weight": 15 },
+            { "model": "block/paintcan2", "y": 270, "weight": 15 }
+        ]
+    }
+}

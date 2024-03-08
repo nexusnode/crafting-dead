@@ -26,6 +26,7 @@ import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.item.gun.Gun;
 import com.craftingdead.core.world.item.gun.GunAnimationEvent;
 import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.item.ItemStack;
 
@@ -59,7 +60,7 @@ public abstract class AbstractReloadAction extends TimedAction {
 
   @Override
   public boolean start(boolean simulate) {
-    if (this.performer().entity().isSprinting() || this.performer().isCrouching()) {
+    if (this.performer().entity().isSprinting() /*|| this.performer().isCrouching()*/) {
       return false;
     }
 

@@ -1,0 +1,63 @@
+{
+	"credit": "Made with Blockbench",
+	"texture_size": [32, 32],
+	"textures": {
+		"0": "craftingdeaddecoration:block/traffic_signs_pipe",
+		"particle": "craftingdeaddecoration:block/traffic_signs_pipe"
+	},
+	"elements": [
+		{
+			"from": [7, 0, 7],
+			"to": [9, 6, 9],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8, 3, 8]},
+			"faces": {
+				"north": {"uv": [3, 6.5, 4, 9.5], "texture": "#0"},
+				"east": {"uv": [2, 6.5, 3, 9.5], "texture": "#0"},
+				"south": {"uv": [5, 6.5, 6, 9.5], "texture": "#0"},
+				"west": {"uv": [4, 6.5, 5, 9.5], "texture": "#0"},
+				"up": {"uv": [4, 6.5, 3, 5.5], "texture": "#0"},
+				"down": {"uv": [5, 5.5, 4, 6.5], "texture": "#0"}
+			}
+		},
+		{
+			"from": [7.5, 6, 7.5],
+			"to": [8.5, 16, 8.5],
+			"faces": {
+				"north": {"uv": [2.5, 0.5, 3, 5.5], "texture": "#0"},
+				"east": {"uv": [2, 0.5, 2.5, 5.5], "texture": "#0"},
+				"south": {"uv": [3.5, 0.5, 4, 5.5], "texture": "#0"},
+				"west": {"uv": [3, 0.5, 3.5, 5.5], "texture": "#0"},
+				"up": {"uv": [3, 0.5, 2.5, 0], "texture": "#0"},
+				"down": {"uv": [3.5, 0, 3, 0.5], "texture": "#0"}
+			}
+		}
+	],
+	"display": {
+		"thirdperson_righthand": {
+			"translation": [0, 0, -0.75],
+			"scale": [0.4, 0.4, 0.4]
+		},
+		"thirdperson_lefthand": {
+			"translation": [0, 0, -0.75],
+			"scale": [0.4, 0.4, 0.4]
+		},
+		"firstperson_righthand": {
+			"rotation": [0, 140, 0],
+			"translation": [0, 4.75, 0],
+			"scale": [0.4, 0.4, 0.4]
+		},
+		"firstperson_lefthand": {
+			"rotation": [0, 140, 0],
+			"translation": [0, 4.75, 0],
+			"scale": [0.4, 0.4, 0.4]
+		},
+		"ground": {
+			"scale": [0.4, 0.4, 0.4]
+		},
+		"gui": {
+			"rotation": [40, 140, 0],
+			"translation": [0.5, 0.75, 0],
+			"scale": [0.92, 0.92, 0.92]
+		}
+	}
+}

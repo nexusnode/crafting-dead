@@ -163,6 +163,32 @@ public class DecorationBlockStateProvider extends BlockStateProvider {
     this.horizontalBlock(DecorationBlocks.AA_POSTER);
 
     this.horizontalBlock(DecorationBlocks.FUSE_BOX);
+    
+    this.simpleBlock(DecorationBlocks.QUARTZ_GLASS);
+    this.simpleBlock(DecorationBlocks.VIBRANT_QUARTZ_GLASS);
+    
+    this.horizontalBlock(DecorationBlocks.SLEEPING_BAG_CLOSED);
+    this.horizontalBlock(DecorationBlocks.SLEEPING_BAG_CLOSED_BLACK);
+    this.horizontalBlock(DecorationBlocks.SLEEPING_BAG_CLOSED_BLUE);
+    this.horizontalBlock(DecorationBlocks.SLEEPING_BAG_CLOSED_DARKGREEN);
+    this.horizontalBlock(DecorationBlocks.SLEEPING_BAG_CLOSED_ORANGE);
+    this.horizontalBlock(DecorationBlocks.SLEEPING_BAG_CLOSED_PINK);
+    this.horizontalBlock(DecorationBlocks.SLEEPING_BAG_CLOSED_PURPLE);
+    this.horizontalBlock(DecorationBlocks.SLEEPING_BAG_CLOSED_RED);
+    this.horizontalBlock(DecorationBlocks.SLEEPING_BAG_CLOSED_YELLOW);
+    
+    this.horizontalBlock(DecorationBlocks.SLEEPING_BAG_OPEN);
+    this.horizontalBlock(DecorationBlocks.SLEEPING_BAG_OPEN_BLACK);
+    this.horizontalBlock(DecorationBlocks.SLEEPING_BAG_OPEN_BLUE);
+    this.horizontalBlock(DecorationBlocks.SLEEPING_BAG_OPEN_DARKGREEN);
+    this.horizontalBlock(DecorationBlocks.SLEEPING_BAG_OPEN_ORANGE);
+    this.horizontalBlock(DecorationBlocks.SLEEPING_BAG_OPEN_PINK);
+    this.horizontalBlock(DecorationBlocks.SLEEPING_BAG_OPEN_PURPLE);
+    this.horizontalBlock(DecorationBlocks.SLEEPING_BAG_OPEN_RED);
+    this.horizontalBlock(DecorationBlocks.SLEEPING_BAG_OPEN_YELLOW);
+
+    // HL2Pack
+    this.horizontalBlock(DecorationBlocks.HEALTH_CHARGER);
   }
 
   private void simpleBlock(RegistryObject<? extends Block> block) {

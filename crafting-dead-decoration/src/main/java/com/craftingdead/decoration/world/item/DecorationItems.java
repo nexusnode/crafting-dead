@@ -1027,4 +1027,463 @@ public class DecorationItems {
       deferredRegister.register("abandoned_campfire",
           () -> new BlockItem(DecorationBlocks.ABANDONED_CAMPFIRE.get(),
               new Item.Properties().tab(TAB)));
+  
+  public static final RegistryObject<Item> ABANDONED_CAMPFIRE_WITH_POT =
+      deferredRegister.register("abandoned_campfire_with_pot",
+          () -> new BlockItem(DecorationBlocks.ABANDONED_CAMPFIRE_WITH_POT.get(),
+              new Item.Properties().tab(TAB)));
+  
+  public static final RegistryObject<Item> SLEEPING_BAG_CLOSED =
+      deferredRegister.register("sleeping_bag_closed",
+          () -> new BlockItem(DecorationBlocks.SLEEPING_BAG_CLOSED.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<Item> SLEEPING_BAG_CLOSED_BLACK =
+      deferredRegister.register("sleeping_bag_closed_black",
+          () -> new BlockItem(DecorationBlocks.SLEEPING_BAG_CLOSED_BLACK.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<Item> SLEEPING_BAG_CLOSED_BLUE =
+      deferredRegister.register("sleeping_bag_closed_blue",
+          () -> new BlockItem(DecorationBlocks.SLEEPING_BAG_CLOSED_BLUE.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<Item> SLEEPING_BAG_CLOSED_DARKGREEN =
+      deferredRegister.register("sleeping_bag_closed_darkgreen",
+          () -> new BlockItem(DecorationBlocks.SLEEPING_BAG_CLOSED_DARKGREEN.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<Item> SLEEPING_BAG_CLOSED_ORANGE =
+      deferredRegister.register("sleeping_bag_closed_orange",
+          () -> new BlockItem(DecorationBlocks.SLEEPING_BAG_CLOSED_ORANGE.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<Item> SLEEPING_BAG_CLOSED_PINK =
+      deferredRegister.register("sleeping_bag_closed_pink",
+          () -> new BlockItem(DecorationBlocks.SLEEPING_BAG_CLOSED_PINK.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<Item> SLEEPING_BAG_CLOSED_PURPLE =
+      deferredRegister.register("sleeping_bag_closed_purple",
+          () -> new BlockItem(DecorationBlocks.SLEEPING_BAG_CLOSED_PURPLE.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<Item> SLEEPING_BAG_CLOSED_RED =
+      deferredRegister.register("sleeping_bag_closed_red",
+          () -> new BlockItem(DecorationBlocks.SLEEPING_BAG_CLOSED_RED.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<Item> SLEEPING_BAG_CLOSED_YELLOW =
+      deferredRegister.register("sleeping_bag_closed_yellow",
+          () -> new BlockItem(DecorationBlocks.SLEEPING_BAG_CLOSED_YELLOW.get(),
+              new Item.Properties().tab(TAB)));
+  
+  public static final RegistryObject<Item> SLEEPING_BAG_OPEN =
+      deferredRegister.register("sleeping_bag_open",
+          () -> new BlockItem(DecorationBlocks.SLEEPING_BAG_OPEN.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<Item> SLEEPING_BAG_OPEN_BLACK =
+      deferredRegister.register("sleeping_bag_open_black",
+          () -> new BlockItem(DecorationBlocks.SLEEPING_BAG_OPEN_BLACK.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<Item> SLEEPING_BAG_OPEN_BLUE =
+      deferredRegister.register("sleeping_bag_open_blue",
+          () -> new BlockItem(DecorationBlocks.SLEEPING_BAG_OPEN_BLUE.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<Item> SLEEPING_BAG_OPEN_DARKGREEN =
+      deferredRegister.register("sleeping_bag_open_darkgreen",
+          () -> new BlockItem(DecorationBlocks.SLEEPING_BAG_OPEN_DARKGREEN.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<Item> SLEEPING_BAG_OPEN_ORANGE =
+      deferredRegister.register("sleeping_bag_open_orange",
+          () -> new BlockItem(DecorationBlocks.SLEEPING_BAG_OPEN_ORANGE.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<Item> SLEEPING_BAG_OPEN_PINK =
+      deferredRegister.register("sleeping_bag_open_pink",
+          () -> new BlockItem(DecorationBlocks.SLEEPING_BAG_OPEN_PINK.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<Item> SLEEPING_BAG_OPEN_PURPLE =
+      deferredRegister.register("sleeping_bag_open_purple",
+          () -> new BlockItem(DecorationBlocks.SLEEPING_BAG_OPEN_PURPLE.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<Item> SLEEPING_BAG_OPEN_RED =
+      deferredRegister.register("sleeping_bag_open_red",
+          () -> new BlockItem(DecorationBlocks.SLEEPING_BAG_OPEN_RED.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<Item> SLEEPING_BAG_OPEN_YELLOW =
+      deferredRegister.register("sleeping_bag_open_yellow",
+          () -> new BlockItem(DecorationBlocks.SLEEPING_BAG_OPEN_YELLOW.get(),
+              new Item.Properties().tab(TAB)));
+  
+  public static final RegistryObject<Item> BOXES_OF_BULLETS =
+      deferredRegister.register("box_of_bullets",
+          () -> new BlockItem(DecorationBlocks.BOXES_OF_BULLETS.get(),
+              new Item.Properties().tab(TAB)));
+  
+  public static final RegistryObject<Item> BOXES_OF_SHOTGUN_SHELLS_RED =
+      deferredRegister.register("boxes_of_shotgun_shells_red",
+          () -> new BlockItem(DecorationBlocks.BOXES_OF_SHOTGUN_SHELLS_RED.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<Item> BOXES_OF_SHOTGUN_SHELLS_GREEN =
+      deferredRegister.register("boxes_of_shotgun_shells_green",
+          () -> new BlockItem(DecorationBlocks.BOXES_OF_SHOTGUN_SHELLS_GREEN.get(),
+              new Item.Properties().tab(TAB)));
+  public static final RegistryObject<Item> BOXES_OF_SHOTGUN_SHELLS_BLUE =
+      deferredRegister.register("boxes_of_shotgun_shells_blue",
+          () -> new BlockItem(DecorationBlocks.BOXES_OF_SHOTGUN_SHELLS_BLUE.get(),
+              new Item.Properties().tab(TAB)));
+  
+  public static final RegistryObject<Item> SEWER_OPENING =
+      deferredRegister.register("brown_stained_glass",
+          () -> new BlockItem(DecorationBlocks.SEWER_OPENING.get(),
+              new Item.Properties().tab(TAB)));
+  
+  public static final RegistryObject<Item> HL2_GLASS =
+      deferredRegister.register("glass",
+          () -> new BlockItem(DecorationBlocks.HL2_GLASS.get(),
+              new Item.Properties().tab(TAB)));
+  
+  public static final RegistryObject<Item> HL2_TRASH =
+      deferredRegister.register("lime_stained_glass",
+          () -> new BlockItem(DecorationBlocks.HL2_TRASH.get(),
+              new Item.Properties().tab(TAB)));
+  
+  public static final RegistryObject<Item> HL2_TRASH_2 =
+      deferredRegister.register("pink_stained_glass",
+          () -> new BlockItem(DecorationBlocks.HL2_TRASH_2.get(),
+              new Item.Properties().tab(TAB)));
+  
+  public static final RegistryObject<Item> WALL_BUSH =
+      deferredRegister.register("lime_stained_glass_pane",
+          () -> new BlockItem(DecorationBlocks.WALL_BUSH.get(),
+              new Item.Properties().tab(TAB)));
+  
+  public static final RegistryObject<Item> COBBLESTONE =
+      deferredRegister.register("cobblestone",
+          () -> new BlockItem(DecorationBlocks.COBBLESTONE.get(),
+              new Item.Properties().tab(TAB)));
+  
+  public static final RegistryObject<Item> SMALL_FENCE =
+      deferredRegister.register("nether_brick_fence",
+          () -> new BlockItem(DecorationBlocks.SMALL_FENCE.get(),
+              new Item.Properties().tab(TAB)));
+  
+  public static final RegistryObject<Item> TRAFFIC_SIGNS_POLE =
+      deferredRegister.register("traffic_signs_01",
+          () -> new BlockItem(DecorationBlocks.TRAFFIC_SIGNS_POLE.get(),
+              new Item.Properties().tab(TAB)));
+  
+  public static final RegistryObject<Item> TRAFFIC_SIGNS_EMPTY =
+      deferredRegister.register("traffic_signs_02",
+          () -> new BlockItem(DecorationBlocks.TRAFFIC_SIGNS_EMPTY.get(),
+              new Item.Properties().tab(TAB)));
+  
+  public static final RegistryObject<Item> TRAFFIC_SIGNS_SPEED20 =
+      deferredRegister.register("traffic_signs_speed20",
+          () -> new BlockItem(DecorationBlocks.TRAFFIC_SIGNS_SPEED20.get(),
+              new Item.Properties().tab(TAB)));
+  
+  public static final RegistryObject<Item> TRAFFIC_SIGNS_SPEED25 =
+      deferredRegister.register("traffic_signs_speed25",
+          () -> new BlockItem(DecorationBlocks.TRAFFIC_SIGNS_SPEED25.get(),
+              new Item.Properties().tab(TAB)));
+
+  public static final RegistryObject<Item> TRAFFIC_SIGNS_SPEED30 =
+      deferredRegister.register("traffic_signs_speed30",
+          () -> new BlockItem(DecorationBlocks.TRAFFIC_SIGNS_SPEED30.get(),
+              new Item.Properties().tab(TAB)));
+
+  public static final RegistryObject<Item> TRAFFIC_SIGNS_SPEED35 =
+      deferredRegister.register("traffic_signs_speed35",
+          () -> new BlockItem(DecorationBlocks.TRAFFIC_SIGNS_SPEED35.get(),
+              new Item.Properties().tab(TAB)));
+
+  public static final RegistryObject<Item> TRAFFIC_SIGNS_SPEED40 =
+      deferredRegister.register("traffic_signs_speed40",
+          () -> new BlockItem(DecorationBlocks.TRAFFIC_SIGNS_SPEED40.get(),
+              new Item.Properties().tab(TAB)));
+
+  public static final RegistryObject<Item> TRAFFIC_SIGNS_SPEED45 =
+      deferredRegister.register("traffic_signs_speed45",
+          () -> new BlockItem(DecorationBlocks.TRAFFIC_SIGNS_SPEED45.get(),
+              new Item.Properties().tab(TAB)));
+
+  public static final RegistryObject<Item> TRAFFIC_SIGNS_SPEED50 =
+      deferredRegister.register("traffic_signs_speed50",
+          () -> new BlockItem(DecorationBlocks.TRAFFIC_SIGNS_SPEED50.get(),
+              new Item.Properties().tab(TAB)));
+
+  public static final RegistryObject<Item> TRAFFIC_SIGNS_SPEED55 =
+      deferredRegister.register("traffic_signs_speed55",
+          () -> new BlockItem(DecorationBlocks.TRAFFIC_SIGNS_SPEED55.get(),
+              new Item.Properties().tab(TAB)));
+
+  public static final RegistryObject<Item> TRAFFIC_SIGNS_SPEED60 =
+      deferredRegister.register("traffic_signs_speed60",
+          () -> new BlockItem(DecorationBlocks.TRAFFIC_SIGNS_SPEED60.get(),
+              new Item.Properties().tab(TAB)));
+
+  public static final RegistryObject<Item> TRAFFIC_SIGNS_SPEED65 =
+      deferredRegister.register("traffic_signs_speed65",
+          () -> new BlockItem(DecorationBlocks.TRAFFIC_SIGNS_SPEED65.get(),
+              new Item.Properties().tab(TAB)));
+
+  public static final RegistryObject<Item> TRAFFIC_SIGNS_SPEED70 =
+      deferredRegister.register("traffic_signs_speed70",
+          () -> new BlockItem(DecorationBlocks.TRAFFIC_SIGNS_SPEED70.get(),
+              new Item.Properties().tab(TAB)));
+
+  public static final RegistryObject<Item> TRAFFIC_SIGNS_SPEED75 =
+      deferredRegister.register("traffic_signs_speed75",
+          () -> new BlockItem(DecorationBlocks.TRAFFIC_SIGNS_SPEED75.get(),
+              new Item.Properties().tab(TAB)));
+
+  public static final RegistryObject<Item> TRAFFIC_SIGNS_SPEED80 =
+      deferredRegister.register("traffic_signs_speed80",
+          () -> new BlockItem(DecorationBlocks.TRAFFIC_SIGNS_SPEED80.get(),
+              new Item.Properties().tab(TAB)));
+  
+  public static final RegistryObject<Item> TRAFFIC_SIGNS_DAMAGED_BULLET =
+      deferredRegister.register("traffic_signs_damaged_bullet",
+          () -> new BlockItem(DecorationBlocks.TRAFFIC_SIGNS_DAMAGED_BULLET.get(),
+              new Item.Properties().tab(TAB)));
+  
+  public static final RegistryObject<Item> TRAFFIC_SIGNS_DAMAGED =
+      deferredRegister.register("traffic_signs_damaged",
+          () -> new BlockItem(DecorationBlocks.TRAFFIC_SIGNS_DAMAGED.get(),
+              new Item.Properties().tab(TAB)));
+  
+  public static final RegistryObject<Item> TRAFFIC_SIGNS_NOTSAFE =
+      deferredRegister.register("traffic_signs_notsafe",
+          () -> new BlockItem(DecorationBlocks.TRAFFIC_SIGNS_NOTSAFE.get(),
+              new Item.Properties().tab(TAB)));
+  
+  public static final RegistryObject<Item> TRAFFIC_SIGNS_RADIOACTIVE =
+      deferredRegister.register("traffic_signs_radioactive",
+          () -> new BlockItem(DecorationBlocks.TRAFFIC_SIGNS_RADIOACTIVE.get(),
+              new Item.Properties().tab(TAB)));
+  
+  public static final RegistryObject<Item> TRAFFIC_SIGNS_RADIOACTIVE_DAMAGED =
+      deferredRegister.register("traffic_signs_radioactive_damaged",
+          () -> new BlockItem(DecorationBlocks.TRAFFIC_SIGNS_RADIOACTIVE_DAMAGED.get(),
+              new Item.Properties().tab(TAB)));
+  
+  public static final RegistryObject<Item> TRAFFIC_SIGNS_03 =
+      deferredRegister.register("traffic_signs_03",
+          () -> new BlockItem(DecorationBlocks.TRAFFIC_SIGNS_03.get(),
+              new Item.Properties().tab(TAB)));
+  
+  public static final RegistryObject<Item> W_TRAFFIC_SIGNS_SPEED20 =
+      deferredRegister.register("w_traffic_signs_speed20",
+          () -> new BlockItem(DecorationBlocks.W_TRAFFIC_SIGNS_SPEED20.get(),
+              new Item.Properties().tab(TAB)));
+  
+  public static final RegistryObject<Item> W_TRAFFIC_SIGNS_SPEED25 =
+      deferredRegister.register("w_traffic_signs_speed25",
+          () -> new BlockItem(DecorationBlocks.W_TRAFFIC_SIGNS_SPEED25.get(),
+              new Item.Properties().tab(TAB)));
+
+  public static final RegistryObject<Item> W_TRAFFIC_SIGNS_SPEED30 =
+      deferredRegister.register("w_traffic_signs_speed30",
+          () -> new BlockItem(DecorationBlocks.W_TRAFFIC_SIGNS_SPEED30.get(),
+              new Item.Properties().tab(TAB)));
+
+  public static final RegistryObject<Item> W_TRAFFIC_SIGNS_SPEED35 =
+      deferredRegister.register("w_traffic_signs_speed35",
+          () -> new BlockItem(DecorationBlocks.W_TRAFFIC_SIGNS_SPEED35.get(),
+              new Item.Properties().tab(TAB)));
+
+  public static final RegistryObject<Item> W_TRAFFIC_SIGNS_SPEED40 =
+      deferredRegister.register("w_traffic_signs_speed40",
+          () -> new BlockItem(DecorationBlocks.W_TRAFFIC_SIGNS_SPEED40.get(),
+              new Item.Properties().tab(TAB)));
+
+  public static final RegistryObject<Item> W_TRAFFIC_SIGNS_SPEED45 =
+      deferredRegister.register("w_traffic_signs_speed45",
+          () -> new BlockItem(DecorationBlocks.W_TRAFFIC_SIGNS_SPEED45.get(),
+              new Item.Properties().tab(TAB)));
+
+  public static final RegistryObject<Item> W_TRAFFIC_SIGNS_SPEED50 =
+      deferredRegister.register("w_traffic_signs_speed50",
+          () -> new BlockItem(DecorationBlocks.W_TRAFFIC_SIGNS_SPEED50.get(),
+              new Item.Properties().tab(TAB)));
+
+  public static final RegistryObject<Item> W_TRAFFIC_SIGNS_SPEED55 =
+      deferredRegister.register("w_traffic_signs_speed55",
+          () -> new BlockItem(DecorationBlocks.W_TRAFFIC_SIGNS_SPEED55.get(),
+              new Item.Properties().tab(TAB)));
+
+  public static final RegistryObject<Item> W_TRAFFIC_SIGNS_SPEED60 =
+      deferredRegister.register("w_traffic_signs_speed60",
+          () -> new BlockItem(DecorationBlocks.W_TRAFFIC_SIGNS_SPEED60.get(),
+              new Item.Properties().tab(TAB)));
+
+  public static final RegistryObject<Item> W_TRAFFIC_SIGNS_SPEED65 =
+      deferredRegister.register("w_traffic_signs_speed65",
+          () -> new BlockItem(DecorationBlocks.W_TRAFFIC_SIGNS_SPEED65.get(),
+              new Item.Properties().tab(TAB)));
+
+  public static final RegistryObject<Item> W_TRAFFIC_SIGNS_SPEED70 =
+      deferredRegister.register("w_traffic_signs_speed70",
+          () -> new BlockItem(DecorationBlocks.W_TRAFFIC_SIGNS_SPEED70.get(),
+              new Item.Properties().tab(TAB)));
+
+  public static final RegistryObject<Item> W_TRAFFIC_SIGNS_SPEED75 =
+      deferredRegister.register("w_traffic_signs_speed75",
+          () -> new BlockItem(DecorationBlocks.W_TRAFFIC_SIGNS_SPEED75.get(),
+              new Item.Properties().tab(TAB)));
+
+  public static final RegistryObject<Item> W_TRAFFIC_SIGNS_SPEED80 =
+      deferredRegister.register("w_traffic_signs_speed80",
+          () -> new BlockItem(DecorationBlocks.W_TRAFFIC_SIGNS_SPEED80.get(),
+              new Item.Properties().tab(TAB)));
+  
+  public static final RegistryObject<Item> W_TRAFFIC_SIGNS_DAMAGED_BULLET =
+      deferredRegister.register("w_traffic_signs_damaged_bullet",
+          () -> new BlockItem(DecorationBlocks.W_TRAFFIC_SIGNS_DAMAGED_BULLET.get(),
+              new Item.Properties().tab(TAB)));
+  
+  public static final RegistryObject<Item> W_TRAFFIC_SIGNS_DAMAGED =
+      deferredRegister.register("w_traffic_signs_damaged",
+          () -> new BlockItem(DecorationBlocks.W_TRAFFIC_SIGNS_DAMAGED.get(),
+              new Item.Properties().tab(TAB)));
+  
+  public static final RegistryObject<Item> W_TRAFFIC_SIGNS_NOTSAFE =
+      deferredRegister.register("w_traffic_signs_notsafe",
+          () -> new BlockItem(DecorationBlocks.W_TRAFFIC_SIGNS_NOTSAFE.get(),
+              new Item.Properties().tab(TAB)));
+  
+  public static final RegistryObject<Item> W_TRAFFIC_SIGNS_RADIOACTIVE =
+      deferredRegister.register("w_traffic_signs_radioactive",
+          () -> new BlockItem(DecorationBlocks.W_TRAFFIC_SIGNS_RADIOACTIVE.get(),
+              new Item.Properties().tab(TAB)));
+  
+  public static final RegistryObject<Item> W_TRAFFIC_SIGNS_RADIOACTIVE_DAMAGED =
+      deferredRegister.register("w_traffic_signs_radioactive_damaged",
+          () -> new BlockItem(DecorationBlocks.W_TRAFFIC_SIGNS_RADIOACTIVE_DAMAGED.get(),
+              new Item.Properties().tab(TAB)));
+  
+  public static final RegistryObject<Item> TRAFFIC_SIGNS_04 =
+      deferredRegister.register("traffic_signs_04",
+          () -> new BlockItem(DecorationBlocks.TRAFFIC_SIGNS_04.get(),
+              new Item.Properties().tab(TAB)));
+  
+  public static final RegistryObject<Item> R_TRAFFIC_SIGNS_SPEED20 =
+      deferredRegister.register("r_traffic_signs_speed20",
+          () -> new BlockItem(DecorationBlocks.R_TRAFFIC_SIGNS_SPEED20.get(),
+              new Item.Properties().tab(TAB)));
+  
+  public static final RegistryObject<Item> R_TRAFFIC_SIGNS_SPEED25 =
+      deferredRegister.register("r_traffic_signs_speed25",
+          () -> new BlockItem(DecorationBlocks.R_TRAFFIC_SIGNS_SPEED25.get(),
+              new Item.Properties().tab(TAB)));
+
+  public static final RegistryObject<Item> R_TRAFFIC_SIGNS_SPEED30 =
+      deferredRegister.register("r_traffic_signs_speed30",
+          () -> new BlockItem(DecorationBlocks.R_TRAFFIC_SIGNS_SPEED30.get(),
+              new Item.Properties().tab(TAB)));
+
+  public static final RegistryObject<Item> R_TRAFFIC_SIGNS_SPEED35 =
+      deferredRegister.register("r_traffic_signs_speed35",
+          () -> new BlockItem(DecorationBlocks.R_TRAFFIC_SIGNS_SPEED35.get(),
+              new Item.Properties().tab(TAB)));
+
+  public static final RegistryObject<Item> R_TRAFFIC_SIGNS_SPEED40 =
+      deferredRegister.register("r_traffic_signs_speed40",
+          () -> new BlockItem(DecorationBlocks.R_TRAFFIC_SIGNS_SPEED40.get(),
+              new Item.Properties().tab(TAB)));
+
+  public static final RegistryObject<Item> R_TRAFFIC_SIGNS_SPEED45 =
+      deferredRegister.register("r_traffic_signs_speed45",
+          () -> new BlockItem(DecorationBlocks.R_TRAFFIC_SIGNS_SPEED45.get(),
+              new Item.Properties().tab(TAB)));
+
+  public static final RegistryObject<Item> R_TRAFFIC_SIGNS_SPEED50 =
+      deferredRegister.register("r_traffic_signs_speed50",
+          () -> new BlockItem(DecorationBlocks.R_TRAFFIC_SIGNS_SPEED50.get(),
+              new Item.Properties().tab(TAB)));
+
+  public static final RegistryObject<Item> R_TRAFFIC_SIGNS_SPEED55 =
+      deferredRegister.register("r_traffic_signs_speed55",
+          () -> new BlockItem(DecorationBlocks.R_TRAFFIC_SIGNS_SPEED55.get(),
+              new Item.Properties().tab(TAB)));
+
+  public static final RegistryObject<Item> R_TRAFFIC_SIGNS_SPEED60 =
+      deferredRegister.register("r_traffic_signs_speed60",
+          () -> new BlockItem(DecorationBlocks.R_TRAFFIC_SIGNS_SPEED60.get(),
+              new Item.Properties().tab(TAB)));
+
+  public static final RegistryObject<Item> R_TRAFFIC_SIGNS_SPEED65 =
+      deferredRegister.register("r_traffic_signs_speed65",
+          () -> new BlockItem(DecorationBlocks.R_TRAFFIC_SIGNS_SPEED65.get(),
+              new Item.Properties().tab(TAB)));
+
+  public static final RegistryObject<Item> R_TRAFFIC_SIGNS_SPEED70 =
+      deferredRegister.register("r_traffic_signs_speed70",
+          () -> new BlockItem(DecorationBlocks.R_TRAFFIC_SIGNS_SPEED70.get(),
+              new Item.Properties().tab(TAB)));
+
+  public static final RegistryObject<Item> R_TRAFFIC_SIGNS_SPEED75 =
+      deferredRegister.register("r_traffic_signs_speed75",
+          () -> new BlockItem(DecorationBlocks.R_TRAFFIC_SIGNS_SPEED75.get(),
+              new Item.Properties().tab(TAB)));
+
+  public static final RegistryObject<Item> R_TRAFFIC_SIGNS_SPEED80 =
+      deferredRegister.register("r_traffic_signs_speed80",
+          () -> new BlockItem(DecorationBlocks.R_TRAFFIC_SIGNS_SPEED80.get(),
+              new Item.Properties().tab(TAB)));
+  
+  public static final RegistryObject<Item> R_TRAFFIC_SIGNS_DAMAGED_BULLET =
+      deferredRegister.register("r_traffic_signs_damaged_bullet",
+          () -> new BlockItem(DecorationBlocks.R_TRAFFIC_SIGNS_DAMAGED_BULLET.get(),
+              new Item.Properties().tab(TAB)));
+  
+  public static final RegistryObject<Item> R_TRAFFIC_SIGNS_DAMAGED =
+      deferredRegister.register("r_traffic_signs_damaged",
+          () -> new BlockItem(DecorationBlocks.R_TRAFFIC_SIGNS_DAMAGED.get(),
+              new Item.Properties().tab(TAB)));
+  
+  public static final RegistryObject<Item> R_TRAFFIC_SIGNS_NOTSAFE =
+      deferredRegister.register("r_traffic_signs_notsafe",
+          () -> new BlockItem(DecorationBlocks.R_TRAFFIC_SIGNS_NOTSAFE.get(),
+              new Item.Properties().tab(TAB)));
+  
+  public static final RegistryObject<Item> R_TRAFFIC_SIGNS_RADIOACTIVE =
+      deferredRegister.register("r_traffic_signs_radioactive",
+          () -> new BlockItem(DecorationBlocks.R_TRAFFIC_SIGNS_RADIOACTIVE.get(),
+              new Item.Properties().tab(TAB)));
+  
+  public static final RegistryObject<Item> R_TRAFFIC_SIGNS_RADIOACTIVE_DAMAGED =
+      deferredRegister.register("r_traffic_signs_radioactive_damaged",
+          () -> new BlockItem(DecorationBlocks.R_TRAFFIC_SIGNS_RADIOACTIVE_DAMAGED.get(),
+              new Item.Properties().tab(TAB)));
+  
+  //HL2Pack Items
+  public static final RegistryObject<Item> HEALTH_CHARGER =
+      deferredRegister.register("acacia_button",
+          () -> new BlockItem(DecorationBlocks.HEALTH_CHARGER.get(),
+              new Item.Properties().tab(TAB)));
+  
+  public static final RegistryObject<Item> FENCE =
+      deferredRegister.register("acacia_fence_gate",
+          () -> new BlockItem(DecorationBlocks.FENCE.get(),
+              new Item.Properties().tab(TAB)));
+  
+  public static final RegistryObject<Item> METAL_DUCT =
+      deferredRegister.register("acacia_stairs",
+          () -> new BlockItem(DecorationBlocks.METAL_DUCT.get(),
+              new Item.Properties().tab(TAB)));
+  
+  public static final RegistryObject<Item> PAINTING_1 =
+      deferredRegister.register("black_stained_glass_pane",
+          () -> new BlockItem(DecorationBlocks.PAINTING_1.get(),
+              new Item.Properties().tab(TAB)));
+  
+  public static final RegistryObject<Item> CRATE =
+      deferredRegister.register("dead_brain_coral",
+          () -> new BlockItem(DecorationBlocks.CRATE.get(),
+              new Item.Properties().tab(TAB)));
+  
+  // AE12 Glass
+  public static final RegistryObject<BlockItem> QUARTZ_GLASS =
+      deferredRegister.register("quartz_glass",
+          () -> new BlockItem(DecorationBlocks.QUARTZ_GLASS.get(),
+              new Item.Properties().tab(TAB)));
+  
+  public static final RegistryObject<BlockItem> VIBRANT_QUARTZ_GLASS =
+      deferredRegister.register("quartz_vibrant_glass",
+          () -> new BlockItem(DecorationBlocks.VIBRANT_QUARTZ_GLASS.get(),
+              new Item.Properties().tab(TAB)));
 }
