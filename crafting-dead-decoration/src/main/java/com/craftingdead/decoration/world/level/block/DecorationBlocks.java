@@ -2175,6 +2175,179 @@ public class DecorationBlocks {
                   .noCollission(),
               BlockShapes.TRAFFIC_SIGNS_WALL, true));
   
+  public static final RegistryObject<Block> TRAFFIC_SIGNS_04 =
+      deferredRegister.register("traffic_signs_04",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.TRAFFIC_SIGNS_R));
+
+  public static final RegistryObject<Block> R_TRAFFIC_SIGNS_SPEED20 =
+      deferredRegister.register("r_traffic_signs_speed20",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.TRAFFIC_SIGNS_R));
+  
+  public static final RegistryObject<Block> R_TRAFFIC_SIGNS_SPEED25 =
+      deferredRegister.register("r_traffic_signs_speed25",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.TRAFFIC_SIGNS_R));
+
+  public static final RegistryObject<Block> R_TRAFFIC_SIGNS_SPEED30 =
+      deferredRegister.register("r_traffic_signs_speed30",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.TRAFFIC_SIGNS_R));
+  
+  public static final RegistryObject<Block> R_TRAFFIC_SIGNS_SPEED35 =
+      deferredRegister.register("r_traffic_signs_speed35",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.TRAFFIC_SIGNS_R));
+
+  public static final RegistryObject<Block> R_TRAFFIC_SIGNS_SPEED40 =
+      deferredRegister.register("r_traffic_signs_speed40",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.TRAFFIC_SIGNS_R));
+  
+  public static final RegistryObject<Block> R_TRAFFIC_SIGNS_SPEED45 =
+      deferredRegister.register("r_traffic_signs_speed450",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.TRAFFIC_SIGNS_R));
+  
+  public static final RegistryObject<Block> R_TRAFFIC_SIGNS_SPEED50 =
+      deferredRegister.register("r_traffic_signs_speed50",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.TRAFFIC_SIGNS_R));
+  
+  public static final RegistryObject<Block> R_TRAFFIC_SIGNS_SPEED55 =
+      deferredRegister.register("r_traffic_signs_speed55",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.TRAFFIC_SIGNS_R));
+  
+  public static final RegistryObject<Block> R_TRAFFIC_SIGNS_SPEED60 =
+      deferredRegister.register("r_traffic_signs_speed60",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.TRAFFIC_SIGNS_R));
+  
+  public static final RegistryObject<Block> R_TRAFFIC_SIGNS_SPEED65 =
+      deferredRegister.register("r_traffic_signs_speed65",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.TRAFFIC_SIGNS_R));
+
+  public static final RegistryObject<Block> R_TRAFFIC_SIGNS_SPEED70 =
+      deferredRegister.register("r_traffic_signs_speed70",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.TRAFFIC_SIGNS_R));
+
+  public static final RegistryObject<Block> R_TRAFFIC_SIGNS_SPEED75 =
+      deferredRegister.register("r_traffic_signs_speed75",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.TRAFFIC_SIGNS_R));
+
+  public static final RegistryObject<Block> R_TRAFFIC_SIGNS_SPEED80 =
+      deferredRegister.register("r_traffic_signs_speed80",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.TRAFFIC_SIGNS_R));
+  
+  public static final RegistryObject<Block> R_TRAFFIC_SIGNS_DAMAGED =
+      deferredRegister.register("r_traffic_signs_damaged",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.TRAFFIC_SIGNS_R));
+  
+  public static final RegistryObject<Block> R_TRAFFIC_SIGNS_DAMAGED_BULLET =
+      deferredRegister.register("r_traffic_signs_damaged_bullet",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.TRAFFIC_SIGNS_R));
+  
+  public static final RegistryObject<Block> R_TRAFFIC_SIGNS_NOTSAFE =
+      deferredRegister.register("r_traffic_signs_notsafe",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
+              BlockShapes.TRAFFIC_SIGNS_R));
+  
+  public static final RegistryObject<Block> R_TRAFFIC_SIGNS_RADIOACTIVE =
+      deferredRegister.register("r_traffic_signs_radioactive",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion()
+                  .noCollission(),
+              BlockShapes.TRAFFIC_SIGNS_R));
+  
+  public static final RegistryObject<Block> R_TRAFFIC_SIGNS_RADIOACTIVE_DAMAGED =
+      deferredRegister.register("r_traffic_signs_radioactive_damaged",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion()
+                  .noCollission(),
+              BlockShapes.TRAFFIC_SIGNS_R));
+  
   // Items from HL2Pack
   public static final RegistryObject<Block> HEALTH_CHARGER =
       deferredRegister.register("acacia_button",
