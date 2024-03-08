@@ -323,6 +323,25 @@
   	"block.craftingdeaddecoration.w_traffic_signs_damaged_bullet": "Damaged Stop Sign",
   	"block.craftingdeaddecoration.w_traffic_signs_radioactive": "Radioactive Sign",
   	"block.craftingdeaddecoration.w_traffic_signs_radioactive_damaged": "Damaged Radioactive Sign",
-  	"block.craftingdeaddecoration.w_traffic_signs_notsafe": "Not Safe Sign"
+  	"block.craftingdeaddecoration.w_traffic_signs_notsafe": "Not Safe Sign",
+  	"block.craftingdeaddecoration.traffic_signs_04": "Stop Traffic Sign",
+    "block.craftingdeaddecoration.r_traffic_signs_speed20": "Speed 20 Sign",
+  	"block.craftingdeaddecoration.r_traffic_signs_speed25": "Speed 25 Sign",
+  	"block.craftingdeaddecoration.r_traffic_signs_speed30": "Speed 30 Sign",
+  	"block.craftingdeaddecoration.r_traffic_signs_speed35": "Speed 35 Sign",
+  	"block.craftingdeaddecoration.r_traffic_signs_speed40": "Speed 40 Sign",
+  	"block.craftingdeaddecoration.r_traffic_signs_speed450": "Speed 45 Sign",
+  	"block.craftingdeaddecoration.r_traffic_signs_speed50": "Speed 50 Sign",
+  	"block.craftingdeaddecoration.r_traffic_signs_speed55": "Speed 55 Sign",
+  	"block.craftingdeaddecoration.r_traffic_signs_speed60": "Speed 60 Sign",
+  	"block.craftingdeaddecoration.r_traffic_signs_speed65": "Speed 65 Sign",
+  	"block.craftingdeaddecoration.r_traffic_signs_speed70": "Speed 70 Sign",
+  	"block.craftingdeaddecoration.r_traffic_signs_speed75": "Speed 75 Sign",
+  	"block.craftingdeaddecoration.r_traffic_signs_speed80": "Speed 80 Sign",
+  	"block.craftingdeaddecoration.r_traffic_signs_damaged": "Damaged Stop Sign",
+  	"block.craftingdeaddecoration.r_traffic_signs_damaged_bullet": "Damaged Stop Sign",
+  	"block.craftingdeaddecoration.r_traffic_signs_radioactive": "Radioactive Sign",
+  	"block.craftingdeaddecoration.r_traffic_signs_radioactive_damaged": "Damaged Radioactive Sign",
+  	"block.craftingdeaddecoration.r_traffic_signs_notsafe": "Not Safe Sign"
     
 }
