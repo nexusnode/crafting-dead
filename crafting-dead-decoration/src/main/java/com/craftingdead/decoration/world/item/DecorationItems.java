@@ -1260,7 +1260,7 @@ public class DecorationItems {
           () -> new BlockItem(DecorationBlocks.TRAFFIC_SIGNS_RADIOACTIVE_DAMAGED.get(),
               new Item.Properties().tab(TAB)));
   
-  public static final RegistryObject<Item> TRAFFIC_SIGNS_RADIOACTIVE_03 =
+  public static final RegistryObject<Item> TRAFFIC_SIGNS_03 =
       deferredRegister.register("traffic_signs_03",
           () -> new BlockItem(DecorationBlocks.TRAFFIC_SIGNS_03.get(),
               new Item.Properties().tab(TAB)));
@@ -1353,6 +1353,101 @@ public class DecorationItems {
   public static final RegistryObject<Item> W_TRAFFIC_SIGNS_RADIOACTIVE_DAMAGED =
       deferredRegister.register("w_traffic_signs_radioactive_damaged",
           () -> new BlockItem(DecorationBlocks.W_TRAFFIC_SIGNS_RADIOACTIVE_DAMAGED.get(),
+              new Item.Properties().tab(TAB)));
+  
+  public static final RegistryObject<Item> TRAFFIC_SIGNS_04 =
+      deferredRegister.register("traffic_signs_04",
+          () -> new BlockItem(DecorationBlocks.TRAFFIC_SIGNS_04.get(),
+              new Item.Properties().tab(TAB)));
+  
+  public static final RegistryObject<Item> R_TRAFFIC_SIGNS_SPEED20 =
+      deferredRegister.register("r_traffic_signs_speed20",
+          () -> new BlockItem(DecorationBlocks.R_TRAFFIC_SIGNS_SPEED20.get(),
+              new Item.Properties().tab(TAB)));
+  
+  public static final RegistryObject<Item> R_TRAFFIC_SIGNS_SPEED25 =
+      deferredRegister.register("r_traffic_signs_speed25",
+          () -> new BlockItem(DecorationBlocks.R_TRAFFIC_SIGNS_SPEED25.get(),
+              new Item.Properties().tab(TAB)));
+
+  public static final RegistryObject<Item> R_TRAFFIC_SIGNS_SPEED30 =
+      deferredRegister.register("r_traffic_signs_speed30",
+          () -> new BlockItem(DecorationBlocks.R_TRAFFIC_SIGNS_SPEED30.get(),
+              new Item.Properties().tab(TAB)));
+
+  public static final RegistryObject<Item> R_TRAFFIC_SIGNS_SPEED35 =
+      deferredRegister.register("r_traffic_signs_speed35",
+          () -> new BlockItem(DecorationBlocks.R_TRAFFIC_SIGNS_SPEED35.get(),
+              new Item.Properties().tab(TAB)));
+
+  public static final RegistryObject<Item> R_TRAFFIC_SIGNS_SPEED40 =
+      deferredRegister.register("r_traffic_signs_speed40",
+          () -> new BlockItem(DecorationBlocks.R_TRAFFIC_SIGNS_SPEED40.get(),
+              new Item.Properties().tab(TAB)));
+
+  public static final RegistryObject<Item> R_TRAFFIC_SIGNS_SPEED45 =
+      deferredRegister.register("r_traffic_signs_speed45",
+          () -> new BlockItem(DecorationBlocks.R_TRAFFIC_SIGNS_SPEED45.get(),
+              new Item.Properties().tab(TAB)));
+
+  public static final RegistryObject<Item> R_TRAFFIC_SIGNS_SPEED50 =
+      deferredRegister.register("r_traffic_signs_speed50",
+          () -> new BlockItem(DecorationBlocks.R_TRAFFIC_SIGNS_SPEED50.get(),
+              new Item.Properties().tab(TAB)));
+
+  public static final RegistryObject<Item> R_TRAFFIC_SIGNS_SPEED55 =
+      deferredRegister.register("r_traffic_signs_speed55",
+          () -> new BlockItem(DecorationBlocks.R_TRAFFIC_SIGNS_SPEED55.get(),
+              new Item.Properties().tab(TAB)));
+
+  public static final RegistryObject<Item> R_TRAFFIC_SIGNS_SPEED60 =
+      deferredRegister.register("r_traffic_signs_speed60",
+          () -> new BlockItem(DecorationBlocks.R_TRAFFIC_SIGNS_SPEED60.get(),
+              new Item.Properties().tab(TAB)));
+
+  public static final RegistryObject<Item> R_TRAFFIC_SIGNS_SPEED65 =
+      deferredRegister.register("r_traffic_signs_speed65",
+          () -> new BlockItem(DecorationBlocks.R_TRAFFIC_SIGNS_SPEED65.get(),
+              new Item.Properties().tab(TAB)));
+
+  public static final RegistryObject<Item> R_TRAFFIC_SIGNS_SPEED70 =
+      deferredRegister.register("r_traffic_signs_speed70",
+          () -> new BlockItem(DecorationBlocks.R_TRAFFIC_SIGNS_SPEED70.get(),
+              new Item.Properties().tab(TAB)));
+
+  public static final RegistryObject<Item> R_TRAFFIC_SIGNS_SPEED75 =
+      deferredRegister.register("r_traffic_signs_speed75",
+          () -> new BlockItem(DecorationBlocks.R_TRAFFIC_SIGNS_SPEED75.get(),
+              new Item.Properties().tab(TAB)));
+
+  public static final RegistryObject<Item> R_TRAFFIC_SIGNS_SPEED80 =
+      deferredRegister.register("r_traffic_signs_speed80",
+          () -> new BlockItem(DecorationBlocks.R_TRAFFIC_SIGNS_SPEED80.get(),
+              new Item.Properties().tab(TAB)));
+  
+  public static final RegistryObject<Item> R_TRAFFIC_SIGNS_DAMAGED_BULLET =
+      deferredRegister.register("r_traffic_signs_damaged_bullet",
+          () -> new BlockItem(DecorationBlocks.R_TRAFFIC_SIGNS_DAMAGED_BULLET.get(),
+              new Item.Properties().tab(TAB)));
+  
+  public static final RegistryObject<Item> R_TRAFFIC_SIGNS_DAMAGED =
+      deferredRegister.register("r_traffic_signs_damaged",
+          () -> new BlockItem(DecorationBlocks.R_TRAFFIC_SIGNS_DAMAGED.get(),
+              new Item.Properties().tab(TAB)));
+  
+  public static final RegistryObject<Item> R_TRAFFIC_SIGNS_NOTSAFE =
+      deferredRegister.register("r_traffic_signs_notsafe",
+          () -> new BlockItem(DecorationBlocks.R_TRAFFIC_SIGNS_NOTSAFE.get(),
+              new Item.Properties().tab(TAB)));
+  
+  public static final RegistryObject<Item> R_TRAFFIC_SIGNS_RADIOACTIVE =
+      deferredRegister.register("r_traffic_signs_radioactive",
+          () -> new BlockItem(DecorationBlocks.R_TRAFFIC_SIGNS_RADIOACTIVE.get(),
+              new Item.Properties().tab(TAB)));
+  
+  public static final RegistryObject<Item> R_TRAFFIC_SIGNS_RADIOACTIVE_DAMAGED =
+      deferredRegister.register("r_traffic_signs_radioactive_damaged",
+          () -> new BlockItem(DecorationBlocks.R_TRAFFIC_SIGNS_RADIOACTIVE_DAMAGED.get(),
               new Item.Properties().tab(TAB)));
   
   //HL2Pack Items

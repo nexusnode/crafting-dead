@@ -1,0 +1,1 @@
+{"variants": {"facing=east": {"model": "craftingdeaddecoration:block/traffic_signs_04", "y": 90}, "facing=north": {"model": "craftingdeaddecoration:block/traffic_signs_04"}, "facing=west": {"model": "craftingdeaddecoration:block/traffic_signs_04", "y": 270}, "facing=south": {"model": "craftingdeaddecoration:block/traffic_signs_04", "y": 180}}}

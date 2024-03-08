@@ -169,6 +169,26 @@ class RenderLayers {
     translucent(DecorationBlocks.W_TRAFFIC_SIGNS_RADIOACTIVE);
     translucent(DecorationBlocks.W_TRAFFIC_SIGNS_RADIOACTIVE_DAMAGED);
     translucent(DecorationBlocks.W_TRAFFIC_SIGNS_NOTSAFE);
+    
+    translucent(DecorationBlocks.TRAFFIC_SIGNS_04);
+    translucent(DecorationBlocks.R_TRAFFIC_SIGNS_SPEED20);
+    translucent(DecorationBlocks.R_TRAFFIC_SIGNS_SPEED25);
+    translucent(DecorationBlocks.R_TRAFFIC_SIGNS_SPEED30);
+    translucent(DecorationBlocks.R_TRAFFIC_SIGNS_SPEED35);
+    translucent(DecorationBlocks.R_TRAFFIC_SIGNS_SPEED40);
+    translucent(DecorationBlocks.R_TRAFFIC_SIGNS_SPEED45);
+    translucent(DecorationBlocks.R_TRAFFIC_SIGNS_SPEED50);
+    translucent(DecorationBlocks.R_TRAFFIC_SIGNS_SPEED55);
+    translucent(DecorationBlocks.R_TRAFFIC_SIGNS_SPEED60);
+    translucent(DecorationBlocks.R_TRAFFIC_SIGNS_SPEED65);
+    translucent(DecorationBlocks.R_TRAFFIC_SIGNS_SPEED70);
+    translucent(DecorationBlocks.R_TRAFFIC_SIGNS_SPEED75);
+    translucent(DecorationBlocks.R_TRAFFIC_SIGNS_SPEED80);
+    translucent(DecorationBlocks.R_TRAFFIC_SIGNS_DAMAGED);
+    translucent(DecorationBlocks.R_TRAFFIC_SIGNS_DAMAGED_BULLET);
+    translucent(DecorationBlocks.R_TRAFFIC_SIGNS_RADIOACTIVE);
+    translucent(DecorationBlocks.R_TRAFFIC_SIGNS_RADIOACTIVE_DAMAGED);
+    translucent(DecorationBlocks.R_TRAFFIC_SIGNS_NOTSAFE);
   }
 
   private static void cutout(Supplier<? extends Block> block) {
