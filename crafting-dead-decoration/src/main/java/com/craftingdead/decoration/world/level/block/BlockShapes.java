@@ -412,6 +412,9 @@ public class BlockShapes {
   public static final Function<Direction, VoxelShape> TRAFFIC_SIGNS_EMPTY =
       rotatedOrientableShape(Shapes.or(Block.box(7.5, 0, 7.5, 8.5, 30, 8.5)));
   
+  public static final Function<Direction, VoxelShape> TRAFFIC_SIGNS_WALL =
+      rotatedOrientableShape(Shapes.or(Block.box(1, 1, 15.75, 15, 15, 16)));
+  
   public static final Function<Direction, VoxelShape> BLOCK =
       unitOrientableShape(Shapes.block());
 
