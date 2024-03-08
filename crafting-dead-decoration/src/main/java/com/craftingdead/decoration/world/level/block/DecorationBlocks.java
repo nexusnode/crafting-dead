@@ -2181,8 +2181,7 @@ public class DecorationBlocks {
               BlockBehaviour.Properties.of(Material.METAL)
                   .strength(1.0F)
                   .sound(SoundType.METAL)
-                  .noOcclusion()
-                  .noCollission(),
+                  .noOcclusion(),
               BlockShapes.TRAFFIC_SIGNS_R));
 
   public static final RegistryObject<Block> R_TRAFFIC_SIGNS_SPEED20 =
@@ -2191,8 +2190,7 @@ public class DecorationBlocks {
               BlockBehaviour.Properties.of(Material.METAL)
                   .strength(1.0F)
                   .sound(SoundType.METAL)
-                  .noOcclusion()
-                  .noCollission(),
+                  .noOcclusion(),
               BlockShapes.TRAFFIC_SIGNS_R));
   
   public static final RegistryObject<Block> R_TRAFFIC_SIGNS_SPEED25 =
@@ -2201,8 +2199,7 @@ public class DecorationBlocks {
               BlockBehaviour.Properties.of(Material.METAL)
                   .strength(1.0F)
                   .sound(SoundType.METAL)
-                  .noOcclusion()
-                  .noCollission(),
+                  .noOcclusion(),
               BlockShapes.TRAFFIC_SIGNS_R));
 
   public static final RegistryObject<Block> R_TRAFFIC_SIGNS_SPEED30 =
@@ -2211,8 +2208,7 @@ public class DecorationBlocks {
               BlockBehaviour.Properties.of(Material.METAL)
                   .strength(1.0F)
                   .sound(SoundType.METAL)
-                  .noOcclusion()
-                  .noCollission(),
+                  .noOcclusion(),
               BlockShapes.TRAFFIC_SIGNS_R));
   
   public static final RegistryObject<Block> R_TRAFFIC_SIGNS_SPEED35 =
@@ -2221,8 +2217,7 @@ public class DecorationBlocks {
               BlockBehaviour.Properties.of(Material.METAL)
                   .strength(1.0F)
                   .sound(SoundType.METAL)
-                  .noOcclusion()
-                  .noCollission(),
+                  .noOcclusion(),
               BlockShapes.TRAFFIC_SIGNS_R));
 
   public static final RegistryObject<Block> R_TRAFFIC_SIGNS_SPEED40 =
@@ -2231,8 +2226,7 @@ public class DecorationBlocks {
               BlockBehaviour.Properties.of(Material.METAL)
                   .strength(1.0F)
                   .sound(SoundType.METAL)
-                  .noOcclusion()
-                  .noCollission(),
+                  .noOcclusion(),
               BlockShapes.TRAFFIC_SIGNS_R));
   
   public static final RegistryObject<Block> R_TRAFFIC_SIGNS_SPEED45 =
@@ -2241,8 +2235,7 @@ public class DecorationBlocks {
               BlockBehaviour.Properties.of(Material.METAL)
                   .strength(1.0F)
                   .sound(SoundType.METAL)
-                  .noOcclusion()
-                  .noCollission(),
+                  .noOcclusion(),
               BlockShapes.TRAFFIC_SIGNS_R));
   
   public static final RegistryObject<Block> R_TRAFFIC_SIGNS_SPEED50 =
@@ -2251,8 +2244,7 @@ public class DecorationBlocks {
               BlockBehaviour.Properties.of(Material.METAL)
                   .strength(1.0F)
                   .sound(SoundType.METAL)
-                  .noOcclusion()
-                  .noCollission(),
+                  .noOcclusion(),
               BlockShapes.TRAFFIC_SIGNS_R));
   
   public static final RegistryObject<Block> R_TRAFFIC_SIGNS_SPEED55 =
@@ -2261,8 +2253,7 @@ public class DecorationBlocks {
               BlockBehaviour.Properties.of(Material.METAL)
                   .strength(1.0F)
                   .sound(SoundType.METAL)
-                  .noOcclusion()
-                  .noCollission(),
+                  .noOcclusion(),
               BlockShapes.TRAFFIC_SIGNS_R));
   
   public static final RegistryObject<Block> R_TRAFFIC_SIGNS_SPEED60 =
@@ -2271,8 +2262,7 @@ public class DecorationBlocks {
               BlockBehaviour.Properties.of(Material.METAL)
                   .strength(1.0F)
                   .sound(SoundType.METAL)
-                  .noOcclusion()
-                  .noCollission(),
+                  .noOcclusion(),
               BlockShapes.TRAFFIC_SIGNS_R));
   
   public static final RegistryObject<Block> R_TRAFFIC_SIGNS_SPEED65 =
@@ -2281,8 +2271,7 @@ public class DecorationBlocks {
               BlockBehaviour.Properties.of(Material.METAL)
                   .strength(1.0F)
                   .sound(SoundType.METAL)
-                  .noOcclusion()
-                  .noCollission(),
+                  .noOcclusion(),
               BlockShapes.TRAFFIC_SIGNS_R));
 
   public static final RegistryObject<Block> R_TRAFFIC_SIGNS_SPEED70 =
@@ -2291,8 +2280,7 @@ public class DecorationBlocks {
               BlockBehaviour.Properties.of(Material.METAL)
                   .strength(1.0F)
                   .sound(SoundType.METAL)
-                  .noOcclusion()
-                  .noCollission(),
+                  .noOcclusion(),
               BlockShapes.TRAFFIC_SIGNS_R));
 
   public static final RegistryObject<Block> R_TRAFFIC_SIGNS_SPEED75 =
@@ -2301,8 +2289,7 @@ public class DecorationBlocks {
               BlockBehaviour.Properties.of(Material.METAL)
                   .strength(1.0F)
                   .sound(SoundType.METAL)
-                  .noOcclusion()
-                  .noCollission(),
+                  .noOcclusion(),
               BlockShapes.TRAFFIC_SIGNS_R));
 
   public static final RegistryObject<Block> R_TRAFFIC_SIGNS_SPEED80 =
@@ -2311,8 +2298,7 @@ public class DecorationBlocks {
               BlockBehaviour.Properties.of(Material.METAL)
                   .strength(1.0F)
                   .sound(SoundType.METAL)
-                  .noOcclusion()
-                  .noCollission(),
+                  .noOcclusion(),
               BlockShapes.TRAFFIC_SIGNS_R));
   
   public static final RegistryObject<Block> R_TRAFFIC_SIGNS_DAMAGED =
@@ -2321,8 +2307,7 @@ public class DecorationBlocks {
               BlockBehaviour.Properties.of(Material.METAL)
                   .strength(1.0F)
                   .sound(SoundType.METAL)
-                  .noOcclusion()
-                  .noCollission(),
+                  .noOcclusion(),
               BlockShapes.TRAFFIC_SIGNS_R));
   
   public static final RegistryObject<Block> R_TRAFFIC_SIGNS_DAMAGED_BULLET =
@@ -2331,8 +2316,7 @@ public class DecorationBlocks {
               BlockBehaviour.Properties.of(Material.METAL)
                   .strength(1.0F)
                   .sound(SoundType.METAL)
-                  .noOcclusion()
-                  .noCollission(),
+                  .noOcclusion(),
               BlockShapes.TRAFFIC_SIGNS_R));
   
   public static final RegistryObject<Block> R_TRAFFIC_SIGNS_NOTSAFE =
@@ -2341,8 +2325,7 @@ public class DecorationBlocks {
               BlockBehaviour.Properties.of(Material.METAL)
                   .strength(1.0F)
                   .sound(SoundType.METAL)
-                  .noOcclusion()
-                  .noCollission(),
+                  .noOcclusion(),
               BlockShapes.TRAFFIC_SIGNS_R));
   
   public static final RegistryObject<Block> R_TRAFFIC_SIGNS_RADIOACTIVE =
