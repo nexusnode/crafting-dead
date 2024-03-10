@@ -6,7 +6,7 @@
     ],
   "textures": {
     "0": "craftingdeaddecoration:block/traffic_signs_pipe",
-    "1": "craftingdeaddecoration:block/traffic_signs_notsafe",
+    "1": "craftingdeaddecoration:block/traffic_signs_radioactive_damaged",
     "particle": "craftingdeaddecoration:block/traffic_signs_pipe"
   },
     "elements": [
