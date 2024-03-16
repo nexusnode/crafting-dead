@@ -163,10 +163,7 @@ public class SurvivalPlayerHandler implements PlayerHandler {
 
   @Override
   public boolean handleDeath(DamageSource cause) {
-    
-    System.out.println(cause.getDirectEntity());
-    System.out.println(cause.getEntity());
-    
+
     Entity attackItemEntity = cause.getDirectEntity();
     Entity attacker = cause.getEntity();
     Entity entityPlayer = this.player.entity();
