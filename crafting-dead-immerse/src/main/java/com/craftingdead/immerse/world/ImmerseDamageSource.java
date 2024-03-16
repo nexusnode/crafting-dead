@@ -24,4 +24,8 @@ public class ImmerseDamageSource {
 
   public static final DamageSource DEHYDRATION =
       new DamageSource("dehydration").bypassArmor();
+  
+  public static final DamageSource HUNGER =
+      new DamageSource("hunger").bypassArmor();
+
 }

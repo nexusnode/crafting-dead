@@ -24,13 +24,22 @@ import java.util.Optional;
 import java.util.UUID;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.jetbrains.annotations.Nullable;
+
+import com.craftingdead.core.CraftingDead;
 import com.craftingdead.core.network.SynchedData;
 import com.craftingdead.core.world.entity.extension.LivingHandlerType;
 import com.craftingdead.core.world.entity.extension.PlayerExtension;
 import com.craftingdead.core.world.entity.extension.PlayerHandler;
+import com.craftingdead.core.world.entity.grenade.FragGrenade;
+import com.craftingdead.core.world.entity.grenade.Grenade;
+import com.craftingdead.core.world.item.GrenadeItem;
+import com.craftingdead.core.world.item.ModItems;
 import com.craftingdead.immerse.CraftingDeadImmerse;
 import com.craftingdead.immerse.event.WaterDecayEvent;
+import com.craftingdead.immerse.network.NetworkChannel;
+import com.craftingdead.immerse.network.play.AddKillFeedEntryMessage;
 import com.craftingdead.immerse.world.ImmerseDamageSource;
+import com.craftingdead.immerse.world.KillFeedEntry;
 import com.craftingdead.immerse.world.level.extension.LegacyBase;
 import com.craftingdead.immerse.world.level.extension.LevelExtension;
 import net.minecraft.core.BlockPos;
@@ -43,11 +52,16 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.stats.Stats;
 import net.minecraft.util.Mth;
 import net.minecraft.world.Difficulty;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.monster.Zombie;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.BlockSnapshot;
+import net.minecraftforge.network.PacketDistributor;
 
 public class SurvivalPlayerHandler implements PlayerHandler {
 
@@ -145,6 +159,45 @@ public class SurvivalPlayerHandler implements PlayerHandler {
       this.setPlayersKilled(this.getPlayersKilled() + 1);
     }
     return false;
+  }
+
+  @Override
+  public boolean handleDeath(DamageSource cause) {
+    
+    System.out.println(cause.getDirectEntity());
+    System.out.println(cause.getEntity());
+    
+    Entity attackItemEntity = cause.getDirectEntity();
+    Entity attacker = cause.getEntity();
+    Entity entityPlayer = this.player.entity();
+   
+    if(attacker.getStringUUID().equalsIgnoreCase(entityPlayer.getStringUUID())){
+      if(attackItemEntity instanceof Grenade) {
+        NetworkChannel.PLAY.getSimpleChannel().send(PacketDistributor.ALL.noArg(),
+            new AddKillFeedEntryMessage(new KillFeedEntry((LivingEntity) entityPlayer,
+                entityPlayer, new ItemStack(ModItems.FRAG_GRENADE.get()),
+                KillFeedEntry.Type.GRENADE)));
+      } else {
+        NetworkChannel.PLAY.getSimpleChannel().send(PacketDistributor.ALL.noArg(),
+            new AddKillFeedEntryMessage(new KillFeedEntry((LivingEntity) entityPlayer,
+                entityPlayer, this.player.mainHandItem(),
+                KillFeedEntry.Type.SUICIDE))); 
+      }
+    }
+    
+    if(cause == ImmerseDamageSource.DEHYDRATION || cause == ImmerseDamageSource.HUNGER) {
+      NetworkChannel.PLAY.getSimpleChannel().send(PacketDistributor.ALL.noArg(),
+          new AddKillFeedEntryMessage(new KillFeedEntry((LivingEntity) entityPlayer,
+              entityPlayer, this.player.mainHandItem(),
+              cause == ImmerseDamageSource.DEHYDRATION ? KillFeedEntry.Type.DEHYDRATION : KillFeedEntry.Type.HUNGER)));
+    }
+    if(cause == DamageSource.FALL) {
+      NetworkChannel.PLAY.getSimpleChannel().send(PacketDistributor.ALL.noArg(),
+          new AddKillFeedEntryMessage(new KillFeedEntry((LivingEntity) entityPlayer,
+              entityPlayer, this.player.mainHandItem(),
+              KillFeedEntry.Type.FALL)));
+    }
+    return PlayerHandler.super.handleDeath(cause);
   }
 
   public int getDaysSurvived() {
@@ -285,4 +338,6 @@ public class SurvivalPlayerHandler implements PlayerHandler {
   public boolean requiresSync() {
     return this.dataManager.isDirty();
   }
+  
+  
 }
