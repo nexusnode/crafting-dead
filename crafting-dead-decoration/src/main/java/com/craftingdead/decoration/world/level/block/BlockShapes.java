@@ -421,6 +421,9 @@ public class BlockShapes {
   public static final Function<Direction, VoxelShape> TRAFFIC_SIGNS_L = 
       rotatedOrientableShape(Block.box(7.5, -0.5, 7.5, 8.5, 29.5, 8.5));
   
+  public static final Function<Direction, VoxelShape> BOTTLE_OF_MEDS = 
+      rotatedOrientableShape(Block.box(2, 0, 2, 14, 2, 14));
+  
   public static final Function<Direction, VoxelShape> BLOCK =
       unitOrientableShape(Shapes.block());
 

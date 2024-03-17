@@ -2521,6 +2521,16 @@ public class DecorationBlocks {
                   .noCollission(),
               BlockShapes.TRAFFIC_SIGNS_L));
   
+  public static final RegistryObject<Block> BOTTLE_OF_MEDS =
+      deferredRegister.register("bottle_of_meds",
+          () -> new OrientableBlock(
+              BlockBehaviour.Properties.of(Material.METAL)
+                  .strength(1.0F)
+                  .sound(SoundType.METAL)
+                  .noOcclusion()
+                  .noCollission(),
+              BlockShapes.BOTTLE_OF_MEDS));
+  
   // Items from HL2Pack
   public static final RegistryObject<Block> HEALTH_CHARGER =
       deferredRegister.register("acacia_button",

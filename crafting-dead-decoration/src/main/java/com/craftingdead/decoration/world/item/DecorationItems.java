@@ -1545,6 +1545,11 @@ public class DecorationItems {
           () -> new BlockItem(DecorationBlocks.L_TRAFFIC_SIGNS_RADIOACTIVE_DAMAGED.get(),
               new Item.Properties().tab(TAB)));
   
+  public static final RegistryObject<Item> BOTTLE_OF_MEDS =
+      deferredRegister.register("bottle_of_meds",
+          () -> new BlockItem(DecorationBlocks.BOTTLE_OF_MEDS.get(),
+              new Item.Properties().tab(TAB)));
+  
   //HL2Pack Items
   public static final RegistryObject<Item> HEALTH_CHARGER =
       deferredRegister.register("acacia_button",

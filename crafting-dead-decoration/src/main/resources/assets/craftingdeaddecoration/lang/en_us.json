@@ -361,6 +361,7 @@
   	"block.craftingdeaddecoration.l_traffic_signs_damaged_bullet": "Damaged Stop Sign",
   	"block.craftingdeaddecoration.l_traffic_signs_radioactive": "Radioactive Sign",
   	"block.craftingdeaddecoration.l_traffic_signs_radioactive_damaged": "Damaged Radioactive Sign",
-  	"block.craftingdeaddecoration.l_traffic_signs_notsafe": "Not Safe Sign"
+  	"block.craftingdeaddecoration.l_traffic_signs_notsafe": "Not Safe Sign",
+  	"block.craftingdeaddecoration.bottle_of_meds": "Bottle of Meds"
     
 }
