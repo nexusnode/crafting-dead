@@ -32,7 +32,7 @@ public class BlockShapes {
 
   public static final Function<Direction, VoxelShape> FUSE_BOX =
       rotatedOrientableShape(Block.box(1, 0, 13, 15, 20, 16));
-  
+
   public static final Function<Direction, VoxelShape> BOXES_OF_BULLETS =
       rotatedOrientableShape(Block.box(2, 0, 4, 14, 6, 14));
   
@@ -372,6 +372,91 @@ public class BlockShapes {
       rotatedOrientableShape(Shapes.or(
           Block.box(0.5, 12.5, 0.5, 16, 16, 16),
           Block.box(2, 0, 2, 16, 12.5, 16)));
+
+public static final VoxelShape BH_BARRICADE_002 = Shapes.or(
+            Block.box(-7.0D, 0.0D, 10.45D, 7.0D, 0.6D, 11.05D),
+            Block.box(-7.0D, 0.0D, -11.55D, 7.0D, 0.6D, -10.95D),
+            Block.box(0.25D, 23.0D, -14.0D, 0.5D, 27.0D, 14.0D),
+            Block.box(0.25D, 16.0D, -14.0D, 0.5D, 20.0D, 14.0D),
+            Block.box(0.25D, 9.0D, -14.0D, 0.5D, 13.0D, 14.0D),
+            Block.box(-0.3D, 0.6D, -10.95D, 0.3D, 27.1D, -10.35D),
+            Block.box(-0.3D, 0.6D, 10.45D, 0.3D, 27.1D, 11.05D)
+        );
+
+public static final VoxelShape BH_BARRICADE_001 = Shapes.or(
+            Block.box(-11, -0.95, 5.55, 8, -0.55, 5.95),
+            Block.box(-8, -0.95, 5.55, 11, -0.55, 5.95),
+            Block.box(-11, -0.95, -5.95, 8, -0.55, -5.55),
+            Block.box(-3.93853, 6.84104, -6.95, 1.06147, 7.09104, 6.95),
+            Block.box(-1.03853, 6.84104, -6.95, 3.96147, 7.09104, 6.95),
+            Block.box(9.66147, 6.84104, -6.95, 14.66147, 7.09104, 6.95),
+            Block.box(-14.63853, 6.84104, -6.95, -9.63853, 7.09104, 6.95)
+        );
+
+public static final Function<Direction, VoxelShape> BH_BARRICADE_001 =
+        rotatedOrientableShape(Shapes.or(
+            Block.box(-11, -0.95, 5.55, 8, -0.55, 5.95),
+            Block.box(-8, -0.95, 5.55, 11, -0.55, 5.95),
+            Block.box(-11, -0.95, -5.95, 8, -0.55, -5.55),
+            Block.box(-3.93853, 6.84104, -6.95, 1.06147, 7.09104, 6.95),
+            Block.box(-1.03853, 6.84104, -6.95, 3.96147, 7.09104, 6.95),
+            Block.box(9.66147, 6.84104, -6.95, 14.66147, 7.09104, 6.95),
+            Block.box(-14.63853, 6.84104, -6.95, -9.63853, 7.09104, 6.95)
+        ));
+
+        public static final Function<Direction, VoxelShape> BH_BARRICADE_002 =
+        rotatedOrientableShape(Shapes.or(
+            Block.box(-7, 0, 10.45, 7, 0.6, 11.05),
+            Block.box(-7, 0, -11.55, 7, 0.6, -10.95),
+            Block.box(0.25, 23, -14, 0.5, 27, 14),
+            Block.box(0.25, 16, -14, 0.5, 20, 14),
+            Block.box(0.25, 9, -14, 0.5, 13, 14),
+            Block.box(-0.3, 0.6, -10.95, 0.3, 27.1, -10.35),
+            Block.box(-0.3, 0.6, 10.45, 0.3, 27.1, 11.05)
+        ));
+
+        public static final Function<Direction, VoxelShape> BH_BENCH_001 =
+        rotatedOrientableShape(Shapes.or(
+            Block.box(5.5, 0, 3.6, 6.5, 7, 5.6),
+            Block.box(-12.7, 7, -31.3, -2.8, 8, 5.5),
+            Block.box(-8.1, 9.1, -31.3, -0.2, 11.1, -30.5),
+            Block.box(-39, 5, -31.3, -36.5, 6.55, -30.5),
+            Block.box(-44.1, 9.1, -31.3, -36.2, 11.1, -30.5),
+            Block.box(-3, 5, -31.3, -0.5, 6.55, -30.5),
+            Block.box(-27.4, -8, 1.4, -24.9, 29, 2)
+        ));
+
+        public static final Function<Direction, VoxelShape> BH_CARDBOARD_BOX_001 =
+        rotatedOrientableShape(Shapes.or(
+            Block.box(-8, 0, -6.5, 8, 9, 6.5)
+        ));
+        
+        public static final Function<Direction, VoxelShape> BH_BLUEBARREL_001 =
+        rotatedOrientableShape(Shapes.or(
+            Block.box(-4.9, 3.5, 2.83, 4.9, 5, 3.53), // Assuming these dimensions fit within a single block space
+            Block.box(-4.9, -11.4, 17.73, 4.9, -9.9, 18.43),
+            Block.box(-5, 1, 5, 5, 20, 6),
+            Block.box(21.75, -6, -6, 22.5, 6, 6)
+        ));
+
+        public static final Function<Direction, VoxelShape> BH_CAFETERIA_BENCH_001 =
+        rotatedOrientableShape(Shapes.or(
+            Block.box(-26.5 + 16, 5.75, -2.5 + 8, 26.5 + 16, 6.5, 2.5 + 8),
+            Block.box(-21.4 + 16, 0.5, -1.5 + 8, -20.45 + 16, 5, 1.5 + 8),
+            Block.box(-21.4 + 16, -0.08135 + 0.5, 1.4783 + 8, -20.45 + 16, 1.61865 + 0.5, 1.9783 + 8),
+            Block.box(-21.4 + 16, -0.08135 + 0.5, -1.9783 + 8, -20.45 + 16, 1.61865 + 0.5, -1.4783 + 8),
+            Block.box(-21.4 + 16, -0.1 + 0.5, 1.5 + 8, -20.45 + 16, 5.1 + 0.5, 2 + 8),
+            Block.box(-21.4 + 16, -0.1 + 0.5, -2 + 8, -20.45 + 16, 5.1 + 0.5, -1.5 + 8)
+        ));
+
+
+        public static final Function<Direction, VoxelShape> BH_BENCH_002 =
+        rotatedOrientableShape(Shapes.or(
+            Block.box(-16.45, 3.75, -1, -15.95, 5.25, 1),
+            Block.box(-22, 6, 2, 22, 6.5, 5),
+            Block.box(-19, 4.85082, -0.75, 19, 5.14918, 0.75),
+            Block.box(-13.34918, 0, -0.75, -13.2, 3.25, 0.75)
+        ));
 
   public static final Function<Direction, VoxelShape> COUNTER =
       rotatedOrientableShape(Shapes.or(

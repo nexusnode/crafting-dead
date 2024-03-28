@@ -96,6 +96,15 @@ class RenderLayers {
     cutout(DecorationBlocks.LIGHT_SWITCH);
     cutout(DecorationBlocks.ELECTRICAL_SOCKET);
     cutout(DecorationBlocks.ABANDONED_CAMPFIRE);
+
+    cutout(DecorationBlocks.BH_barricade_001);
+    cutout(DecorationBlocks.BH_barricade_002);
+    cutout(DecorationBlocks.BH_bench_001);
+    cutout(DecorationBlocks.BH_bench_002);
+    cutout(DecorationBlocks.BH_bluebarrel_001);
+    cutout(DecorationBlocks.BH_cafeteria_table_001);
+    cutout(DecorationBlocks.BH_cafeteria_bench_001);
+    cutout(DecorationBlocks.BH_cardboard_box_001);
     
     translucent(DecorationBlocks.QUARTZ_GLASS);
     translucent(DecorationBlocks.VIBRANT_QUARTZ_GLASS);
