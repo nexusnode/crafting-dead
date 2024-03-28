@@ -373,6 +373,26 @@ public class BlockShapes {
           Block.box(0.5, 12.5, 0.5, 16, 16, 16),
           Block.box(2, 0, 2, 16, 12.5, 16)));
 
+public static final VoxelShape BH_BARRICADE_002 = Shapes.or(
+            Block.box(-7.0D, 0.0D, 10.45D, 7.0D, 0.6D, 11.05D),
+            Block.box(-7.0D, 0.0D, -11.55D, 7.0D, 0.6D, -10.95D),
+            Block.box(0.25D, 23.0D, -14.0D, 0.5D, 27.0D, 14.0D),
+            Block.box(0.25D, 16.0D, -14.0D, 0.5D, 20.0D, 14.0D),
+            Block.box(0.25D, 9.0D, -14.0D, 0.5D, 13.0D, 14.0D),
+            Block.box(-0.3D, 0.6D, -10.95D, 0.3D, 27.1D, -10.35D),
+            Block.box(-0.3D, 0.6D, 10.45D, 0.3D, 27.1D, 11.05D)
+        );
+
+public static final VoxelShape BH_BARRICADE_001 = Shapes.or(
+            Block.box(-11, -0.95, 5.55, 8, -0.55, 5.95),
+            Block.box(-8, -0.95, 5.55, 11, -0.55, 5.95),
+            Block.box(-11, -0.95, -5.95, 8, -0.55, -5.55),
+            Block.box(-3.93853, 6.84104, -6.95, 1.06147, 7.09104, 6.95),
+            Block.box(-1.03853, 6.84104, -6.95, 3.96147, 7.09104, 6.95),
+            Block.box(9.66147, 6.84104, -6.95, 14.66147, 7.09104, 6.95),
+            Block.box(-14.63853, 6.84104, -6.95, -9.63853, 7.09104, 6.95)
+        );
+
 public static final Function<Direction, VoxelShape> BH_BARRICADE_001 =
         rotatedOrientableShape(Shapes.or(
             Block.box(-11, -0.95, 5.55, 8, -0.55, 5.95),
@@ -413,7 +433,7 @@ public static final Function<Direction, VoxelShape> BH_BARRICADE_001 =
         
         public static final Function<Direction, VoxelShape> BH_BLUEBARREL_001 =
         rotatedOrientableShape(Shapes.or(
-            Block.box(-4.9, 3.5, 2.83, 4.9, 5, 3.53),
+            Block.box(-4.9, 3.5, 2.83, 4.9, 5, 3.53), // Assuming these dimensions fit within a single block space
             Block.box(-4.9, -11.4, 17.73, 4.9, -9.9, 18.43),
             Block.box(-5, 1, 5, 5, 20, 6),
             Block.box(21.75, -6, -6, 22.5, 6, 6)
