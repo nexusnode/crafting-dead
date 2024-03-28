@@ -46,6 +46,6 @@ public class LootBlock extends Block {
   @Override
   public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos,
       CollisionContext context) {
-    return Block.box(0, 0, 0, 16, 3, 16);
+    return Block.box(2, 0, 2, 14, 6, 14);
   }
 }

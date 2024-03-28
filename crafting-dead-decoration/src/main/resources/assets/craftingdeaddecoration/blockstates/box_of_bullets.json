@@ -1,7 +1,9 @@
 {
-    "variants": {
-        "": {
-            "model": "craftingdeaddecoration:block/box_of_bullets"
-        }
+    "variants": 
+    {"facing=east": 
+        {"model": "craftingdeaddecoration:block/box_of_bullets", "y": 90}, "facing=north": 
+        {"model": "craftingdeaddecoration:block/box_of_bullets"}, "facing=west": 
+        {"model": "craftingdeaddecoration:block/box_of_bullets", "y": 270}, "facing=south": 
+        {"model": "craftingdeaddecoration:block/box_of_bullets", "y": 180}
     }
 }

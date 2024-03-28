@@ -40,6 +40,9 @@ public class DecorationItems {
         public ItemStack makeIcon() {
           return new ItemStack(STACKED_WOODEN_PALLETS.get());
         }
+        public boolean hasSearchBar() {
+            return true;
+        }
       };
 
   public static final RegistryObject<BlockItem> FUSE_BOX =
