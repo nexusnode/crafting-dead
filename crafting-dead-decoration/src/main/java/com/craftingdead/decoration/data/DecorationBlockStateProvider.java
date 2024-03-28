@@ -46,14 +46,6 @@ public class DecorationBlockStateProvider extends BlockStateProvider {
     this.horizontalBlock(DecorationBlocks.LIGHT_SWITCH);
     this.horizontalBlock(DecorationBlocks.ELECTRICAL_SOCKET);
     this.horizontalBlock(DecorationBlocks.ABANDONED_CAMPFIRE);
-    this.horizontalBlock(DecorationBlocks.BH_BARRICADE_001);
-    this.horizontalBlock(DecorationBlocks.BH_BARRICADE_002);
-    this.horizontalBlock(DecorationBlocks.BH_BENCH_001);
-    this.horizontalBlock(DecorationBlocks.BH_BENCH_002);
-    this.horizontalBlock(DecorationBlocks.BH_BLUEBARREL_001);
-    this.horizontalBlock(DecorationBlocks.BH_CAFETERIA_BENCH_001);
-    this.horizontalBlock(DecorationBlocks.BH_CAFETERIA_TABLE_001);
-    this.horizontalBlock(DecorationBlocks.BH_CARDBOARD_BOX_001);
 
     this.horizontalBlock(DecorationBlocks.CLOTHING_RACK.get(),
         state -> this.blockModel("clothing_rack_"

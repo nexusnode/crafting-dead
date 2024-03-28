@@ -1139,46 +1139,6 @@ public class DecorationItems {
       deferredRegister.register("lime_stained_glass",
           () -> new BlockItem(DecorationBlocks.HL2_TRASH.get(),
               new Item.Properties().tab(TAB)));
-
-public static final RegistryObject<Item> BH_BARRICADE_001 =
-      deferredRegister.register("bh_barricade_001",
-          () -> new BlockItem(DecorationBlocks.BH_BARRICADE_001.get(),
-              new Item.Properties().tab(TAB)));
-  
-  public static final RegistryObject<Item> BH_BARRICADE_002 =
-      deferredRegister.register("bh_barricade_002",
-          () -> new BlockItem(DecorationBlocks.BH_BARRICADE_002.get(),
-              new Item.Properties().tab(TAB)));
-  
-  public static final RegistryObject<Item> BH_BENCH_001 =
-      deferredRegister.register("bh_bench_001",
-          () -> new BlockItem(DecorationBlocks.BH_BENCH_001.get(),
-              new Item.Properties().tab(TAB)));
-  
-  public static final RegistryObject<Item> BH_BENCH_002 =
-      deferredRegister.register("bh_bench_002",
-          () -> new BlockItem(DecorationBlocks.BH_BENCH_002.get(),
-              new Item.Properties().tab(TAB)));
-  
-  public static final RegistryObject<Item> BH_BLUEBARREL_001 =
-      deferredRegister.register("bh_bluebarrel_001",
-          () -> new BlockItem(DecorationBlocks.BH_BLUEBARREL_001.get(),
-              new Item.Properties().tab(TAB)));
-  
-  public static final RegistryObject<Item> BH_CAFETERIA_TABLE_001 =
-      deferredRegister.register("bh_cafeteria_table_001",
-          () -> new BlockItem(DecorationBlocks.BH_CAFETERIA_TABLE_001.get(),
-              new Item.Properties().tab(TAB)));
-  
-  public static final RegistryObject<Item> BH_CAFETERIA_BENCH_001 =
-      deferredRegister.register("bh_cafeteria_bench_001",
-          () -> new BlockItem(DecorationBlocks.BH_CAFETERIA_BENCH_001.get(),
-              new Item.Properties().tab(TAB)));
-  
-  public static final RegistryObject<Item> BH_CARDBOARD_BOX_001 =
-      deferredRegister.register("bh_cardboard_box_001",
-          () -> new BlockItem(DecorationBlocks.BH_CARDBOARD_BOX_001.get(),
-              new Item.Properties().tab(TAB)));
   
   public static final RegistryObject<Item> HL2_TRASH_2 =
       deferredRegister.register("pink_stained_glass",

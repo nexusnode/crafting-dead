@@ -631,67 +631,6 @@ public class DecorationBlocks {
                   .noOcclusion(),
               BlockShapes.COMPUTER));
 
-              public static final RegistryObject<Block> BH_BARRICADE_001 =
-              deferredRegister.register("BH_barricade_001",
-                  () -> new OrientableBlock(
-                      BlockBehaviour.Properties.of(Material.METAL)
-                          .strength(5.0F)
-                          .sound(SoundType.METAL)
-                          .noOcclusion(),
-                      BlockShapes.BH_BARRICADE_001));
-      
-          public static final RegistryObject<Block> BH_BARRICADE_002 =
-              deferredRegister.register("BH_barricade_002",
-                  () -> new OrientableBlock(
-                      BlockBehaviour.Properties.of(Material.METAL)
-                          .strength(5.0F)
-                          .sound(SoundType.METAL)
-                          .noOcclusion(),
-                      BlockShapes.BH_BARRICADE_002));
-      
-          public static final RegistryObject<Block> BH_BENCH_001 =
-              deferredRegister.register("BH_bench_001",
-                  () -> new Block(
-                      BlockBehaviour.Properties.of(Material.WOOD)
-                          .strength(2.0F)
-                          .sound(SoundType.WOOD)));
-
-            public static final RegistryObject<Block> BH_CARDBOARD_BOX_001 =
-                deferredRegister.register("BH_cardboard_box_001",
-                    () -> new Block(
-                        BlockBehaviour.Properties.of(Material.WOOD)
-                            .strength(2.0F)
-                            .sound(SoundType.WOOD)));
-      
-          public static final RegistryObject<Block> BH_BENCH_002 =
-              deferredRegister.register("BH_bench_002",
-                  () -> new Block(
-                      BlockBehaviour.Properties.of(Material.WOOD)
-                          .strength(2.0F)
-                          .sound(SoundType.WOOD)));
-      
-          public static final RegistryObject<Block> BH_BLUEBARREL_001 =
-              deferredRegister.register("BH_bluebarrel_001",
-                  () -> new Block(
-                      BlockBehaviour.Properties.of(Material.METAL)
-                          .strength(3.0F)
-                          .sound(SoundType.METAL)
-                          .noOcclusion()));
-      
-          public static final RegistryObject<Block> BH_CAFETERIA_BENCH_001 =
-              deferredRegister.register("BH_cafeteria_bench_001",
-                  () -> new Block(
-                      BlockBehaviour.Properties.of(Material.WOOD)
-                          .strength(2.5F)
-                          .sound(SoundType.WOOD)));
-      
-          public static final RegistryObject<Block> BH_CAFETERIA_TABLE_001 =
-              deferredRegister.register("BH_cafeteria_table_001",
-                  () -> new Block(
-                      BlockBehaviour.Properties.of(Material.WOOD)
-                          .strength(2.5F)
-                          .sound(SoundType.WOOD)));
-
   public static final RegistryObject<Block> COMPUTER_2 =
       deferredRegister.register("computer_2",
           () -> new OrientableBlock(
