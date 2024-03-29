@@ -210,6 +210,58 @@ public class DecorationItems {
           () -> new BlockItem(DecorationBlocks.TOOL_4.get(),
               new Item.Properties().tab(TAB)));
 
+public static final RegistryObject<BlockItem> MILITARY_PLASTIC_CRATE_1X1 =
+    deferredRegister.register("military_plastic_crate_1x1",
+        () -> new BlockItem(DecorationBlocks.MILITARY_PLASTIC_CRATE_1X1.get(),
+            new Item.Properties().tab(TAB)));
+
+public static final RegistryObject<BlockItem> BLACK_MILITARY_PLASTIC_CRATE_1X1 =
+    deferredRegister.register("black_military_plastic_crate_1x1",
+        () -> new BlockItem(DecorationBlocks.BLACK_MILITARY_PLASTIC_CRATE_1X1.get(),
+            new Item.Properties().tab(TAB)));
+
+public static final RegistryObject<BlockItem> YELLOW_MILITARY_PLASTIC_CRATE_1X1 =
+    deferredRegister.register("yellow_military_plastic_crate_1x1",
+        () -> new BlockItem(DecorationBlocks.YELLOW_MILITARY_PLASTIC_CRATE_1X1.get(),
+            new Item.Properties().tab(TAB)));
+
+public static final RegistryObject<BlockItem> WHITE_MILITARY_PLASTIC_CRATE_1X1 =
+    deferredRegister.register("white_military_plastic_crate_1x1",
+        () -> new BlockItem(DecorationBlocks.WHITE_MILITARY_PLASTIC_CRATE_1X1.get(),
+            new Item.Properties().tab(TAB)));
+
+
+public static final RegistryObject<BlockItem> CRACKED_CONCRETE_ROAD_BLOCK_WITH_STRIPE_LINE =
+    deferredRegister.register("cracked_concrete_road_block_with_stripe_line",
+        () -> new BlockItem(DecorationBlocks.CRACKED_CONCRETE_ROAD_BLOCK_WITH_STRIPE_LINE.get(),
+            new Item.Properties().tab(TAB)));
+
+public static final RegistryObject<BlockItem> CRACKED_CONCRETE_ROAD_BLOCK_WITH_RIPPED_STRIPE_LINE =
+    deferredRegister.register("cracked_concrete_road_block_with_ripped_stripe_line",
+        () -> new BlockItem(DecorationBlocks.CRACKED_CONCRETE_ROAD_BLOCK_WITH_RIPPED_STRIPE_LINE.get(),
+            new Item.Properties().tab(TAB)));
+
+public static final RegistryObject<BlockItem> CRACKED_CONCRETE_ROAD_BLOCK =
+    deferredRegister.register("cracked_concrete_road_block",
+        () -> new BlockItem(DecorationBlocks.CRACKED_CONCRETE_ROAD_BLOCK.get(),
+            new Item.Properties().tab(TAB)));
+
+public static final RegistryObject<BlockItem> CONCRETE_ROAD_BLOCK_WITH_STRIPE_LINE =
+    deferredRegister.register("concrete_road_block_with_stripe_line",
+        () -> new BlockItem(DecorationBlocks.CONCRETE_ROAD_BLOCK_WITH_STRIPE_LINE.get(),
+            new Item.Properties().tab(TAB)));
+
+public static final RegistryObject<BlockItem> CONCRETE_ROAD_BLOCK =
+    deferredRegister.register("concrete_road_block",
+        () -> new BlockItem(DecorationBlocks.CONCRETE_ROAD_BLOCK.get(),
+            new Item.Properties().tab(TAB)));
+
+public static final RegistryObject<BlockItem> CONCRETE_ROAD_BLOCK_WITH_RIPPED_STRIPE_LINE =
+    deferredRegister.register("concrete_road_block_with_ripped_stripe_line",
+        () -> new BlockItem(DecorationBlocks.CONCRETE_ROAD_BLOCK_WITH_RIPPED_STRIPE_LINE.get(),
+            new Item.Properties().tab(TAB)));
+
+
   public static final RegistryObject<BlockItem> TOILET =
       deferredRegister.register("toilet",
           () -> new BlockItem(DecorationBlocks.TOILET.get(),

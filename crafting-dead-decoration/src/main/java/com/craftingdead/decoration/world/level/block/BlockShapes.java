@@ -185,6 +185,25 @@ public static final Function<Direction, VoxelShape> ROAD_BARRICADE_3 = rotatedOr
     Block.box(0, 11, 6, 17, 15, 10),
     Block.box(0, 0, 4, 17, 11, 12)));
 
+
+    public static final Function<Direction, VoxelShape> BLACK_MILITARY_PLASTIC_CRATE_1X1 =
+    rotatedOrientableShape(Block.box(0, 0, 0, 16, 17, 16));
+
+    public static final Function<Direction, VoxelShape> MILITARY_PLASTIC_CRATE_1X1 =
+    rotatedOrientableShape(Block.box(0, 0, 0, 16, 17, 16));
+
+    public static final Function<Direction, VoxelShape> YELLOW_MILITARY_PLASTIC_CRATE_1X1 =
+    rotatedOrientableShape(Block.box(0, 0, 0, 16, 17, 16));
+
+    public static final Function<Direction, VoxelShape> WHITE_MILITARY_PLASTIC_CRATE_1X1 =
+    rotatedOrientableShape(Block.box(0, 0, 0, 16, 17, 16));
+
+public static final Function<Direction, VoxelShape> CONCRETE_ROAD_BLOCK =
+    rotatedOrientableShape(Block.box(0, 0, 5, 16, 16, 11));
+
+
+
+
   public static final VoxelShape FLOWER_POT = Shapes.or(
       Block.box(6.5, 9, 6.25, 8, 12, 8),
       Block.box(4, 0, 4, 12, 7, 12),

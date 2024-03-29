@@ -1,0 +1,19 @@
+{
+    "variants": {
+        "facing=east": {
+            "model": "craftingdeaddecoration:block/military_plastic_crate_1x1",
+            "y": 90
+        },
+        "facing=north": {
+            "model": "craftingdeaddecoration:block/military_plastic_crate_1x1"
+        },
+        "facing=west": {
+            "model": "craftingdeaddecoration:block/military_plastic_crate_1x1",
+            "y": 270
+        },
+        "facing=south": {
+            "model": "craftingdeaddecoration:block/military_plastic_crate_1x1",
+            "y": 180
+        }
+    }
+}
