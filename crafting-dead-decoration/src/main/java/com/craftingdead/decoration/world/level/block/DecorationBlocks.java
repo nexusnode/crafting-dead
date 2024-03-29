@@ -77,7 +77,31 @@ public class DecorationBlocks {
                   .sound(SoundType.METAL)
                   .noCollission(),
               BlockShapes.BOXES_OF_SHOTGUN_SHELLS, false));
-  
+
+    public static final RegistryObject<Block> ROAD_BARRICADE_1 =
+        deferredRegister.register("road_barricade_1",
+            () -> new OrientableBlock(
+                BlockBehaviour.Properties.of(Material.METAL)
+                    .strength(5.0F)
+                    .sound(SoundType.METAL),
+                    BlockShapes.ROAD_BARRICADE_1));
+        
+    public static final RegistryObject<Block> ROAD_BARRICADE_2 =
+        deferredRegister.register("road_barricade_2",
+            () -> new OrientableBlock(
+                BlockBehaviour.Properties.of(Material.METAL)
+                    .strength(5.0F)
+                    .sound(SoundType.METAL),
+                    BlockShapes.ROAD_BARRICADE_2));
+
+    public static final RegistryObject<Block> ROAD_BARRICADE_3 =
+        deferredRegister.register("road_barricade_3",
+            () -> new OrientableBlock(
+                BlockBehaviour.Properties.of(Material.METAL)
+                    .strength(5.0F)
+                    .sound(SoundType.METAL),
+                    BlockShapes.ROAD_BARRICADE_3));
+        
   public static final RegistryObject<Block> BOXES_OF_SHOTGUN_SHELLS_BLUE =
       deferredRegister.register("boxes_of_shotgun_shells_blue",
           () -> new OrientableBlock(
@@ -286,6 +310,7 @@ public class DecorationBlocks {
                   .noOcclusion(),
               BlockShapes.STORE_SHELF));
 
+              
   public static final RegistryObject<Block> BOTTOM_CAN_STORE_SHELF_1 =
       deferredRegister.register("bottom_can_store_shelf_1",
           () -> new OrientableBlock(

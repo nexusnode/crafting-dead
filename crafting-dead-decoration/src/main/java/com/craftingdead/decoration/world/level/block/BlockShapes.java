@@ -173,6 +173,18 @@ public class BlockShapes {
       Block.box(3, 9, 13.5, 13, 10, 14.5),
       Block.box(1.5, 8, 3, 2.5, 9, 13));
 
+public static final Function<Direction, VoxelShape> ROAD_BARRICADE_1 = rotatedOrientableShape(Shapes.or(
+    Block.box(0, 11, 6, 17, 15, 10),
+    Block.box(0, 0, 4, 17, 11, 12)));
+
+public static final Function<Direction, VoxelShape> ROAD_BARRICADE_2 = rotatedOrientableShape(Shapes.or(
+    Block.box(0, 11, 6, 17, 15, 10),
+    Block.box(0, 0, 4, 17, 11, 12)));
+
+public static final Function<Direction, VoxelShape> ROAD_BARRICADE_3 = rotatedOrientableShape(Shapes.or(
+    Block.box(0, 11, 6, 17, 15, 10),
+    Block.box(0, 0, 4, 17, 11, 12)));
+
   public static final VoxelShape FLOWER_POT = Shapes.or(
       Block.box(6.5, 9, 6.25, 8, 12, 8),
       Block.box(4, 0, 4, 12, 7, 12),
