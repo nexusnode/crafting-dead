@@ -1,0 +1,19 @@
+{
+    "variants": {
+        "facing=east": {
+            "model": "craftingdeaddecoration:block/cracked_concrete_road_block_with_stripe_line",
+            "y": 90
+        },
+        "facing=north": {
+            "model": "craftingdeaddecoration:block/cracked_concrete_road_block_with_stripe_line"
+        },
+        "facing=west": {
+            "model": "craftingdeaddecoration:block/cracked_concrete_road_block_with_stripe_line",
+            "y": 270
+        },
+        "facing=south": {
+            "model": "craftingdeaddecoration:block/cracked_concrete_road_block_with_stripe_line",
+            "y": 180
+        }
+    }
+}

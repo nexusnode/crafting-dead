@@ -77,7 +77,115 @@ public class DecorationBlocks {
                   .sound(SoundType.METAL)
                   .noCollission(),
               BlockShapes.BOXES_OF_SHOTGUN_SHELLS, false));
-  
+
+
+public static final RegistryObject<Block> MILITARY_PLASTIC_CRATE_1X1 =
+    deferredRegister.register("military_plastic_crate_1x1",
+        () -> new OrientableBlock(
+            BlockBehaviour.Properties.of(Material.METAL)
+                .strength(5.0F)
+                .sound(SoundType.METAL),
+            BlockShapes.MILITARY_PLASTIC_CRATE_1X1, false));
+
+
+public static final RegistryObject<Block> YELLOW_MILITARY_PLASTIC_CRATE_1X1 =
+    deferredRegister.register("yellow_military_plastic_crate_1x1",
+        () -> new OrientableBlock(
+            BlockBehaviour.Properties.of(Material.METAL)
+                .strength(5.0F)
+                .sound(SoundType.METAL),
+            BlockShapes.YELLOW_MILITARY_PLASTIC_CRATE_1X1, false));
+
+public static final RegistryObject<Block> WHITE_MILITARY_PLASTIC_CRATE_1X1 =
+    deferredRegister.register("white_military_plastic_crate_1x1",
+        () -> new OrientableBlock(
+            BlockBehaviour.Properties.of(Material.METAL)
+                .strength(5.0F)
+                .sound(SoundType.METAL),
+            BlockShapes.WHITE_MILITARY_PLASTIC_CRATE_1X1, false));
+
+public static final RegistryObject<Block> BLACK_MILITARY_PLASTIC_CRATE_1X1 =
+    deferredRegister.register("black_military_plastic_crate_1x1",
+        () -> new OrientableBlock(
+            BlockBehaviour.Properties.of(Material.METAL)
+                .strength(5.0F)
+                .sound(SoundType.METAL),
+            BlockShapes.BLACK_MILITARY_PLASTIC_CRATE_1X1, false));
+
+            
+public static final RegistryObject<Block> CRACKED_CONCRETE_ROAD_BLOCK_WITH_STRIPE_LINE =
+    deferredRegister.register("cracked_concrete_road_block_with_stripe_line",
+        () -> new OrientableBlock(
+            BlockBehaviour.Properties.of(Material.METAL)
+                .strength(5.0F)
+                .sound(SoundType.METAL),
+            BlockShapes.CONCRETE_ROAD_BLOCK));
+
+public static final RegistryObject<Block> CRACKED_CONCRETE_ROAD_BLOCK_WITH_RIPPED_STRIPE_LINE =
+    deferredRegister.register("cracked_concrete_road_block_with_ripped_stripe_line",
+        () -> new OrientableBlock(
+            BlockBehaviour.Properties.of(Material.METAL)
+                .strength(5.0F)
+                .sound(SoundType.METAL),
+            BlockShapes.CONCRETE_ROAD_BLOCK));
+
+public static final RegistryObject<Block> CRACKED_CONCRETE_ROAD_BLOCK =
+    deferredRegister.register("cracked_concrete_road_block",
+        () -> new OrientableBlock(
+            BlockBehaviour.Properties.of(Material.METAL)
+                .strength(5.0F)
+                .sound(SoundType.METAL),
+            BlockShapes.CONCRETE_ROAD_BLOCK));
+
+public static final RegistryObject<Block> CONCRETE_ROAD_BLOCK_WITH_STRIPE_LINE =
+    deferredRegister.register("concrete_road_block_with_stripe_line",
+        () -> new OrientableBlock(
+            BlockBehaviour.Properties.of(Material.METAL)
+                .strength(5.0F)
+                .sound(SoundType.METAL),
+            BlockShapes.CONCRETE_ROAD_BLOCK));
+
+public static final RegistryObject<Block> CONCRETE_ROAD_BLOCK =
+    deferredRegister.register("concrete_road_block",
+        () -> new OrientableBlock(
+            BlockBehaviour.Properties.of(Material.METAL)
+                .strength(5.0F)
+                .sound(SoundType.METAL),
+            BlockShapes.CONCRETE_ROAD_BLOCK));
+
+public static final RegistryObject<Block> CONCRETE_ROAD_BLOCK_WITH_RIPPED_STRIPE_LINE =
+    deferredRegister.register("concrete_road_block_with_ripped_stripe_line",
+        () -> new OrientableBlock(
+            BlockBehaviour.Properties.of(Material.METAL)
+                .strength(5.0F)
+                .sound(SoundType.METAL),
+            BlockShapes.CONCRETE_ROAD_BLOCK));
+
+
+    public static final RegistryObject<Block> ROAD_BARRICADE_1 =
+        deferredRegister.register("road_barricade_1",
+            () -> new OrientableBlock(
+                BlockBehaviour.Properties.of(Material.METAL)
+                    .strength(5.0F)
+                    .sound(SoundType.METAL),
+                    BlockShapes.ROAD_BARRICADE_1));
+        
+    public static final RegistryObject<Block> ROAD_BARRICADE_2 =
+        deferredRegister.register("road_barricade_2",
+            () -> new OrientableBlock(
+                BlockBehaviour.Properties.of(Material.METAL)
+                    .strength(5.0F)
+                    .sound(SoundType.METAL),
+                    BlockShapes.ROAD_BARRICADE_2));
+
+    public static final RegistryObject<Block> ROAD_BARRICADE_3 =
+        deferredRegister.register("road_barricade_3",
+            () -> new OrientableBlock(
+                BlockBehaviour.Properties.of(Material.METAL)
+                    .strength(5.0F)
+                    .sound(SoundType.METAL),
+                    BlockShapes.ROAD_BARRICADE_3));
+        
   public static final RegistryObject<Block> BOXES_OF_SHOTGUN_SHELLS_BLUE =
       deferredRegister.register("boxes_of_shotgun_shells_blue",
           () -> new OrientableBlock(
@@ -286,6 +394,7 @@ public class DecorationBlocks {
                   .noOcclusion(),
               BlockShapes.STORE_SHELF));
 
+              
   public static final RegistryObject<Block> BOTTOM_CAN_STORE_SHELF_1 =
       deferredRegister.register("bottom_can_store_shelf_1",
           () -> new OrientableBlock(

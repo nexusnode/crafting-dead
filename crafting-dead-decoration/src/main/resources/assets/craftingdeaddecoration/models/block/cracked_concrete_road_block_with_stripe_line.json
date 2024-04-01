@@ -1,0 +1,7 @@
+{
+	"parent": "craftingdeaddecoration:block/concrete_road_block",
+	"textures": {
+		"0": "craftingdeaddecoration:block/cracked_concrete_road_block_with_stripe_line",
+		"particle": "#0"
+	}
+}

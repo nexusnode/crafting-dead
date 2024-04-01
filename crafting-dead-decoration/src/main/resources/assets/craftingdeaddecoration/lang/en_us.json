@@ -1,6 +1,14 @@
 {
     "itemGroup.craftingdeaddecoration": "Crafting Dead Decoration",
 
+    "block.craftingdeaddecoration.cracked_concrete_road_block_with_stripe_line": "Cracked Concrete Road Block with Stripe Line",
+    "block.craftingdeaddecoration.cracked_concrete_road_block_with_ripped_stripe_line": "Cracked Concrete Road Block with Ripped Stripe Line",
+    "block.craftingdeaddecoration.cracked_concrete_road_block": "Cracked Concrete Road Block",
+    "block.craftingdeaddecoration.concrete_road_block_with_stripe_line": "Concrete Road Block with Stripe Line",
+    "block.craftingdeaddecoration.concrete_road_block": "Concrete Road Block",
+    "block.craftingdeaddecoration.concrete_road_block_with_ripped_stripe_line": "Concrete Road Block with Ripped Stripe Line",
+  
+
     "block.craftingdeaddecoration.fuse_box": "Fuse Box",
 
     "block.craftingdeaddecoration.aa_poster": "AA Poster",
@@ -17,11 +25,22 @@
     "block.craftingdeaddecoration.red_gas_can_2": "Red Gas Can 2",
     "block.craftingdeaddecoration.red_gas_can_3": "Red Gas Can 3",
 
+    "block.craftingdeaddecoration.military_plastic_crate_1x1": "Military Plastic Crate 1x1",
+    "block.craftingdeaddecoration.black_military_plastic_crate_1x1": "Black Military Plastic Crate 1x1",
+    "block.craftingdeaddecoration.white_military_plastic_crate_1x1": "White Military Plastic Crate 1x1",
+    "block.craftingdeaddecoration.yellow_military_plastic_crate_1x1": "Yellow Military Plastic Crate 1x1",
+    
+
     "block.craftingdeaddecoration.box_store_shelf_1": "Box Store Shelf 1",
     "block.craftingdeaddecoration.box_store_shelf_2": "Box Store Shelf 2",
     "block.craftingdeaddecoration.box_store_shelf_3": "Box Store Shelf 3",
     "block.craftingdeaddecoration.box_store_shelf_4": "Box Store Shelf 4",
 
+    "block.craftingdeaddecoration.road_barricade_1": "Road Barricade 1",
+    "block.craftingdeaddecoration.road_barricade_2": "Road Barricade 2",
+    "block.craftingdeaddecoration.road_barricade_3": "Road Barricade 3",
+
+    
     "block.craftingdeaddecoration.bottom_box_store_shelf_1": "Bottom Box Store Shelf 1",
     "block.craftingdeaddecoration.bottom_box_store_shelf_2": "Bottom Box Store Shelf 2",
     "block.craftingdeaddecoration.bottom_box_store_shelf_3": "Bottom Box Store Shelf 3",
