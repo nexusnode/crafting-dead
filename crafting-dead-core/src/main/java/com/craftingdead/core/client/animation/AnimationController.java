@@ -45,9 +45,13 @@ public class AnimationController {
   }
 
   public void apply(float partialTicks, PoseStack poseStack) {
-    for (var animation : this.animations) {
+    var iterator = this.animations.iterator();
+    while (iterator.hasNext()) {
+      var animation = iterator.next();
       if (animation.isAlive()) {
         animation.apply(partialTicks, poseStack);
+      } else {
+        iterator.remove();
       }
     }
   }
