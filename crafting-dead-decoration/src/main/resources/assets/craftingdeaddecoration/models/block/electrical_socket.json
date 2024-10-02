@@ -1,8 +1,8 @@
 {
-	"credit": "Made with Blockbench",
+	"credit": "nuklear71",
 	"textures": {
 		"0": "craftingdeaddecoration:block/electrical_socket",
-		"particle": "#0"
+		"particle": "craftingdeaddecoration:block/electrical_socket"
 	},
 	"elements": [
 		{

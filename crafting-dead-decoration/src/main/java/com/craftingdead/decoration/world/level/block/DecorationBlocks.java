@@ -78,6 +78,14 @@ public class DecorationBlocks {
                   .noCollission(),
               BlockShapes.BOXES_OF_SHOTGUN_SHELLS, false));
 
+public static final RegistryObject<Block> CAMPING_CHAIR_YELLOW =
+    deferredRegister.register("camping_chair_yellow",
+        () -> new OrientableBlock(
+            BlockBehaviour.Properties.of(Material.WOOD, MaterialColor.COLOR_YELLOW)
+                .strength(2.0F)
+                .sound(SoundType.WOOD),
+            BlockShapes.CAMPING_CHAIR_YELLOW, false));
+
 
 public static final RegistryObject<Block> MILITARY_PLASTIC_CRATE_1X1 =
     deferredRegister.register("military_plastic_crate_1x1",
@@ -145,6 +153,719 @@ public static final RegistryObject<Block> CONCRETE_ROAD_BLOCK_WITH_STRIPE_LINE =
                 .sound(SoundType.METAL),
             BlockShapes.CONCRETE_ROAD_BLOCK));
 
+
+public static final RegistryObject<Block> BOTTLE_OF_MEDS =
+    deferredRegister.register("bottle_of_meds",
+        () -> new OrientableBlock(
+            BlockBehaviour.Properties.of(Material.METAL)
+                .strength(5.0F)
+                .sound(SoundType.METAL),
+            BlockShapes.BOTTLE_OF_MEDS));
+
+public static final RegistryObject<Block> RENAMED_BOXES_OF_BULLETS =
+    deferredRegister.register("renamed_boxes_of_bullets",
+        () -> new OrientableBlock(
+            BlockBehaviour.Properties.of(Material.METAL)
+                .strength(5.0F)
+                .sound(SoundType.METAL),
+            BlockShapes.BOXES_OF_BULLETS));
+
+public static final RegistryObject<Block> BOXES_OF_SHOTGUN_SHELLS =
+    deferredRegister.register("boxes_of_shotgun_shells",
+        () -> new OrientableBlock(
+            BlockBehaviour.Properties.of(Material.METAL)
+                .strength(5.0F)
+                .sound(SoundType.METAL),
+            BlockShapes.BOXES_OF_SHOTGUN_SHELLS));
+
+public static final RegistryObject<Block> CAMERA_BROKEN_HANGING =
+    deferredRegister.register("camera_broken_hanging",
+        () -> new OrientableBlock(
+            BlockBehaviour.Properties.of(Material.METAL)
+                .strength(5.0F)
+                .sound(SoundType.METAL),
+            BlockShapes.CAMERA_BROKEN_HANGING));
+
+public static final RegistryObject<Block> CAMERA_BROKEN =
+    deferredRegister.register("camera_broken",
+        () -> new OrientableBlock(
+            BlockBehaviour.Properties.of(Material.METAL)
+                .strength(5.0F)
+                .sound(SoundType.METAL),
+            BlockShapes.CAMERA_BROKEN));
+
+public static final RegistryObject<Block> CAMPING_CHAIR =
+    deferredRegister.register("camping_chair",
+        () -> new OrientableBlock(
+            BlockBehaviour.Properties.of(Material.METAL)
+                .strength(5.0F)
+                .sound(SoundType.METAL),
+            BlockShapes.CAMPING_CHAIR));
+
+public static final RegistryObject<Block> COMPUTER_DESTROYED =
+    deferredRegister.register("computer_destroyed",
+        () -> new OrientableBlock(
+            BlockBehaviour.Properties.of(Material.METAL)
+                .strength(5.0F)
+                .sound(SoundType.METAL),
+            BlockShapes.COMPUTER_DESTROYED));
+
+public static final RegistryObject<Block> COMPUTER_NO_CASE =
+    deferredRegister.register("computer_no_case",
+        () -> new OrientableBlock(
+            BlockBehaviour.Properties.of(Material.METAL)
+                .strength(5.0F)
+                .sound(SoundType.METAL),
+            BlockShapes.COMPUTER_DESTROYED));
+
+public static final RegistryObject<Block> ELECTRONIC_JUNK_1 =
+    deferredRegister.register("electronic_junk_1",
+        () -> new OrientableBlock(
+            BlockBehaviour.Properties.of(Material.METAL)
+                .strength(5.0F)
+                .sound(SoundType.METAL),
+            BlockShapes.ELECTRONIC_JUNK_1));
+
+public static final RegistryObject<Block> ELECTRONIC_JUNK_2 =
+    deferredRegister.register("electronic_junk_2",
+        () -> new OrientableBlock(
+            BlockBehaviour.Properties.of(Material.METAL)
+                .strength(5.0F)
+                .sound(SoundType.METAL),
+            BlockShapes.ELECTRONIC_JUNK_2));
+
+public static final RegistryObject<Block> ELEVATOR_BUTTONS_01 =
+    deferredRegister.register("elevator_buttons_01",
+        () -> new OrientableBlock(
+            BlockBehaviour.Properties.of(Material.METAL)
+                .strength(5.0F)
+                .sound(SoundType.METAL),
+            BlockShapes.ELEVATOR_BUTTONS_01));
+
+public static final RegistryObject<Block> ELEVATOR_CALL_BUTTON =
+    deferredRegister.register("elevator_call_button",
+        () -> new OrientableBlock(
+            BlockBehaviour.Properties.of(Material.METAL)
+                .strength(5.0F)
+                .sound(SoundType.METAL),
+            BlockShapes.ELEVATOR_CALL_BUTTON));
+
+public static final RegistryObject<Block> ELEVATOR_DOOR_FULL_OPEN =
+    deferredRegister.register("elevator_door_full_open",
+        () -> new OrientableBlock(
+            BlockBehaviour.Properties.of(Material.METAL)
+                .strength(5.0F)
+                .sound(SoundType.METAL),
+            BlockShapes.ELEVATOR_DOOR_FULL_OPEN));
+
+public static final RegistryObject<Block> ELEVATOR_DOOR_HALF_OPEN =
+    deferredRegister.register("elevator_door_half_open",
+        () -> new OrientableBlock(
+            BlockBehaviour.Properties.of(Material.METAL)
+                .strength(5.0F)
+                .sound(SoundType.METAL),
+            BlockShapes.ELEVATOR_DOOR_HALF_OPEN));
+
+public static final RegistryObject<Block> ELEVATOR_DOOR =
+    deferredRegister.register("elevator_door",
+        () -> new OrientableBlock(
+            BlockBehaviour.Properties.of(Material.METAL)
+                .strength(5.0F)
+                .sound(SoundType.METAL),
+            BlockShapes.ELEVATOR_DOOR));
+
+public static final RegistryObject<Block> ELEVATOR_INFO_LIGHT_DIGITAL =
+    deferredRegister.register("elevator_info_light_digital",
+        () -> new OrientableBlock(
+            BlockBehaviour.Properties.of(Material.METAL)
+                .strength(5.0F)
+                .sound(SoundType.METAL),
+            BlockShapes.ELEVATOR_INFO_LIGHT_DIGITAL));
+
+public static final RegistryObject<Block> ELEVATOR_INFO_LIGHT =
+    deferredRegister.register("elevator_info_light",
+        () -> new OrientableBlock(
+            BlockBehaviour.Properties.of(Material.METAL)
+                .strength(5.0F)
+                .sound(SoundType.METAL),
+            BlockShapes.ELEVATOR_INFO_LIGHT));
+
+public static final RegistryObject<Block> FLAMETHROWER =
+    deferredRegister.register("flamethrower",
+        () -> new OrientableBlock(
+            BlockBehaviour.Properties.of(Material.METAL)
+                .strength(5.0F)
+                .sound(SoundType.METAL),
+            BlockShapes.FLAMETHROWER));
+
+public static final RegistryObject<Block> GAS_CAN =
+    deferredRegister.register("gas_can",
+        () -> new OrientableBlock(
+            BlockBehaviour.Properties.of(Material.METAL)
+                .strength(5.0F)
+                .sound(SoundType.METAL),
+            BlockShapes.GAS_CAN));
+
+public static final RegistryObject<Block> GAS_CANS =
+    deferredRegister.register("gas_cans",
+        () -> new OrientableBlock(
+            BlockBehaviour.Properties.of(Material.METAL)
+                .strength(5.0F)
+                .sound(SoundType.METAL),
+            BlockShapes.GAS_CANS));
+
+public static final RegistryObject<Block> GRENADE_BOX =
+    deferredRegister.register("grenade_box",
+        () -> new OrientableBlock(
+            BlockBehaviour.Properties.of(Material.METAL)
+                .strength(5.0F)
+                .sound(SoundType.METAL),
+            BlockShapes.GRENADE_BOX));
+
+public static final RegistryObject<Block> GUN_CASE_HALF_OPEN =
+    deferredRegister.register("gun_case_half_open",
+        () -> new OrientableBlock(
+            BlockBehaviour.Properties.of(Material.METAL)
+                .strength(5.0F)
+                .sound(SoundType.METAL),
+            BlockShapes.GUN_CASE_HALF_OPEN));
+
+public static final RegistryObject<Block> GUN_CASE_OPEN =
+    deferredRegister.register("gun_case_open",
+        () -> new OrientableBlock(
+            BlockBehaviour.Properties.of(Material.METAL)
+                .strength(5.0F)
+                .sound(SoundType.METAL),
+            BlockShapes.GUN_CASE_OPEN));
+
+public static final RegistryObject<Block> GUN_CASE_STACK =
+    deferredRegister.register("gun_case_stack",
+        () -> new OrientableBlock(
+            BlockBehaviour.Properties.of(Material.METAL)
+                .strength(5.0F)
+                .sound(SoundType.METAL),
+            BlockShapes.GUN_CASE_STACK));
+            
+public static final RegistryObject<Block> GUN_CASE =
+    deferredRegister.register("gun_case",
+        () -> new OrientableBlock(
+            BlockBehaviour.Properties.of(Material.METAL)
+                .strength(5.0F)
+                .sound(SoundType.METAL),
+            BlockShapes.GUN_CASE));
+
+public static final RegistryObject<Block> INDUSTRIAL_BUTTON =
+    deferredRegister.register("industrial_button",
+        () -> new OrientableBlock(
+            BlockBehaviour.Properties.of(Material.METAL)
+                .strength(5.0F)
+                .sound(SoundType.METAL),
+            BlockShapes.INDUSTRIAL_BUTTON));
+
+public static final RegistryObject<Block> JUNK_BOOK =
+    deferredRegister.register("junk_book",
+        () -> new OrientableBlock(
+            BlockBehaviour.Properties.of(Material.METAL)
+                .strength(5.0F)
+                .sound(SoundType.METAL),
+            BlockShapes.JUNK_BOOK));
+
+public static final RegistryObject<Block> LAB_HOT_PLATE =
+    deferredRegister.register("lab_hot_plate",
+        () -> new OrientableBlock(
+            BlockBehaviour.Properties.of(Material.METAL)
+                .strength(5.0F)
+                .sound(SoundType.METAL),
+            BlockShapes.LAB_HOT_PLATE));
+
+public static final RegistryObject<Block> LAB_MICROSCOPE =
+    deferredRegister.register("lab_microscope",
+        () -> new OrientableBlock(
+            BlockBehaviour.Properties.of(Material.METAL)
+                .strength(5.0F)
+                .sound(SoundType.METAL),
+            BlockShapes.LAB_MICROSCOPE));
+
+public static final RegistryObject<Block> LAB_MIXER =
+    deferredRegister.register("lab_mixer",
+        () -> new OrientableBlock(
+            BlockBehaviour.Properties.of(Material.METAL)
+                .strength(5.0F)
+                .sound(SoundType.METAL),
+            BlockShapes.LAB_MIXER));
+
+public static final RegistryObject<Block> LAB_PRESSURE_CHAMBER =
+    deferredRegister.register("lab_pressure_chamber",
+        () -> new OrientableBlock(
+            BlockBehaviour.Properties.of(Material.METAL)
+                .strength(5.0F)
+                .sound(SoundType.METAL),
+            BlockShapes.LAB_PRESSURE_CHAMBER));
+
+public static final RegistryObject<Block> LAPTOP_DESTROYED =
+    deferredRegister.register("laptop_destroyed",
+        () -> new OrientableBlock(
+            BlockBehaviour.Properties.of(Material.METAL)
+                .strength(5.0F)
+                .sound(SoundType.METAL),
+            BlockShapes.LAPTOP_DESTROYED));
+
+public static final RegistryObject<Block> MEDICAL_KIT =
+    deferredRegister.register("medical_kit",
+        () -> new OrientableBlock(
+            BlockBehaviour.Properties.of(Material.METAL)
+                .strength(5.0F)
+                .sound(SoundType.METAL),
+            BlockShapes.MEDICAL_KIT));
+
+public static final RegistryObject<Block> MILITARY_RADIO_BLOCK_1 =
+    deferredRegister.register("military_radio_block_1",
+        () -> new Block(
+            Block.Properties.of(Material.STONE)
+                .strength(5.0F, 5.0F)));
+
+public static final RegistryObject<Block> MILITARY_RADIO_BLOCK_2 =
+    deferredRegister.register("military_radio_block_2",
+        () -> new Block(
+            Block.Properties.of(Material.STONE)
+                .strength(5.0F, 5.0F)));
+
+public static final RegistryObject<Block> MILITARY_RADIO_BLOCK_3 =
+    deferredRegister.register("military_radio_block_3",
+        () -> new Block(
+            Block.Properties.of(Material.STONE)
+                .strength(5.0F, 5.0F)));
+
+public static final RegistryObject<Block> MILITARY_RADIO_BLOCK_4 =
+    deferredRegister.register("military_radio_block_4",
+        () -> new Block(
+            Block.Properties.of(Material.STONE)
+                .strength(5.0F, 5.0F)));
+
+public static final RegistryObject<Block> MILITARY_RADIO_BLOCK_5 =
+    deferredRegister.register("military_radio_block_5",
+        () -> new Block(
+            Block.Properties.of(Material.STONE)
+                .strength(5.0F, 5.0F)));
+
+public static final RegistryObject<Block> ROAD_BLANK_SLAB_1 =
+    deferredRegister.register("road_blank_slab_1",
+        () -> new SlabBlock(
+            Block.Properties.of(Material.STONE)
+                .strength(5.0F, 5.0F)));
+
+public static final RegistryObject<Block> ROAD_BLANK_SLAB_2 =
+    deferredRegister.register("road_blank_slab_2",
+        () -> new SlabBlock(
+            Block.Properties.of(Material.STONE)
+                .strength(5.0F, 5.0F)));
+
+public static final RegistryObject<Block> ROAD_BLANK_SLAB_3 =
+    deferredRegister.register("road_blank_slab_3",
+        () -> new SlabBlock(
+            Block.Properties.of(Material.STONE)
+                .strength(5.0F, 5.0F)));
+
+public static final RegistryObject<Block> ROAD_BLANK_SLAB_4 =
+    deferredRegister.register("road_blank_slab_4",
+        () -> new SlabBlock(
+            Block.Properties.of(Material.STONE)
+                .strength(5.0F, 5.0F)));
+
+public static final RegistryObject<Block> ROAD_BLANK_SLAB_5 =
+    deferredRegister.register("road_blank_slab_5",
+        () -> new SlabBlock(
+            Block.Properties.of(Material.STONE)
+                .strength(5.0F, 5.0F)));
+
+public static final RegistryObject<Block> OLD_COMPUTER_MINI =
+    deferredRegister.register("old_computer_mini",
+        () -> new OrientableBlock(
+            BlockBehaviour.Properties.of(Material.METAL)
+                .strength(5.0F)
+                .sound(SoundType.METAL),
+            BlockShapes.OLD_COMPUTER_MINI));
+
+public static final RegistryObject<Block> OLD_COMPUTER =
+    deferredRegister.register("old_computer",
+        () -> new OrientableBlock(
+            BlockBehaviour.Properties.of(Material.METAL)
+                .strength(5.0F)
+                .sound(SoundType.METAL),
+            BlockShapes.OLD_COMPUTER));
+
+public static final RegistryObject<Block> OLD_TV =
+    deferredRegister.register("old_tv",
+        () -> new OrientableBlock(
+            BlockBehaviour.Properties.of(Material.METAL)
+                .strength(5.0F)
+                .sound(SoundType.METAL),
+            BlockShapes.OLD_TV));
+
+public static final RegistryObject<Block> OPEN_MEDICAL_KIT =
+    deferredRegister.register("open_medical_kit",
+        () -> new OrientableBlock(
+            BlockBehaviour.Properties.of(Material.METAL)
+                .strength(5.0F)
+                .sound(SoundType.METAL),
+            BlockShapes.OPEN_MEDICAL_KIT));
+
+public static final RegistryObject<Block> PAPER =
+    deferredRegister.register("paper",
+        () -> new OrientableBlock(
+            BlockBehaviour.Properties.of(Material.METAL)
+                .strength(5.0F)
+                .sound(SoundType.METAL),
+            BlockShapes.PAPER));
+            
+public static final RegistryObject<Block> PLANKS_01 =
+    deferredRegister.register("planks_01",
+    () -> new SlabBlock(
+        Block.Properties.of(Material.STONE)
+            .strength(5.0F, 5.0F)));
+
+public static final RegistryObject<Block> PLANKS_02 =
+    deferredRegister.register("planks_02",
+    () -> new SlabBlock(
+        Block.Properties.of(Material.STONE)
+            .strength(5.0F, 5.0F)));
+
+public static final RegistryObject<Block> PLANKS_03 =
+    deferredRegister.register("planks_03",
+    () -> new SlabBlock(
+        Block.Properties.of(Material.STONE)
+            .strength(5.0F, 5.0F)));
+
+public static final RegistryObject<Block> PLANKS_04 =
+    deferredRegister.register("planks_04",
+    () -> new SlabBlock(
+        Block.Properties.of(Material.STONE)
+            .strength(5.0F, 5.0F)));
+
+public static final RegistryObject<Block> PLANKS_05 =
+    deferredRegister.register("planks_05",
+    () -> new SlabBlock(
+        Block.Properties.of(Material.STONE)
+            .strength(5.0F, 5.0F)));
+
+public static final RegistryObject<Block> PLANKS_06 =
+    deferredRegister.register("planks_06",
+    () -> new SlabBlock(
+        Block.Properties.of(Material.STONE)
+            .strength(5.0F, 5.0F)));
+
+
+public static final RegistryObject<Block> PLANKS_07 =
+    deferredRegister.register("planks_07",
+    () -> new SlabBlock(
+        Block.Properties.of(Material.STONE)
+            .strength(5.0F, 5.0F)));
+
+public static final RegistryObject<Block> PLANKS_08 =
+    deferredRegister.register("planks_08",
+    () -> new SlabBlock(
+        Block.Properties.of(Material.STONE)
+            .strength(5.0F, 5.0F)));
+
+public static final RegistryObject<Block> PLANKS_09 =
+    deferredRegister.register("planks_09",
+    () -> new SlabBlock(
+        Block.Properties.of(Material.STONE)
+            .strength(5.0F, 5.0F)));
+
+public static final RegistryObject<Block> PLANKS_10 =
+    deferredRegister.register("planks_10",
+    () -> new SlabBlock(
+        Block.Properties.of(Material.STONE)
+            .strength(5.0F, 5.0F)));
+
+public static final RegistryObject<Block> PLANKS_11 =
+    deferredRegister.register("planks_11",
+    () -> new SlabBlock(
+        Block.Properties.of(Material.STONE)
+            .strength(5.0F, 5.0F)));
+
+public static final RegistryObject<Block> PORTABLE_GENERATOR =
+    deferredRegister.register("portable_generator",
+        () -> new OrientableBlock(
+            BlockBehaviour.Properties.of(Material.METAL)
+                .strength(5.0F)
+                .sound(SoundType.METAL),
+            BlockShapes.PORTABLE_GENERATOR));
+
+            public static final RegistryObject<Block> PORTABLE_MILITARY_RADIO =
+                deferredRegister.register("portable_military_radio",
+                    () -> new OrientableBlock(
+                        BlockBehaviour.Properties.of(Material.METAL)
+                            .strength(5.0F)
+                            .sound(SoundType.METAL),
+                        BlockShapes.PORTABLE_MILITARY_RADIO));
+
+            public static final RegistryObject<Block> POWER_BOX =
+                deferredRegister.register("power_box",
+                () -> new Block(
+                    Block.Properties.of(Material.STONE)
+                        .strength(5.0F, 5.0F)));
+
+            public static final RegistryObject<Block> RADAR_TERMINAL_A1 =
+                deferredRegister.register("radar_terminal_a1",
+                    () -> new OrientableBlock(
+                        BlockBehaviour.Properties.of(Material.METAL)
+                            .strength(5.0F)
+                            .sound(SoundType.METAL),
+                        BlockShapes.RADAR_TERMINAL));
+
+            public static final RegistryObject<Block> RADAR_TERMINAL_A2 =
+                deferredRegister.register("radar_terminal_a2",
+                    () -> new OrientableBlock(
+                        BlockBehaviour.Properties.of(Material.METAL)
+                            .strength(5.0F)
+                            .sound(SoundType.METAL),
+                        BlockShapes.RADAR_TERMINAL));
+
+            public static final RegistryObject<Block> RADAR_TERMINAL_A3 =
+                deferredRegister.register("radar_terminal_a3",
+                    () -> new OrientableBlock(
+                        BlockBehaviour.Properties.of(Material.METAL)
+                            .strength(5.0F)
+                            .sound(SoundType.METAL),
+                        BlockShapes.RADAR_TERMINAL));
+
+            public static final RegistryObject<Block> RADAR_TERMINAL_A4 =
+                deferredRegister.register("radar_terminal_a4",
+                    () -> new OrientableBlock(
+                        BlockBehaviour.Properties.of(Material.METAL)
+                            .strength(5.0F)
+                            .sound(SoundType.METAL),
+                        BlockShapes.RADAR_TERMINAL));
+
+
+public static final RegistryObject<Block> RADAR_TERMINAL_A5 =
+    deferredRegister.register("radar_terminal_a5",
+        () -> new OrientableBlock(
+            BlockBehaviour.Properties.of(Material.METAL)
+                .strength(5.0F)
+                .sound(SoundType.METAL),
+            BlockShapes.RADAR_TERMINAL));
+
+public static final RegistryObject<Block> RADAR_TERMINAL_B1 =
+    deferredRegister.register("radar_terminal_b1",
+        () -> new OrientableBlock(
+            BlockBehaviour.Properties.of(Material.METAL)
+                .strength(5.0F)
+                .sound(SoundType.METAL),
+            BlockShapes.RADAR_TERMINAL));
+
+public static final RegistryObject<Block> RADAR_TERMINAL_B2 =
+    deferredRegister.register("radar_terminal_b2",
+        () -> new OrientableBlock(
+            BlockBehaviour.Properties.of(Material.METAL)
+                .strength(5.0F)
+                .sound(SoundType.METAL),
+            BlockShapes.RADAR_TERMINAL));
+
+public static final RegistryObject<Block> RADAR_TERMINAL_B3 =
+    deferredRegister.register("radar_terminal_b3",
+        () -> new OrientableBlock(
+            BlockBehaviour.Properties.of(Material.METAL)
+                .strength(5.0F)
+                .sound(SoundType.METAL),
+            BlockShapes.RADAR_TERMINAL));
+
+public static final RegistryObject<Block> RADAR_TERMINAL_B4 =
+    deferredRegister.register("radar_terminal_b4",
+        () -> new OrientableBlock(
+            BlockBehaviour.Properties.of(Material.METAL)
+                .strength(5.0F)
+                .sound(SoundType.METAL),
+            BlockShapes.RADAR_TERMINAL));
+
+public static final RegistryObject<Block> RADAR_TERMINAL_B5 =
+    deferredRegister.register("radar_terminal_b5",
+        () -> new OrientableBlock(
+            BlockBehaviour.Properties.of(Material.METAL)
+                .strength(5.0F)
+                .sound(SoundType.METAL),
+            BlockShapes.RADAR_TERMINAL));
+
+
+public static final RegistryObject<Block> RADAR_TERMINAL_C1 =
+    deferredRegister.register("radar_terminal_c1",
+        () -> new OrientableBlock(
+            BlockBehaviour.Properties.of(Material.METAL)
+                .strength(5.0F)
+                .sound(SoundType.METAL),
+            BlockShapes.RADAR_TERMINAL));
+
+public static final RegistryObject<Block> RADAR_TERMINAL_C2 =
+    deferredRegister.register("radar_terminal_c2",
+        () -> new OrientableBlock(
+            BlockBehaviour.Properties.of(Material.METAL)
+                .strength(5.0F)
+                .sound(SoundType.METAL),
+            BlockShapes.RADAR_TERMINAL));
+
+public static final RegistryObject<Block> RADAR_TERMINAL_C3 =
+    deferredRegister.register("radar_terminal_c3",
+        () -> new OrientableBlock(
+            BlockBehaviour.Properties.of(Material.METAL)
+                .strength(5.0F)
+                .sound(SoundType.METAL),
+            BlockShapes.RADAR_TERMINAL));
+
+public static final RegistryObject<Block> RADAR_TERMINAL_C4 =
+    deferredRegister.register("radar_terminal_c4",
+        () -> new OrientableBlock(
+            BlockBehaviour.Properties.of(Material.METAL)
+                .strength(5.0F)
+                .sound(SoundType.METAL),
+            BlockShapes.RADAR_TERMINAL));
+
+public static final RegistryObject<Block> RADAR_TERMINAL_C5 =
+    deferredRegister.register("radar_terminal_c5",
+        () -> new OrientableBlock(
+            BlockBehaviour.Properties.of(Material.METAL)
+                .strength(5.0F)
+                .sound(SoundType.METAL),
+            BlockShapes.RADAR_TERMINAL));
+
+public static final RegistryObject<Block> RADAR_TERMINAL_D1 =
+    deferredRegister.register("radar_terminal_d1",
+        () -> new OrientableBlock(
+            BlockBehaviour.Properties.of(Material.METAL)
+                .strength(5.0F)
+                .sound(SoundType.METAL),
+            BlockShapes.RADAR_TERMINAL));
+
+public static final RegistryObject<Block> RADAR_TERMINAL_D2 =
+    deferredRegister.register("radar_terminal_d2",
+        () -> new OrientableBlock(
+            BlockBehaviour.Properties.of(Material.METAL)
+                .strength(5.0F)
+                .sound(SoundType.METAL),
+            BlockShapes.RADAR_TERMINAL));
+
+public static final RegistryObject<Block> RADAR_TERMINAL_D3 =
+    deferredRegister.register("radar_terminal_d3",
+        () -> new OrientableBlock(
+            BlockBehaviour.Properties.of(Material.METAL)
+                .strength(5.0F)
+                .sound(SoundType.METAL),
+            BlockShapes.RADAR_TERMINAL));
+
+public static final RegistryObject<Block> RADAR_TERMINAL_D4 =
+    deferredRegister.register("radar_terminal_d4",
+        () -> new OrientableBlock(
+            BlockBehaviour.Properties.of(Material.METAL)
+                .strength(5.0F)
+                .sound(SoundType.METAL),
+            BlockShapes.RADAR_TERMINAL));
+
+public static final RegistryObject<Block> RADAR_TERMINAL_D5 =
+    deferredRegister.register("radar_terminal_d5",
+        () -> new OrientableBlock(
+            BlockBehaviour.Properties.of(Material.METAL)
+                .strength(5.0F)
+                .sound(SoundType.METAL),
+            BlockShapes.RADAR_TERMINAL));
+
+
+
+public static final RegistryObject<Block> SKELETON_MOSSY =
+    deferredRegister.register("skeleton_mossy",
+        () -> new OrientableBlock(
+            BlockBehaviour.Properties.of(Material.METAL)
+                .strength(5.0F)
+                .sound(SoundType.METAL),
+            BlockShapes.SKELETON_MOSSY));
+
+public static final RegistryObject<Block> SKELETON_TILTED_LEFT =
+    deferredRegister.register("skeleton_tilted_left",
+        () -> new OrientableBlock(
+            BlockBehaviour.Properties.of(Material.METAL)
+                .strength(5.0F)
+                .sound(SoundType.METAL),
+            BlockShapes.SKELETON_TILTED_LEFT));
+
+public static final RegistryObject<Block> SKELETON_TILTED_RIGHT =
+    deferredRegister.register("skeleton_tilted_right",
+        () -> new OrientableBlock(
+            BlockBehaviour.Properties.of(Material.METAL)
+                .strength(5.0F)
+                .sound(SoundType.METAL),
+            BlockShapes.SKELETON_TILTED_RIGHT));
+
+public static final RegistryObject<Block> SLEEPING_BAG =
+    deferredRegister.register("sleeping_bad",
+        () -> new OrientableBlock(
+            BlockBehaviour.Properties.of(Material.METAL)
+                .strength(5.0F)
+                .sound(SoundType.METAL),
+            BlockShapes.SLEEPING_BAG));
+
+public static final RegistryObject<Block> SMALL_MEDICAL_KIT =
+    deferredRegister.register("small_medical_kit",
+        () -> new OrientableBlock(
+            BlockBehaviour.Properties.of(Material.METAL)
+                .strength(5.0F)
+                .sound(SoundType.METAL),
+            BlockShapes.SMALL_MEDICAL_KIT));
+
+public static final RegistryObject<Block> SMALL_OPEN_MEDICAL_KIT =
+    deferredRegister.register("small_open_medical_kit",
+        () -> new OrientableBlock(
+            BlockBehaviour.Properties.of(Material.METAL)
+                .strength(5.0F)
+                .sound(SoundType.METAL),
+            BlockShapes.SMALL_OPEN_MEDICAL_KIT));
+
+public static final RegistryObject<Block> SPOOL_EMPTY =
+    deferredRegister.register("spool_empty",
+        () -> new OrientableBlock(
+            BlockBehaviour.Properties.of(Material.METAL)
+                .strength(5.0F)
+                .sound(SoundType.METAL),
+            BlockShapes.SPOOL));
+
+public static final RegistryObject<Block> SPOOL_FULL =
+    deferredRegister.register("spool_full",
+        () -> new OrientableBlock(
+            BlockBehaviour.Properties.of(Material.METAL)
+                .strength(5.0F)
+                .sound(SoundType.METAL),
+            BlockShapes.SPOOL));
+
+public static final RegistryObject<Block> SPOOL_HALF =
+    deferredRegister.register("spool_half",
+        () -> new OrientableBlock(
+            BlockBehaviour.Properties.of(Material.METAL)
+                .strength(5.0F)
+                .sound(SoundType.METAL),
+            BlockShapes.SPOOL));
+
+public static final RegistryObject<Block> TV =
+    deferredRegister.register("tv",
+        () -> new OrientableBlock(
+            BlockBehaviour.Properties.of(Material.METAL)
+                .strength(5.0F)
+                .sound(SoundType.METAL),
+            BlockShapes.TV));
+
+public static final RegistryObject<Block> WATER_BARREL =
+    deferredRegister.register("water_barrel",
+        () -> new OrientableBlock(
+            BlockBehaviour.Properties.of(Material.METAL)
+                .strength(5.0F)
+                .sound(SoundType.METAL),
+            BlockShapes.WATER_BARREL));
+
+
+
+
+
+
+            
+            
 public static final RegistryObject<Block> CONCRETE_ROAD_BLOCK =
     deferredRegister.register("concrete_road_block",
         () -> new OrientableBlock(

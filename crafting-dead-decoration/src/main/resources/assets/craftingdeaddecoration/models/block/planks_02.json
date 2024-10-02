@@ -1,0 +1,59 @@
+{
+	"credit": "nuklear71",
+	"texture_size": [128, 128],
+	"textures": {
+		"0": "craftingdeaddecoration:block/oak_planks",
+		"particle": "craftingdeaddecoration:block/oak_planks"
+	},
+	"elements": [
+		{
+			"from": [-6, 0, 6],
+			"to": [22, 2, 11],
+			"rotation": {"angle": 22.5, "axis": "y", "origin": [8, 1, 8.5]},
+			"faces": {
+				"north": {"uv": [5.375, 7.375, 8.875, 7.625], "texture": "#0"},
+				"east": {"uv": [4.75, 7.375, 5.375, 7.625], "texture": "#0"},
+				"south": {"uv": [9.5, 7.375, 13, 7.625], "texture": "#0"},
+				"west": {"uv": [8.875, 7.375, 9.5, 7.625], "texture": "#0"},
+				"up": {"uv": [8.875, 7.375, 5.375, 6.75], "texture": "#0"},
+				"down": {"uv": [12.375, 6.75, 8.875, 7.375], "texture": "#0"}
+			}
+		}
+	],
+	"display": {
+		"thirdperson_righthand": {
+			"translation": [0, 0, -1.5],
+			"scale": [0.4, 0.4, 0.4]
+		},
+		"thirdperson_lefthand": {
+			"translation": [0, 0, -1.5],
+			"scale": [0.4, 0.4, 0.4]
+		},
+		"firstperson_righthand": {
+			"rotation": [0, 140, 0],
+			"translation": [0, 4.75, 0],
+			"scale": [0.4, 0.4, 0.4]
+		},
+		"firstperson_lefthand": {
+			"rotation": [0, 140, 0],
+			"translation": [0, 4.75, 0],
+			"scale": [0.4, 0.4, 0.4]
+		},
+		"ground": {
+			"scale": [0.4, 0.4, 0.4]
+		},
+		"gui": {
+			"rotation": [40, 140, 0],
+			"translation": [-1.75, -0.75, 0],
+			"scale": [0.45, 0.45, 0.45]
+		}
+	},
+	"groups": [
+		{
+			"name": "group",
+			"origin": [6, 0, 4],
+			"color": 0,
+			"children": [0]
+		}
+	]
+}

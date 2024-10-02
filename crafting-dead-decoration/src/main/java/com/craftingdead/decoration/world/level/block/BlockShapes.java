@@ -287,6 +287,204 @@ public static final Function<Direction, VoxelShape> CONCRETE_ROAD_BLOCK =
           Block.box(0, 9.3, 6, 16, 12.3, 7),
           Block.box(0, 5.3, 6, 16, 8.3, 7)));
 
+  public static final Function<Direction, VoxelShape> BOTTLE_OF_MEDS =
+      rotatedOrientableShape(Block.box(2, 0, 2, 14, 2, 14));
+
+public static final Function<Direction, VoxelShape> CAMERA =
+    rotatedOrientableShape(Block.box(6, 6, 10, 10, 11, 16));
+
+public static final Function<Direction, VoxelShape> CAMPING_CHAIR =
+    rotatedOrientableShape(Block.box(2, 0, 2, 14, 11, 14));
+
+    public static final Function<Direction, VoxelShape> CAMPING_CHAIR_YELLOW =
+    rotatedOrientableShape(Block.box(2, 0, 2, 14, 11, 14));
+    
+    public static final Function<Direction, VoxelShape> CAMERA_BROKEN =
+        rotatedOrientableShape(Block.box(6, 6, 10, 10, 11, 16));
+
+  public static final Function<Direction, VoxelShape> BOF_OF_BULLETS =
+      rotatedOrientableShape(Block.box(2, 0, 4, 14, 6, 14));
+
+
+public static final Function<Direction, VoxelShape> COMPUTER_DESTROYED =
+    rotatedOrientableShape(Block.box(2, 0, 2, 14, 2, 14));
+
+public static final Function<Direction, VoxelShape> ELECTRONIC_JUNK_1 =
+    rotatedOrientableShape(Block.box(2, 0, 2, 14, 3, 14));
+
+public static final Function<Direction, VoxelShape> ELECTRONIC_JUNK_2 =
+    rotatedOrientableShape(Block.box(2, 0, 2, 14, 3, 14));
+
+public static final Function<Direction, VoxelShape> ELEVATOR_BUTTONS_01 =
+    rotatedOrientableShape(Block.box(4, 2, 15, 12, 15, 17));
+
+public static final Function<Direction, VoxelShape> ELEVATOR_CALL_BUTTON =
+    rotatedOrientableShape(Shapes.or(
+        Block.box(6, 4, 15.5, 10, 13, 16.5),
+        Block.box(7, 5, 15.25, 9, 8, 16.25),
+        Block.box(7, 9, 15.25, 9, 12, 16.25)));
+
+public static final Function<Direction, VoxelShape> ELEVATOR_DOOR =
+    rotatedOrientableShape(Block.box(0, 0, 5, 16, 16, 11));
+
+public static final Function<Direction, VoxelShape> ELEVATOR_DOOR_FULL_OPEN =
+    rotatedOrientableShape(Block.box(14, 0, 5, 16, 16, 11));
+
+public static final Function<Direction, VoxelShape> ELEVATOR_DOOR_HALF_OPEN =
+    rotatedOrientableShape(Block.box(8, 0, 5, 16, 16, 11));
+
+public static final Function<Direction, VoxelShape> ELEVATOR_INFO_LIGHT =
+    rotatedOrientableShape(Block.box(-5, 2, 15, 20, 11, 16));
+
+public static final Function<Direction, VoxelShape> ELEVATOR_INFO_LIGHT_DIGITAL =
+    rotatedOrientableShape(Block.box(-5, 2, 15, 20, 11, 16));
+
+public static final Function<Direction, VoxelShape> OLD_COMPUTER =
+    rotatedOrientableShape(Shapes.or(
+        Block.box(3, 3, 9, 13, 9, 17),
+        Block.box(2, 0, 6, 14, 10, 15),
+        Block.box(0, 0, 0, 16, 8, 16)));
+
+public static final Function<Direction, VoxelShape> GAS_CANS =
+    rotatedOrientableShape(Block.box(1, 0, 3, 15, 9, 14));
+
+public static final Function<Direction, VoxelShape> GRENADE_BOX =
+    rotatedOrientableShape(Block.box(2, 0, 2, 14, 3, 14));
+
+public static final Function<Direction, VoxelShape> GUN_CASE =
+    rotatedOrientableShape(Block.box(-10, 0, 0, 26, 5, 16));
+
+public static final Function<Direction, VoxelShape> INDUSTRIAL_BUTTON =
+    rotatedOrientableShape(Block.box(5, 4, 15, 11, 13, 16));
+
+public static final Function<Direction, VoxelShape> JUNK_BOOK =
+    rotatedOrientableShape(Block.box(2, 0, 2, 14, 3, 14));
+
+public static final Function<Direction, VoxelShape> LAB_HOT_PLATE =
+    rotatedOrientableShape(Block.box(1, 0, 3, 15, 9, 14));
+
+public static final Function<Direction, VoxelShape> LAB_MICROSCOPE =
+    rotatedOrientableShape(Block.box(5, 0, 4, 11, 10, 11));
+
+public static final Function<Direction, VoxelShape> LAB_MIXER =
+    rotatedOrientableShape(Block.box(1, 0, 5, 7, 5, 11));
+
+public static final Function<Direction, VoxelShape> LAB_PRESSURE_CHAMBER =
+    rotatedOrientableShape(Block.box(0, 0, 6, 15, 11, 14));
+
+public static final Function<Direction, VoxelShape> LAPTOP_DESTROYED =
+    rotatedOrientableShape(Block.box(0, 0, 0, 16, 1, 16));
+
+public static final Function<Direction, VoxelShape> MEDICAL_KIT =
+    rotatedOrientableShape(Block.box(1, 0, 1, 15, 3, 15));
+
+public static final Function<Direction, VoxelShape> OLD_COMPUTER_MINI =
+    rotatedOrientableShape(Block.box(1, 0, 6, 15, 7, 16));
+
+public static final Function<Direction, VoxelShape> OLD_COMPUTERI =
+    rotatedOrientableShape(Shapes.or(
+        Block.box(3, 3, 9, 13, 9, 17),
+        Block.box(2, 0, 6, 14, 10, 15)));
+
+public static final Function<Direction, VoxelShape> OLD_TV =
+    rotatedOrientableShape(Shapes.or(
+        Block.box(0, 0, 0, 16, 14, 7),
+        Block.box(2, 0, 7, 14, 12, 15)));
+
+public static final Function<Direction, VoxelShape> OPEN_MEDICAL_KIT =
+    rotatedOrientableShape(Block.box(1, 0, 1, 15, 3, 15));
+
+public static final Function<Direction, VoxelShape> PAPER =
+    rotatedOrientableShape(Block.box(0, 0, 0, 16, 1, 16));
+
+public static final Function<Direction, VoxelShape> PORTABLE_GENERATOR =
+    rotatedOrientableShape(Block.box(1, 0, 0, 15, 14, 16));
+
+public static final Function<Direction, VoxelShape> PORTABLE_MILITARY_RADIO =
+    rotatedOrientableShape(Shapes.or(
+        Block.box(3, 0, 4, 13, 12, 12),
+        Block.box(15, 17, 4, 18, 20, 12),
+        Block.box(14, 14, 4, 17, 17, 12),
+        Block.box(13, 11, 4, 16, 14, 12)));
+
+public static final Function<Direction, VoxelShape> RADAR_TERMINAL =
+    rotatedOrientableShape(Shapes.or(
+        Block.box(0, 17, 7, 16, 19, 12),
+        Block.box(0, 0, 6, 16, 17, 16),
+        Block.box(0, 0, 0, 16, 2, 6)));
+
+public static final Function<Direction, VoxelShape> SKELETON_MOSSY =
+    rotatedOrientableShape(Shapes.or(
+        Block.box(4, 0, 0, 12, 4, 12),
+        Block.box(6.67878, 0, 13.46716, 14.67878, 8, 21.46716)));
+
+public static final Function<Direction, VoxelShape> SKELETON_TILTED_LEFT =
+    rotatedOrientableShape(Shapes.or(
+        Block.box(4, 0, 0, 12, 4, 12),
+        Block.box(6.67878, 0, 13.46716, 14.67878, 8, 21.46716)));
+
+public static final Function<Direction, VoxelShape> SKELETON_TILTED_RIGHT =
+    rotatedOrientableShape(Shapes.or(
+        Block.box(4, 0, 0, 12, 4, 12),
+        Block.box(-0.90923, 0, 13.62567, 7.09077, 8, 21.62567)));
+
+public static final Function<Direction, VoxelShape> SMALL_MEDICAL_KIT =
+    rotatedOrientableShape(Block.box(1, 0, 4, 15, 2, 12));
+
+public static final Function<Direction, VoxelShape> SMALL_OPEN_MEDICAL_KIT =
+    rotatedOrientableShape(Block.box(1, 0, 4, 15, 2, 12));
+
+public static final Function<Direction, VoxelShape> SPOOL =
+    rotatedOrientableShape(Block.box(1, 0, 1, 15, 16, 15));
+
+public static final Function<Direction, VoxelShape> TV =
+    rotatedOrientableShape(Shapes.or(
+        Block.box(-7, 3, 7, 23, 22, 8),
+        Block.box(5, 1, 8, 11, 7, 10),
+        Block.box(-1, 7, 8, 18, 19, 10),
+        Block.box(3, 0, 6, 13, 1, 11)));
+
+
+public static final Function<Direction, VoxelShape> WATER_BARREL =
+    rotatedOrientableShape(Block.box(2, 0, 2, 14, 16, 14));
+
+public static final Function<Direction, VoxelShape> GUN_CASE_STACK =
+    rotatedOrientableShape(Shapes.or(
+        Block.box(-10, 17, 8, 26, 21, 12),
+        Block.box(-10, 17, 0, 26, 24, 8),
+        Block.box(-10, 0, 0, 26, 17, 16)));
+
+
+public static final Function<Direction, VoxelShape> GUN_CASE_OPEN =
+    rotatedOrientableShape(Shapes.or(
+        Block.box(-10, 0, 0, 26, 2, 16),
+        Block.box(-10, 13, 22, 26, 17, 24),
+        Block.box(-10, 9, 20, 26, 13, 22),
+        Block.box(-10, 5, 18, 26, 9, 20),
+        Block.box(-10, 1, 16, 26, 5, 18),
+        Block.box(0, 9.3, 6, 16, 12.3, 7),
+        Block.box(0, 5.3, 6, 16, 8.3, 7)));
+
+
+public static final Function<Direction, VoxelShape> GUN_CASE_HALF_OPEN =
+    rotatedOrientableShape(Shapes.or(
+        Block.box(-10, 5, 8, 26, 9, 12),
+        Block.box(-10, 0, 0, 26, 5, 16),
+        Block.box(-10, 5, 0, 26, 12, 8)));
+
+
+public static final Function<Direction, VoxelShape> FLAMETHROWER = rotatedOrientableShape(Shapes.or(
+    Block.box(0, 0, 6, 13, 15, 18),
+    Block.box(4, 20, -12, 12, 25, 20),
+    Block.box(6.5, 2, 1.5, 9.5, 21, 4.5),
+    Block.box(4, 0, 0, 12, 2, 6)));
+
+public static final Function<Direction, VoxelShape> CAMERA_BROKEN_HANGING =
+      rotatedOrientableShape(Shapes.or(
+          Block.box(6, 1, 10, 10, 6, 16),
+          Block.box(6, 6, 13, 10, 11, 16)));
+        
+
   public static final Function<Direction, VoxelShape> STOP_SIGN =
       rotatedOrientableShape(Shapes.or(
           Block.box(7, -16, 7, 9, -10, 9),

@@ -1,0 +1,37 @@
+{
+	"credit": "nuklear71",
+	"texture_size": [64, 64],
+	"textures": {
+		"0": "craftingdeaddecoration:block/elevator_door",
+		"particle": "craftingdeaddecoration:block/elevator_door"
+	},
+	"elements": [
+		{
+			"from": [8, 0, 5],
+			"to": [16, 16, 11],
+			"faces": {
+				"north": {"uv": [3.5, 1.5, 5.5, 5.5], "texture": "#0"},
+				"east": {"uv": [2, 1.5, 3.5, 5.5], "texture": "#0"},
+				"south": {"uv": [7, 1.5, 9, 5.5], "texture": "#0"},
+				"west": {"uv": [5.5, 1.5, 7, 5.5], "texture": "#0"},
+				"up": {"uv": [5.5, 1.5, 3.5, 0], "texture": "#0"},
+				"down": {"uv": [7.5, 0, 5.5, 1.5], "texture": "#0"}
+			}
+		}
+	],
+	"display": {
+		"thirdperson_righthand": {
+			"translation": [0, 0, -1.5],
+			"scale": [0.4, 0.4, 0.4]
+		},
+		"thirdperson_lefthand": {
+			"translation": [0, 0, -1.25],
+			"scale": [0.4, 0.4, 0.4]
+		},
+		"gui": {
+			"rotation": [40, 140, 0],
+			"translation": [2.5, -0.75, 0],
+			"scale": [0.68, 0.68, 0.68]
+		}
+	}
+}

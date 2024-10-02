@@ -1,9 +1,9 @@
 {
-	"credit": "Made with Blockbench",
+	"credit": "nuklear71",
 	"texture_size": [32, 32],
 	"textures": {
-		"0": "craftingdeaddecoration:block/traffic_signs_pipe",
-		"particle": "craftingdeaddecoration:block/traffic_signs_pipe"
+		"0": "craftingdeaddecoration:block/traffic_signs/traffic_signs_pipe",
+		"particle": "craftingdeaddecoration:block/traffic_signs/traffic_signs_pipe"
 	},
 	"elements": [
 		{
