@@ -18,7 +18,7 @@ jobs:
       with:
         java-version: 17
     - name: Cache Gradle packages
-      uses: actions/cache@v3
+      uses: actions/cache@v2
       with:
         path: |
          ~/.gradle
@@ -34,7 +34,7 @@ jobs:
        ./gradlew crafting-dead-survival:build
        ./gradlew crafting-dead-decoration:build
        ./gradlew crafting-dead-worldguard:jar
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v3
       with:
         name: crafting-dead
         path: |
