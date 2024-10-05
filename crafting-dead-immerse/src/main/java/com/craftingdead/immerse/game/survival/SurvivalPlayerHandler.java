@@ -165,10 +165,10 @@ public class SurvivalPlayerHandler implements PlayerHandler {
   public boolean handleDeath(DamageSource cause) {
 
     Entity attackItemEntity = cause.getDirectEntity();
-    Entity attacker = cause.getEntity();
+    Entity attacker = cause.getEntity();  // This can be null in some cases? 
     Entity entityPlayer = this.player.entity();
    
-    if(attacker.getStringUUID().equalsIgnoreCase(entityPlayer.getStringUUID())){
+  if (attacker != null && attacker.getStringUUID().equalsIgnoreCase(entityPlayer.getStringUUID())) {
       if(attackItemEntity instanceof Grenade) {
         NetworkChannel.PLAY.getSimpleChannel().send(PacketDistributor.ALL.noArg(),
             new AddKillFeedEntryMessage(new KillFeedEntry((LivingEntity) entityPlayer,
