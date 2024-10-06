@@ -1,5 +1,6 @@
 {
 	"credit": "Made with Blockbench",
+	"render_type": "cutout",
 	"texture_size": [128, 128],
 	"textures": {
 		"0": "craftingdeadsurvival:block/loot/medic_loot",
@@ -170,6 +171,5 @@
 				}
 			]
 		}
-	],
-	"render_type": "cutout"
+	]
 }
