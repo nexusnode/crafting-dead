@@ -52,6 +52,7 @@
   "options.craftingdeadsurvival.server.zombies.misc.attack_knockback": "Zombie Attack Knockback (Attribute)",
   "options.craftingdeadsurvival.server.zombies.misc.death_drops": "Zombie Death Drops",
   "options.craftingdeadsurvival.server.abilities.broken_leg": "Broken Leg Enabled",
+  "options.craftingdeadsurvival.server.abilities.broken_leg.chance": "Broken Leg Chance (Percentage)",
   "options.craftingdeadsurvival.server.abilities.bleed_effect": "Bleeding Enabled",
   "options.craftingdeadsurvival.server.abilities.infection_effect": "Infection Enabled",
   "options.craftingdeadsurvival.server.explosives.pipe_bomb.enable": "Pipe Bomb Enabled",

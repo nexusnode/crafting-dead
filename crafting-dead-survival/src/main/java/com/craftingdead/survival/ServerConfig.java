@@ -89,6 +89,7 @@ public class ServerConfig {
   // ================================================================================
 
   public final ForgeConfigSpec.BooleanValue brokenLegsEnabled;
+  public final ForgeConfigSpec.DoubleValue brokenLegChance;
   public final ForgeConfigSpec.BooleanValue bleedingEnabled;
   public final ForgeConfigSpec.BooleanValue infectionEnabled;
 
@@ -320,6 +321,10 @@ public class ServerConfig {
           .translation("options.craftingdeadsurvival.server.abilities.broken_leg")
           .comment("Defines if players can break their legs")
           .define("brokenLegsEnabled", true);
+      this.brokenLegChance = builder
+              .translation("options.craftingdeadsurvival.server.abilities.broken_leg.chance")
+              .comment("Defines the chance of the player breaking his leg")
+              .defineInRange("brokenLegChance", 0.25F, 0.01F, 0.50F);
       this.bleedingEnabled = builder
           .translation("options.craftingdeadsurvival.server.abilities.bleed_effect")
           .comment("Defines if players can bleed")
