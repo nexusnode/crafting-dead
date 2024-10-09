@@ -46,7 +46,7 @@ public class RemoveMagazineAction extends TimedAction {
   public RemoveMagazineAction(LivingExtension<?, ?> performer) {
     this.performer = performer;
     this.gun = performer.mainHandGun()
-        .orElseThrow(() -> new IllegalStateException("Performer not holding gun"));
+            .orElseThrow(() -> new IllegalStateException("Performer not holding gun"));
     AmmoProvider ammoProvider = this.gun.getAmmoProvider();
     if (!(ammoProvider instanceof MagazineAmmoProvider)) {
       throw new IllegalStateException("No MagazineAmmoProvider present");
@@ -89,11 +89,13 @@ public class RemoveMagazineAction extends TimedAction {
 
   @Override
   public boolean tick() {
-    if (!this.performer.level().isClientSide()
-        && !this.performer.mainHandItem().is(this.gun.getItemStack().getItem())
-        || this.performer().entity().isSprinting()) {
-      this.performer().cancelAction(true);
-      return false;
+    if (!this.performer().level().isClientSide()) {
+      if (this.performer.mainHandItem().isEmpty() ||
+              !this.performer.mainHandItem().is(this.gun.getItemStack().getItem()) ||
+              this.performer().entity().isSprinting()) {
+        this.performer().cancelAction(true);
+        return false;
+      }
     }
     return super.tick();
   }
