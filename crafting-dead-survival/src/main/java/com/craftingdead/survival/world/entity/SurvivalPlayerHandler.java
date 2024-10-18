@@ -140,7 +140,7 @@ public class SurvivalPlayerHandler implements PlayerHandler {
         && !this.player.entity().hasEffect(SurvivalMobEffects.BROKEN_LEG.get())
         && source == DamageSource.FALL) {
       var legBreakChance =
-          0.25F * this.player.entity().fallDistance / this.player.entity().getMaxFallDistance();
+          CraftingDeadSurvival.serverConfig.brokenLegChance.get() * this.player.entity().fallDistance / this.player.entity().getMaxFallDistance();
       if (random.nextFloat() < legBreakChance
           && this.player.entity().addEffect(
               new MobEffectInstance(SurvivalMobEffects.BROKEN_LEG.get(), 9999999, 4))) {
