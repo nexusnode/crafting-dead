@@ -448,8 +448,8 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
       random.setSeed(randomSeed);
 
       var partialTick = level.isClientSide() ? this.getClient().getPartialTick() : 1.0F;
-      var hitResult = rayTrace(entity, this.getRange(), partialTick,
-          this.getAccuracy(living), this.getShotCount(), random).orElse(null);
+      var hitResult =
+          RayTraceUtil.rayTrace(entity, this.getRange(), partialTick, 0, 0).orElse(null);
 
       if (hitResult != null) {
         switch (hitResult.getType()) {
@@ -877,13 +877,6 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
     }
   }
 
-  public static Optional<? extends HitResult> rayTrace(Entity fromEntity,
-      double distance, float partialTick, float accuracy, int shotCount, Random random) {
-    return RayTraceUtil.rayTrace(fromEntity, distance, partialTick,
-        getAccuracyOffset(accuracy, shotCount, random),
-        getAccuracyOffset(accuracy, shotCount, random));
-  }
-
   public static Optional<Vec3> rayTrace(Level level, EntitySnapshot fromSnapshot,
       EntitySnapshot targetSnapshot, double distance, float accuracy,
       int shotCount, Random random) {
@@ -892,9 +885,8 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
     }
 
     var startPos = fromSnapshot.position().add(0.0D, fromSnapshot.eyeHeight(), 0.0D);
-    var look = RayTraceUtil.calculateViewVector(
-        fromSnapshot.rotation().x + getAccuracyOffset(accuracy, shotCount, random),
-        fromSnapshot.rotation().y + getAccuracyOffset(accuracy, shotCount, random));
+    var look =
+        RayTraceUtil.calculateViewVector(fromSnapshot.rotation().x, fromSnapshot.rotation().y);
 
     var blockRayTraceResult = RayTraceUtil.rayTraceBlocks(startPos, distance, look, level);
 
@@ -910,12 +902,5 @@ public abstract class AbstractGun implements Gun, INBTSerializable<CompoundTag> 
     } else {
       return potentialHit;
     }
-  }
-
-  public static float getAccuracyOffset(float accuracy, int shotCount, Random random) {
-    return ((1.0F - (accuracy * accuracy))
-        * (Math.min(20, shotCount + 1) / 2.0F)
-        * (random.nextInt(5) % 2 == 0 ? -1.0F : 1.0F))
-        + ((1.0F - accuracy) * (random.nextInt(9) + 1));
   }
 }
