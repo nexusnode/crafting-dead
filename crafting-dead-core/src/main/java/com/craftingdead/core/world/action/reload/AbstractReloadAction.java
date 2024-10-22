@@ -26,7 +26,6 @@ import com.craftingdead.core.world.entity.extension.LivingExtension;
 import com.craftingdead.core.world.item.gun.Gun;
 import com.craftingdead.core.world.item.gun.GunAnimationEvent;
 import net.minecraft.client.Minecraft;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.item.ItemStack;
 
@@ -89,9 +88,10 @@ public abstract class AbstractReloadAction extends TimedAction {
   @Override
   public boolean tick() {
     if (!this.performer().level().isClientSide()
-        && !this.performer.mainHandItem().is(this.gun.getItemStack().getItem())
-        || this.performer().entity().isSprinting()) {
-      this.performer().cancelAction(true);
+        && (!this.performer.mainHandItem().is(this.gun.getItemStack().getItem())
+        || this.performer().mainHandItem().isEmpty()
+        || this.performer().entity().isSprinting())) {
+      this.performer.cancelAction(true);
       return false;
     }
     return super.tick();
