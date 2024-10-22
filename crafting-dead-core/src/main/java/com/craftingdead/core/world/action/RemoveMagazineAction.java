@@ -89,9 +89,10 @@ public class RemoveMagazineAction extends TimedAction {
 
   @Override
   public boolean tick() {
-    if (!this.performer.level().isClientSide()
-        && !this.performer.mainHandItem().is(this.gun.getItemStack().getItem())
-        || this.performer().entity().isSprinting()) {
+    if (!this.performer().level().isClientSide() &&
+        (this.performer.mainHandItem().isEmpty() ||
+            !this.performer.mainHandItem().is(this.gun.getItemStack().getItem()) ||
+            this.performer().entity().isSprinting())) {
       this.performer().cancelAction(true);
       return false;
     }
