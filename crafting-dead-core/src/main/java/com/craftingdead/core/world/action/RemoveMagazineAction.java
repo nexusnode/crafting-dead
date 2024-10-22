@@ -110,8 +110,8 @@ public class RemoveMagazineAction extends TimedAction {
         if (!this.oldMagazineStack.isEmpty()
             && this.performer().entity() instanceof Player
             && !(this.oldMagazineStack.getCapability(Magazine.CAPABILITY).map(Magazine::isEmpty)
-                .orElse(true)
-                && ServerConfig.instance.reloadDestroyMagWhenEmpty.get())) {
+            .orElse(true)
+            && ServerConfig.instance.reloadDestroyMagWhenEmpty.get())) {
           ((Player) this.performer().entity()).addItem(this.oldMagazineStack);
         }
       }
