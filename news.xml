@@ -1,6 +1,102 @@
 <root>
 <text>
 
+§4§lCrafting Dead Modpack - Version 1.2.0§r
+
+§a§lMajor Base System Update§r
+
+§rA completely new Base System has arrived! Build, manage and defend your own base with the new Blueprint building system.
+
+- Added a completely new Base System
+- Added a new Blueprint building system for constructing bases
+- Added Blueprints for walls, platforms, slabs, stairs, doors, door walls, sleeping bags, campfires, furnaces, water pumps, signs and other base structures
+- Added Wood, Stone, Metal and Concrete building tiers
+- Added a new Base Center used to manage and control your base
+- Added Base member management
+- Added different Base member roles and permissions
+- Added Base ownership transfer
+- Added Base crafting and recipe management
+- Added a search bar to the Base crafting menu
+- Added Base Shields
+- Added Base repairing
+- Added Base raiding and explosive damage
+- Added Base destruction and loot handling
+- Added Loot Bags for resources dropped from destroyed bases
+- Added Wooden Base Chests
+- Added Base Furnaces
+- Added Water Pumps
+
+§6§lResources & Production§r
+
+- Added Metal Ore generation
+- Added Metal Ore regeneration
+- Added Sulfur Ore generation
+- Added Sulfur Ore regeneration
+- Added Metal Ingot processing through Base Furnaces
+- Improved Base Furnace processing
+- Improved Water Pump processing
+- Improved world resource generation
+- Improved resource regeneration
+
+§e§lTrader System§r
+
+- Added a completely new Trader system
+- Added configurable Trader offers and stock
+- Improved Trader handling
+- Adjusted several Trader offers and usage limits
+
+§c§lExplosives & Grenades§r
+
+- Added the ability to attach C4 to Flies
+- Added visible C4 models to Flies carrying explosives
+- Added the ability to shoot certain explosives such as C4
+- Improved grenade throwing behavior
+- Improved grenade bouncing and collision behavior
+- Improved grenade models and rotations while moving
+- Improved C4 behavior
+- Fixed several grenade collision issues
+- Fixed several grenade rendering issues
+- Fixed C4 positioning and rendering issues
+
+§b§lQuality of Life§r
+
+- Added an option to automatically translate chat messages into your selected language (enabled by default)
+- Added support for localized Holograms
+- Added configurable Binocular scope sensitivity
+- Improved Blueprint previews to clearly show valid and invalid placement positions
+- Improved Blueprint snapping and placement behavior
+- Improved Base member management
+- Improved Base ownership and permission handling
+- Improved language support
+- Improved translation fallback behavior
+- Fixed Binoculars interacting with chests, levers and other usable blocks
+
+§d§lCombat & Killfeed Improvements§r
+
+- Improved Killfeed detection
+- Improved Killfeed support for explosives and environmental deaths
+- Fixed incorrect Killfeed attribution for some grenade kills
+- Improved weapon inspect animations
+- Fixed several weapon inspect animation issues
+- Fixed inspect animations continuing when switching weapons
+- Fixed inspect animations conflicting with reloading
+- Fixed inspect animations conflicting with magazine removal
+- Fixed inspect animations conflicting with sprinting
+- Fixed inspect animations conflicting with aiming
+
+§7§lOther Improvements§r
+
+- Improved Base loading and synchronization
+- Improved Base destruction behavior
+- Improved Base Center loot handling
+- Increased Wooden Base Chest durability
+- Improved general UI synchronization
+- Improved client and server stability
+- Fixed several potential client and server crashes
+- Fixed potential crashes related to the Immerse menu and server list
+
+§aThank you for playing Crafting Dead!§r
+
 §4§lChernarus Open Beta Test is Live!§r
 
 §aThe wait is over! Chernarus is now available for open beta testing
