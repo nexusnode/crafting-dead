@@ -71,7 +71,7 @@
 - Improved translation fallback behavior
 - Fixed Binoculars interacting with chests, levers and other usable blocks
 
-§d§lCombat & Killfeed Improvements§r
+§d§lCombat && Killfeed Improvements§r
 
 - Improved Killfeed detection
 - Improved Killfeed support for explosives and environmental deaths
