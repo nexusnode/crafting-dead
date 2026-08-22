@@ -26,7 +26,7 @@
 - Added Base Furnaces
 - Added Water Pumps
 
-§6§lResources & Production§r
+§6§lResources &amp; Production§r
 
 - Added Metal Ore generation
 - Added Metal Ore regeneration
@@ -45,7 +45,7 @@
 - Improved Trader handling
 - Adjusted several Trader offers and usage limits
 
-§c§lExplosives & Grenades§r
+§c§lExplosives &amp; Grenades§r
 
 - Added the ability to attach C4 to Flies
 - Added visible C4 models to Flies carrying explosives
@@ -71,7 +71,7 @@
 - Improved translation fallback behavior
 - Fixed Binoculars interacting with chests, levers and other usable blocks
 
-§d§lCombat && Killfeed Improvements§r
+§d§lCombat &amp; Killfeed Improvements§r
 
 - Improved Killfeed detection
 - Improved Killfeed support for explosives and environmental deaths
